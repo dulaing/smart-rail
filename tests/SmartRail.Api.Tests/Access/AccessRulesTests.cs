@@ -226,4 +226,29 @@ public class AccessRulesTests
         Assert.Equal(AccessDecision.OutOfScope,
             Check(controller, Permissions.ChangesPublish, new AccessTarget.Station(StationA)));
     }
+
+    [Fact]
+    public void Effective_permissions_list_only_what_the_account_can_act_on()
+    {
+        var driver = Account(assigned: [JourneyOne], grants: Grant(Roles.Driver));
+        var staff = Account(grants:
+        [
+            Grant(Roles.StationStaff, StationB),
+            Grant(Roles.StationStaff, StationA),
+            Grant(Roles.StationStaff, Guid.NewGuid(), validUntil: Now.AddDays(-1)),
+        ]);
+        var driverWithNothingAssigned = Account(grants: Grant(Roles.Driver));
+        var disabled = Account(AccountStatus.Disabled, grants: Grant(Roles.Controller));
+
+        var driverPermissions = EffectivePermissions.Of(driver, Now);
+        Assert.Equal([Permissions.DriverBriefingRead, Permissions.DriverReportsCreate], driverPermissions.Select(p => p.Code));
+        Assert.All(driverPermissions, p => Assert.Equal([JourneyOne], p.JourneyIds));
+
+        var staffPermission = Assert.Single(EffectivePermissions.Of(staff, Now));
+        Assert.Equal(Permissions.PlatformChangesPublish, staffPermission.Code);
+        Assert.Equal(new[] { StationA, StationB }.Order(), staffPermission.StationIds);
+
+        Assert.Empty(EffectivePermissions.Of(driverWithNothingAssigned, Now));
+        Assert.Empty(EffectivePermissions.Of(disabled, Now));
+    }
 }

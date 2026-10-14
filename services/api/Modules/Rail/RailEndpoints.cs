@@ -18,7 +18,7 @@ public static partial class RailEndpoints
 
     public static void MapRailEndpoints(this IEndpointRouteBuilder app)
     {
-        var api = app.MapGroup("/api");
+        var api = app.MapGroup("/api").AllowAnonymous();
         api.MapGet("/stations", GetStations);
         api.MapGet("/journeys", GetJourneys);
         api.MapGet("/next-trains", GetNextTrains);

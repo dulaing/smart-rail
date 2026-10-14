@@ -112,3 +112,52 @@ public static class AccessRules
             _ => false,
         };
 }
+
+/// <summary>What an account may do right now, for a client to show. The API still checks every request.</summary>
+public sealed record EffectivePermission(
+    string Code, ScopeKind Scope, IReadOnlyList<Guid> StationIds, IReadOnlyList<Guid> JourneyIds);
+
+public static class EffectivePermissions
+{
+    /// <summary>
+    /// The permissions an enabled account holds through active grants. A permission appears only
+    /// when something it can act on exists: a station for station scope, an assignment for
+    /// journey scope. A disabled account has none.
+    /// </summary>
+    public static IReadOnlyList<EffectivePermission> Of(AccessAccount account, DateTimeOffset now)
+    {
+        if (account.Status != AccountStatus.Active)
+        {
+            return [];
+        }
+
+        var active = account.Grants.Where(g => g.IsActiveAt(now)).ToList();
+        var result = new List<EffectivePermission>();
+
+        foreach (var (code, scope) in Permissions.Scopes.OrderBy(s => s.Key, StringComparer.Ordinal))
+        {
+            var holders = active.Where(g => g.Permissions.Contains(code)).ToList();
+            var unrestricted = holders.Any(g => g.StationScopeId is null);
+            var stationIds = holders.Where(g => g.StationScopeId is not null)
+                .Select(g => g.StationScopeId!.Value).Distinct().Order().ToList();
+
+            var effective = scope switch
+            {
+                ScopeKind.Station when stationIds.Count > 0 =>
+                    new EffectivePermission(code, scope, stationIds, []),
+                ScopeKind.Journey when unrestricted && account.AssignedJourneyIds.Count > 0 =>
+                    new EffectivePermission(code, scope, [], account.AssignedJourneyIds.Order().ToList()),
+                ScopeKind.Network or ScopeKind.Own when unrestricted =>
+                    new EffectivePermission(code, scope, [], []),
+                _ => null,
+            };
+
+            if (effective is not null)
+            {
+                result.Add(effective);
+            }
+        }
+
+        return result;
+    }
+}

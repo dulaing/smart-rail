@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SmartRail.Api.Infrastructure;
+using SmartRail.Api.Modules.Access;
 using SmartRail.Api.Modules.Rail;
 using OpenTelemetry;
 using OpenTelemetry.Logs;
@@ -39,6 +40,7 @@ if (!string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOIN
 
 builder.Services.TryAddSingleton(TimeProvider.System);
 var hasDatabase = builder.AddSmartRailDatabase();
+builder.AddSmartRailAccess(hasDatabase);
 
 var app = builder.Build();
 
@@ -49,21 +51,24 @@ if (args.Contains("--migrate-and-seed"))
     return;
 }
 
+app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
+
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapOpenApi().AllowAnonymous();
 }
 
 if (hasDatabase)
 {
     app.MapRailEndpoints();
+    app.MapAccessEndpoints();
 }
 
-app.UseHttpsRedirection();
-
 // Live only says the process is running, so it runs no checks.
-app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false });
-app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = check => check.Tags.Contains("ready") });
+app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false }).AllowAnonymous();
+app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = check => check.Tags.Contains("ready") }).AllowAnonymous();
 
 app.Run();
 

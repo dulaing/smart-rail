@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SmartRail.Api.Modules.Access;
 using SmartRail.Api.Modules.Rail.Timetable;
 
 namespace SmartRail.Api.Infrastructure;
@@ -34,6 +35,13 @@ public static class DatabaseSetup
         var start = app.Configuration.GetValue<DateOnly?>("Seed:StartDate")
             ?? ColomboTime.ServiceDateOf(TimeProvider.System.GetUtcNow());
         var days = app.Configuration.GetValue("Seed:Days", 7);
-        await DemoTimetableSeeder.SeedAsync(db, start, days);
+        await SeedAsync(db, start, days);
+    }
+
+    /// <summary>The seed data every database needs: the role matrix and the demo timetable.</summary>
+    public static async Task SeedAsync(SmartRailDbContext db, DateOnly startDate, int days)
+    {
+        await AccessSeeder.SeedRolesAsync(db);
+        await DemoTimetableSeeder.SeedAsync(db, startDate, days);
     }
 }

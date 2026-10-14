@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using SmartRail.Api.Infrastructure;
-using SmartRail.Api.Modules.Rail.Timetable;
 
 namespace SmartRail.Api.Tests.Rail;
 
@@ -25,8 +24,19 @@ public sealed class RequiresDatabaseFactAttribute : FactAttribute
     }
 }
 
+public sealed class RequiresDatabaseTheoryAttribute : TheoryAttribute
+{
+    public RequiresDatabaseTheoryAttribute()
+    {
+        if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(RequiresDatabaseFactAttribute.Variable)))
+        {
+            Skip = $"Set {RequiresDatabaseFactAttribute.Variable} to a PostgreSQL connection string to run the database tests.";
+        }
+    }
+}
+
 /// <summary>One fresh, migrated and seeded database plus an API host that points at it.</summary>
-public sealed class TimetableApi : IAsyncLifetime
+public class TimetableApi : IAsyncLifetime
 {
     // 2026-10-14 is a Wednesday.
     public static readonly DateOnly SeedStart = new(2026, 10, 14);
@@ -37,6 +47,8 @@ public sealed class TimetableApi : IAsyncLifetime
     private WebApplicationFactory<Program>? _factory;
 
     public HttpClient Client { get; private set; } = null!;
+
+    public WebApplicationFactory<Program> Factory => _factory!;
 
     public string ConnectionString =>
         new NpgsqlConnectionStringBuilder(_adminConnection) { Database = _databaseName }.ConnectionString;
@@ -56,10 +68,18 @@ public sealed class TimetableApi : IAsyncLifetime
         }
 
         _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
-            builder.UseSetting("ConnectionStrings:smartrail", ConnectionString));
+        {
+            builder.UseSetting("ConnectionStrings:smartrail", ConnectionString);
+            ConfigureHost(builder);
+        });
         Client = _factory.CreateClient();
 
         await MigrateAndSeedAsync();
+    }
+
+    /// <summary>A fixture can change the host, for example to trust a test token signer.</summary>
+    protected virtual void ConfigureHost(IWebHostBuilder builder)
+    {
     }
 
     /// <summary>Same steps as <c>--migrate-and-seed</c>; safe to call again.</summary>
@@ -68,7 +88,7 @@ public sealed class TimetableApi : IAsyncLifetime
         await using var scope = _factory!.Services.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<SmartRailDbContext>();
         await db.Database.MigrateAsync();
-        await DemoTimetableSeeder.SeedAsync(db, SeedStart, SeedDays);
+        await DatabaseSetup.SeedAsync(db, SeedStart, SeedDays);
     }
 
     public async Task WithDbAsync(Func<SmartRailDbContext, Task> action)
@@ -77,7 +97,7 @@ public sealed class TimetableApi : IAsyncLifetime
         await action(scope.ServiceProvider.GetRequiredService<SmartRailDbContext>());
     }
 
-    public async Task DisposeAsync()
+    public virtual async Task DisposeAsync()
     {
         if (_factory is null)
         {

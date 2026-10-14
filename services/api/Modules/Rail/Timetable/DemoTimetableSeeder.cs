@@ -1,5 +1,3 @@
-using System.Security.Cryptography;
-using System.Text;
 using Microsoft.EntityFrameworkCore;
 using SmartRail.Api.Infrastructure;
 
@@ -149,7 +147,5 @@ public static class DemoTimetableSeeder
         await db.SaveChangesAsync(cancellationToken);
     }
 
-    // The same key always gives the same GUID, so a re-seed is recognisable and IDs are stable.
-    private static Guid StableId(string kind, string key) =>
-        new(MD5.HashData(Encoding.UTF8.GetBytes($"smartrail:{kind}:{key}")));
+    private static Guid StableId(string kind, string key) => StableIds.For(kind, key);
 }

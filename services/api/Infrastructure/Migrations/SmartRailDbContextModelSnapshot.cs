@@ -22,6 +22,143 @@ namespace SmartRail.Api.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("SmartRail.Api.Modules.Access.Account", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("display_name");
+
+                    b.Property<string>("Issuer")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("issuer");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("status");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("subject");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Issuer", "Subject")
+                        .IsUnique();
+
+                    b.ToTable("accounts", "identity", t =>
+                        {
+                            t.HasCheckConstraint("ck_accounts_status", "status IN ('ACTIVE', 'DISABLED')");
+                        });
+                });
+
+            modelBuilder.Entity("SmartRail.Api.Modules.Access.JourneyAssignment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("DriverId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("driver_id");
+
+                    b.Property<Guid>("JourneyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("journey_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JourneyId");
+
+                    b.HasIndex("DriverId", "JourneyId")
+                        .IsUnique();
+
+                    b.ToTable("journey_assignments", "identity");
+                });
+
+            modelBuilder.Entity("SmartRail.Api.Modules.Access.Role", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("code");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("roles", "identity");
+                });
+
+            modelBuilder.Entity("SmartRail.Api.Modules.Access.RoleGrant", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("account_id");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("role_id");
+
+                    b.Property<Guid?>("StationScopeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("station_scope_id");
+
+                    b.Property<DateTimeOffset?>("ValidUntil")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("valid_until");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("StationScopeId");
+
+                    b.HasIndex("AccountId", "RoleId", "StationScopeId")
+                        .IsUnique();
+
+                    NpgsqlIndexBuilderExtensions.AreNullsDistinct(b.HasIndex("AccountId", "RoleId", "StationScopeId"), false);
+
+                    b.ToTable("role_grants", "identity");
+                });
+
+            modelBuilder.Entity("SmartRail.Api.Modules.Access.RolePermission", b =>
+                {
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("role_id");
+
+                    b.Property<string>("PermissionCode")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("permission_code");
+
+                    b.HasKey("RoleId", "PermissionCode");
+
+                    b.ToTable("role_permissions", "identity");
+                });
+
             modelBuilder.Entity("SmartRail.Api.Modules.Rail.Timetable.PatternStop", b =>
                 {
                     b.Property<Guid>("Id")
@@ -193,6 +330,52 @@ namespace SmartRail.Api.Infrastructure.Migrations
                     b.ToTable("stations", "network");
                 });
 
+            modelBuilder.Entity("SmartRail.Api.Modules.Access.JourneyAssignment", b =>
+                {
+                    b.HasOne("SmartRail.Api.Modules.Access.Account", null)
+                        .WithMany()
+                        .HasForeignKey("DriverId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartRail.Api.Modules.Rail.Timetable.ScheduledJourney", null)
+                        .WithMany()
+                        .HasForeignKey("JourneyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SmartRail.Api.Modules.Access.RoleGrant", b =>
+                {
+                    b.HasOne("SmartRail.Api.Modules.Access.Account", null)
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartRail.Api.Modules.Access.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartRail.Api.Modules.Rail.Timetable.Station", null)
+                        .WithMany()
+                        .HasForeignKey("StationScopeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("SmartRail.Api.Modules.Access.RolePermission", b =>
+                {
+                    b.HasOne("SmartRail.Api.Modules.Access.Role", null)
+                        .WithMany("Permissions")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("SmartRail.Api.Modules.Rail.Timetable.PatternStop", b =>
                 {
                     b.HasOne("SmartRail.Api.Modules.Rail.Timetable.ServicePattern", null)
@@ -217,6 +400,11 @@ namespace SmartRail.Api.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Pattern");
+                });
+
+            modelBuilder.Entity("SmartRail.Api.Modules.Access.Role", b =>
+                {
+                    b.Navigation("Permissions");
                 });
 
             modelBuilder.Entity("SmartRail.Api.Modules.Rail.Timetable.ServicePattern", b =>
