@@ -1,0 +1,11 @@
+**/bin/
+**/obj/
+**/node_modules/
+**/dist/
+.git/
+.github/
+_specs/
+docs/
+apps/
+.env
+.env.*
