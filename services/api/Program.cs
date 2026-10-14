@@ -42,6 +42,14 @@ builder.Services.TryAddSingleton(TimeProvider.System);
 var hasDatabase = builder.AddSmartRailDatabase();
 builder.AddSmartRailAccess(hasDatabase);
 
+// Browsers may call the API only from the origins listed in Cors:AllowedOrigins.
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+builder.Services.AddCors(cors => cors.AddDefaultPolicy(policy => policy
+    .WithOrigins(allowedOrigins)
+    .WithMethods("GET", "POST", "PUT", "PATCH", "DELETE")
+    .WithHeaders("Authorization", "Content-Type", "If-None-Match")
+    .WithExposedHeaders("ETag")));
+
 var app = builder.Build();
 
 // `dotnet run --project services/api -- --migrate-and-seed` prepares the database, then exits.
@@ -52,8 +60,23 @@ if (args.Contains("--migrate-and-seed"))
 }
 
 app.UseHttpsRedirection();
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
+
+// `dotnet run --project services/api -- --seed-demo-identities` creates synthetic Keycloak users
+// and their local accounts for local development, then exits.
+if (args.Contains("--seed-demo-identities"))
+{
+    if (!app.Environment.IsDevelopment())
+    {
+        throw new InvalidOperationException("Demo identities can only be seeded in the Development environment.");
+    }
+
+    await using var scope = app.Services.CreateAsyncScope();
+    await DemoIdentitySeeder.SeedAsync(scope.ServiceProvider.GetRequiredService<SmartRailDbContext>(), app.Configuration);
+    return;
+}
 
 if (app.Environment.IsDevelopment())
 {

@@ -1,121 +1,106 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import { useCallback, useEffect, useState } from 'react'
+import { initAuth, loadAccount, signIn, signOut, type SignInState } from './auth'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [state, setState] = useState<SignInState | 'loading'>('loading')
+
+  const load = useCallback(async (forceRefresh = false) => {
+    setState(await loadAccount(forceRefresh))
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    initAuth()
+      .then((signedIn) => {
+        if (cancelled) return
+        if (signedIn) {
+          void load()
+        } else {
+          setState({ kind: 'signed-out' })
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setState({ kind: 'error', message: 'Could not reach the sign-in service.' })
+        }
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [load])
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
+    <main>
+      <h1>SmartRail operations</h1>
+      {state === 'loading' && <p>Checking your session…</p>}
+
+      {state !== 'loading' && state.kind === 'signed-out' && (
+        <section>
+          <p>Sign in with your SmartRail staff account.</p>
+          <button type="button" onClick={() => void signIn()}>
+            Sign in
+          </button>
+        </section>
+      )}
+
+      {state !== 'loading' && state.kind === 'no-account' && (
+        <section>
           <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
+            You are signed in, but there is no active SmartRail account for you. Ask a
+            system administrator to enable one.
           </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+          <button type="button" onClick={() => void signOut()}>
+            Sign out
+          </button>
+        </section>
+      )}
 
-      <div className="ticks"></div>
+      {state !== 'loading' && state.kind === 'error' && (
+        <section>
+          <p role="alert">{state.message}</p>
+          <button type="button" onClick={() => void load()}>
+            Try again
+          </button>{' '}
+          <button type="button" onClick={() => void signOut()}>
+            Sign out
+          </button>
+        </section>
+      )}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
+      {state !== 'loading' && state.kind === 'signed-in' && (
+        <section aria-label="Your account">
+          <h2>{state.me.displayName}</h2>
+          <p>
+            Status: <strong>{state.me.status}</strong>
+          </p>
+          <h3>Roles</h3>
           <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
+            {state.me.grants.map((grant) => (
+              <li key={`${grant.role}-${grant.stationId ?? 'all'}`}>
+                {grant.role}
+                {grant.stationId ? ' (one station)' : ''}
+                {grant.validUntil ? ` until ${grant.validUntil}` : ''}
+              </li>
+            ))}
           </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
+          <h3>What you can do</h3>
           <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
+            {state.me.permissions.map((permission) => (
+              <li key={permission.code}>
+                <code>{permission.code}</code> — {permission.scope.toLowerCase()}
+              </li>
+            ))}
           </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+          <button type="button" onClick={() => void load(true)}>
+            Refresh session
+          </button>{' '}
+          <button type="button" onClick={() => void signOut()}>
+            Sign out
+          </button>
+        </section>
+      )}
+    </main>
   )
 }
 

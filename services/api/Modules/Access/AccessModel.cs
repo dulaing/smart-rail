@@ -10,8 +10,8 @@ namespace SmartRail.Api.Modules.Access;
 public sealed class Account
 {
     public Guid Id { get; init; }
-    public required string Issuer { get; init; }
-    public required string Subject { get; init; }
+    public required string Issuer { get; set; }
+    public required string Subject { get; set; }
     public required string DisplayName { get; set; }
     public AccountStatus Status { get; set; }
 }
