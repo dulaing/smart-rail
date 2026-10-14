@@ -1,0 +1,47 @@
+erDiagram
+    direction LR
+    identityAccounts ||--o{ cateringOrderLinks : places
+    networkJourneys ||--o{ cateringOrderLinks : contains
+    networkPatternStops ||--o{ cateringOrderLinks : pickup_at
+    cateringOrderLinks ||--o{ cateringWebhookReceipts : receives
+    changesServiceChanges ||--o{ cateringOutboxMessages : publishes_to_provider
+
+    identityAccounts["identity.accounts"] {
+        uuid id PK
+    }
+    networkJourneys["network.journeys"] {
+        uuid id PK
+    }
+    networkPatternStops["network.pattern_stops"] {
+        uuid id PK
+    }
+    changesServiceChanges["changes.service_changes"] {
+        uuid id PK
+    }
+    cateringOrderLinks["catering.order_links"] {
+        uuid id PK
+        uuid account_id FK
+        uuid journey_id FK
+        uuid pickup_stop_id FK
+        string client_request_key UK
+        json request_payload
+        string provider_order_ref UK
+        string provider_status
+        int status_sequence
+        string pickup_code
+    }
+    cateringOutboxMessages["catering.outbox_messages"] {
+        uuid id PK
+        uuid service_change_id FK
+        string event_id UK
+        json payload
+        string delivery_state
+        int attempt_count
+        datetime next_attempt_at
+    }
+    cateringWebhookReceipts["catering.webhook_receipts"] {
+        string provider_event_id PK
+        uuid order_link_id FK
+        int status_sequence
+        datetime received_at
+    }

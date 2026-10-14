@@ -1,0 +1,59 @@
+erDiagram
+    direction LR
+    networkJourneys ||--|| changesJourneyVersions : tracks_version
+    networkJourneys ||--o{ changesServiceChanges : changes
+    networkJourneys ||--o{ changesDriverReports : receives_reports
+    changesIncidents o|..o{ changesServiceChanges : explains
+    changesDriverReports o|..o| changesIncidents : starts
+    identityAccounts ||--o{ changesServiceChanges : publishes
+    identityAccounts ||--o{ changesDriverReports : submits
+    networkPatternStops o|..o{ changesServiceChanges : targets
+
+    networkJourneys["network.journeys"] {
+        uuid id PK
+    }
+    networkPatternStops["network.pattern_stops"] {
+        uuid id PK
+    }
+    identityAccounts["identity.accounts"] {
+        uuid id PK
+    }
+    changesJourneyVersions["changes.journey_change_versions"] {
+        uuid journey_id PK, FK
+        int version
+        datetime updated_at
+    }
+    changesServiceChanges["changes.service_changes"] {
+        uuid id PK
+        uuid journey_id FK
+        int journey_version
+        string action
+        string kind
+        int delay_minutes
+        string new_platform
+        uuid target_stop_id FK
+        uuid final_stop_id FK
+        uuid supersedes_change_id FK
+        uuid incident_id FK
+        uuid published_by_id FK
+        datetime published_at
+    }
+    changesDriverReports["changes.driver_reports"] {
+        uuid id PK
+        uuid journey_id FK
+        uuid submitted_by_id FK
+        string client_report_id UK
+        string reason_code
+        datetime received_at
+        uuid acknowledged_by_id FK
+        datetime acknowledged_at
+    }
+    changesIncidents["changes.incidents"] {
+        uuid id PK
+        uuid source_report_id FK
+        string status
+        string reason_code
+        uuid opened_by_id FK
+        datetime opened_at
+        datetime resolved_at
+    }

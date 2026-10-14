@@ -1,0 +1,64 @@
+erDiagram
+    direction LR
+    rbCollectionPoints ||--o{ rbMenuItems : offers
+    rbCollectionPoints ||--o{ rbOrders : fulfills
+    rbOrders ||--|{ rbOrderItems : contains
+    rbMenuItems ||--o{ rbOrderItems : selected_as
+    rbJourneyOrderStates ||--o{ rbOrders : controls_eligibility
+    rbOrders ||--o{ rbWebhookOutbox : emits_status
+
+    rbCollectionPoints["RailBites.collection_points"] {
+        string id PK
+        uuid smart_rail_station_id
+        string name
+        int cutoff_minutes
+        bool active
+    }
+    rbMenuItems["RailBites.menu_items"] {
+        string id PK
+        string collection_point_id FK
+        string name
+        int price_minor_lkr
+        int stock_quantity
+        bool active
+    }
+    rbOrders["RailBites.orders"] {
+        string id PK
+        uuid smart_rail_order_link_id UK
+        uuid smart_rail_journey_id FK
+        uuid smart_rail_pickup_stop_id
+        string collection_point_id FK
+        string pickup_code UK
+        string status
+        int status_sequence
+        datetime current_eta
+    }
+    rbJourneyOrderStates["RailBites.journey_order_states"] {
+        uuid smart_rail_journey_id PK
+        int applied_journey_version
+        bool order_closed
+        json blocked_pickup_stop_ids
+        datetime updated_at
+    }
+    rbOrderItems["RailBites.order_items"] {
+        string id PK
+        string order_id FK
+        string menu_item_id FK
+        int quantity
+        int unit_price_minor_lkr
+    }
+    rbReceivedEvents["RailBites.received_events"] {
+        string event_id PK
+        uuid smart_rail_journey_id
+        int journey_version
+        string event_type
+        datetime received_at
+    }
+    rbWebhookOutbox["RailBites.webhook_outbox"] {
+        string event_id PK
+        string order_id FK
+        int status_sequence
+        json payload
+        int attempt_count
+        datetime next_attempt_at
+    }

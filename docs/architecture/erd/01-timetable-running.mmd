@@ -1,0 +1,53 @@
+erDiagram
+    direction LR
+    networkStations ||--o{ networkPatternStops : appears_at
+    networkServicePatterns ||--|{ networkPatternStops : defines
+    networkServicePatterns ||--o{ networkJourneys : runs_as
+    networkJourneys ||--o{ liveObservations : reports
+    networkPatternStops ||--o{ liveObservations : segment_start
+    networkPatternStops ||--o{ liveObservations : segment_end
+
+    networkStations["network.stations"] {
+        uuid id PK
+        string code UK
+        string name_en
+        string name_si
+        string name_ta
+    }
+    networkServicePatterns["network.service_patterns"] {
+        uuid id PK
+        string train_number
+        string source_kind
+        string source_url
+        datetime source_checked_at
+        int operating_days_mask
+        date effective_from
+        date effective_to
+    }
+    networkPatternStops["network.pattern_stops"] {
+        uuid id PK
+        uuid pattern_id FK
+        uuid station_id FK
+        int stop_sequence
+        time arrival_local
+        time departure_local
+        int day_offset
+        string planned_platform
+    }
+    networkJourneys["network.journeys"] {
+        uuid id PK
+        uuid pattern_id FK
+        date service_date
+        string demo_seed_key UK
+    }
+    liveObservations["live.observations"] {
+        uuid id PK
+        uuid journey_id FK
+        string source_event_id UK
+        uuid from_stop_id FK
+        uuid to_stop_id FK
+        int progress_permille
+        int reported_delay_seconds
+        datetime observed_at
+        datetime received_at
+    }

@@ -1,0 +1,63 @@
+# SmartRail pilot data model
+
+Status: proposed physical model for the 20 October 2026 pilot, revised 14 October for Keycloak. No migrations have been applied. The five Mermaid files in [`erd/`](erd/) are the editable source for the FigJam diagrams; refresh the accounts group on the board before treating it as migration-ready.
+
+FigJam board: [SmartRail Board — Backend ERD](https://www.figma.com/board/sZ1Nhbgwg9HJFVxMK679so/SmartRail-Board?node-id=0-1).
+
+## Ownership and boundaries
+
+SmartRail uses one PostgreSQL database with `network`, `live`, `changes`, `identity`, `passenger`, and `catering` schemas. The extra `passenger` schema holds personal preferences and follows; it keeps them distinct from authentication. A module owns its schema's rules and mappings. Foreign keys to stable IDs in another SmartRail schema protect integrity, while feature code crosses module boundaries through explicit interfaces rather than querying another module's EF sets. The [backend decision](backend-decision.md) uses one EF Core context for the pilot so changes, audit and outbox rows can commit in one transaction.
+
+Keycloak has a **separate database** and owns credentials, login sessions and refresh tokens. SmartRail's `identity.accounts` is only an application account linked to the Keycloak `(issuer, subject)` pair; it has no password hash or refresh-token table. `identity.roles`, grants, journey assignments and audit entries remain SmartRail-owned because they describe railway-specific authorization. There is no cross-database foreign key to Keycloak. See [identity and local development](identity-and-local-development.md).
+
+RailBites is a separate service and SQLite database. `provider_order_ref`, `smart_rail_order_link_id`, `smart_rail_journey_id`, `smart_rail_pickup_stop_id`, and `smart_rail_station_id` cross the API boundary as identifiers, **not cross-database foreign keys**. Within RailBites, an order's `smart_rail_journey_id` does reference its local `journey_order_states` row. RailBites owns menus, stock, order state, pickup codes, collection policy, and kiosk payment status. SmartRail owns the passenger-to-order link and the last provider status it was told.
+
+All SmartRail IDs are UUIDs. Times stored as instants use UTC `timestamptz`; `service_date`, `arrival_local`, and `departure_local` represent the `Asia/Colombo` timetable. `day_offset` allows a service to cross midnight. SQLite stores UTC instants in a documented ISO-8601 representation. Enum-like values use validated codes rather than free text.
+
+## Diagram index
+
+1. [Timetable and simulated running](erd/01-timetable-running.mmd)
+2. [Changes, incidents, and driver reports](erd/02-operations.mmd)
+3. [Accounts and passenger preferences](erd/03-accounts-passengers.mmd)
+4. [SmartRail catering link](erd/04-smartrail-catering.mmd)
+5. [RailBites-owned data](erd/05-railbites.mmd)
+
+The fourth FigJam group contains diagrams 4 and 5 side by side so the database boundary is visible.
+
+## Tables and rules not fully visible in the diagrams
+
+| Area | Physical rule |
+| --- | --- |
+| Schedule provenance | `network.service_patterns.source_kind` is `PUBLISHED` or `FICTIONAL_DEMO`. Published rows require `source_url` and `source_checked_at`; fictional rows display “SmartRail simulation.” Published patterns are hand-checked seeds, not an automated live feed. Treat a pattern as immutable after journeys exist; a timetable revision creates a new pattern version. |
+| Timetable identity | Unique `stations.code`, `(pattern_id, stop_sequence)` in `pattern_stops`, and `(pattern_id, service_date)` in `journeys`. Do not make `(pattern_id, station_id)` unique: a route may visit a station twice. `operating_days_mask` and effective dates determine whether a pattern runs on a date. The demo seeder uses a unique nullable `demo_seed_key` so a reset is repeatable. |
+| Dated stop times | Compute a journey stop's planned instant from its pattern stop's local time, `day_offset`, and the journey's Colombo service date. The pilot does not duplicate every scheduled stop into a `journey_stops` table. A platform or early-ending change targets the stop occurrence by `pattern_stop_id` together with `journey_id`. |
+| Simulated observations | Unique `live.observations.source_event_id`; `progress_permille` is 0–1000. Both segment stop IDs must belong to the journey's pattern, with the second immediately after the first. Preserve `observed_at` and `received_at` separately. A late-arriving event enters history but never replaces a newer observed position. |
+| Change concurrency | Seed one `changes.journey_change_versions` row per journey. Publishing or withdrawing requires the previewed version. Atomically update it from `v` to `v+1`, insert a `service_changes` row with unique `(journey_id, journey_version)`, append an audit entry, and enqueue any provider message. If the update affects no row, return **409** with the latest version and require another preview. This intentionally rechecks the whole journey, even for unrelated change types. Dilani (operations) advised letting unrelated edits through; for the pilot we chose the whole-journey recheck because it is safer and simpler. |
+| Change history | `service_changes` is append-only. `action` is `PUBLISH` or `WITHDRAW`; `kind` is `DELAY`, `CANCEL`, `PLATFORM`, or `EARLY_END`. A withdrawal references its earlier change with nullable `supersedes_change_id`. Type-specific fields are nullable `delay_minutes`, `new_platform`, `target_stop_id`, and `final_stop_id`; a check constraint or validated write path permits only the relevant fields. `incident_id` is optional. Effective state is folded in journey-version order, preserving independently confirmed platform changes when observations go stale. |
+| Driver reports and incidents | Unique `driver_reports.client_report_id` makes retries safe. A report is **Not sent** only on the device; on server receipt it is **Sent — awaiting Control**. `acknowledged_by_id` and `acknowledged_at` are set together by a controller. `incidents.source_report_id` is optional and unique; one incident can explain many service changes. |
+| Roles and auditing | Unique `(issuer, subject)` in `identity.accounts` links a Keycloak identity to one local account. Seed role codes and `role_permissions`. `role_grants.station_scope_id` is set for station staff and checked on each write; `valid_until` is nullable. Unique `(driver_id, journey_id)` in `journey_assignments`. Keycloak stores credentials and refresh tokens; SmartRail stores neither. `audit_entries` records actor, action, target, outcome, time, and correlation ID, including denied staff writes, without request bodies or secrets. |
+| Passenger data | Unique `(account_id, origin_station_id, destination_station_id)` for saved routes and `(account_id, journey_id)` for follows. The in-app alert feed is derived from followed journeys and published changes; no alert-delivery table is needed. The passenger's offline timetable cache stays on the device, with its saved time. |
+| SmartRail order link | Unique `(account_id, client_request_key)` and unique nullable `provider_order_ref`. The link points to a **specific pattern stop** so early ending can invalidate orders beyond the final stop. A temporary `request_payload` JSON value holds the collection point and provider item IDs with quantities so a timed-out placement can be resent unchanged; clear it after confirmation or final rejection. RailBites generates the pickup code; SmartRail stores it only for the owning passenger's order view, never in logs. SmartRail sends its generated `order_links.id`, **not the passenger's request key**, as `smart_rail_order_link_id` on every provider attempt. |
+| Reliable integration | Unique `outbox_messages.event_id`; retry using `attempt_count` and `next_attempt_at` until RailBites confirms receipt. Unique `webhook_receipts.provider_event_id` rejects replay; apply a status only if its sequence exceeds `order_links.status_sequence` after checking HMAC over timestamp and raw body. The event receipt and order update commit together. |
+| RailBites orders | Unique `orders.smart_rail_order_link_id` and `orders.pickup_code`, unique `received_events.event_id`, and unique `webhook_outbox.event_id`. Only authenticated SmartRail service calls may look up an order by its link ID; the passenger API checks `order_links.account_id` before returning the pickup code. On a repeated link ID, return the existing order's **current** status, including cancellation. Only a new link ID proceeds to stock, cutoff, and journey-eligibility checks. `order_items` snapshots item price in minor LKR units. A collection point owns its cutoff and menu items. Train-change event IDs are processed once; order status callbacks are retried until SmartRail accepts them. |
+| Early-ending order race | `RailBites.journey_order_states` holds one row per journey, created on the first order attempt or train-change event. `applied_journey_version` guards a full eligibility snapshot: `order_closed` plus `blocked_pickup_stop_ids` (a validated JSON UUID array stored as SQLite text). SmartRail sends the current snapshot and journey version for a cancellation, early ending, or withdrawal. RailBites applies only newer versions; in one SQLite `BEGIN IMMEDIATE` transaction it updates the state, cancels existing newly ineligible orders, and queues their status callbacks. A new order creates/reads this state and checks eligibility in the same kind of write transaction as inserting the order. Thus a retry **after** an early-ending event cannot create an order for a blocked stop; a withdrawal can reopen it. |
+| SmartRail retry gate | Before every timed-out provider retry, recompute eligibility from the latest published journey changes. If the stop is now ineligible, do not place a new order. Reconcile the earlier attempt by querying RailBites with the same `order_links.id` or consuming its callback before declaring a final rejection; the first request may already have succeeded. A provider event still in transit can briefly race a new order, so delivery cancels that order when processed. The integration promises eventual correction, not instantaneous consistency across databases. |
+
+## Five flow checks before migrations
+
+1. **Next trains:** two ordered `pattern_stops` identify origin and destination on a dated `journey`; schedule provenance distinguishes a published service from a fictional one. No account is needed.
+2. **Stale train:** the latest valid `observation` supplies a simulated segment and delay. After four minutes without an observation, position and derived ETA become unknown; the stored published platform change remains visible.
+3. **Service change:** a controller previews version `v`, publishes a change, and the whole journey advances to `v+1`. A second controller using `v` receives 409. An early ending keeps stops through `final_stop_id` and removes later ETA and ordering eligibility.
+4. **Driver report:** an assigned driver submits a uniquely keyed report; Control explicitly acknowledges it, opens an optional incident, and can publish a related change. The audit shows who acted and when.
+5. **Food and retries:** each passenger key creates one SmartRail link; its generated link ID identifies one provider order globally. If the first provider response times out, SmartRail checks eligibility again before retrying and reconciles an unknown first result. If RailBites already processed an early ending, its versioned journey state rejects an order for a blocked pickup stop. A delay or early ending is durably queued, processed once by RailBites, and reflected back through a signed, sequenced webhook. RailBites stays the source of truth for order state and cutoff.
+
+### Retry race checks
+
+| Case | Expected result |
+| --- | --- |
+| First placement was not accepted; early ending arrives before retry | SmartRail stops the retry after its eligibility check. RailBites also refuses any new order for the blocked stop. |
+| First placement was accepted; response was lost; early ending arrives | RailBites cancels that order. A lookup or repeat using the same SmartRail link ID returns its current cancelled status. |
+| Two passengers choose the same client request key | Each has a different `order_links.id`, so RailBites creates distinct orders. Neither passenger can read the other's pickup code. |
+| An early ending is withdrawn, then its older event is redelivered | The newer journey version reopens eligible stops; the older version is ignored. |
+
+No `eta`, `freshness`, GPS, vehicle, train-hardware, payment-processor, push-notification, or AI tables are part of this pilot.

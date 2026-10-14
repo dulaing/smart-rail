@@ -1,0 +1,70 @@
+erDiagram
+    direction LR
+    identityAccounts ||--o{ identityRoleGrants : receives
+    identityRoles ||--o{ identityRoleGrants : granted_as
+    identityRoles ||--o{ identityRolePermissions : allows
+    identityAccounts ||--o{ identityJourneyAssignments : assigned_to
+    identityAccounts ||--o{ identityAuditEntries : acts_in
+    identityAccounts ||--o{ passengerSavedRoutes : saves
+    identityAccounts ||--o{ passengerFollowedJourneys : follows
+    networkJourneys ||--o{ identityJourneyAssignments : assigned_driver
+    networkJourneys ||--o{ passengerFollowedJourneys : followed_by
+    networkStations ||--o{ passengerSavedRoutes : origin
+    networkStations ||--o{ passengerSavedRoutes : destination
+    networkStations o|..o{ identityRoleGrants : station_scope
+
+    identityAccounts["identity.accounts"] {
+        uuid id PK
+        string issuer "Keycloak issuer"
+        string subject "Keycloak sub"
+        string display_name
+        string status
+    }
+    identityRoles["identity.roles"] {
+        uuid id PK
+        string code UK
+    }
+    identityRolePermissions["identity.role_permissions"] {
+        uuid role_id PK, FK
+        string permission_code PK
+    }
+    identityRoleGrants["identity.role_grants"] {
+        uuid id PK
+        uuid account_id FK
+        uuid role_id FK
+        uuid station_scope_id FK
+        datetime valid_until
+    }
+    identityJourneyAssignments["identity.journey_assignments"] {
+        uuid id PK
+        uuid driver_id FK
+        uuid journey_id FK
+    }
+    identityAuditEntries["identity.audit_entries"] {
+        uuid id PK
+        uuid actor_id FK
+        string action
+        string outcome
+        string target_type
+        uuid target_id
+        string correlation_id
+        datetime occurred_at
+    }
+    passengerSavedRoutes["passenger.saved_routes"] {
+        uuid id PK
+        uuid account_id FK
+        uuid origin_station_id FK
+        uuid destination_station_id FK
+    }
+    passengerFollowedJourneys["passenger.followed_journeys"] {
+        uuid id PK
+        uuid account_id FK
+        uuid journey_id FK
+        datetime followed_at
+    }
+    networkStations["network.stations"] {
+        uuid id PK
+    }
+    networkJourneys["network.journeys"] {
+        uuid id PK
+    }
