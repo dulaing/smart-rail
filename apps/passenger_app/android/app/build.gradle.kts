@@ -27,6 +27,8 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        // The custom URL scheme AppAuth listens on; it must match the Keycloak redirect URI.
+        manifestPlaceholders["appAuthRedirectScheme"] = "com.smartrail.passenger"
     }
 
     buildTypes {

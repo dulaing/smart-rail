@@ -100,3 +100,38 @@ transaction. Denied staff actions are audited too. A SysAdmin cannot change thei
 | `DELETE /api/admin/accounts/{accountId}/grants/{grantId}` | `grants.manage` |
 
 `GET /api/me` shows the signed-in account's roles and effective permissions.
+
+### Passenger and driver apps (Flutter)
+
+Both apps sign in with Authorization Code + PKCE through the system browser
+(`flutter_appauth`), keep the refresh and ID tokens in secure platform storage
+(`flutter_secure_storage`) and the access token in memory, and read `GET /api/me`. The realm
+registers `smartrail-passenger-app` (`com.smartrail.passenger:/oauthredirect`) and
+`smartrail-driver-app` (`com.smartrail.driver:/oauthredirect`) as public clients with exact
+redirect URIs. The passenger app starts as a guest; cancelling sign-in or signing out returns
+there. The driver app requires sign-in.
+
+A device or emulator must reach the **same** issuer URL the API validates,
+`https://localhost:8080/realms/smartrail`, and trust its certificate. Do not rewrite the issuer
+or switch certificate validation off. For an Android emulator or a USB device:
+
+1. Make the host's ports visible as `localhost` on the device:
+
+       adb reverse tcp:8080 tcp:8080
+       adb reverse tcp:7074 tcp:7074
+
+2. Export the .NET development certificate and install it as a user certificate on the device
+   (Settings > Security > Install a certificate > CA certificate):
+
+       dotnet dev-certs https --export-path smartrail-dev.crt --format Pem
+
+   Debug builds trust user-installed certificates through `network_security_config.xml`;
+   release builds do not.
+3. Apply the updated realm (see "Changing the realm") and run
+   `--seed-demo-identities` so `demo-passenger` and `demo-driver` exist.
+4. Run an app, for example `flutter run` in `apps/passenger_app`. Override the endpoints with
+   `--dart-define=ISSUER=...` and `--dart-define=API_URL=...` only if the reachable URL differs,
+   and then the Keycloak hostname and `Identity:Issuer` must be changed to match.
+
+`flutter_appauth` supports Android, iOS and macOS; it does not run on Windows or web, and its
+Flutter plugins need Windows Developer Mode (symlinks) to build.
