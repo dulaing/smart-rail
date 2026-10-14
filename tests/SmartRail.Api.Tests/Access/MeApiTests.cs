@@ -119,14 +119,18 @@ public class MeApiTests(AccessApi api) : IClassFixture<AccessApi>
     [RequiresDatabaseFact]
     public async Task Public_timetable_and_health_routes_work_without_login_or_with_a_bad_token()
     {
+        var results = new List<string>();
         foreach (var token in new string?[] { null, "not.a.jwt" })
         {
             using var client = api.ClientFor(token);
-            Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/stations")).StatusCode);
-            Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/journeys?serviceDate=2026-10-14")).StatusCode);
-            Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/health/live")).StatusCode);
-            Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/health/ready")).StatusCode);
+            foreach (var path in new[] { "/api/stations", "/api/journeys?serviceDate=2026-10-14", "/health/live", "/health/ready" })
+            {
+                var response = await client.GetAsync(path);
+                results.Add($"{token ?? "none"} {path} {(int)response.StatusCode}");
+            }
         }
+
+        Assert.All(results, r => Assert.EndsWith(" 200", r));
     }
 
     [RequiresDatabaseFact]

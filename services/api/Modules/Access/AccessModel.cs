@@ -47,6 +47,28 @@ public sealed class JourneyAssignment
     public Guid JourneyId { get; init; }
 }
 
+/// <summary>
+/// One privileged change or denied staff action. It records who, what, on which target and when.
+/// It never holds a token, request body, email or phone number.
+/// </summary>
+public sealed class AuditEntry
+{
+    public Guid Id { get; init; }
+    public Guid ActorId { get; init; }
+    public required string Action { get; init; }
+    public required string Outcome { get; init; }
+    public required string TargetType { get; init; }
+    public Guid? TargetId { get; init; }
+    public required string CorrelationId { get; init; }
+    public DateTimeOffset OccurredAt { get; init; }
+}
+
+public static class AuditOutcomes
+{
+    public const string Succeeded = "SUCCEEDED";
+    public const string Denied = "DENIED";
+}
+
 /// <summary>Maps the Access module's tables in the <c>identity</c> schema.</summary>
 public static class AccessModel
 {
@@ -112,6 +134,23 @@ public static class AccessModel
             assignment.HasIndex(a => new { a.DriverId, a.JourneyId }).IsUnique();
             assignment.HasOne<Account>().WithMany().HasForeignKey(a => a.DriverId).OnDelete(DeleteBehavior.Restrict);
             assignment.HasOne<ScheduledJourney>().WithMany().HasForeignKey(a => a.JourneyId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        model.Entity<AuditEntry>(entry =>
+        {
+            entry.ToTable("audit_entries", Schema, table =>
+                table.HasCheckConstraint("ck_audit_entries_outcome", "outcome IN ('SUCCEEDED', 'DENIED')"));
+            entry.HasKey(e => e.Id);
+            entry.Property(e => e.Id).HasColumnName("id").ValueGeneratedNever();
+            entry.Property(e => e.ActorId).HasColumnName("actor_id");
+            entry.Property(e => e.Action).HasColumnName("action").HasMaxLength(64);
+            entry.Property(e => e.Outcome).HasColumnName("outcome").HasMaxLength(16);
+            entry.Property(e => e.TargetType).HasColumnName("target_type").HasMaxLength(32);
+            entry.Property(e => e.TargetId).HasColumnName("target_id");
+            entry.Property(e => e.CorrelationId).HasColumnName("correlation_id").HasMaxLength(64);
+            entry.Property(e => e.OccurredAt).HasColumnName("occurred_at");
+            entry.HasIndex(e => e.OccurredAt);
+            entry.HasOne<Account>().WithMany().HasForeignKey(e => e.ActorId).OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

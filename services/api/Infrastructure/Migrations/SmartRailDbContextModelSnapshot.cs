@@ -63,6 +63,60 @@ namespace SmartRail.Api.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("SmartRail.Api.Modules.Access.AuditEntry", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("action");
+
+                    b.Property<Guid>("ActorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("actor_id");
+
+                    b.Property<string>("CorrelationId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("correlation_id");
+
+                    b.Property<DateTimeOffset>("OccurredAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("occurred_at");
+
+                    b.Property<string>("Outcome")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("outcome");
+
+                    b.Property<Guid?>("TargetId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("target_id");
+
+                    b.Property<string>("TargetType")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("target_type");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActorId");
+
+                    b.HasIndex("OccurredAt");
+
+                    b.ToTable("audit_entries", "identity", t =>
+                        {
+                            t.HasCheckConstraint("ck_audit_entries_outcome", "outcome IN ('SUCCEEDED', 'DENIED')");
+                        });
+                });
+
             modelBuilder.Entity("SmartRail.Api.Modules.Access.JourneyAssignment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -328,6 +382,15 @@ namespace SmartRail.Api.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("stations", "network");
+                });
+
+            modelBuilder.Entity("SmartRail.Api.Modules.Access.AuditEntry", b =>
+                {
+                    b.HasOne("SmartRail.Api.Modules.Access.Account", null)
+                        .WithMany()
+                        .HasForeignKey("ActorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SmartRail.Api.Modules.Access.JourneyAssignment", b =>

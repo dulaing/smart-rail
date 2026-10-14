@@ -1,7 +1,10 @@
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,8 +39,48 @@ public sealed class AccessApi : TimetableApi
         configuration.SigningKeys.Add(publicKey);
 
         builder.ConfigureTestServices(services =>
+        {
+            services.AddTransient<IStartupFilter, TestOperationsFilter>();
             services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
-                options.ConfigurationManager = new StaticConfigurationManager<OpenIdConnectConfiguration>(configuration)));
+                options.ConfigurationManager = new StaticConfigurationManager<OpenIdConnectConfiguration>(configuration));
+        });
+    }
+
+    /// <summary>
+    /// Stand-ins for the operational endpoints that do not exist yet. They are mapped only in
+    /// this test host and use the same guard and policies that real endpoints will use.
+    /// </summary>
+    private sealed class TestOperationsFilter : IStartupFilter
+    {
+        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) => app =>
+        {
+            // A separate branch with its own routing, but the same services, token validation and
+            // policies as the real pipeline, so these behave like production endpoints.
+            app.Map("/test-ops", branch =>
+            {
+                branch.UseRouting();
+                branch.UseAuthentication();
+                branch.UseAuthorization();
+                branch.UseEndpoints(endpoints =>
+                {
+                    endpoints.MapPost("/changes", () => Results.Ok())
+                        .RequireAuthorization(AccessPolicies.For(Permissions.ChangesPublish));
+
+                    endpoints.MapPost("/stations/{stationId:guid}/platform-change",
+                        async (Guid stationId, HttpContext context, AccessGuard guard) =>
+                            await guard.CheckAsync(context, Permissions.PlatformChangesPublish, new AccessTarget.Station(stationId))
+                                == AccessDecision.Allowed ? Results.Ok() : Results.Forbid())
+                        .RequireAuthorization(AccessPolicies.ActiveAccount);
+
+                    endpoints.MapPost("/journeys/{journeyId:guid}/report",
+                        async (Guid journeyId, HttpContext context, AccessGuard guard) =>
+                            await guard.CheckAsync(context, Permissions.DriverReportsCreate, new AccessTarget.Journey(journeyId))
+                                == AccessDecision.Allowed ? Results.Ok() : Results.Forbid())
+                        .RequireAuthorization(AccessPolicies.ActiveAccount);
+                });
+            });
+            next(app);
+        };
     }
 
     public sealed record TokenOptions
@@ -98,6 +141,48 @@ public sealed class AccessApi : TimetableApi
             await db.SaveChangesAsync();
         });
         return id;
+    }
+
+    public async Task<Guid> StationIdAsync(string code)
+    {
+        var id = Guid.Empty;
+        await WithDbAsync(async db => id = await db.Stations.Where(s => s.Code == code).Select(s => s.Id).SingleAsync());
+        return id;
+    }
+
+    public async Task<Guid> JourneyIdAsync(int skip = 0)
+    {
+        var id = Guid.Empty;
+        await WithDbAsync(async db =>
+            id = await db.Journeys.OrderBy(j => j.DemoSeedKey).Skip(skip).Select(j => j.Id).FirstAsync());
+        return id;
+    }
+
+    public Task GrantAsync(Guid accountId, string role, Guid? stationId = null, DateTimeOffset? validUntil = null) =>
+        WithDbAsync(async db =>
+        {
+            var roleId = await db.Roles.Where(r => r.Code == role).Select(r => r.Id).SingleAsync();
+            db.RoleGrants.Add(new RoleGrant
+            {
+                Id = Guid.NewGuid(), AccountId = accountId, RoleId = roleId,
+                StationScopeId = stationId, ValidUntil = validUntil,
+            });
+            await db.SaveChangesAsync();
+        });
+
+    public Task AssignAsync(Guid driverId, Guid journeyId) =>
+        WithDbAsync(async db =>
+        {
+            db.JourneyAssignments.Add(new JourneyAssignment { Id = Guid.NewGuid(), DriverId = driverId, JourneyId = journeyId });
+            await db.SaveChangesAsync();
+        });
+
+    public async Task<List<AuditEntry>> AuditAsync(Guid actorId)
+    {
+        var entries = new List<AuditEntry>();
+        await WithDbAsync(async db =>
+            entries = await db.AuditEntries.AsNoTracking().Where(e => e.ActorId == actorId).OrderBy(e => e.OccurredAt).ToListAsync());
+        return entries;
     }
 
     public override async Task DisposeAsync()

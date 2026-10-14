@@ -20,6 +20,7 @@ public sealed class SmartRailDbContext(DbContextOptions<SmartRailDbContext> opti
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<RoleGrant> RoleGrants => Set<RoleGrant>();
     public DbSet<JourneyAssignment> JourneyAssignments => Set<JourneyAssignment>();
+    public DbSet<AuditEntry> AuditEntries => Set<AuditEntry>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

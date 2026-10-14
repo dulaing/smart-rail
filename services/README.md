@@ -85,3 +85,18 @@ Optional overrides: `VITE_KEYCLOAK_URL`, `VITE_KEYCLOAK_REALM`, `VITE_KEYCLOAK_C
 `VITE_API_URL` (default `https://localhost:7074`, the API's HTTPS address under the AppHost).
 Tokens stay in memory, so a reload does a quick Keycloak session check. **Refresh session**
 forces a refresh-token exchange; **Sign out** clears the tokens and ends the Keycloak session.
+
+### Managing accounts and grants (SysAdmin only)
+
+These change SmartRail's own records; they never create or disable a Keycloak user. Each
+change takes effect on the account's next request and writes an audit row in the same
+transaction. Denied staff actions are audited too. A SysAdmin cannot change their own account.
+
+| Request | Permission |
+| --- | --- |
+| `PUT /api/admin/accounts/{accountId}/status` `{ "status": "ACTIVE" \| "DISABLED" }` | `accounts.manage` |
+| `GET /api/admin/accounts/{accountId}/grants` | `grants.manage` |
+| `POST /api/admin/accounts/{accountId}/grants` `{ "role", "stationId"?, "validUntil"? }` (repeat to change `validUntil`) | `grants.manage` |
+| `DELETE /api/admin/accounts/{accountId}/grants/{grantId}` | `grants.manage` |
+
+`GET /api/me` shows the signed-in account's roles and effective permissions.

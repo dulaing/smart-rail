@@ -7,6 +7,9 @@ namespace SmartRail.Api.Modules.Access;
 public static class AccessPolicies
 {
     public const string ActiveAccount = "ActiveAccount";
+
+    /// <summary>The policy that requires a network-wide permission, such as accounts.manage.</summary>
+    public static string For(string permission) => $"permission:{permission}";
 }
 
 public static class AccessSetup
@@ -66,6 +69,13 @@ public static class AccessSetup
         builder.Services.AddAuthorization(options =>
         {
             options.AddPolicy(AccessPolicies.ActiveAccount, activeAccount);
+            foreach (var (code, scope) in Permissions.Scopes.Where(s => s.Value == ScopeKind.Network))
+            {
+                options.AddPolicy(AccessPolicies.For(code), policy => policy
+                    .RequireAuthenticatedUser()
+                    .AddRequirements(new ActiveAccountRequirement(), new PermissionRequirement(code)));
+            }
+
             // Deny by default: an endpoint with no authorization metadata needs a signed-in,
             // enabled account. Public routes say so with AllowAnonymous.
             options.FallbackPolicy = activeAccount;
@@ -78,6 +88,8 @@ public static class AccessSetup
             builder.Services.AddScoped<AccountDirectory>();
             builder.Services.AddScoped<CurrentAccount>();
             builder.Services.AddScoped<IAuthorizationHandler, ActiveAccountHandler>();
+            builder.Services.AddScoped<AccessGuard>();
+            builder.Services.AddScoped<IAuthorizationHandler, PermissionHandler>();
         }
     }
 }

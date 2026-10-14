@@ -87,6 +87,7 @@ if (hasDatabase)
 {
     app.MapRailEndpoints();
     app.MapAccessEndpoints();
+    app.MapAccessAdminEndpoints();
 }
 
 // Live only says the process is running, so it runs no checks.
