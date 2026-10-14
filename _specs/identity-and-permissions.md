@@ -1,0 +1,37 @@
+# Identity and permissions
+
+## Why
+
+Passengers and staff need to sign in without SmartRail managing their passwords. Staff actions must be limited to the permissions, stations, and journeys assigned to their local account.
+
+## Done when
+
+The operations web app and both Flutter apps can sign in through Keycloak and read their local account. Invalid tokens are rejected; disabled accounts and out-of-scope actions are denied even with a valid token. Public timetable and health reads still work without login.
+
+## Decisions
+
+- Follow the [identity boundary](../docs/architecture/identity-and-local-development.md#identity-boundary): Keycloak owns credentials, sessions, signing keys, and refresh tokens. Use Authorization Code with PKCE, public clients without embedded secrets, exact redirect URIs, and the API's expected audience. SmartRail validates issuer, signature, audience, and expiry; it does not issue tokens or identify users by email.
+- Follow the [backend boundaries](../docs/architecture/backend-decision.md#code-boundaries): put Access features inside the existing API and reuse its EF context. Map the [identity tables and rules](../docs/architecture/data-model.md#tables-and-rules-not-fully-visible-in-the-diagrams) and [accounts ERD](../docs/architecture/erd/03-accounts-passengers.mmd), without password/session tables or cross-database foreign keys.
+- Resolve `(issuer, subject)` to a seeded local account. A valid but unknown or disabled account gets 403 on protected reads/actions; missing or invalid credentials get 401. Check account status and grants on each protected request so disabling an account or removing a grant takes effect without waiting for token expiry.
+- Seed the [pilot role matrix](../docs/06-scope-decision.md#who-can-do-what) as explicit permission codes. Keycloak role claims do not grant SmartRail permissions. Default to denial; evaluate permission and scope on the same active grant. StationStaff requires a matching station grant, Driver a matching journey assignment; resolve the target from server data, not a client-supplied station claim. Honour `valid_until` when set. A SysAdmin role alone never authorizes train changes; Auditor remains read-only.
+- Provide protected `GET /api/me` for the local account and effective permissions/scopes, plus SysAdmin-only account-status and grant-management APIs. Seed driver assignments for the demo; a journey-assignment editor is later work. Audit privileged local changes and denied staff actions without tokens, bodies, email, or phone; commit successful administrative changes and their audit rows together.
+- Browser login uses the [Keycloak JavaScript adapter](https://www.keycloak.org/securing-apps/javascript-adapter), keeping tokens in memory. Flutter uses a maintained OIDC/PKCE client, the system browser, and secure platform storage. Refresh through Keycloak; logout clears local tokens and ends the Keycloak session. Preserve a guest return in the passenger app. Endpoint checks enforce security even if the UI hides an action.
+- Demo identities are synthetic and provisioned through a development-only seed step; credentials come from local secrets. Map local accounts to the subjects actually returned by Keycloak. All clients and the API must agree on a reachable, trusted issuer URL; the current localhost issuer needs a documented mobile-device/emulator setup, not disabled certificate validation or rewritten token issuers.
+
+## What exists now
+
+- [Local foundation](local-foundation.md) is implemented: `services/apphost/AppHost.cs` runs PostgreSQL and Keycloak with a separate identity database. `services/apphost/realms/smartrail-realm.json` defines an enabled realm with registration disabled, but no login clients or users. See [services setup](../services/README.md).
+- `services/api/Program.cs` has no authentication middleware. `Infrastructure/SmartRailDbContext.cs` maps Rail only; the public timetable endpoints and `tests/SmartRail.Api.Tests/` already exist.
+- `apps/ops-web/src/App.tsx` and both Flutter `lib/main.dart` files are starter screens with no login. The architecture docs describe the target identity model; those tables and permissions are not implemented yet.
+
+## Tasks
+
+- [x] **T1 - Prove the pilot access rules.** Add small Access permission/scope rules and focused tests under `services/api/Modules/Access/` and `tests/SmartRail.Api.Tests/Access/`. Check: `dotnet test tests/SmartRail.Api.Tests --filter Access` covers the role matrix, wrong station/journey, disabled account, expired grant, and SysAdmin/Auditor operational denial. No running Keycloak required.
+- [ ] **T2 - Resolve a token to a local account.** Configure JWT validation, the identity mappings/migration in the existing context, and `/api/me`; explicitly allow anonymous timetable/health routes. Files: API host/configuration, `Modules/Access/`, `Infrastructure/`, and API tests. Check: API integration tests against disposable PostgreSQL return 401 for missing/invalid tokens, 403 for unknown/disabled accounts, the correct local account for a valid subject, and preserve anonymous timetable access. Reuse the existing test project.
+- [ ] **T3 - Sign in from the operations web app.** Configure the web public client, access-token audience and exact redirects, an idempotent development-only demo-user/local-account seed, and a minimal sign-in/account/logout view in `apps/ops-web/`. Update existing realm configuration explicitly: restarting realm import does not replace an existing realm. Document setup in `services/README.md`, keeping credentials out of Git. Check: a real browser PKCE login reads `/api/me`, refreshes through Keycloak, and logout returns to the signed-out view; API calls cannot use an ID token in place of an access token.
+- [ ] **T4 - Change grants and enforce their limits.** Add SysAdmin-only local status/grant endpoints, database-backed authorization, and audit persistence under Access; extend the API tests. Check: integration tests prove grant removal/account disabling immediately denies access, another station or journey is refused, authorized administrative changes create audit rows, and SysAdmin cannot perform operational edits. Until operational write endpoints exist, prove station/journey policies through test-only handlers; do not ship fake train-edit routes.
+- [ ] **T5 - Sign in from passenger and driver apps.** Add the same PKCE/account/logout flow to `apps/passenger_app/` and `apps/driver_app/`, with secure storage and exact callback configuration; document a trusted issuer reachable from the test device/emulator. Check: on the documented device, each app signs in and reads its seeded account, refreshes, and clears tokens on logout; the passenger can return to guest mode. If issuer/certificate/device setup is unavailable, mark this task Blocked with the specific cause while completing independent backend/web work.
+
+## Boundaries
+
+No custom registration/password/refresh-token service, production user provisioning, MFA/SSO, full admin UI, or new business-module projects. This feature supplies authentication and reusable authorization; train-change/report/order behavior belongs to its own features. Apply passenger ownership checks when those personal endpoints are built. Station displays and public timetable browsing remain anonymous. Offline driver briefing behavior is separate; cached content must not authorize a new protected server action.
