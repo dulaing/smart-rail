@@ -1,0 +1,40 @@
+schema: spec-driven
+
+# The core workflow profile is configured globally by OpenSpec, not in this file.
+# Review and commit are companion commands/skills, not schema artifacts.
+context: |
+  Follow a practical spec-driven loop: plan, implement a small task, verify,
+  review, then prepare a commit message for the staged changes.
+  Use openspec/templates/feature-spec.md as a planning checklist. Distribute
+  its sections across the standard proposal, specs, design, and tasks artifacts;
+  keep OpenSpec's built-in templates and required formats.
+  Companion commands are .claude/commands/review.md and .claude/commands/commit.md
+  (Claude Code: /review and /commit). Codex equivalents are the project skills
+  .agents/skills/review/SKILL.md and .agents/skills/commit/SKILL.md ($review and $commit).
+  The commit companion drafts a message only; staging and creating a Git commit
+  are separate user actions or explicitly requested work.
+
+rules:
+  proposal:
+    - Explain the problem and why it matters now, and describe a concrete, verifiable deliverable.
+    - State what is out of scope and preserve the built-in Capabilities and Impact sections.
+  specs:
+    - Describe observable behavior and testable scenarios; keep implementation details in design and tasks.
+    - Preserve OpenSpec delta headings, normative requirements, and four-hash Scenario headings.
+  design:
+    - Summarize the current state, relevant files, and existing patterns before proposing changes.
+    - State required conventions, prohibited changes, and explicit scope boundaries.
+  tasks:
+    - Keep each tracked task small enough for one focused session, with concrete files and a verification command or observable check.
+    - Use numbered checkbox tasks in OpenSpec's required format; do not use the tutorial's T1/T2 headings as tracked tasks.
+    - Include feature-level validation when integration checks are needed; keep archive and commit follow-up as plain bullets outside tracked tasks.
+
+operations:
+  apply:
+    guidance:
+      - Respect a requested single-task scope and verify the task before marking it complete.
+      - Review the resulting diff against the selected change artifacts using the review companion before preparing a commit message.
+      - Use the commit companion for a message based on staged changes when requested; do not stage files or create a commit as part of that companion.
+  archive:
+    guidance:
+      - Check that implementation verification and review are complete, and report any remaining gaps before archiving.
