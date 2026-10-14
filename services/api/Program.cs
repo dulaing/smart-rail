@@ -1,4 +1,7 @@
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using SmartRail.Api.Infrastructure;
+using SmartRail.Api.Modules.Rail;
 using OpenTelemetry;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Resources;
@@ -34,11 +37,26 @@ if (!string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOIN
     telemetry.UseOtlpExporter();
 }
 
+builder.Services.TryAddSingleton(TimeProvider.System);
+var hasDatabase = builder.AddSmartRailDatabase();
+
 var app = builder.Build();
+
+// `dotnet run --project services/api -- --migrate-and-seed` prepares the database, then exits.
+if (args.Contains("--migrate-and-seed"))
+{
+    await app.MigrateAndSeedAsync();
+    return;
+}
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+}
+
+if (hasDatabase)
+{
+    app.MapRailEndpoints();
 }
 
 app.UseHttpsRedirection();
@@ -48,3 +66,5 @@ app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => fa
 app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = check => check.Tags.Contains("ready") });
 
 app.Run();
+
+public partial class Program;

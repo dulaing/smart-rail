@@ -6,4 +6,7 @@
   <Folder Name="/services/apphost/">
     <Project Path="services/apphost/SmartRail.AppHost.csproj" />
   </Folder>
+  <Folder Name="/tests/SmartRail.Api.Tests/">
+    <Project Path="tests/SmartRail.Api.Tests/SmartRail.Api.Tests.csproj" />
+  </Folder>
 </Solution>
