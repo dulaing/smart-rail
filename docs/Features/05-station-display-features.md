@@ -6,15 +6,16 @@
 
 - **Platform:** Show this platform's next train, destination, expected time, and status. Keep it visible; no news, ads, or rotating pages.
 - **Entrance:** Show an overview of upcoming departures, arrivals, platforms, and major disruptions.
-- **Waiting area:** Show the overview plus a short explanation of delays or cancellations.
+- **Waiting area:** Reuse the entrance overview with a short delay explanation; no separate app is needed.
 
 ## Build first
 
-1. **Clear changes:** Make cancellations, delays, and platform changes stand out with words and strong contrast, not colour alone. Avoid flashing text.
+1. **Clear changes:** Make cancellations, delays, platform changes and **“Train ends at [station]”** stand out with words and strong contrast, not colour alone. If a train ends early, do not show it as going to later stations. Avoid flashing text.
 2. **Three languages at once:** Show Sinhala, Tamil, and English together for key status and disruption messages. Do not make passengers wait for a language carousel.
-3. **Honest updates:** The operations app sends confirmed changes automatically. Show the source and last update time. A station staff correction must be recorded and visible to the operations team.
+3. **Honest updates:** Show the time of the last train observation and the time of each confirmed change. An old position becomes **unknown** after four minutes; a separately confirmed platform change remains visible with its own time. Changes come from the authorised operations workflow.
 4. **Network failure:** Keep a downloaded timetable visible with a prominent **“Live updates unavailable”** message and timestamp. Do not show an old ETA or platform as if it is current. Recover when connected.
-5. **Urgent notices:** Authorised station staff can put a clear message on affected screens. This supports, but does not replace, the PA and established emergency procedures.
+
+Free-text urgent notices and direct screen corrections are later work. They need a verified staff workflow; this pilot uses the operations app for confirmed service changes.
 
 ## Physical upkeep
 

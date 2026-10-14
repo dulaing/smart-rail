@@ -14,6 +14,8 @@ Every feature mentioned anywhere in this project, whether built, thin, design-on
 | `V2` | `C:\Projects\smartrail-system-design-v2.html` |
 | `S` | `docs/06-scope-decision.md` |
 | `C` | `docs/ai-usage/2026-10-01-scoping-council.md` and the council reports |
+| `K` | Kasun screen feedback supplied by the project owner on 8 October 2026 |
+| `G` | 8 October simulated stakeholder group discussion; suggestions and claimed progress are not implementation evidence |
 
 ---
 
@@ -40,6 +42,9 @@ Every feature mentioned anywhere in this project, whether built, thin, design-on
 
 - Save a journey or train to a watch list `01` `V2` `S`
 - Home screen that answers "Is my train coming?" straight away (saved-train status card) `01` `S`
+- Guest opening screen: Gampaha → Colombo Fort, with a clear way to change both stations `K` `01` `S`
+- First screen shows the next two or three trains: scheduled and estimated arrival at the boarding station, delay, platform and update age `K` `01` `S`
+- Highlight the earliest expected arrival only when its estimate is current, it serves both stations and it is not cancelled `K` `01` `S`
 - Home screen laid out as a departure board, not a map `V1`
 - Train status: on time / early / late / cancelled / terminated early / unknown `B` `V2` `S`
 - On-time band: up to 1 min late counts as on time; 2+ min shows as late `V2`
@@ -68,7 +73,9 @@ Every feature mentioned anywhere in this project, whether built, thin, design-on
 - Next option or alternative train after a cancellation `01` `V2`
 - Station-closure advice: nearest open station `V2`
 - Early termination advice: where the train ends now and how to continue `V2`
+- Early ending keeps valid earlier stops and removes later arrival estimates and food collection options `G` `S`
 - Platform-change alert `B` `01`
+- Prioritise a change to the platform where the passenger boards; show later-station changes in detail `K` `01` `S`
 - Departure-time-change alert `B`
 - Show who confirmed a change and when (source and time) `01` `S`
 - Show the delay reason `V2` `S`
@@ -108,7 +115,8 @@ Every feature mentioned anywhere in this project, whether built, thin, design-on
 
 ### Accounts and personal data
 
-- Works without an account; an account is needed only for saved journeys, alerts and food `B` `V2` `S`
+- Opens public train information without an account; optional sign-in offers "Continue without an account" back to trains `B` `V2` `K` `01` `S`
+- Sign in only when saving a commute, following for personal alerts or ordering food; food stays in its own tab `K` `01` `S`
 - Sign in with email and password `V2` `S`
 - Sign in with Google or Apple `V2`
 - Passenger self-registration `V2`
@@ -179,6 +187,7 @@ Every feature mentioned anywhere in this project, whether built, thin, design-on
 - Short timestamped reports to control `02`
 - Messages with control (two-way chat) `02` `V2`
 - Control acknowledges or replies, and the driver sees it `02` `S`
+- Distinct report states: Not sent; Sent — awaiting Control acknowledgement; Acknowledged by a named controller at a recorded time after an explicit action `G` `S`
 - Report types: departed, arrived, running late with reason, incident, cannot continue `V2`
 - Observed arrival and departure times, treated as claims until a controller verifies them `V1`
 - Dwell-extension reason, "awaiting path" codes, berth confirmations `V1`
@@ -259,6 +268,7 @@ Every feature mentioned anywhere in this project, whether built, thin, design-on
   `B` `V2` `S`
 - Change states: Draft → Published → Withdrawn `C`
 - Protection against two controllers editing at once (row version, 409) `S` `V1`
+- A second controller cannot silently overwrite a newer change; demonstrate the conflict before claiming it works `G` `S`
 - Publish once, deliver to every app, board, driver and the caterer `03` `V2`
 
 ### Incidents
@@ -548,6 +558,7 @@ Every feature mentioned anywhere in this project, whether built, thin, design-on
 - Cancellation is free until the cutoff `S` `V2` `V1`
 - The order follows the train: on a delay, the new ETA is sent and the ordering window extends `S` `V2`
 - Train cancelled or terminated before the station → order cancelled automatically, passenger notified `S` `V2`
+- Early ending cancels **existing** orders beyond the new endpoint, with a reason; payment at collection means no pilot refund `G` `S`
 - Train cancelled → full refund, claimable within 72 h `V1`
 - Missed collection → No-show after departure `S`
   - V2 variant: held 15 min, then no refund unless the train was at fault.
@@ -620,7 +631,8 @@ V1 lists 16 roles in total, each scoped by role, region and operator.
 
 - Roles mapped to permissions through a table `S`
 - Deny by default `S`
-- Self-issued JWT behind `ITokenService`, with 15-min access tokens and rotated, hashed refresh tokens `S`
+- Keycloak sign-in for passengers and staff; OIDC Authorization Code with PKCE, API JWT validation, and SmartRail-owned scoped permissions **pilot decision 14 Oct**
+- Self-issued JWT behind `ITokenService`, with 15-min access tokens and rotated, hashed refresh tokens `S` — **superseded by Keycloak decision**
 - ASP.NET Core Identity store `V2` `C`
 - Entra ID for staff, Entra External ID for passengers, MFA, conditional access `V1`
 - OPA policy engine `V1`
@@ -688,7 +700,7 @@ V1 lists 16 roles in total, each scoped by role, region and operator.
 - Azure Data Explorer for telemetry and analytics `V1`
 - Budget alerts `S`
 - Cost model for Azure credit and after-credit costs `N`
-- .NET Aspire dashboard locally `V2` `C`
+- .NET Aspire dashboard locally `V2` `C` — **selected for the pilot 14 Oct**
 
 ---
 
@@ -761,8 +773,8 @@ V1 lists 16 roles in total, each scoped by role, region and operator.
 
 - Monorepo `N` `S` `V2`
 - Modular monolith in .NET 10 `S`; .NET 8 `V2`; Node/NestJS microservices on AKS `V1`
-- Docker Compose for local development and the demo fallback `S`
-- .NET Aspire AppHost `V2`
+- Docker Compose for local development and the demo fallback `S` — **superseded by Aspire AppHost decision**
+- .NET Aspire AppHost `V2` — **selected for local development and demo fallback 14 Oct**
 - Azure Container Apps `S` `V2`
 - AKS with Argo CD GitOps `V1`
 - Azure Static Web Apps `S` `V2`

@@ -4,16 +4,16 @@
 
 ## Build first, in this order
 
-1. **Handle incidents:** Report a problem, choose a provisional severity, assign an owner, record actions, and close it. Show who changed it and when.
-2. **See the corridor:** Show each pilot train, its last reported location and update time, delays, cancellations, and affected stations. Say **unknown** when train data is stale.
-3. **Confirm service changes:** Authorised staff enter delays, cancellations, and platform changes. Show the affected journeys before publishing updates to the other apps.
-4. **Use clear permissions:** Separate controller, station, maintenance, manager, system administrator, and auditor access. Staff see and change only what their job requires; an IT administrator cannot edit train status. Temporary access has an end date and a recorded authoriser.
-5. **Handle conflicting records:** If staff report that a paper record and the app disagree, flag the conflict and record how it was resolved. The app must not silently overwrite either record.
-6. **Receive field reports:** See driver messages and engine defects, then route them to the right operational or maintenance staff.
+1. **See the pilot trains:** Show each train's last reported station, update time, delay and status. Say **unknown** when a train observation is too old.
+2. **Publish confirmed changes:** Authorised staff enter delays, cancellations, platform changes and **“Train ends at [station]”**. Preview affected stops, passenger views, station screens and food orders before publishing.
+3. **Handle an early ending:** Keep valid stops before the new endpoint. Remove later arrival estimates, stop new food orders beyond it and cancel existing orders beyond it with a clear reason.
+4. **Read and acknowledge driver reports:** Show reports in a Control inbox. A named controller actively acknowledges a report; the driver then sees who acknowledged it and when. Open or resolve a simple incident separately.
+5. **Prevent silent overwrites:** If two staff members edit the same change, reject the later save and ask them to reload and review it. The planned API response is **409**. Demonstrate this before claiming it works.
+6. **Keep roles separate:** Controllers, station staff, auditors and system administrators have different permissions. Show the change history, system health and simulator controls to authorised staff.
 
 ## Later
 
-Network-wide tracking, crew and engine planning, train-control charts, crossing registers, ticketing, freight, and advanced analytics. Formal incident classes, deadlines, and reference numbers need verified SLR rules before we use them.
+Paper-versus-app conflict handling, maintenance routing, network-wide tracking, crew and engine planning, train-control charts, crossing registers, ticketing, freight and advanced analytics. Formal incident classes, deadlines and reference numbers need verified SLR rules before we use them.
 
 ## Important limits
 

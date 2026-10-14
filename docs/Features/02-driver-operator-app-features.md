@@ -1,20 +1,19 @@
 # Driver / operator app features
 
-**Goal:** Help a driver prepare for a journey and report problems to control. This priority comes from one driver's account; we must check the workflow with more railway staff.
+**Goal:** Help a driver read the assigned journey and report a problem to Control. The driver account below is input for the pilot, not proof of official railway procedure.
 
 ## Build first, in this order
 
-1. **Briefing before departure:** Show the assigned journey, train or engine, temporary speed restrictions, closures, and hazards ahead. Show who issued each item and when. In our demo, these are **simulated**.
-2. **Messages with control:** Staff can send a short, timestamped report; control can reply. Urgent safety communication still follows the railway's established radio and emergency procedures.
-3. **Engine condition:** Show the assigned engine, known defects, fuel and last service when those records exist. Let staff report a new defect, with a photo when safe to take one, to operations or maintenance.
-4. **Delay reasons:** Record a simple reason such as signal failure, engine defect, restriction, or flooding, so delays have context.
-5. **Offline access:** Download the briefing before departure. Show its last update time; queue non-urgent reports until connected. Never imply that an old briefing includes new restrictions.
+1. **Journey briefing:** Show the assigned train, stops, times and confirmed changes. Show who sent each change and when.
+2. **Report a problem:** Pick a short reason such as train fault, signal delay or obstruction. Show when the report was sent.
+3. **Honest acknowledgement:** Show **Not sent** if the report has not reached the server; **Sent — awaiting Control acknowledgement** after delivery; and **Acknowledged by [name] at [time]** only after a controller actively acknowledges it. Delivery alone is not acknowledgement.
+4. **Offline briefing:** Keep the last downloaded briefing with its download time. Say it may be old. If the optional offline report queue is cut, clearly say **Not sent — Control has not been told**; never pretend a report was queued or delivered.
 
-Use large, high-contrast text that works in sunlight. Design reports for use **while stopped**, not while driving.
+Use large, high-contrast text that works in sunlight. Design reports for use **while stopped**, not while driving. Urgent problems use established railway radio and emergency procedures; the app must direct the driver there.
 
 ## Later, with railway approval
 
-Crossing instructions, single-line movement orders, and any app that drivers rely on for actual speed or movement authority. These need the railway's rulebook, authorised data, safety testing, and operational approval. We will not simulate them as if they were valid orders.
+Temporary speed restrictions, crossing and single-line orders, engine records, defect photos, chat, and any app that drivers rely on for speed or movement authority. These need authorised data, railway rules and safety approval. A non-urgent offline report queue is optional for this pilot.
 
 ## Clear boundaries
 
