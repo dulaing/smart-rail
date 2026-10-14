@@ -1,0 +1,6 @@
+{
+  "realm": "smartrail",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false
+}

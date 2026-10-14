@@ -1,0 +1,30 @@
+var builder = DistributedApplication.CreateBuilder(args);
+
+// One PostgreSQL server with two databases. The named volume keeps data across restarts.
+var postgres = builder.AddPostgres("postgres")
+    .WithDataVolume("smartrail-postgres-data");
+var smartrailDb = postgres.AddDatabase("smartrail");
+var keycloakDb = postgres.AddDatabase("keycloak-db", "keycloak");
+
+// Keycloak on a fixed port with a fixed hostname, so the token issuer is always
+// https://localhost:8080/realms/smartrail. Its data lives in the keycloak database.
+var keycloak = builder.AddKeycloak("keycloak", 8080)
+    .WithRealmImport("./realms")
+    .WithEnvironment("KC_HOSTNAME", "https://localhost:8080")
+    .WithEnvironment("KC_DB", "postgres")
+    .WithEnvironment("KC_DB_URL", ReferenceExpression.Create(
+        $"jdbc:postgresql://{postgres.Resource.Host}:{postgres.Resource.Port}/{keycloakDb.Resource.DatabaseName}"))
+    .WithEnvironment("KC_DB_USERNAME", postgres.Resource.UserNameReference)
+    .WithEnvironment("KC_DB_PASSWORD", postgres.Resource.PasswordParameter)
+    .WaitFor(keycloakDb);
+
+builder.AddProject<Projects.SmartRail_Api>("api")
+    .WithReference(smartrailDb)
+    .WaitFor(smartrailDb)
+    .WithHttpHealthCheck("/health/ready");
+
+builder.AddJavaScriptApp("railbites", "../railbites", "dev")
+    .WithHttpEndpoint(env: "PORT")
+    .WithHttpHealthCheck("/health/live");
+
+builder.Build().Run();

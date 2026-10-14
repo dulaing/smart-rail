@@ -3,4 +3,7 @@
   <Folder Name="/services/api/">
     <Project Path="services/api/SmartRail.Api.csproj" />
   </Folder>
+  <Folder Name="/services/apphost/">
+    <Project Path="services/apphost/SmartRail.AppHost.csproj" />
+  </Folder>
 </Solution>
