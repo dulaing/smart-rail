@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  pull_request:
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet build services/api/SmartRail.Api.csproj --configuration Release
+
+  railbites:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/railbites
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: services/railbites/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
