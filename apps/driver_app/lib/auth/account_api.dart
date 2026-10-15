@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:cronet_http/cronet_http.dart';
 
 /// The signed-in person's SmartRail account, from `GET /api/me`.
 class Account {
@@ -48,7 +51,12 @@ abstract class AccountApi {
 
 class HttpAccountApi implements AccountApi {
   HttpAccountApi(this._baseUrl, {http.Client? client})
-    : _client = client ?? http.Client();
+    : _client = client ?? _platformClient();
+
+  // On Android, Dart's own HTTP client trusts only the built-in system CAs. Cronet checks
+  // certificates through Android, so it follows network_security_config.xml like AppAuth does.
+  static http.Client _platformClient() =>
+      Platform.isAndroid ? CronetClient.defaultCronetEngine() : http.Client();
 
   final String _baseUrl;
   final http.Client _client;
@@ -69,7 +77,8 @@ class HttpAccountApi implements AccountApi {
         return const AccountMissing();
       }
       return AccountFailed('The server answered ${response.statusCode}.');
-    } catch (_) {
+    } catch (error) {
+      debugPrint('GET /api/me failed: ${error.runtimeType}: $error');
       return const AccountFailed('Could not reach SmartRail.');
     }
   }
