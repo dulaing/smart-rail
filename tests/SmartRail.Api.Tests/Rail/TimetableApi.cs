@@ -7,10 +7,8 @@ using SmartRail.Api.Infrastructure;
 
 namespace SmartRail.Api.Tests.Rail;
 
-/// <summary>
-/// Needs a disposable PostgreSQL server: set SMARTRAIL_TEST_POSTGRES to a connection string
-/// that may create and drop databases. Without it the database tests are skipped.
-/// </summary>
+// Needs a disposable PostgreSQL server: set SMARTRAIL_TEST_POSTGRES to a connection string
+// that may create and drop databases. Without it the database tests are skipped.
 public sealed class RequiresDatabaseFactAttribute : FactAttribute
 {
     public const string Variable = "SMARTRAIL_TEST_POSTGRES";
@@ -35,7 +33,7 @@ public sealed class RequiresDatabaseTheoryAttribute : TheoryAttribute
     }
 }
 
-/// <summary>One fresh, migrated and seeded database plus an API host that points at it.</summary>
+// One fresh, migrated and seeded database plus an API host that points at it.
 public class TimetableApi : IAsyncLifetime
 {
     // 2026-10-14 is a Wednesday.
@@ -77,12 +75,12 @@ public class TimetableApi : IAsyncLifetime
         await MigrateAndSeedAsync();
     }
 
-    /// <summary>A fixture can change the host, for example to trust a test token signer.</summary>
+    // A fixture can change the host, for example to trust a test token signer.
     protected virtual void ConfigureHost(IWebHostBuilder builder)
     {
     }
 
-    /// <summary>Same steps as <c>--migrate-and-seed</c>; safe to call again.</summary>
+    // Same steps as --migrate-and-seed; safe to call again.
     public async Task MigrateAndSeedAsync()
     {
         await using var scope = _factory!.Services.CreateAsyncScope();

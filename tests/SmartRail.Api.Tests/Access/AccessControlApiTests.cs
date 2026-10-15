@@ -6,10 +6,8 @@ using SmartRail.Api.Tests.Rail;
 
 namespace SmartRail.Api.Tests.Access;
 
-/// <summary>
-/// Grant and status changes, scope limits and audit rows against a disposable PostgreSQL.
-/// Operational routes are test-only stand-ins using the production guard and policies.
-/// </summary>
+// Grant and status changes, scope limits and audit rows against a disposable PostgreSQL.
+// Operational routes are test-only stand-ins using the production guard and policies.
 public class AccessControlApiTests(AccessApi api) : IClassFixture<AccessApi>
 {
     private HttpClient As(string subject) => api.ClientFor(api.Token(subject));

@@ -3,12 +3,10 @@ using SmartRail.Api.Infrastructure;
 
 namespace SmartRail.Api.Modules.Rail.Timetable;
 
-/// <summary>
-/// Seeds a small fictional Gampaha-Colombo corridor so the public reads have data. Every
-/// pattern is labelled FICTIONAL_DEMO: none is a verified running service. Running it again
-/// adds only what is missing, because IDs come from stable keys and journeys carry a
-/// <c>demo_seed_key</c>.
-/// </summary>
+// Seeds a small fictional Gampaha-Colombo corridor so the public reads have data. Every
+// pattern is labelled FICTIONAL_DEMO: none is a verified running service. Running it again
+// adds only what is missing, because IDs come from stable keys and journeys carry a
+// demo_seed_key.
 public static class DemoTimetableSeeder
 {
     private sealed record StopSpec(string Station, string? Arrival, string? Departure, int DayOffset = 0, string? Platform = null);

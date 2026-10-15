@@ -5,12 +5,10 @@ using SmartRail.Api.Infrastructure;
 
 namespace SmartRail.Api.Modules.Access;
 
-/// <summary>
-/// Development only: creates a few synthetic Keycloak users and the local accounts that map to
-/// them. Keycloak chooses each user's subject, so the local account is linked to the subject
-/// Keycloak actually returns. Run it again to reset the demo passwords; nothing is duplicated.
-/// Credentials come from configuration (user-secrets or environment), never from source.
-/// </summary>
+// Development only: creates a few synthetic Keycloak users and the local accounts that map to
+// them. Keycloak chooses each user's subject, so the local account is linked to the subject
+// Keycloak actually returns. Run it again to reset the demo passwords; nothing is duplicated.
+// Credentials come from configuration (user-secrets or environment), never from source.
 public static class DemoIdentitySeeder
 {
     private sealed record DemoUser(string Username, string DisplayName, string Role, string? StationCode = null);

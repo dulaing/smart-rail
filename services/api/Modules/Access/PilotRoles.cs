@@ -1,9 +1,7 @@
 namespace SmartRail.Api.Modules.Access;
 
-/// <summary>
-/// Pilot role codes. Guest is not a role: it is a caller with no account at all. The RailBites
-/// service is not an account either; its webhooks use a signed HMAC contract.
-/// </summary>
+// Pilot role codes. Guest is not a role: it is a caller with no account at all. The RailBites
+// service is not an account either; its webhooks use a signed HMAC contract.
 public static class Roles
 {
     public const string Passenger = "PASSENGER";
@@ -18,19 +16,19 @@ public static class Roles
         [Passenger, Driver, Controller, StationStaff, Auditor, SysAdmin, SimOperator];
 }
 
-/// <summary>What a permission is limited to. The scope belongs to the permission, not the role.</summary>
+// What a permission is limited to. The scope belongs to the permission, not the role.
 public enum ScopeKind
 {
-    /// <summary>Pilot-wide. Only a grant that is not limited to one station confers it.</summary>
+    // Pilot-wide. Only a grant that is not limited to one station confers it.
     Network,
 
-    /// <summary>One station. The grant's station must be the target station.</summary>
+    // One station. The grant's station must be the target station.
     Station,
 
-    /// <summary>One journey. The driver must be assigned to the target journey.</summary>
+    // One journey. The driver must be assigned to the target journey.
     Journey,
 
-    /// <summary>The caller's own data. The target must name the caller's own account.</summary>
+    // The caller's own data. The target must name the caller's own account.
     Own,
 }
 
@@ -55,7 +53,7 @@ public static class Permissions
 
     public const string SimulationControl = "simulation.control";
 
-    /// <summary>Every permission and its scope. A code that is not listed is always denied.</summary>
+    // Every permission and its scope. A code that is not listed is always denied.
     public static readonly IReadOnlyDictionary<string, ScopeKind> Scopes = new Dictionary<string, ScopeKind>
     {
         [SavedRoutesManage] = ScopeKind.Own,
@@ -75,12 +73,10 @@ public static class Permissions
     };
 }
 
-/// <summary>
-/// The seeded pilot role matrix from "Who can do what" in the scope decision. It seeds
-/// <c>identity.role_permissions</c>; at run time the database rows are what authorize, so a
-/// later role is a new row plus a test here. No role has a permission it was not given:
-/// SysAdmin manages accounts and grants only, and Auditor only reads.
-/// </summary>
+// The seeded pilot role matrix from "Who can do what" in the scope decision. It seeds
+// identity.role_permissions; at run time the database rows are what authorize, so a
+// later role is a new row plus a test here. No role has a permission it was not given:
+// SysAdmin manages accounts and grants only, and Auditor only reads.
 public static class RoleMatrix
 {
     private static readonly IReadOnlyDictionary<string, IReadOnlyList<string>> ByRole =

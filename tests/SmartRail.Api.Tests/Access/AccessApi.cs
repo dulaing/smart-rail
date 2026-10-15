@@ -17,10 +17,8 @@ using SmartRail.Api.Tests.Rail;
 
 namespace SmartRail.Api.Tests.Access;
 
-/// <summary>
-/// The API with a test token signer standing in for Keycloak: the API validates tokens the
-/// same way, but trusts this fixture's key instead of fetching Keycloak's.
-/// </summary>
+// The API with a test token signer standing in for Keycloak: the API validates tokens the
+// same way, but trusts this fixture's key instead of fetching Keycloak's.
 public sealed class AccessApi : TimetableApi
 {
     public const string Issuer = "https://keycloak.test/realms/smartrail";
@@ -46,10 +44,8 @@ public sealed class AccessApi : TimetableApi
         });
     }
 
-    /// <summary>
-    /// Stand-ins for the operational endpoints that do not exist yet. They are mapped only in
-    /// this test host and use the same guard and policies that real endpoints will use.
-    /// </summary>
+    // Stand-ins for the operational endpoints that do not exist yet. They are mapped only in
+    // this test host and use the same guard and policies that real endpoints will use.
     private sealed class TestOperationsFilter : IStartupFilter
     {
         public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) => app =>
@@ -88,12 +84,12 @@ public sealed class AccessApi : TimetableApi
         public string Issuer { get; init; } = AccessApi.Issuer;
         public string Audience { get; init; } = AccessApi.Audience;
         public string Type { get; init; } = "Bearer";
-        /// <summary>Negative for an already expired token; must stay after 10 minutes ago.</summary>
+        // Negative for an already expired token; must stay after 10 minutes ago.
         public TimeSpan ExpiresIn { get; init; } = TimeSpan.FromMinutes(5);
         public bool SignedByAnotherKey { get; init; }
     }
 
-    /// <summary>A Keycloak-shaped access token for <paramref name="subject"/>.</summary>
+    // A Keycloak-shaped access token for subject.
     public string Token(string subject, TokenOptions? options = null)
     {
         options ??= new TokenOptions();
@@ -122,7 +118,7 @@ public sealed class AccessApi : TimetableApi
         return client;
     }
 
-    /// <summary>Adds a local account and returns its ID. Grants are given as role codes (no station).</summary>
+    // Adds a local account and returns its ID. Grants are given as role codes (no station).
     public async Task<Guid> AddAccountAsync(
         string subject, string displayName = "Test Person", AccountStatus status = AccountStatus.Active,
         string issuer = Issuer, params string[] roles)

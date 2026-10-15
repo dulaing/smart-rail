@@ -6,10 +6,8 @@ namespace SmartRail.Api.Infrastructure;
 
 public static class DatabaseSetup
 {
-    /// <summary>
-    /// Registers the database when <c>ConnectionStrings:smartrail</c> is set. Without it (a plain
-    /// <c>dotnet run</c>) the API still starts, but the timetable routes are not mapped.
-    /// </summary>
+    // Registers the database when ConnectionStrings:smartrail is set. Without it (a plain
+    // dotnet run) the API still starts, but the timetable routes are not mapped.
     public static bool AddSmartRailDatabase(this WebApplicationBuilder builder)
     {
         var connectionString = builder.Configuration.GetConnectionString("smartrail");
@@ -22,10 +20,8 @@ public static class DatabaseSetup
         return true;
     }
 
-    /// <summary>
-    /// Runs when the API is started with <c>--migrate-and-seed</c>. Migrations are applied by
-    /// this explicit command, never silently at ordinary startup. Safe to run repeatedly.
-    /// </summary>
+    // Runs when the API is started with --migrate-and-seed. Migrations are applied by
+    // this explicit command, never silently at ordinary startup. Safe to run repeatedly.
     public static async Task MigrateAndSeedAsync(this WebApplication app)
     {
         await using var scope = app.Services.CreateAsyncScope();
@@ -38,7 +34,7 @@ public static class DatabaseSetup
         await SeedAsync(db, start, days);
     }
 
-    /// <summary>The seed data every database needs: the role matrix and the demo timetable.</summary>
+    // The seed data every database needs: the role matrix and the demo timetable.
     public static async Task SeedAsync(SmartRailDbContext db, DateOnly startDate, int days)
     {
         await AccessSeeder.SeedRolesAsync(db);

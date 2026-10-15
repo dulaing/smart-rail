@@ -1,6 +1,6 @@
 namespace SmartRail.Api.Modules.Access;
 
-/// <summary>Endpoints about the signed-in caller's own local account.</summary>
+// Endpoints about the signed-in caller's own local account.
 public static class AccessEndpoints
 {
     public static void MapAccessEndpoints(this IEndpointRouteBuilder app)

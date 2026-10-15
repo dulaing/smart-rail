@@ -2,7 +2,7 @@ using SmartRail.Api.Modules.Access;
 
 namespace SmartRail.Api.Tests.Access;
 
-/// <summary>The pilot role matrix and scope rules, with no database or Keycloak.</summary>
+// The pilot role matrix and scope rules, with no database or Keycloak.
 public class AccessRulesTests
 {
     private static readonly DateTimeOffset Now = new(2026, 10, 14, 6, 0, 0, TimeSpan.Zero);
@@ -21,7 +21,7 @@ public class AccessRulesTests
     private static AccessDecision Check(AccessAccount account, string permission, AccessTarget target) =>
         AccessRules.Evaluate(account, permission, target, Now);
 
-    /// <summary>The target a correctly scoped request for this permission would carry.</summary>
+    // The target a correctly scoped request for this permission would carry.
     private static AccessTarget TargetFor(AccessAccount account, string permission) => Permissions.Scopes[permission] switch
     {
         ScopeKind.Network => new AccessTarget.Network(),

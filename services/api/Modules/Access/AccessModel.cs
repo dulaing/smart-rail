@@ -3,10 +3,8 @@ using SmartRail.Api.Modules.Rail.Timetable;
 
 namespace SmartRail.Api.Modules.Access;
 
-/// <summary>
-/// A SmartRail account linked to one Keycloak identity by <c>(issuer, subject)</c>. It holds no
-/// password, email or token: Keycloak owns those.
-/// </summary>
+// A SmartRail account linked to one Keycloak identity by (issuer, subject). It holds no
+// password, email or token: Keycloak owns those.
 public sealed class Account
 {
     public Guid Id { get; init; }
@@ -29,7 +27,7 @@ public sealed class RolePermission
     public required string PermissionCode { get; init; }
 }
 
-/// <summary>A role given to an account, optionally for one station and optionally until a time.</summary>
+// A role given to an account, optionally for one station and optionally until a time.
 public sealed class RoleGrant
 {
     public Guid Id { get; init; }
@@ -47,10 +45,8 @@ public sealed class JourneyAssignment
     public Guid JourneyId { get; init; }
 }
 
-/// <summary>
-/// One privileged change or denied staff action. It records who, what, on which target and when.
-/// It never holds a token, request body, email or phone number.
-/// </summary>
+// One privileged change or denied staff action. It records who, what, on which target and when.
+// It never holds a token, request body, email or phone number.
 public sealed class AuditEntry
 {
     public Guid Id { get; init; }
@@ -69,7 +65,7 @@ public static class AuditOutcomes
     public const string Denied = "DENIED";
 }
 
-/// <summary>Maps the Access module's tables in the <c>identity</c> schema.</summary>
+// Maps the Access module's tables in the identity schema.
 public static class AccessModel
 {
     public const string Schema = "identity";

@@ -6,7 +6,7 @@ using SmartRail.Api.Modules.Rail.Timetable;
 
 namespace SmartRail.Api.Modules.Rail;
 
-/// <summary>Anonymous timetable reads. No sign-in is needed for any route here.</summary>
+// Anonymous timetable reads. No sign-in is needed for any route here.
 public static partial class RailEndpoints
 {
     public const string ScheduleNote = "Scheduled times only — not live";

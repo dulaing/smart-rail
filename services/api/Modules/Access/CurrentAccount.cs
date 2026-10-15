@@ -5,13 +5,13 @@ using SmartRail.Api.Infrastructure;
 
 namespace SmartRail.Api.Modules.Access;
 
-/// <summary>A local account as the rules see it, plus the name to show.</summary>
+// A local account as the rules see it, plus the name to show.
 public sealed record LocalAccount(string DisplayName, AccessAccount Access)
 {
     public Guid Id => Access.Id;
 }
 
-/// <summary>Reads a local account, its grants and its assignments straight from the database.</summary>
+// Reads a local account, its grants and its assignments straight from the database.
 public sealed class AccountDirectory(SmartRailDbContext db)
 {
     public async Task<LocalAccount?> FindAsync(string issuer, string subject, CancellationToken cancellationToken)
@@ -49,11 +49,9 @@ public sealed class AccountDirectory(SmartRailDbContext db)
     }
 }
 
-/// <summary>
-/// The local account behind the request's validated token. It is read once per request, so the
-/// authorization handler and the endpoint see the same answer, and never cached across
-/// requests: disabling an account or removing a grant applies on the next call.
-/// </summary>
+// The local account behind the request's validated token. It is read once per request, so the
+// authorization handler and the endpoint see the same answer, and never cached across
+// requests: disabling an account or removing a grant applies on the next call.
 public sealed class CurrentAccount(AccountDirectory directory)
 {
     private bool _loaded;
@@ -77,7 +75,7 @@ public sealed class CurrentAccount(AccountDirectory directory)
 
 public sealed class ActiveAccountRequirement : IAuthorizationRequirement;
 
-/// <summary>A valid token is not enough: the subject must map to an enabled local account.</summary>
+// A valid token is not enough: the subject must map to an enabled local account.
 public sealed class ActiveAccountHandler(CurrentAccount current) : AuthorizationHandler<ActiveAccountRequirement>
 {
     protected override async Task HandleRequirementAsync(

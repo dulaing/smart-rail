@@ -1,6 +1,6 @@
 namespace SmartRail.Api.Modules.Rail.Timetable;
 
-/// <summary>A scheduled direct train from an origin stop to a later destination stop.</summary>
+// A scheduled direct train from an origin stop to a later destination stop.
 public sealed record ScheduledTrain(
     Guid JourneyId,
     DateOnly ServiceDate,
@@ -15,11 +15,9 @@ public sealed record ScheduledTrain(
     Guid DestinationStopId,
     DateTimeOffset DestinationArrival);
 
-/// <summary>
-/// Picks the next direct scheduled trains between two stations. The caller decides which
-/// journeys to load (for an early-morning request, include the previous service date so an
-/// overnight train can match); this class only applies the matching rules.
-/// </summary>
+// Picks the next direct scheduled trains between two stations. The caller decides which
+// journeys to load (for an early-morning request, include the previous service date so an
+// overnight train can match); this class only applies the matching rules.
 public static class NextTrainFinder
 {
     public const int DefaultLimit = 3;

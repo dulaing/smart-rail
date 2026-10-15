@@ -5,10 +5,8 @@ namespace SmartRail.Api.Modules.Access;
 
 public static class AccessSeeder
 {
-    /// <summary>
-    /// Makes <c>identity.roles</c> and <c>identity.role_permissions</c> match <see cref="RoleMatrix"/>.
-    /// Safe to run repeatedly; a permission removed from the matrix is removed here too.
-    /// </summary>
+    // Makes identity.roles and identity.role_permissions match RoleMatrix.
+    // Safe to run repeatedly; a permission removed from the matrix is removed here too.
     public static async Task SeedRolesAsync(SmartRailDbContext db, CancellationToken cancellationToken = default)
     {
         var existing = await db.Roles.Include(r => r.Permissions).ToDictionaryAsync(r => r.Code, cancellationToken);

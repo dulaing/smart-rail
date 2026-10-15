@@ -3,11 +3,9 @@ using SmartRail.Api.Infrastructure;
 
 namespace SmartRail.Api.Modules.Access;
 
-/// <summary>
-/// SysAdmin-only management of SmartRail accounts: enable or disable one, and give or remove
-/// role grants. These change SmartRail's own records. They never create or disable a Keycloak
-/// identity, and each successful change commits together with its audit row.
-/// </summary>
+// SysAdmin-only management of SmartRail accounts: enable or disable one, and give or remove
+// role grants. These change SmartRail's own records. They never create or disable a Keycloak
+// identity, and each successful change commits together with its audit row.
 public static class AccessAdminEndpoints
 {
     public const string SetStatusAction = "account.set_status";

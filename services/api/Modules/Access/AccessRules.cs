@@ -23,7 +23,7 @@ public static class AccountStatuses
     };
 }
 
-/// <summary>One role given to an account, with the permissions that role currently carries.</summary>
+// One role given to an account, with the permissions that role currently carries.
 public sealed record AccessGrant(
     Guid Id,
     string RoleCode,
@@ -34,17 +34,15 @@ public sealed record AccessGrant(
     public bool IsActiveAt(DateTimeOffset now) => ValidUntil is null || ValidUntil > now;
 }
 
-/// <summary>Everything the rules need to know about one local account, read fresh from the database.</summary>
+// Everything the rules need to know about one local account, read fresh from the database.
 public sealed record AccessAccount(
     Guid Id,
     AccountStatus Status,
     IReadOnlyList<AccessGrant> Grants,
     IReadOnlySet<Guid> AssignedJourneyIds);
 
-/// <summary>
-/// What the caller wants to act on. Build it from server data, never from a client-supplied
-/// station or journey claim.
-/// </summary>
+// What the caller wants to act on. Build it from server data, never from a client-supplied
+// station or journey claim.
 public abstract record AccessTarget
 {
     public sealed record Network : AccessTarget;
@@ -53,7 +51,7 @@ public abstract record AccessTarget
 
     public sealed record Journey(Guid JourneyId) : AccessTarget;
 
-    /// <summary>Personal data owned by <paramref name="OwnerAccountId"/>.</summary>
+    // Personal data owned by OwnerAccountId.
     public sealed record Own(Guid OwnerAccountId) : AccessTarget;
 }
 
@@ -65,11 +63,9 @@ public enum AccessDecision
     OutOfScope,
 }
 
-/// <summary>
-/// The pilot's authorization rules as pure functions, so they can be tested without a
-/// database. The default answer is denial: access needs an enabled account and one active
-/// grant whose role carries the permission and whose scope covers the target.
-/// </summary>
+// The pilot's authorization rules as pure functions, so they can be tested without a
+// database. The default answer is denial: access needs an enabled account and one active
+// grant whose role carries the permission and whose scope covers the target.
 public static class AccessRules
 {
     public static AccessDecision Evaluate(
@@ -113,17 +109,15 @@ public static class AccessRules
         };
 }
 
-/// <summary>What an account may do right now, for a client to show. The API still checks every request.</summary>
+// What an account may do right now, for a client to show. The API still checks every request.
 public sealed record EffectivePermission(
     string Code, ScopeKind Scope, IReadOnlyList<Guid> StationIds, IReadOnlyList<Guid> JourneyIds);
 
 public static class EffectivePermissions
 {
-    /// <summary>
-    /// The permissions an enabled account holds through active grants. A permission appears only
-    /// when something it can act on exists: a station for station scope, an assignment for
-    /// journey scope. A disabled account has none.
-    /// </summary>
+    // The permissions an enabled account holds through active grants. A permission appears only
+    // when something it can act on exists: a station for station scope, an assignment for
+    // journey scope. A disabled account has none.
     public static IReadOnlyList<EffectivePermission> Of(AccessAccount account, DateTimeOffset now)
     {
         if (account.Status != AccountStatus.Active)

@@ -10,10 +10,8 @@ using SmartRail.Api.Tests.Rail;
 
 namespace SmartRail.Api.Tests.Access;
 
-/// <summary>
-/// Token validation and account resolution against a disposable PostgreSQL. The test signer
-/// stands in for Keycloak, so no identity server has to be running.
-/// </summary>
+// Token validation and account resolution against a disposable PostgreSQL. The test signer
+// stands in for Keycloak, so no identity server has to be running.
 public class MeApiTests(AccessApi api) : IClassFixture<AccessApi>
 {
     private async Task<HttpResponseMessage> GetMeAsync(string? token)

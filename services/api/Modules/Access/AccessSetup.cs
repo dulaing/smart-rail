@@ -8,7 +8,7 @@ public static class AccessPolicies
 {
     public const string ActiveAccount = "ActiveAccount";
 
-    /// <summary>The policy that requires a network-wide permission, such as accounts.manage.</summary>
+    // The policy that requires a network-wide permission, such as accounts.manage.
     public static string For(string permission) => $"permission:{permission}";
 }
 
@@ -18,11 +18,9 @@ public static class AccessSetup
     // audience check already rejects an ID token, and this makes the rule explicit.
     private const string AccessTokenType = "Bearer";
 
-    /// <summary>
-    /// Validates Keycloak access tokens (issuer, signature, audience, expiry) and makes every
-    /// endpoint require a valid token and an enabled local account unless it opts out with
-    /// <c>AllowAnonymous</c>. SmartRail issues no tokens.
-    /// </summary>
+    // Validates Keycloak access tokens (issuer, signature, audience, expiry) and makes every
+    // endpoint require a valid token and an enabled local account unless it opts out with
+    // AllowAnonymous. SmartRail issues no tokens.
     public static void AddSmartRailAccess(this WebApplicationBuilder builder, bool hasDatabase)
     {
         var issuer = builder.Configuration["Identity:Issuer"];

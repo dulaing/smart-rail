@@ -4,12 +4,10 @@ using SmartRail.Api.Infrastructure;
 
 namespace SmartRail.Api.Modules.Access;
 
-/// <summary>
-/// Checks a permission and target for the signed-in account against the database, on every
-/// call, and records a denied action. A feature builds the target from server data (the
-/// station of the stop being changed, the journey of the report) and calls this before it
-/// acts; it never trusts a station or journey the client claims.
-/// </summary>
+// Checks a permission and target for the signed-in account against the database, on every
+// call, and records a denied action. A feature builds the target from server data (the
+// station of the stop being changed, the journey of the report) and calls this before it
+// acts; it never trusts a station or journey the client claims.
 public sealed class AccessGuard(CurrentAccount current, SmartRailDbContext db, TimeProvider time)
 {
     public async Task<AccessDecision> CheckAsync(HttpContext context, string permission, AccessTarget target)
@@ -32,7 +30,7 @@ public sealed class AccessGuard(CurrentAccount current, SmartRailDbContext db, T
         return decision;
     }
 
-    /// <summary>An audit row for the caller to save in the same transaction as its change.</summary>
+    // An audit row for the caller to save in the same transaction as its change.
     public AuditEntry NewEntry(
         HttpContext context, Guid actorId, string action, string outcome, string targetType, Guid? targetId) =>
         new()
@@ -56,7 +54,7 @@ public sealed class AccessGuard(CurrentAccount current, SmartRailDbContext db, T
     };
 }
 
-/// <summary>A network-wide permission. Station and journey permissions go through <see cref="AccessGuard"/>.</summary>
+// A network-wide permission. Station and journey permissions go through AccessGuard.
 public sealed class PermissionRequirement(string permission) : IAuthorizationRequirement
 {
     public string Permission { get; } = permission;

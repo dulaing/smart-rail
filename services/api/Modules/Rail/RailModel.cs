@@ -3,7 +3,7 @@ using SmartRail.Api.Modules.Rail.Timetable;
 
 namespace SmartRail.Api.Modules.Rail;
 
-/// <summary>Maps the Rail module's tables in the <c>network</c> schema.</summary>
+// Maps the Rail module's tables in the network schema.
 public static class RailModel
 {
     public const string Schema = "network";
