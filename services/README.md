@@ -9,8 +9,8 @@ Requires the .NET 10 SDK, Node 24 and Docker.
 This starts PostgreSQL, Keycloak, the API and RailBites, and opens the Aspire dashboard
 (URL and login link are printed in the console). Stop it with Ctrl+C.
 
-- Keycloak: `https://localhost:8080` (uses the .NET dev certificate; run
-  `dotnet dev-certs https --trust` once). Token issuer: `https://localhost:8080/realms/smartrail`.
+- Keycloak: `https://localhost:8080`, with a certificate from the SmartRail development CA (see
+  "Local HTTPS" below). Token issuer: `https://localhost:8080/realms/smartrail`.
   The admin password is in the dashboard under the keycloak resource.
 - API: `http://localhost:5111/health/live` and `/health/ready` (ready checks the database).
 - RailBites: its port is shown in the dashboard; `/health/live`.
@@ -39,11 +39,26 @@ Settings the API reads (defaults suit the Aspire stack):
 | `Identity:Audience` | `smartrail-api` | Expected `aud` of an access token. |
 | `Cors:AllowedOrigins` | `http://localhost:5173` (Development) | Browser origins allowed to call the API. |
 
+### Local HTTPS
+
+On its first run the AppHost creates a SmartRail development CA and a `localhost` certificate
+issued by it, in `%LOCALAPPDATA%\SmartRail\dev-certs` (outside the repository). Keycloak and the
+API serve that certificate; it is renewed automatically 30 days before it expires. The ASP.NET
+Core development certificate is not used for them because it is not a CA, and Android refuses to
+install it.
+
+Trust the CA once on this machine (Windows asks you to confirm):
+
+    certutil -user -addstore Root %LOCALAPPDATA%\SmartRail\dev-certs\smartrail-dev-ca.crt
+
+`smartrail-dev-ca.pfx` in the same folder holds the CA private key: never share or commit it.
+Delete the folder and remove "SmartRail Development CA" from the certificate store to start over.
+
 ### One-time local setup
 
-1. Trust the .NET development certificate once: `dotnet dev-certs https --trust`. Keycloak and
-   the API both use it; the API must trust the Keycloak issuer, so do not turn certificate
-   validation off.
+1. Trust the SmartRail development CA once (see "Local HTTPS" below). Keycloak and the API both
+   present certificates from it, and the API must trust the Keycloak issuer, so do not turn
+   certificate validation off.
 2. Start the stack: `dotnet run --project services/apphost`.
 3. Prepare the database: `dotnet run --project services/api -- --migrate-and-seed` with
    `ConnectionStrings__smartrail` set to the `smartrail` database shown in the dashboard.
@@ -120,18 +135,28 @@ or switch certificate validation off. For an Android emulator or a USB device:
        adb reverse tcp:8080 tcp:8080
        adb reverse tcp:7074 tcp:7074
 
-2. Export the .NET development certificate and install it as a user certificate on the device
-   (Settings > Security > Install a certificate > CA certificate):
+2. Install the SmartRail development CA on the device: copy
+   `%LOCALAPPDATA%\SmartRail\dev-certs\smartrail-dev-ca.crt` to it, for example
 
-       dotnet dev-certs https --export-path smartrail-dev.crt --format Pem
+       adb push %LOCALAPPDATA%\SmartRail\dev-certs\smartrail-dev-ca.crt /sdcard/Download/
 
-   Debug builds trust user-installed certificates through `network_security_config.xml`;
-   release builds do not.
+   then Settings > Security & privacy > More security > Encryption & credentials > Install a
+   certificate > CA certificate. Android needs a screen lock for this. Chrome and the debug
+   build of the apps then trust Keycloak and the API (`network_security_config.xml` lets debug
+   builds trust user-installed CAs; release builds do not).
 3. Apply the updated realm (see "Changing the realm") and run
    `--seed-demo-identities` so `demo-passenger` and `demo-driver` exist.
 4. Run an app, for example `flutter run` in `apps/passenger_app`. Override the endpoints with
    `--dart-define=ISSUER=...` and `--dart-define=API_URL=...` only if the reachable URL differs,
    and then the Keycloak hostname and `Identity:Issuer` must be changed to match.
 
-`flutter_appauth` supports Android, iOS and macOS; it does not run on Windows or web, and its
-Flutter plugins need Windows Developer Mode (symlinks) to build.
+Android details that matter:
+
+- The main activity must not set `android:taskAffinity=""` (the Flutter template adds it).
+  Otherwise the sign-in redirect opens in another task and AppAuth reports "No stored state".
+- Dart's own HTTP client trusts only Android's built-in CAs, so API calls use `cronet_http`,
+  which checks certificates through Android and therefore trusts the development CA in debug
+  builds. Its two Chromium libraries share a namespace, so `android/gradle.properties` sets
+  `android.uniquePackageNames=false`.
+
+`flutter_appauth` supports Android, iOS and macOS; it does not run on Windows or web.
