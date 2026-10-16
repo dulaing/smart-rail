@@ -145,7 +145,7 @@ public class MeApiTests(AccessApi api) : IClassFixture<AccessApi>
         // a service key instead; ObservationIngestionApiTests prove it refuses everything without one.
         Assert.Equal(
             [
-                "/api/journeys", "/api/next-trains", "/api/stations", "/health/live", "/health/ready",
+                "/api/journeys", "/api/journeys/{journeyId}/running", "/api/next-trains", "/api/stations", "/health/live", "/health/ready",
                 "/internal/rail/observations", "/openapi/{documentName}.json",
             ],
             anonymous);

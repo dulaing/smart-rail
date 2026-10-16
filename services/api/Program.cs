@@ -49,7 +49,7 @@ builder.Services.AddCors(cors => cors.AddDefaultPolicy(policy => policy
     .WithOrigins(allowedOrigins)
     .WithMethods("GET", "POST", "PUT", "PATCH", "DELETE")
     .WithHeaders("Authorization", "Content-Type", "If-None-Match")
-    .WithExposedHeaders("ETag")));
+    .WithExposedHeaders("ETag", RunningEndpoints.ServerTimeHeader)));
 
 var app = builder.Build();
 
