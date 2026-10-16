@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SmartRail.Api.Infrastructure;
 using SmartRail.Api.Modules.Access;
+using SmartRail.Api.Modules.Catering;
 using SmartRail.Api.Modules.Operations;
 using SmartRail.Api.Modules.Rail;
 using SmartRail.Api.Modules.Rail.Running;
@@ -44,6 +45,7 @@ builder.Services.TryAddSingleton(TimeProvider.System);
 var hasDatabase = builder.AddSmartRailDatabase();
 builder.AddSmartRailAccess(hasDatabase);
 builder.AddSmartRailRail(hasDatabase);
+builder.AddSmartRailCatering(hasDatabase);
 builder.AddSmartRailOperations(hasDatabase);
 builder.AddSmartRailSimulator(hasDatabase);
 

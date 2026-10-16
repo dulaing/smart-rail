@@ -30,7 +30,7 @@ public class PreviewApiTests(AccessApi api) : IClassFixture<AccessApi>
         Assert.True(body.GetProperty("food").GetProperty("etaChanges").GetBoolean());
 
         // Nothing stored, no version moved, nothing audited for a successful preview.
-        Assert.Equal((0, 0), await api.CountsAsync(journeyId));
+        Assert.Equal((0, 0, 0), await api.CountsAsync(journeyId));
         Assert.Empty(await api.AuditAsync(controller));
         var state = await api.Client.GetAsync($"/api/journeys/{journeyId}/changes");
         Assert.Equal(0, (await state.JsonAsync()).GetProperty("activeChanges").GetArrayLength());
@@ -67,7 +67,7 @@ public class PreviewApiTests(AccessApi api) : IClassFixture<AccessApi>
         Assert.Equal(1, body.GetProperty("previewedVersion").GetInt32());
         Assert.Equal("ENDS_EARLY", body.GetProperty("before").GetProperty("availability").GetString());
         Assert.Equal("AS_SCHEDULED", body.GetProperty("after").GetProperty("availability").GetString());
-        Assert.Equal((1, 1), await api.CountsAsync(journeyId));
+        Assert.Equal((1, 1, 0), await api.CountsAsync(journeyId));
     }
 
     [RequiresDatabaseFact]
@@ -166,7 +166,7 @@ public class PreviewApiTests(AccessApi api) : IClassFixture<AccessApi>
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         var denied = Assert.Single(await api.AuditAsync(account));
         Assert.Equal(("DENIED", "JOURNEY", (Guid?)journeyId), (denied.Outcome, denied.TargetType, denied.TargetId));
-        Assert.Equal((0, 0), await api.CountsAsync(journeyId));
+        Assert.Equal((0, 0, 0), await api.CountsAsync(journeyId));
     }
 
     [RequiresDatabaseFact]

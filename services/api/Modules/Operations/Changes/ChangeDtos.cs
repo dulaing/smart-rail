@@ -4,6 +4,9 @@ namespace SmartRail.Api.Modules.Operations.Changes;
 // published change to withdraw, never both. Confirm also carries the version the preview showed.
 public sealed record ChangeRequest(ChangeDraft? Draft, Guid? WithdrawChangeId, int? PreviewedVersion);
 
+// The answer to a confirmed change: its ID, the journey's new version and the state now in force.
+public sealed record ChangeConfirmedDto(Guid ChangeId, int JourneyVersion, ConfirmedStateDto State);
+
 public sealed record ChangeDetailsDto(
     string Kind, int? DelayMinutes, string? NewPlatform, Guid? TargetStopId, Guid? FinalStopId)
 {

@@ -1,6 +1,8 @@
 using System.Net.Http.Json;
 using System.Text.Json;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using SmartRail.Api.Modules.Operations.Changes;
 using SmartRail.Api.Tests.Access;
 
@@ -47,14 +49,35 @@ public static class OperationsApiExtensions
         return fields;
     }
 
-    public static async Task<(int Version, int Changes)> CountsAsync(this AccessApi api, Guid journeyId)
+    // The journey's version, its history rows and its Catering outbox rows.
+    public static async Task<(int Version, int Changes, int Outbox)> CountsAsync(this AccessApi api, Guid journeyId)
     {
-        var result = (0, 0);
+        var result = (0, 0, 0);
         await api.WithDbAsync(async db =>
             result = (
                 (await db.JourneyVersions.SingleAsync(v => v.JourneyId == journeyId)).Version,
-                await db.ServiceChanges.CountAsync(c => c.JourneyId == journeyId)));
+                await db.ServiceChanges.CountAsync(c => c.JourneyId == journeyId),
+                await db.OutboxMessages.CountAsync(m => db.ServiceChanges.Any(c => c.Id == m.ServiceChangeId && c.JourneyId == journeyId))));
         return result;
+    }
+
+    // Audit entries about one journey that report a success.
+    public static async Task<int> SuccessAuditCountAsync(this AccessApi api, Guid journeyId)
+    {
+        var count = 0;
+        await api.WithDbAsync(async db =>
+            count = await db.AuditEntries.CountAsync(e => e.TargetId == journeyId && e.Outcome == "SUCCEEDED"));
+        return count;
+    }
+
+    // A request sent to a copy of the API whose services have been replaced, over the same database.
+    public static Task<HttpResponseMessage> ConfirmWithAsync(
+        this AccessApi api, Action<IServiceCollection> replace, string subject, Guid journeyId, object body)
+    {
+        var factory = api.Factory.WithWebHostBuilder(host => host.ConfigureTestServices(replace));
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", api.Token(subject));
+        return client.PostAsJsonAsync($"/api/operations/journeys/{journeyId}/changes", body);
     }
 
     // Writes a published change straight into history, as an earlier confirmation would have.

@@ -9,6 +9,7 @@ public static class OperationsSetup
         if (hasDatabase)
         {
             builder.Services.AddScoped<ChangeStore>();
+            builder.Services.AddScoped<ChangeConfirmer>();
         }
     }
 

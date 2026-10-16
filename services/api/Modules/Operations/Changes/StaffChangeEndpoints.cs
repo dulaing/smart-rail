@@ -15,6 +15,7 @@ public static class StaffChangeEndpoints
             .RequireAuthorization(AccessPolicies.ActiveAccount);
 
         journey.MapPost("changes/preview", Preview);
+        journey.MapPost("changes", Confirm);
     }
 
     // Shows what a publish or withdrawal would do. Nothing is stored, versioned or sent.
@@ -33,6 +34,69 @@ public static class StaffChangeEndpoints
             ? ToProblem(problem)
             : Results.Ok(ChangePreviewDto.From(preview.Value!));
     }
+
+    // Makes the previewed change real, but only if the journey is still at the version the
+    // preview showed. The preview is recomputed here; nothing the client says about its impact is
+    // trusted. A stale preview is a 409 and nothing is written.
+    private static async Task<IResult> Confirm(
+        Guid journeyId, ChangeRequest? request, HttpContext context,
+        IJourneyStopReader journeys, ChangeStore store, AccessGuard guard, CurrentAccount current, ChangeConfirmer confirmer)
+    {
+        var loaded = await LoadAsync(journeyId, request, context, journeys, store, guard);
+        if (loaded.Failure is not null)
+        {
+            return loaded.Failure;
+        }
+
+        var journey = loaded.Journey!;
+        var changes = loaded.Changes!;
+        if (request!.PreviewedVersion is not { } previewedVersion)
+        {
+            return Results.Problem(
+                title: "Invalid change request",
+                detail: "previewedVersion is required: preview the change, then confirm it.",
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+
+        // Problems with the draft itself do not depend on the journey's history.
+        if (request.Draft is not null && ChangeRules.ValidateDraft(request.Draft, journey).Problem is { } invalid)
+        {
+            return ToProblem(invalid);
+        }
+
+        if (previewedVersion != changes.Version)
+        {
+            return StalePreview(previewedVersion, changes.Version);
+        }
+
+        var preview = Evaluate(journey, changes, request);
+        if (preview.Problem is { } problem)
+        {
+            return ToProblem(problem);
+        }
+
+        var actor = (await current.GetAsync(context.User, context.RequestAborted))!;
+        var result = await confirmer.ConfirmAsync(context, actor.Id, journey, changes, preview.Value!);
+        return result switch
+        {
+            ConfirmResult.Confirmed done => Results.Ok(new ChangeConfirmedDto(done.ChangeId, done.JourneyVersion, done.State)),
+            ConfirmResult.Stale stale => StalePreview(previewedVersion, stale.LatestVersion),
+            _ => throw new InvalidOperationException("Unknown confirmation result."),
+        };
+    }
+
+    // 409 with the latest version, so the client previews again. It is never retried here.
+    private static IResult StalePreview(int previewedVersion, int latestVersion) =>
+        Results.Problem(
+            title: "Stale preview",
+            detail: "The journey changed after this preview. Preview it again before confirming.",
+            statusCode: StatusCodes.Status409Conflict,
+            extensions: new Dictionary<string, object?>
+            {
+                ["code"] = "STALE_PREVIEW",
+                ["previewedVersion"] = previewedVersion,
+                ["latestVersion"] = latestVersion,
+            });
 
     // The common start of preview and confirm: the journey exists, the body names exactly one
     // action, and the caller may do it. The caller gets either the journey with its version and

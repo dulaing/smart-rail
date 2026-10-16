@@ -213,6 +213,62 @@ namespace SmartRail.Api.Infrastructure.Migrations
                     b.ToTable("role_permissions", "identity");
                 });
 
+            modelBuilder.Entity("SmartRail.Api.Modules.Catering.Outbox.OutboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("AttemptCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("attempt_count");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("DeliveryState")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("delivery_state");
+
+                    b.Property<string>("EventId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("event_id");
+
+                    b.Property<DateTimeOffset>("NextAttemptAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("next_attempt_at");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("payload");
+
+                    b.Property<Guid>("ServiceChangeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("service_change_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId")
+                        .IsUnique();
+
+                    b.HasIndex("ServiceChangeId");
+
+                    b.HasIndex("DeliveryState", "NextAttemptAt");
+
+                    b.ToTable("outbox_messages", "catering", t =>
+                        {
+                            t.HasCheckConstraint("ck_outbox_messages_attempts", "attempt_count >= 0");
+
+                            t.HasCheckConstraint("ck_outbox_messages_state", "delivery_state IN ('PENDING', 'DELIVERED', 'FAILED')");
+                        });
+                });
+
             modelBuilder.Entity("SmartRail.Api.Modules.Operations.Changes.JourneyChangeVersion", b =>
                 {
                     b.Property<Guid>("JourneyId")
@@ -597,6 +653,15 @@ namespace SmartRail.Api.Infrastructure.Migrations
                         .WithMany("Permissions")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SmartRail.Api.Modules.Catering.Outbox.OutboxMessage", b =>
+                {
+                    b.HasOne("SmartRail.Api.Modules.Operations.Changes.ServiceChange", null)
+                        .WithMany()
+                        .HasForeignKey("ServiceChangeId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
