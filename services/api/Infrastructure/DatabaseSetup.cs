@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SmartRail.Api.Modules.Access;
+using SmartRail.Api.Modules.Operations.Changes;
+using SmartRail.Api.Modules.Rail;
 using SmartRail.Api.Modules.Rail.Timetable;
 
 namespace SmartRail.Api.Infrastructure;
@@ -34,10 +36,12 @@ public static class DatabaseSetup
         await SeedAsync(db, start, days);
     }
 
-    // The seed data every database needs: the role matrix and the demo timetable.
+    // The seed data every database needs: the role matrix, the demo timetable and a change
+    // version row for every journey.
     public static async Task SeedAsync(SmartRailDbContext db, DateOnly startDate, int days)
     {
         await AccessSeeder.SeedRolesAsync(db);
         await DemoTimetableSeeder.SeedAsync(db, startDate, days);
+        await OperationsSeeder.SeedVersionsAsync(db, new JourneyStopReader(db), TimeProvider.System.GetUtcNow());
     }
 }

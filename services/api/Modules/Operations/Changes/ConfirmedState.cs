@@ -67,6 +67,17 @@ public enum ServiceAvailability
     Cancelled,
 }
 
+public static class ServiceAvailabilities
+{
+    public static string ToCode(this ServiceAvailability availability) => availability switch
+    {
+        ServiceAvailability.AsScheduled => "AS_SCHEDULED",
+        ServiceAvailability.EndsEarly => "ENDS_EARLY",
+        ServiceAvailability.Cancelled => "CANCELLED",
+        _ => throw new ArgumentOutOfRangeException(nameof(availability)),
+    };
+}
+
 // One stop occurrence as passengers, boards and Catering should see it. Platform is the
 // confirmed one while a platform change is in force, otherwise the scheduled one.
 public sealed record StopOutcome(

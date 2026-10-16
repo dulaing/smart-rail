@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SmartRail.Api.Modules.Access;
+using SmartRail.Api.Modules.Operations.Changes;
 using SmartRail.Api.Modules.Rail;
 using SmartRail.Api.Modules.Rail.Running;
 using SmartRail.Api.Modules.Rail.Timetable;
@@ -22,9 +23,13 @@ public sealed class SmartRailDbContext(DbContextOptions<SmartRailDbContext> opti
     public DbSet<JourneyAssignment> JourneyAssignments => Set<JourneyAssignment>();
     public DbSet<AuditEntry> AuditEntries => Set<AuditEntry>();
 
+    public DbSet<JourneyChangeVersion> JourneyVersions => Set<JourneyChangeVersion>();
+    public DbSet<ServiceChange> ServiceChanges => Set<ServiceChange>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyRailModel();
         modelBuilder.ApplyAccessModel();
+        modelBuilder.ApplyOperationsModel();
     }
 }

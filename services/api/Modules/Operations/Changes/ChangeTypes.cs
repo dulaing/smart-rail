@@ -87,12 +87,41 @@ public sealed record ChangeDetails(
 
 // One row of changes.service_changes. History is only ever appended to. A withdrawal carries
 // the kind of the change it withdraws, no type-specific fields, and points at that change.
-public sealed record ServiceChange(
-    Guid Id,
-    int JourneyVersion,
-    ChangeAction Action,
-    ChangeDetails Details,
-    Guid? SupersedesChangeId = null);
+// JourneyId, PublishedById and PublishedAt are set by the server when a row is stored.
+public sealed class ServiceChange
+{
+    private ServiceChange()
+    {
+    }
+
+    public ServiceChange(Guid id, int journeyVersion, ChangeAction action, ChangeDetails details, Guid? supersedesChangeId = null)
+    {
+        Id = id;
+        JourneyVersion = journeyVersion;
+        Action = action;
+        Kind = details.Kind;
+        DelayMinutes = details.DelayMinutes;
+        NewPlatform = details.NewPlatform;
+        TargetStopId = details.TargetStopId;
+        FinalStopId = details.FinalStopId;
+        SupersedesChangeId = supersedesChangeId;
+    }
+
+    public Guid Id { get; private set; }
+    public Guid JourneyId { get; init; }
+    public int JourneyVersion { get; private set; }
+    public ChangeAction Action { get; private set; }
+    public ChangeKind Kind { get; private set; }
+    public int? DelayMinutes { get; private set; }
+    public string? NewPlatform { get; private set; }
+    public Guid? TargetStopId { get; private set; }
+    public Guid? FinalStopId { get; private set; }
+    public Guid? SupersedesChangeId { get; private set; }
+    public Guid PublishedById { get; init; }
+    public DateTimeOffset PublishedAt { get; init; }
+
+    public ChangeDetails Details => new(Kind, DelayMinutes, NewPlatform, TargetStopId, FinalStopId);
+}
 
 // What the rules need to know about one stop occurrence of a journey's pattern. Rail supplies
 // these later; the rules never query Rail's tables.

@@ -213,6 +213,108 @@ namespace SmartRail.Api.Infrastructure.Migrations
                     b.ToTable("role_permissions", "identity");
                 });
 
+            modelBuilder.Entity("SmartRail.Api.Modules.Operations.Changes.JourneyChangeVersion", b =>
+                {
+                    b.Property<Guid>("JourneyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("journey_id");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("integer")
+                        .HasColumnName("version");
+
+                    b.HasKey("JourneyId");
+
+                    b.ToTable("journey_change_versions", "changes", t =>
+                        {
+                            t.HasCheckConstraint("ck_journey_change_versions_version", "version >= 0");
+                        });
+                });
+
+            modelBuilder.Entity("SmartRail.Api.Modules.Operations.Changes.ServiceChange", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("action");
+
+                    b.Property<int?>("DelayMinutes")
+                        .HasColumnType("integer")
+                        .HasColumnName("delay_minutes");
+
+                    b.Property<Guid?>("FinalStopId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("final_stop_id");
+
+                    b.Property<Guid>("JourneyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("journey_id");
+
+                    b.Property<int>("JourneyVersion")
+                        .HasColumnType("integer")
+                        .HasColumnName("journey_version");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("kind");
+
+                    b.Property<string>("NewPlatform")
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("new_platform");
+
+                    b.Property<DateTimeOffset>("PublishedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("published_at");
+
+                    b.Property<Guid>("PublishedById")
+                        .HasColumnType("uuid")
+                        .HasColumnName("published_by_id");
+
+                    b.Property<Guid?>("SupersedesChangeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("supersedes_change_id");
+
+                    b.Property<Guid?>("TargetStopId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("target_stop_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FinalStopId");
+
+                    b.HasIndex("PublishedById");
+
+                    b.HasIndex("SupersedesChangeId");
+
+                    b.HasIndex("TargetStopId");
+
+                    b.HasIndex("JourneyId", "JourneyVersion")
+                        .IsUnique();
+
+                    b.ToTable("service_changes", "changes", t =>
+                        {
+                            t.HasCheckConstraint("ck_service_changes_action", "action IN ('PUBLISH', 'WITHDRAW')");
+
+                            t.HasCheckConstraint("ck_service_changes_fields", "(action = 'PUBLISH' AND supersedes_change_id IS NULL AND (\n    (kind = 'DELAY' AND delay_minutes >= 0 AND new_platform IS NULL AND target_stop_id IS NULL AND final_stop_id IS NULL)\n OR (kind = 'CANCEL' AND delay_minutes IS NULL AND new_platform IS NULL AND target_stop_id IS NULL AND final_stop_id IS NULL)\n OR (kind = 'PLATFORM' AND delay_minutes IS NULL AND btrim(new_platform) <> '' AND target_stop_id IS NOT NULL AND final_stop_id IS NULL)\n OR (kind = 'EARLY_END' AND delay_minutes IS NULL AND new_platform IS NULL AND target_stop_id IS NULL AND final_stop_id IS NOT NULL)))\nOR (action = 'WITHDRAW' AND supersedes_change_id IS NOT NULL\n    AND delay_minutes IS NULL AND new_platform IS NULL AND target_stop_id IS NULL AND final_stop_id IS NULL)");
+
+                            t.HasCheckConstraint("ck_service_changes_kind", "kind IN ('DELAY', 'CANCEL', 'PLATFORM', 'EARLY_END')");
+
+                            t.HasCheckConstraint("ck_service_changes_version", "journey_version >= 1");
+                        });
+                });
+
             modelBuilder.Entity("SmartRail.Api.Modules.Rail.Running.Observation", b =>
                 {
                     b.Property<Guid>("Id")
@@ -496,6 +598,45 @@ namespace SmartRail.Api.Infrastructure.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("SmartRail.Api.Modules.Operations.Changes.JourneyChangeVersion", b =>
+                {
+                    b.HasOne("SmartRail.Api.Modules.Rail.Timetable.ScheduledJourney", null)
+                        .WithOne()
+                        .HasForeignKey("SmartRail.Api.Modules.Operations.Changes.JourneyChangeVersion", "JourneyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SmartRail.Api.Modules.Operations.Changes.ServiceChange", b =>
+                {
+                    b.HasOne("SmartRail.Api.Modules.Rail.Timetable.PatternStop", null)
+                        .WithMany()
+                        .HasForeignKey("FinalStopId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SmartRail.Api.Modules.Rail.Timetable.ScheduledJourney", null)
+                        .WithMany()
+                        .HasForeignKey("JourneyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartRail.Api.Modules.Access.Account", null)
+                        .WithMany()
+                        .HasForeignKey("PublishedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartRail.Api.Modules.Operations.Changes.ServiceChange", null)
+                        .WithMany()
+                        .HasForeignKey("SupersedesChangeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SmartRail.Api.Modules.Rail.Timetable.PatternStop", null)
+                        .WithMany()
+                        .HasForeignKey("TargetStopId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("SmartRail.Api.Modules.Rail.Running.Observation", b =>

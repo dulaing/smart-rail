@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SmartRail.Api.Infrastructure;
 using SmartRail.Api.Modules.Access;
+using SmartRail.Api.Modules.Operations;
 using SmartRail.Api.Modules.Rail;
 using SmartRail.Api.Modules.Rail.Running;
 using OpenTelemetry;
@@ -42,6 +43,8 @@ if (!string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOIN
 builder.Services.TryAddSingleton(TimeProvider.System);
 var hasDatabase = builder.AddSmartRailDatabase();
 builder.AddSmartRailAccess(hasDatabase);
+builder.AddSmartRailRail(hasDatabase);
+builder.AddSmartRailOperations(hasDatabase);
 builder.AddSmartRailSimulator(hasDatabase);
 
 // Browsers may call the API only from the origins listed in Cors:AllowedOrigins.
@@ -91,6 +94,7 @@ if (hasDatabase)
     app.MapRunningEndpoints();
     app.MapAccessEndpoints();
     app.MapAccessAdminEndpoints();
+    app.MapOperationsEndpoints();
 
     // Demo-only controls: never available outside Development.
     if (app.Environment.IsDevelopment())
