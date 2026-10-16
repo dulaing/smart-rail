@@ -15,5 +15,6 @@ public static class OperationsSetup
     public static void MapOperationsEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapPublicChanges();
+        app.MapStaffChanges();
     }
 }

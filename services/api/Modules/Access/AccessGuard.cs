@@ -30,6 +30,34 @@ public sealed class AccessGuard(CurrentAccount current, SmartRailDbContext db, T
         return decision;
     }
 
+    // Allowed when the account holds any one of the options, for a feature where a controller or
+    // a scoped station member may act. A refusal is audited once, against the named target (for
+    // example the journey), not once per option. It records the first option's permission.
+    public async Task<AccessDecision> CheckAnyAsync(
+        HttpContext context,
+        IReadOnlyList<(string Permission, AccessTarget Target)> options,
+        string auditTargetType,
+        Guid auditTargetId)
+    {
+        var account = await current.GetAsync(context.User, context.RequestAborted);
+        if (account is null)
+        {
+            return AccessDecision.NoPermission;
+        }
+
+        var now = time.GetUtcNow();
+        var decisions = options.Select(o => AccessRules.Evaluate(account.Access, o.Permission, o.Target, now)).ToList();
+        if (decisions.Contains(AccessDecision.Allowed))
+        {
+            return AccessDecision.Allowed;
+        }
+
+        db.AuditEntries.Add(NewEntry(
+            context, account.Id, options[0].Permission, AuditOutcomes.Denied, auditTargetType, auditTargetId));
+        await db.SaveChangesAsync(context.RequestAborted);
+        return decisions[0];
+    }
+
     // An audit row for the caller to save in the same transaction as its change.
     public AuditEntry NewEntry(
         HttpContext context, Guid actorId, string action, string outcome, string targetType, Guid? targetId) =>
