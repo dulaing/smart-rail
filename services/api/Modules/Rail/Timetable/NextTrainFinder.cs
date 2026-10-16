@@ -86,17 +86,7 @@ public static class NextTrainFinder
                     continue;
                 }
 
-                // One day offset serves both times, so an arrival "after" the departure
-                // (23:58 in, 00:03 out) happened the day before.
-                DateTimeOffset? originArrival = null;
-                if (origin.ArrivalLocal is { } a)
-                {
-                    originArrival = ColomboTime.ToInstant(journey.ServiceDate, a, origin.DayOffset);
-                    if (originArrival > departure)
-                    {
-                        originArrival = originArrival.Value.AddDays(-1);
-                    }
-                }
+                var (originArrival, _) = ColomboTime.StopInstants(journey.ServiceDate, origin);
 
                 return new ScheduledTrain(
                     journey.Id,

@@ -141,8 +141,13 @@ public class MeApiTests(AccessApi api) : IClassFixture<AccessApi>
             .Order()
             .ToList();
 
+        // The internal observation route skips the signed-in-user rule because it is guarded by
+        // a service key instead; ObservationIngestionApiTests prove it refuses everything without one.
         Assert.Equal(
-            ["/api/journeys", "/api/next-trains", "/api/stations", "/health/live", "/health/ready", "/openapi/{documentName}.json"],
+            [
+                "/api/journeys", "/api/next-trains", "/api/stations", "/health/live", "/health/ready",
+                "/internal/rail/observations", "/openapi/{documentName}.json",
+            ],
             anonymous);
     }
 

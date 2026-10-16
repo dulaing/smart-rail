@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SmartRail.Api.Modules.Access;
 using SmartRail.Api.Modules.Rail;
+using SmartRail.Api.Modules.Rail.Running;
 using SmartRail.Api.Modules.Rail.Timetable;
 
 namespace SmartRail.Api.Infrastructure;
@@ -13,6 +14,7 @@ public sealed class SmartRailDbContext(DbContextOptions<SmartRailDbContext> opti
     public DbSet<ServicePattern> ServicePatterns => Set<ServicePattern>();
     public DbSet<PatternStop> PatternStops => Set<PatternStop>();
     public DbSet<ScheduledJourney> Journeys => Set<ScheduledJourney>();
+    public DbSet<Observation> Observations => Set<Observation>();
 
     public DbSet<Account> Accounts => Set<Account>();
     public DbSet<Role> Roles => Set<Role>();

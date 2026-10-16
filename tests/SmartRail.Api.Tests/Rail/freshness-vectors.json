@@ -1,0 +1,18 @@
+{
+  "description": "Freshness of simulated running evidence (scope decision D5). Age is now minus observedAt. Shared by the C# tests now; the Dart and TypeScript clients should run the same cases.",
+  "ageingAfterSeconds": 180,
+  "unknownAfterSeconds": 240,
+  "cases": [
+    { "name": "no observation", "observedAt": null, "now": "2026-10-15T08:00:00+05:30", "freshness": "UNKNOWN" },
+    { "name": "observed just now", "observedAt": "2026-10-15T08:00:00+05:30", "now": "2026-10-15T08:00:00+05:30", "freshness": "CURRENT" },
+    { "name": "179 seconds old", "observedAt": "2026-10-15T08:00:00+05:30", "now": "2026-10-15T08:02:59+05:30", "freshness": "CURRENT" },
+    { "name": "just under 180 seconds", "observedAt": "2026-10-15T08:00:00+05:30", "now": "2026-10-15T08:02:59.999+05:30", "freshness": "CURRENT" },
+    { "name": "180 seconds old", "observedAt": "2026-10-15T08:00:00+05:30", "now": "2026-10-15T08:03:00+05:30", "freshness": "AGEING" },
+    { "name": "239 seconds old", "observedAt": "2026-10-15T08:00:00+05:30", "now": "2026-10-15T08:03:59+05:30", "freshness": "AGEING" },
+    { "name": "just under 240 seconds", "observedAt": "2026-10-15T08:00:00+05:30", "now": "2026-10-15T08:03:59.999+05:30", "freshness": "AGEING" },
+    { "name": "240 seconds old", "observedAt": "2026-10-15T08:00:00+05:30", "now": "2026-10-15T08:04:00+05:30", "freshness": "UNKNOWN" },
+    { "name": "one hour old", "observedAt": "2026-10-15T08:00:00+05:30", "now": "2026-10-15T09:00:00+05:30", "freshness": "UNKNOWN" },
+    { "name": "same instants written in UTC", "observedAt": "2026-10-15T02:30:00Z", "now": "2026-10-15T02:33:00Z", "freshness": "AGEING" },
+    { "name": "age crosses local midnight", "observedAt": "2026-10-14T23:59:00+05:30", "now": "2026-10-15T00:02:00+05:30", "freshness": "AGEING" }
+  ]
+}

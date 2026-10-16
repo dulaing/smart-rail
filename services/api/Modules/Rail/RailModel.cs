@@ -1,12 +1,15 @@
 using Microsoft.EntityFrameworkCore;
+using SmartRail.Api.Modules.Rail.Running;
 using SmartRail.Api.Modules.Rail.Timetable;
 
 namespace SmartRail.Api.Modules.Rail;
 
-// Maps the Rail module's tables in the network schema.
+// Maps the Rail module's tables: the timetable in the network schema and simulated
+// observations in the live schema.
 public static class RailModel
 {
     public const string Schema = "network";
+    public const string LiveSchema = "live";
 
     public static void ApplyRailModel(this ModelBuilder model)
     {
@@ -82,6 +85,31 @@ public static class RailModel
             journey.HasIndex(j => new { j.PatternId, j.ServiceDate }).IsUnique();
             journey.HasIndex(j => j.DemoSeedKey).IsUnique();
             journey.HasOne(j => j.Pattern).WithMany().HasForeignKey(j => j.PatternId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        model.Entity<Observation>(observation =>
+        {
+            observation.ToTable("observations", LiveSchema, table =>
+            {
+                table.HasCheckConstraint("ck_observations_progress", "progress_permille BETWEEN 0 AND 1000");
+                table.HasCheckConstraint("ck_observations_delay", "reported_delay_seconds >= 0");
+            });
+            observation.HasKey(o => o.Id);
+            observation.Property(o => o.Id).HasColumnName("id").ValueGeneratedNever();
+            observation.Property(o => o.JourneyId).HasColumnName("journey_id");
+            observation.Property(o => o.SourceEventId).HasColumnName("source_event_id").HasMaxLength(ObservationRules.MaxEventIdLength);
+            observation.Property(o => o.FromStopId).HasColumnName("from_stop_id");
+            observation.Property(o => o.ToStopId).HasColumnName("to_stop_id");
+            observation.Property(o => o.ProgressPermille).HasColumnName("progress_permille");
+            observation.Property(o => o.ReportedDelaySeconds).HasColumnName("reported_delay_seconds");
+            observation.Property(o => o.ObservedAt).HasColumnName("observed_at");
+            observation.Property(o => o.ReceivedAt).HasColumnName("received_at");
+            // The database, not the application, makes a retry or a race safe.
+            observation.HasIndex(o => o.SourceEventId).IsUnique();
+            observation.HasIndex(o => new { o.JourneyId, o.ObservedAt });
+            observation.HasOne<ScheduledJourney>().WithMany().HasForeignKey(o => o.JourneyId).OnDelete(DeleteBehavior.Restrict);
+            observation.HasOne<PatternStop>().WithMany().HasForeignKey(o => o.FromStopId).OnDelete(DeleteBehavior.Restrict);
+            observation.HasOne<PatternStop>().WithMany().HasForeignKey(o => o.ToStopId).OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

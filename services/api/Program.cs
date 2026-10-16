@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using SmartRail.Api.Infrastructure;
 using SmartRail.Api.Modules.Access;
 using SmartRail.Api.Modules.Rail;
+using SmartRail.Api.Modules.Rail.Running;
 using OpenTelemetry;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Resources;
@@ -86,6 +87,7 @@ if (app.Environment.IsDevelopment())
 if (hasDatabase)
 {
     app.MapRailEndpoints();
+    app.MapRunningEndpoints();
     app.MapAccessEndpoints();
     app.MapAccessAdminEndpoints();
 }

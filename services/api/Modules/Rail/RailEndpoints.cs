@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using SmartRail.Api.Infrastructure;
 using SmartRail.Api.Modules.Rail.Timetable;
@@ -7,7 +6,7 @@ using SmartRail.Api.Modules.Rail.Timetable;
 namespace SmartRail.Api.Modules.Rail;
 
 // Anonymous timetable reads. No sign-in is needed for any route here.
-public static partial class RailEndpoints
+public static class RailEndpoints
 {
     public const string ScheduleNote = "Scheduled times only — not live";
 
@@ -94,7 +93,7 @@ public static partial class RailEndpoints
         {
             instant = time.GetUtcNow();
         }
-        else if (!TryParseInstant(at, out instant))
+        else if (!InstantText.TryParse(at, out instant))
         {
             return Bad("Invalid at", "at must be an ISO 8601 timestamp with an offset, such as 2026-10-14T07:00:00+05:30.");
         }
@@ -138,17 +137,6 @@ public static partial class RailEndpoints
 
     private static IResult Bad(string title, string detail) =>
         Results.Problem(title: title, detail: detail, statusCode: StatusCodes.Status400BadRequest);
-
-    // The offset must be written out ("Z" or "+05:30"); a bare local time would be a guess.
-    private static bool TryParseInstant(string value, out DateTimeOffset instant)
-    {
-        instant = default;
-        return OffsetSuffix().IsMatch(value)
-            && DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out instant);
-    }
-
-    [GeneratedRegex(@"^\d{4}-\d{2}-\d{2}T.*(Z|[+-]\d{2}:\d{2})$")]
-    private static partial Regex OffsetSuffix();
 
     private sealed record StationDto(Guid Id, string Code, string NameEn, string NameSi, string NameTa);
 

@@ -112,4 +112,20 @@ public static class ColomboTime
 
     public static DateOnly ServiceDateOf(DateTimeOffset instant) =>
         DateOnly.FromDateTime(instant.ToOffset(Offset).DateTime);
+
+    // Scheduled arrival and departure of one stop occurrence. One day offset serves both
+    // times, so an arrival "after" the departure (23:58 in, 00:03 out) happened the day before.
+    public static (DateTimeOffset? Arrival, DateTimeOffset? Departure) StopInstants(
+        DateOnly serviceDate, PatternStop stop)
+    {
+        DateTimeOffset? arrival = stop.ArrivalLocal is { } a ? ToInstant(serviceDate, a, stop.DayOffset) : null;
+        DateTimeOffset? departure = stop.DepartureLocal is { } d ? ToInstant(serviceDate, d, stop.DayOffset) : null;
+
+        if (arrival > departure)
+        {
+            arrival = arrival.Value.AddDays(-1);
+        }
+
+        return (arrival, departure);
+    }
 }

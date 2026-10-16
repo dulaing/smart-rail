@@ -213,6 +213,65 @@ namespace SmartRail.Api.Infrastructure.Migrations
                     b.ToTable("role_permissions", "identity");
                 });
 
+            modelBuilder.Entity("SmartRail.Api.Modules.Rail.Running.Observation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("FromStopId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("from_stop_id");
+
+                    b.Property<Guid>("JourneyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("journey_id");
+
+                    b.Property<DateTimeOffset>("ObservedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("observed_at");
+
+                    b.Property<int>("ProgressPermille")
+                        .HasColumnType("integer")
+                        .HasColumnName("progress_permille");
+
+                    b.Property<DateTimeOffset>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("received_at");
+
+                    b.Property<int>("ReportedDelaySeconds")
+                        .HasColumnType("integer")
+                        .HasColumnName("reported_delay_seconds");
+
+                    b.Property<string>("SourceEventId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("source_event_id");
+
+                    b.Property<Guid>("ToStopId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("to_stop_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FromStopId");
+
+                    b.HasIndex("SourceEventId")
+                        .IsUnique();
+
+                    b.HasIndex("ToStopId");
+
+                    b.HasIndex("JourneyId", "ObservedAt");
+
+                    b.ToTable("observations", "live", t =>
+                        {
+                            t.HasCheckConstraint("ck_observations_delay", "reported_delay_seconds >= 0");
+
+                            t.HasCheckConstraint("ck_observations_progress", "progress_permille BETWEEN 0 AND 1000");
+                        });
+                });
+
             modelBuilder.Entity("SmartRail.Api.Modules.Rail.Timetable.PatternStop", b =>
                 {
                     b.Property<Guid>("Id")
@@ -436,6 +495,27 @@ namespace SmartRail.Api.Infrastructure.Migrations
                         .WithMany("Permissions")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SmartRail.Api.Modules.Rail.Running.Observation", b =>
+                {
+                    b.HasOne("SmartRail.Api.Modules.Rail.Timetable.PatternStop", null)
+                        .WithMany()
+                        .HasForeignKey("FromStopId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartRail.Api.Modules.Rail.Timetable.ScheduledJourney", null)
+                        .WithMany()
+                        .HasForeignKey("JourneyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartRail.Api.Modules.Rail.Timetable.PatternStop", null)
+                        .WithMany()
+                        .HasForeignKey("ToStopId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
