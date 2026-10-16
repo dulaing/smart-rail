@@ -1,3 +1,5 @@
+using SmartRail.Api.Modules.Access;
+
 namespace SmartRail.Api.Modules.Operations.Changes;
 
 // The body of the preview and confirm routes: either a draft to publish or the ID of a
@@ -6,6 +8,9 @@ public sealed record ChangeRequest(ChangeDraft? Draft, Guid? WithdrawChangeId, i
 
 // The answer to a confirmed change: its ID, the journey's new version and the state now in force.
 public sealed record ChangeConfirmedDto(Guid ChangeId, int JourneyVersion, ConfirmedStateDto State);
+
+// The audit trail of one journey, oldest first.
+public sealed record JourneyAuditDto(Guid JourneyId, IReadOnlyList<AuditRecord> Entries);
 
 public sealed record ChangeDetailsDto(
     string Kind, int? DelayMinutes, string? NewPlatform, Guid? TargetStopId, Guid? FinalStopId)

@@ -9,6 +9,9 @@ public static class StaffChangeEndpoints
 {
     public const string JourneyTarget = "JOURNEY";
 
+    public const int DefaultAuditLimit = 100;
+    public const int MaxAuditLimit = 200;
+
     public static void MapStaffChanges(this IEndpointRouteBuilder app)
     {
         var journey = app.MapGroup("/api/operations/journeys/{journeyId:guid}")
@@ -16,6 +19,25 @@ public static class StaffChangeEndpoints
 
         journey.MapPost("changes/preview", Preview);
         journey.MapPost("changes", Confirm);
+
+        // Reading the trail needs its own permission, held by auditors but not by controllers.
+        journey.MapGet("audit", ReadAudit).RequireAuthorization(AccessPolicies.For(Permissions.AuditRead));
+    }
+
+    // Who did what to this journey and when, oldest first, at most limit entries. Denied
+    // attempts are listed beside successful changes. Request bodies are never kept, so none show.
+    private static async Task<IResult> ReadAudit(
+        Guid journeyId, int? limit, HttpContext context, IJourneyStopReader journeys, IAuditTrail audit)
+    {
+        if (await journeys.FindAsync(journeyId, context.RequestAborted) is null)
+        {
+            return Results.Problem(
+                title: "Unknown journey", detail: "No journey has this ID.", statusCode: StatusCodes.Status404NotFound);
+        }
+
+        var take = Math.Clamp(limit ?? DefaultAuditLimit, 1, MaxAuditLimit);
+        var entries = await audit.ReadForTargetAsync(JourneyTarget, journeyId, take, context.RequestAborted);
+        return Results.Ok(new JourneyAuditDto(journeyId, entries));
     }
 
     // Shows what a publish or withdrawal would do. Nothing is stored, versioned or sent.

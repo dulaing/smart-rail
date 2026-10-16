@@ -33,12 +33,21 @@ public sealed class AuditTrail(SmartRailDbContext db, AccessGuard guard) : IAudi
         db.AuditEntries.Add(guard.NewEntry(context, actorId, action, outcome, targetType, targetId));
 
     public async Task<IReadOnlyList<AuditRecord>> ReadForTargetAsync(
-        string targetType, Guid targetId, int limit, CancellationToken cancellationToken) =>
-        await db.AuditEntries.AsNoTracking()
+        string targetType, Guid targetId, int limit, CancellationToken cancellationToken)
+    {
+        var rows = await db.AuditEntries.AsNoTracking()
             .Where(e => e.TargetType == targetType && e.TargetId == targetId)
-            .Join(db.Accounts, e => e.ActorId, a => a.Id, (e, a) => new AuditRecord(
-                e.Id, e.ActorId, a.DisplayName, e.Action, e.Outcome, e.TargetType, e.TargetId, e.OccurredAt, e.CorrelationId))
-            .OrderBy(r => r.OccurredAt).ThenBy(r => r.Id)
+            .OrderBy(e => e.OccurredAt).ThenBy(e => e.Id)
             .Take(limit)
+            .Select(e => new
+            {
+                Entry = e,
+                ActorName = db.Accounts.Where(a => a.Id == e.ActorId).Select(a => a.DisplayName).First(),
+            })
             .ToListAsync(cancellationToken);
+
+        return rows.Select(r => new AuditRecord(
+            r.Entry.Id, r.Entry.ActorId, r.ActorName, r.Entry.Action, r.Entry.Outcome,
+            r.Entry.TargetType, r.Entry.TargetId, r.Entry.OccurredAt, r.Entry.CorrelationId)).ToList();
+    }
 }
