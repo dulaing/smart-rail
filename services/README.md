@@ -24,6 +24,42 @@ This starts PostgreSQL, Keycloak, the API and RailBites, and opens the Aspire da
 
 Without the AppHost the API has no database, so `/health/ready` reports healthy with no checks.
 
+## Simulated running (demo trains)
+
+The API can pretend the fictional seeded trains are running: every 30 seconds it reports where
+each one is, through the same checks a real feed would pass. It is off by default. Guests read the
+result at `GET /api/journeys/{journeyId}/running`; a train that is not reporting becomes
+**unknown** after four minutes.
+
+| Setting | Default | Meaning |
+| --- | --- | --- |
+| `Observations:ServiceKey` | none | Shared key for `POST /internal/rail/observations` and the pause/resume commands, sent as `X-SmartRail-Service-Key`. With no key set every such call is refused. |
+| `Simulator:Enabled` | `false` | Turns the 30-second simulator on. |
+| `Simulator:DemoDelaySeconds` | `0` | Runs every simulated train this many seconds late (never early). Must not be negative. |
+
+Short local run (with the stack from "Whole stack (Aspire)" and the database prepared as in
+"One-time local setup"):
+
+    dotnet user-secrets set Observations:ServiceKey demo-key --project services/api
+    dotnet user-secrets set Simulator:Enabled true --project services/api
+    dotnet run --project services/apphost
+
+    # Find a journey that is running now (see the times below), then watch it:
+    curl "http://localhost:5111/api/journeys?serviceDate=2026-10-16"
+    curl http://localhost:5111/api/journeys/<journeyId>/running
+
+    # Make one train go silent, and bring it back (Development only):
+    curl -X POST -H "X-SmartRail-Service-Key: demo-key" http://localhost:5111/internal/rail/simulator/journeys/<journeyId>/pause
+    curl -X POST -H "X-SmartRail-Service-Key: demo-key" http://localhost:5111/internal/rail/simulator/journeys/<journeyId>/resume
+
+A train reports only while it is in service (Colombo time): `SIM-1003` 07:20-08:15, `SIM-1001`
+07:35-08:30, `SIM-1002` 08:05-09:00, `SIM-2001` 17:10-18:30 and `SIM-9001` 23:45-00:45. It reports
+nothing before it first departs and stops after it reaches its last stop; at a stop it waits at
+progress 1000 until the scheduled departure. Pausing stops that journey's reports but not the clock,
+so it goes ageing after three minutes and unknown after four; resuming reports where the train is
+now and does not replay the missed 30-second steps. Reports already stored are never deleted. Pauses
+are kept in memory, so restarting the API resumes every train.
+
 ## Signing in (Keycloak)
 
 Keycloak owns the passwords, sessions and tokens. The API validates its access tokens

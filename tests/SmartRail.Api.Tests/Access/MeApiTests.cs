@@ -141,12 +141,15 @@ public class MeApiTests(AccessApi api) : IClassFixture<AccessApi>
             .Order()
             .ToList();
 
-        // The internal observation route skips the signed-in-user rule because it is guarded by
-        // a service key instead; ObservationIngestionApiTests prove it refuses everything without one.
+        // The internal observation and simulator routes skip the signed-in-user rule because a
+        // service key guards them instead; the Observation and Simulator tests prove each one
+        // refuses everything without the key.
         Assert.Equal(
             [
                 "/api/journeys", "/api/journeys/{journeyId}/running", "/api/next-trains", "/api/stations", "/health/live", "/health/ready",
-                "/internal/rail/observations", "/openapi/{documentName}.json",
+                "/internal/rail/observations",
+                "/internal/rail/simulator/journeys/{journeyId}/pause", "/internal/rail/simulator/journeys/{journeyId}/resume",
+                "/openapi/{documentName}.json",
             ],
             anonymous);
     }
