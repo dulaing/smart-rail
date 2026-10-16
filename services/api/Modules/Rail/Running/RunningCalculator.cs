@@ -1,3 +1,4 @@
+using SmartRail.Api.Modules.Rail;
 using SmartRail.Api.Modules.Rail.Timetable;
 
 namespace SmartRail.Api.Modules.Rail.Running;
@@ -9,14 +10,39 @@ public static class RunningCalculator
 {
     public const int FullProgress = 1000;
 
+    // Applies the confirmed decisions to the schedule and the evidence. A confirmed delay raises
+    // the estimates; a cancellation or early ending removes them where the train no longer goes;
+    // a confirmed platform is shown whatever the evidence says. Decisions never make the evidence
+    // fresher: with no usable observation there are still no estimates.
     public static RunningState Calculate(
         ScheduledJourney journey,
         RunningObservation? observation,
         DateTimeOffset now,
-        int? confirmedDelaySeconds = null)
+        int? confirmedDelaySeconds = null,
+        ConfirmedOverrides? overrides = null)
     {
+        overrides ??= ConfirmedOverrides.None;
         var stops = journey.Pattern.Stops.OrderBy(s => s.Sequence).ToList();
         var times = stops.Select(s => ColomboTime.StopInstants(journey.ServiceDate, s)).ToList();
+
+        // A final stop that is not in this journey cannot end it early.
+        var finalIndex = overrides.FinalStopId is { } finalStopId ? stops.FindIndex(s => s.Id == finalStopId) : -1;
+        var availability = overrides.Cancelled
+            ? Availabilities.Cancelled
+            : finalIndex >= 0 ? Availabilities.EndsEarly : Availabilities.AsScheduled;
+        bool Served(int i) => !overrides.Cancelled && (finalIndex < 0 || i <= finalIndex);
+
+        RunningState Result(
+            Freshness freshness, CurrentPosition? position, int? delay, Func<int, (DateTimeOffset?, DateTimeOffset?)> estimates) =>
+            new(
+                freshness,
+                observation,
+                position,
+                delay,
+                stops.Select((s, i) => Row(s, times[i], estimates(i), Served(i), overrides)).ToList(),
+                availability,
+                overrides.DelayMinutes,
+                finalIndex >= 0 ? overrides.FinalStopId : null);
 
         var freshness = FreshnessRules.Classify(observation?.ObservedAt, now);
         var toIndex = observation is null ? -1 : IndexOfToStop(stops, observation);
@@ -24,8 +50,13 @@ public static class RunningCalculator
         // Evidence that cannot be placed on this journey is treated as no evidence.
         if (freshness == Freshness.Unknown || observation is null || toIndex < 0)
         {
-            var scheduleOnly = stops.Select((s, i) => Row(s, times[i], null, null)).ToList();
-            return new RunningState(Freshness.Unknown, observation, null, null, scheduleOnly);
+            return Result(Freshness.Unknown, null, null, _ => (null, null));
+        }
+
+        // A cancelled journey keeps its observations but predicts nothing.
+        if (overrides.Cancelled)
+        {
+            return Result(freshness, null, null, _ => (null, null));
         }
 
         // Below 1000 the train is heading for the To stop; at 1000 it is there and the
@@ -33,20 +64,17 @@ public static class RunningCalculator
         var atStop = observation.ProgressPermille == FullProgress;
         var nextIndex = atStop ? toIndex + 1 : toIndex;
 
-        var delay = DelaySeconds(observation, confirmedDelaySeconds, nextIndex < stops.Count ? times[nextIndex] : null, now);
+        var confirmedSeconds = confirmedDelaySeconds ?? overrides.DelayMinutes * 60;
+        var delay = DelaySeconds(observation, confirmedSeconds, nextIndex < stops.Count ? times[nextIndex] : null, now);
         var delayBy = TimeSpan.FromSeconds(delay);
 
         // A train standing at a stop has still to depart from it; every other earlier stop is done.
         var firstDeparture = atStop ? toIndex : nextIndex;
 
-        var rows = stops.Select((s, i) => Row(
-            s,
-            times[i],
-            i >= nextIndex ? times[i].Arrival + delayBy : null,
-            i >= firstDeparture ? times[i].Departure + delayBy : null)).ToList();
-
         var position = new CurrentPosition(observation.FromStopId, observation.ToStopId, observation.ProgressPermille);
-        return new RunningState(freshness, observation, position, delay, rows);
+        return Result(freshness, position, delay, i => (
+            Served(i) && i >= nextIndex ? times[i].Arrival + delayBy : null,
+            Served(i) && i >= firstDeparture ? times[i].Departure + delayBy : null));
     }
 
     // Where a segment ends in the ordered stops, or -1 when the two are not neighbouring
@@ -89,15 +117,22 @@ public static class RunningCalculator
     private static StopRunning Row(
         PatternStop stop,
         (DateTimeOffset? Arrival, DateTimeOffset? Departure) time,
-        DateTimeOffset? estimatedArrival,
-        DateTimeOffset? estimatedDeparture) =>
-        new(
+        (DateTimeOffset? Arrival, DateTimeOffset? Departure) estimate,
+        bool served,
+        ConfirmedOverrides overrides)
+    {
+        var platform = overrides.Platforms.GetValueOrDefault(stop.Id);
+        return new StopRunning(
             stop.Id,
             stop.StationId,
             stop.Sequence,
             time.Arrival,
             time.Departure,
             stop.PlannedPlatform,
-            estimatedArrival,
-            estimatedDeparture);
+            estimate.Arrival,
+            estimate.Departure,
+            served,
+            platform?.Platform,
+            platform?.ConfirmedAt);
+    }
 }

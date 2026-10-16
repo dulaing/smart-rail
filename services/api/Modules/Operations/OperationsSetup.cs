@@ -1,4 +1,5 @@
 using SmartRail.Api.Modules.Operations.Changes;
+using SmartRail.Api.Modules.Rail;
 
 namespace SmartRail.Api.Modules.Operations;
 
@@ -10,6 +11,7 @@ public static class OperationsSetup
         {
             builder.Services.AddScoped<ChangeStore>();
             builder.Services.AddScoped<ChangeConfirmer>();
+            builder.Services.AddScoped<IConfirmedChangeReader, ConfirmedChangeReader>();
         }
     }
 

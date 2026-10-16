@@ -16,6 +16,9 @@ public sealed record RunningResponse(
     LastObservationSummary? LastObservation,
     CurrentPosition? CurrentPosition,
     int? DelaySeconds,
+    string Availability,
+    int? ConfirmedDelayMinutes,
+    Guid? FinalStopId,
     IReadOnlyList<StopRunning> Stops);
 
 // Where the schedule came from. It is the timetable's label, never a claim about live running.
@@ -53,6 +56,9 @@ public static class RunningResponses
             observation is null ? null : Summarise(observation, state.Stops),
             state.CurrentPosition,
             state.DelaySeconds,
+            state.Availability,
+            state.ConfirmedDelayMinutes,
+            state.FinalStopId,
             state.Stops);
     }
 

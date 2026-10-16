@@ -54,8 +54,18 @@ public sealed record RunningObservation(
 
 public sealed record CurrentPosition(Guid FromStopId, Guid ToStopId, int ProgressPermille);
 
+// How staff decisions leave the journey as a whole. A cancellation outranks an early ending.
+public static class Availabilities
+{
+    public const string AsScheduled = "AS_SCHEDULED";
+    public const string EndsEarly = "ENDS_EARLY";
+    public const string Cancelled = "CANCELLED";
+}
+
 // One stop occurrence with its schedule and, while the evidence is usable, its estimates.
-// An estimate is null for a time that has already happened.
+// An estimate is null for a time that has already happened, and for a stop the train no longer
+// serves (Served is false after an early ending or a cancellation). A confirmed platform and the
+// time it was confirmed stay whatever the evidence says, because staff confirmed them.
 public sealed record StopRunning(
     Guid StopId,
     Guid StationId,
@@ -64,7 +74,13 @@ public sealed record StopRunning(
     DateTimeOffset? ScheduledDeparture,
     string? PlannedPlatform,
     DateTimeOffset? EstimatedArrival,
-    DateTimeOffset? EstimatedDeparture);
+    DateTimeOffset? EstimatedDeparture,
+    bool Served = true,
+    string? ConfirmedPlatform = null,
+    DateTimeOffset? ConfirmedPlatformAt = null)
+{
+    public string? Platform => ConfirmedPlatform ?? PlannedPlatform;
+}
 
 // The calculated running picture of one journey. The schedule and the last observation
 // are always present; position, delay and estimates are null once the evidence is unknown.
@@ -73,4 +89,7 @@ public sealed record RunningState(
     RunningObservation? LastObservation,
     CurrentPosition? CurrentPosition,
     int? DelaySeconds,
-    IReadOnlyList<StopRunning> Stops);
+    IReadOnlyList<StopRunning> Stops,
+    string Availability = Availabilities.AsScheduled,
+    int? ConfirmedDelayMinutes = null,
+    Guid? FinalStopId = null);

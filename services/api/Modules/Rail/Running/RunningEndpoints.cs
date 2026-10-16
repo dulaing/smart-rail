@@ -1,6 +1,7 @@
 using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using SmartRail.Api.Infrastructure;
+using SmartRail.Api.Modules.Rail;
 
 namespace SmartRail.Api.Modules.Rail.Running;
 
@@ -23,7 +24,7 @@ public static class RunningEndpoints
     }
 
     private static async Task<IResult> GetRunning(
-        HttpContext context, SmartRailDbContext db, TimeProvider time, string journeyId)
+        HttpContext context, SmartRailDbContext db, TimeProvider time, IConfirmedChangeReader changes, string journeyId)
     {
         if (!Guid.TryParse(journeyId, out var id))
         {
@@ -43,7 +44,8 @@ public static class RunningEndpoints
 
         var now = time.GetUtcNow();
         var observation = await ObservationIngestion.CurrentAsync(db, id, context.RequestAborted);
-        var state = RunningCalculator.Calculate(journey, observation?.ToRunning(), now);
+        var confirmed = await changes.ReadAsync(id, context.RequestAborted);
+        var state = RunningCalculator.Calculate(journey, observation?.ToRunning(), now, overrides: confirmed);
 
         // Set before the ETag helper so a 304 carries it too. It is not part of the body.
         context.Response.Headers[ServerTimeHeader] =
