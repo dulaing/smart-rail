@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SmartRail.Api.Modules.Access;
 using SmartRail.Api.Modules.Catering.Outbox;
 using SmartRail.Api.Modules.Operations.Changes;
+using SmartRail.Api.Modules.Operations.Incidents;
 using SmartRail.Api.Modules.Operations.Reports;
 using SmartRail.Api.Modules.Rail;
 using SmartRail.Api.Modules.Rail.Running;
@@ -28,6 +29,7 @@ public sealed class SmartRailDbContext(DbContextOptions<SmartRailDbContext> opti
     public DbSet<JourneyChangeVersion> JourneyVersions => Set<JourneyChangeVersion>();
     public DbSet<ServiceChange> ServiceChanges => Set<ServiceChange>();
     public DbSet<DriverReport> DriverReports => Set<DriverReport>();
+    public DbSet<Incident> Incidents => Set<Incident>();
 
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
@@ -37,6 +39,7 @@ public sealed class SmartRailDbContext(DbContextOptions<SmartRailDbContext> opti
         modelBuilder.ApplyAccessModel();
         modelBuilder.ApplyOperationsModel();
         modelBuilder.ApplyReportsModel();
+        modelBuilder.ApplyIncidentsModel();
         modelBuilder.ApplyCateringModel();
     }
 }

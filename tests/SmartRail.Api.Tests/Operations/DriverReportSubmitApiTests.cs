@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SmartRail.Api.Modules.Access;
+using SmartRail.Api.Modules.Operations;
 using SmartRail.Api.Modules.Operations.Reports;
 using SmartRail.Api.Tests.Access;
 using SmartRail.Api.Tests.Rail;

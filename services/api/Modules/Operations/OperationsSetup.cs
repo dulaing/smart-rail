@@ -1,4 +1,5 @@
 using SmartRail.Api.Modules.Operations.Changes;
+using SmartRail.Api.Modules.Operations.Incidents;
 using SmartRail.Api.Modules.Operations.Reports;
 using SmartRail.Api.Modules.Rail;
 
@@ -16,6 +17,9 @@ public static class OperationsSetup
             builder.Services.AddScoped<ReportStore>();
             builder.Services.AddScoped<ReportSubmitter>();
             builder.Services.AddScoped<ReportAcknowledger>();
+            builder.Services.AddScoped<IncidentStore>();
+            builder.Services.AddScoped<IncidentOpener>();
+            builder.Services.AddScoped<IncidentResolver>();
             builder.Services.AddScoped<JourneyAuditTargets>();
         }
     }
@@ -26,5 +30,6 @@ public static class OperationsSetup
         app.MapStaffChanges();
         app.MapDriverReports();
         app.MapControlReports();
+        app.MapIncidents();
     }
 }

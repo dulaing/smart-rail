@@ -371,6 +371,60 @@ namespace SmartRail.Api.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("SmartRail.Api.Modules.Operations.Incidents.Incident", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("OpenedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("opened_at");
+
+                    b.Property<Guid>("OpenedById")
+                        .HasColumnType("uuid")
+                        .HasColumnName("opened_by_id");
+
+                    b.Property<string>("ReasonCode")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("reason_code");
+
+                    b.Property<DateTimeOffset?>("ResolvedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("resolved_at");
+
+                    b.Property<Guid?>("SourceReportId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("source_report_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("status");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OpenedById");
+
+                    b.HasIndex("SourceReportId")
+                        .IsUnique()
+                        .HasDatabaseName("ux_incidents_source_report_id");
+
+                    b.HasIndex("OpenedAt", "Id");
+
+                    b.ToTable("incidents", "changes", t =>
+                        {
+                            t.HasCheckConstraint("ck_incidents_reason", "reason_code IN ('TRAIN_FAULT', 'SIGNAL_DELAY', 'OBSTRUCTION', 'CANNOT_CONTINUE')");
+
+                            t.HasCheckConstraint("ck_incidents_resolution", "(status = 'RESOLVED') = (resolved_at IS NOT NULL)");
+
+                            t.HasCheckConstraint("ck_incidents_status", "status IN ('OPEN', 'RESOLVED')");
+                        });
+                });
+
             modelBuilder.Entity("SmartRail.Api.Modules.Operations.Reports.DriverReport", b =>
                 {
                     b.Property<Guid>("Id")
@@ -759,6 +813,20 @@ namespace SmartRail.Api.Infrastructure.Migrations
                     b.HasOne("SmartRail.Api.Modules.Rail.Timetable.PatternStop", null)
                         .WithMany()
                         .HasForeignKey("TargetStopId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("SmartRail.Api.Modules.Operations.Incidents.Incident", b =>
+                {
+                    b.HasOne("SmartRail.Api.Modules.Access.Account", null)
+                        .WithMany()
+                        .HasForeignKey("OpenedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartRail.Api.Modules.Operations.Reports.DriverReport", null)
+                        .WithMany()
+                        .HasForeignKey("SourceReportId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 

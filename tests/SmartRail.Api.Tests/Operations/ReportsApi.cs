@@ -17,6 +17,10 @@ public static class ReportsApiExtensions
     public static Task<HttpResponseMessage> GetAsync(this AccessApi api, string? subject, string path) =>
         api.ClientFor(subject is null ? null : api.Token(subject)).GetAsync(path);
 
+    // A POST with no body, such as an acknowledgement or a resolution.
+    public static Task<HttpResponseMessage> PostEmptyAsync(this AccessApi api, string? subject, string path) =>
+        api.ClientFor(subject is null ? null : api.Token(subject)).PostAsync(path, null);
+
     public static Task<HttpResponseMessage> SubmitReportAsync(this AccessApi api, string? subject, Guid journeyId, object? body) =>
         api.PostAsync(subject, ReportsPath(journeyId), body);
 

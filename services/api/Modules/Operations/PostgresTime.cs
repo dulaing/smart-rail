@@ -1,4 +1,4 @@
-namespace SmartRail.Api.Modules.Operations.Reports;
+namespace SmartRail.Api.Modules.Operations;
 
 public static class PostgresTime
 {

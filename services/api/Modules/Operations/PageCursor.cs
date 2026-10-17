@@ -2,7 +2,7 @@ using System.Buffers.Text;
 using System.Globalization;
 using System.Text;
 
-namespace SmartRail.Api.Modules.Operations.Reports;
+namespace SmartRail.Api.Modules.Operations;
 
 // Where the next page of a newest-first list starts: strictly after this time and ID. The
 // client treats the text as opaque and sends it back unchanged.
