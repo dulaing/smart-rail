@@ -417,6 +417,8 @@ namespace SmartRail.Api.Infrastructure.Migrations
 
                     b.HasIndex("SubmittedById");
 
+                    b.HasIndex("ReceivedAt", "Id");
+
                     b.HasIndex("JourneyId", "SubmittedById", "ReceivedAt", "Id");
 
                     b.ToTable("driver_reports", "changes", t =>

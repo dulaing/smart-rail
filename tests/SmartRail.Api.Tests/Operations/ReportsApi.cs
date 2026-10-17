@@ -45,12 +45,13 @@ public static class ReportsApiExtensions
         return reports;
     }
 
-    // Successful audit rows about one report.
-    public static async Task<int> ReportAuditCountAsync(this AccessApi api, Guid reportId)
+    // Successful audit rows about one report, optionally only those for one action.
+    public static async Task<int> ReportAuditCountAsync(this AccessApi api, Guid reportId, string? action = null)
     {
         var count = 0;
         await api.WithDbAsync(async db =>
-            count = await db.AuditEntries.CountAsync(e => e.TargetType == "REPORT" && e.TargetId == reportId && e.Outcome == "SUCCEEDED"));
+            count = await db.AuditEntries.CountAsync(e =>
+                e.TargetType == "REPORT" && e.TargetId == reportId && e.Outcome == "SUCCEEDED" && (action == null || e.Action == action)));
         return count;
     }
 

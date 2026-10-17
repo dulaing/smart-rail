@@ -34,9 +34,6 @@ public sealed class ReportSubmitter(SmartRailDbContext db, IAuditTrail audit, Re
             return Classify(existing, driverId, journeyId, reasonCode);
         }
 
-        // PostgreSQL keeps microseconds, so the receipt time is rounded down to them: the 201 and
-        // every later read then show the same instant.
-        var now = time.GetUtcNow();
         var report = new DriverReport
         {
             Id = Guid.NewGuid(),
@@ -44,7 +41,7 @@ public sealed class ReportSubmitter(SmartRailDbContext db, IAuditTrail audit, Re
             SubmittedById = driverId,
             ClientReportId = clientReportId,
             ReasonCode = reasonCode,
-            ReceivedAt = new DateTimeOffset(now.Ticks - now.Ticks % 10, TimeSpan.Zero),
+            ReceivedAt = PostgresTime.Round(time.GetUtcNow()),
         };
         db.DriverReports.Add(report);
         audit.Stage(context, driverId, SubmitAction, AuditOutcomes.Succeeded, ReportTarget, report.Id);

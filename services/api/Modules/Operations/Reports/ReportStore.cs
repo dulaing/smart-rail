@@ -26,17 +26,47 @@ public sealed class ReportStore(SmartRailDbContext db)
             query = query.Where(r => r.ClientReportId == key);
         }
 
+        return await query.NewestFirstAfter(after).Take(size + 1).ToListAsync(cancellationToken);
+    }
+
+    public Task<DriverReport?> FindAsync(Guid reportId, CancellationToken cancellationToken) =>
+        db.DriverReports.AsNoTracking().SingleOrDefaultAsync(r => r.Id == reportId, cancellationToken);
+
+    // Control's inbox, newest first, optionally for one journey and only acknowledged or only
+    // unacknowledged reports. One more than size comes back, as for a driver's list.
+    public async Task<List<DriverReport>> ListInboxAsync(
+        Guid? journeyId, bool? acknowledged, PageCursor? after, int size, CancellationToken cancellationToken)
+    {
+        var query = db.DriverReports.AsNoTracking();
+        if (journeyId is { } journey)
+        {
+            query = query.Where(r => r.JourneyId == journey);
+        }
+
+        if (acknowledged is { } wanted)
+        {
+            query = query.Where(r => (r.AcknowledgedAt != null) == wanted);
+        }
+
+        return await query.NewestFirstAfter(after).Take(size + 1).ToListAsync(cancellationToken);
+    }
+
+    public Task<List<Guid>> IdsForJourneyAsync(Guid journeyId, CancellationToken cancellationToken) =>
+        db.DriverReports.AsNoTracking().Where(r => r.JourneyId == journeyId).Select(r => r.Id).ToListAsync(cancellationToken);
+}
+
+internal static class ReportQueries
+{
+    // Newest first with the ID as the tie-break, starting strictly after the cursor. PostgreSQL
+    // compares the IDs itself, so the order of pages matches the order inside each page.
+    public static IQueryable<DriverReport> NewestFirstAfter(this IQueryable<DriverReport> query, PageCursor? after)
+    {
         if (after is not null)
         {
             var (time, id) = after;
             query = query.Where(r => r.ReceivedAt < time || (r.ReceivedAt == time && r.Id.CompareTo(id) < 0));
         }
 
-        return await query.OrderByDescending(r => r.ReceivedAt).ThenByDescending(r => r.Id)
-            .Take(size + 1)
-            .ToListAsync(cancellationToken);
+        return query.OrderByDescending(r => r.ReceivedAt).ThenByDescending(r => r.Id);
     }
-
-    public Task<List<Guid>> IdsForJourneyAsync(Guid journeyId, CancellationToken cancellationToken) =>
-        db.DriverReports.AsNoTracking().Where(r => r.JourneyId == journeyId).Select(r => r.Id).ToListAsync(cancellationToken);
 }

@@ -35,6 +35,8 @@ public static class ReportsModel
             report.Ignore(r => r.State);
 
             report.HasIndex(r => r.ClientReportId).IsUnique().HasDatabaseName(ClientKeyIndex);
+            // Control's inbox, newest first.
+            report.HasIndex(r => new { r.ReceivedAt, r.Id });
             // A driver's own reports on one journey, newest first.
             report.HasIndex(r => new { r.JourneyId, r.SubmittedById, r.ReceivedAt, r.Id });
             report.HasOne<ScheduledJourney>().WithMany().HasForeignKey(r => r.JourneyId).OnDelete(DeleteBehavior.Restrict);

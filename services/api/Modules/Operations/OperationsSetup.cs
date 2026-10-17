@@ -15,6 +15,7 @@ public static class OperationsSetup
             builder.Services.AddScoped<IConfirmedChangeReader, ConfirmedChangeReader>();
             builder.Services.AddScoped<ReportStore>();
             builder.Services.AddScoped<ReportSubmitter>();
+            builder.Services.AddScoped<ReportAcknowledger>();
             builder.Services.AddScoped<JourneyAuditTargets>();
         }
     }
@@ -24,5 +25,6 @@ public static class OperationsSetup
         app.MapPublicChanges();
         app.MapStaffChanges();
         app.MapDriverReports();
+        app.MapControlReports();
     }
 }
