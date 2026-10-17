@@ -4,10 +4,13 @@ namespace SmartRail.Api.Modules.Operations.Changes;
 
 // The body of the preview and confirm routes: either a draft to publish or the ID of a
 // published change to withdraw, never both. Confirm also carries the version the preview showed.
-public sealed record ChangeRequest(ChangeDraft? Draft, Guid? WithdrawChangeId, int? PreviewedVersion);
+// A draft may name the incident that explains it; a withdrawal never does, because it keeps the
+// incident of the change it withdraws.
+public sealed record ChangeRequest(ChangeDraft? Draft, Guid? WithdrawChangeId, int? PreviewedVersion, Guid? IncidentId = null);
 
-// The answer to a confirmed change: its ID, the journey's new version and the state now in force.
-public sealed record ChangeConfirmedDto(Guid ChangeId, int JourneyVersion, ConfirmedStateDto State);
+// The answer to a confirmed change: its ID, the journey's new version and the state now in force,
+// and the incident it carries, if any. This is a staff response; public reads never show it.
+public sealed record ChangeConfirmedDto(Guid ChangeId, int JourneyVersion, ConfirmedStateDto State, Guid? IncidentId = null);
 
 // The audit trail of one journey, oldest first.
 public sealed record JourneyAuditDto(Guid JourneyId, IReadOnlyList<AuditRecord> Entries);
@@ -38,9 +41,10 @@ public sealed record ChangePreviewDto(
     IReadOnlyList<StopOutcome> AffectedStops,
     IReadOnlyList<ScreenImpact> Screens,
     FoodImpact Food,
-    EarlyEndImpact? EarlyEnd)
+    EarlyEndImpact? EarlyEnd,
+    Guid? IncidentId = null)
 {
-    public static ChangePreviewDto From(ChangePreview p) =>
+    public static ChangePreviewDto From(ChangePreview p, Guid? incidentId = null) =>
         new(
             p.Action.ToCode(),
             ChangeDetailsDto.From(p.Change),
@@ -51,5 +55,6 @@ public sealed record ChangePreviewDto(
             p.AffectedStops,
             p.Screens,
             p.Food,
-            p.EarlyEnd);
+            p.EarlyEnd,
+            incidentId);
 }

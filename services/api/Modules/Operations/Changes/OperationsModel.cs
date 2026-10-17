@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SmartRail.Api.Modules.Access;
+using SmartRail.Api.Modules.Operations.Incidents;
 using SmartRail.Api.Modules.Rail.Timetable;
 
 namespace SmartRail.Api.Modules.Operations.Changes;
@@ -64,6 +65,7 @@ public static class OperationsModel
             change.Property(c => c.TargetStopId).HasColumnName("target_stop_id");
             change.Property(c => c.FinalStopId).HasColumnName("final_stop_id");
             change.Property(c => c.SupersedesChangeId).HasColumnName("supersedes_change_id");
+            change.Property(c => c.IncidentId).HasColumnName("incident_id");
             change.Property(c => c.PublishedById).HasColumnName("published_by_id");
             change.Property(c => c.PublishedAt).HasColumnName("published_at");
             change.Ignore(c => c.Details);
@@ -75,6 +77,7 @@ public static class OperationsModel
             change.HasOne<PatternStop>().WithMany().HasForeignKey(c => c.FinalStopId).OnDelete(DeleteBehavior.Restrict);
             change.HasOne<ServiceChange>().WithMany().HasForeignKey(c => c.SupersedesChangeId).OnDelete(DeleteBehavior.Restrict);
             change.HasOne<Account>().WithMany().HasForeignKey(c => c.PublishedById).OnDelete(DeleteBehavior.Restrict);
+            change.HasOne<Incident>().WithMany().HasForeignKey(c => c.IncidentId).OnDelete(DeleteBehavior.Restrict);
         });
     }
 

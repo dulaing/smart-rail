@@ -1,4 +1,5 @@
 using SmartRail.Api.Modules.Access;
+using SmartRail.Api.Modules.Operations.Incidents;
 using SmartRail.Api.Modules.Rail;
 
 namespace SmartRail.Api.Modules.Operations.Changes;
@@ -43,10 +44,11 @@ public static class StaffChangeEndpoints
         return Results.Ok(new JourneyAuditDto(journeyId, entries));
     }
 
-    // Shows what a publish or withdrawal would do. Nothing is stored, versioned or sent.
+    // Shows what a publish or withdrawal would do, including the incident it would carry.
+    // Nothing is stored, versioned or sent.
     private static async Task<IResult> Preview(
         Guid journeyId, ChangeRequest? request, HttpContext context,
-        IJourneyStopReader journeys, ChangeStore store, AccessGuard guard)
+        IJourneyStopReader journeys, ChangeStore store, AccessGuard guard, IncidentLinks links)
     {
         var loaded = await LoadAsync(journeyId, request, context, journeys, store, guard);
         if (loaded.Failure is not null)
@@ -55,9 +57,13 @@ public static class StaffChangeEndpoints
         }
 
         var preview = Evaluate(loaded.Journey!, loaded.Changes!, request!);
-        return preview.Problem is { } problem
-            ? ToProblem(problem)
-            : Results.Ok(ChangePreviewDto.From(preview.Value!));
+        if (preview.Problem is { } problem)
+        {
+            return ToProblem(problem);
+        }
+
+        var link = await LinkAsync(journeyId, request!, loaded.Changes!, preview.Value!, links, context.RequestAborted);
+        return link.Failure ?? Results.Ok(ChangePreviewDto.From(preview.Value!, link.IncidentId));
     }
 
     // Makes the previewed change real, but only if the journey is still at the version the
@@ -65,7 +71,8 @@ public static class StaffChangeEndpoints
     // trusted. A stale preview is a 409 and nothing is written.
     private static async Task<IResult> Confirm(
         Guid journeyId, ChangeRequest? request, HttpContext context,
-        IJourneyStopReader journeys, ChangeStore store, AccessGuard guard, CurrentAccount current, ChangeConfirmer confirmer)
+        IJourneyStopReader journeys, ChangeStore store, AccessGuard guard, CurrentAccount current, ChangeConfirmer confirmer,
+        IncidentLinks links)
     {
         var loaded = await LoadAsync(journeyId, request, context, journeys, store, guard);
         if (loaded.Failure is not null)
@@ -100,12 +107,21 @@ public static class StaffChangeEndpoints
             return ToProblem(problem);
         }
 
+        // The incident is checked again now; the confirmer holds it open while it commits.
+        var link = await LinkAsync(journeyId, request, changes, preview.Value!, links, context.RequestAborted);
+        if (link.Failure is not null)
+        {
+            return link.Failure;
+        }
+
         var actor = (await current.GetAsync(context.User, context.RequestAborted))!;
-        var result = await confirmer.ConfirmAsync(context, actor.Id, journey, changes, preview.Value!);
+        var result = await confirmer.ConfirmAsync(context, actor.Id, journey, changes, preview.Value!, link.IncidentId);
         return result switch
         {
-            ConfirmResult.Confirmed done => Results.Ok(new ChangeConfirmedDto(done.ChangeId, done.JourneyVersion, done.State)),
+            ConfirmResult.Confirmed done => Results.Ok(new ChangeConfirmedDto(done.ChangeId, done.JourneyVersion, done.State, done.IncidentId)),
             ConfirmResult.Stale stale => StalePreview(previewedVersion, stale.LatestVersion),
+            ConfirmResult.IncidentClosed => LinkProblem(new ChangeProblem(
+                ProblemKind.Invalid, "The incident was resolved after the preview, so it can no longer explain this change.")),
             _ => throw new InvalidOperationException("Unknown confirmation result."),
         };
     }
@@ -146,12 +162,55 @@ public static class StaffChangeEndpoints
                 statusCode: StatusCodes.Status400BadRequest));
         }
 
+        if (request.IncidentId is { } incidentId && (request.WithdrawChangeId is not null || incidentId == Guid.Empty))
+        {
+            return Loaded.Fail(Results.Problem(
+                title: "Invalid change request",
+                detail: request.WithdrawChangeId is not null
+                    ? "A withdrawal keeps the incident of the change it withdraws; do not send incidentId."
+                    : "incidentId must be an incident ID.",
+                statusCode: StatusCodes.Status400BadRequest));
+        }
+
         var decision = await guard.CheckAnyAsync(
             context, PermissionOptions(journey, changes.History, request), JourneyTarget, journeyId);
+
+        // Naming an incident also takes the right to manage incidents, which station staff lack.
+        if (decision == AccessDecision.Allowed && request.IncidentId is not null)
+        {
+            decision = await guard.CheckAsync(context, Permissions.IncidentsManage, new AccessTarget.Network());
+        }
+
         return decision == AccessDecision.Allowed
             ? Loaded.Ok(journey, changes)
             : Loaded.Fail(Results.Forbid());
     }
+
+    // The incident a change would carry. A new publish carries the one it names, once that checks
+    // out; a withdrawal carries whatever the change it withdraws already has.
+    private static async Task<(Guid? IncidentId, IResult? Failure)> LinkAsync(
+        Guid journeyId, ChangeRequest request, JourneyChanges changes, ChangePreview preview,
+        IncidentLinks links, CancellationToken cancellationToken)
+    {
+        if (preview.Action == ChangeAction.Withdraw)
+        {
+            return (changes.History.FirstOrDefault(c => c.Id == preview.WithdrawsChangeId)?.IncidentId, null);
+        }
+
+        if (request.IncidentId is not { } incidentId)
+        {
+            return (null, null);
+        }
+
+        return await links.CheckForPublishAsync(journeyId, incidentId, cancellationToken) is { } problem
+            ? (null, LinkProblem(problem))
+            : (incidentId, null);
+    }
+
+    private static IResult LinkProblem(ChangeProblem problem) =>
+        problem.Kind == ProblemKind.NotFound
+            ? Results.Problem(title: "Unknown incident", detail: problem.Message, statusCode: StatusCodes.Status404NotFound)
+            : Results.Problem(title: "Invalid incident link", detail: problem.Message, statusCode: StatusCodes.Status400BadRequest);
 
     // A controller may change anything. A platform change may instead come from station staff
     // granted the station of the stop it targets, which the server finds from the stop itself.

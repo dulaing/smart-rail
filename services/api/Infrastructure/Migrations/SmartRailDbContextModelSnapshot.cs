@@ -311,6 +311,10 @@ namespace SmartRail.Api.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("final_stop_id");
 
+                    b.Property<Guid?>("IncidentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("incident_id");
+
                     b.Property<Guid>("JourneyId")
                         .HasColumnType("uuid")
                         .HasColumnName("journey_id");
@@ -349,6 +353,8 @@ namespace SmartRail.Api.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("FinalStopId");
+
+                    b.HasIndex("IncidentId");
 
                     b.HasIndex("PublishedById");
 
@@ -791,6 +797,11 @@ namespace SmartRail.Api.Infrastructure.Migrations
                     b.HasOne("SmartRail.Api.Modules.Rail.Timetable.PatternStop", null)
                         .WithMany()
                         .HasForeignKey("FinalStopId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SmartRail.Api.Modules.Operations.Incidents.Incident", null)
+                        .WithMany()
+                        .HasForeignKey("IncidentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("SmartRail.Api.Modules.Rail.Timetable.ScheduledJourney", null)

@@ -14,9 +14,11 @@ public sealed record IncidentDto(
     Guid OpenedById,
     string? OpenedByName,
     DateTimeOffset OpenedAt,
-    DateTimeOffset? ResolvedAt)
+    DateTimeOffset? ResolvedAt,
+    IReadOnlyList<Guid> ChangeIds)
 {
-    public static IncidentDto From(Incident incident, IReadOnlyDictionary<Guid, string> names) =>
+    public static IncidentDto From(
+        Incident incident, IReadOnlyDictionary<Guid, string> names, IReadOnlyDictionary<Guid, IReadOnlyList<Guid>> changeIds) =>
         new(
             incident.Id,
             incident.SourceReportId,
@@ -25,7 +27,8 @@ public sealed record IncidentDto(
             incident.OpenedById,
             names.GetValueOrDefault(incident.OpenedById),
             incident.OpenedAt,
-            incident.ResolvedAt);
+            incident.ResolvedAt,
+            changeIds.GetValueOrDefault(incident.Id) ?? []);
 }
 
 public sealed record IncidentPageDto(IReadOnlyList<IncidentDto> Items, string? NextCursor);

@@ -18,6 +18,7 @@ public static class OperationsSetup
             builder.Services.AddScoped<ReportSubmitter>();
             builder.Services.AddScoped<ReportAcknowledger>();
             builder.Services.AddScoped<IncidentStore>();
+            builder.Services.AddScoped<IncidentLinks>();
             builder.Services.AddScoped<IncidentOpener>();
             builder.Services.AddScoped<IncidentResolver>();
             builder.Services.AddScoped<JourneyAuditTargets>();

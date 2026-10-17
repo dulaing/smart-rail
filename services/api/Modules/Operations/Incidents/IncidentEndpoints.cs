@@ -24,7 +24,8 @@ public static class IncidentEndpoints
 
     // 201 for a new incident, 200 when the report had already started one.
     private static async Task<IResult> Open(
-        IncidentRequest? request, HttpContext context, CurrentAccount current, IncidentOpener opener, IAccountNames names)
+        IncidentRequest? request, HttpContext context, CurrentAccount current,
+        IncidentOpener opener, IncidentStore store, IAccountNames names)
     {
         if (request is null || (request.SourceReportId is null) == (request.ReasonCode is null))
         {
@@ -55,9 +56,9 @@ public static class IncidentEndpoints
         {
             case OpenResult.Opened opened:
                 return Results.Created(
-                    $"/api/operations/incidents/{opened.Incident.Id}", await ToDtoAsync(opened.Incident, names, context));
+                    $"/api/operations/incidents/{opened.Incident.Id}", await ToDtoAsync(opened.Incident, store, names, context));
             case OpenResult.AlreadyOpened existing:
-                return Results.Ok(await ToDtoAsync(existing.Incident, names, context));
+                return Results.Ok(await ToDtoAsync(existing.Incident, store, names, context));
             default:
                 return Results.Problem(
                     title: "Unknown report", detail: "No report has this ID.", statusCode: StatusCodes.Status404NotFound);
@@ -66,7 +67,8 @@ public static class IncidentEndpoints
 
     // 200 whether this request resolved it or it was already resolved: the first resolution time stays.
     private static async Task<IResult> Resolve(
-        Guid incidentId, HttpContext context, CurrentAccount current, IncidentResolver resolver, IAccountNames names)
+        Guid incidentId, HttpContext context, CurrentAccount current,
+        IncidentResolver resolver, IncidentStore store, IAccountNames names)
     {
         var controller = (await current.GetAsync(context.User, context.RequestAborted))!;
         var incident = await resolver.ResolveAsync(context, controller.Id, incidentId) switch
@@ -76,7 +78,7 @@ public static class IncidentEndpoints
             _ => null,
         };
 
-        return incident is null ? UnknownIncident() : Results.Ok(await ToDtoAsync(incident, names, context));
+        return incident is null ? UnknownIncident() : Results.Ok(await ToDtoAsync(incident, store, names, context));
     }
 
     // Newest first. state is OPEN or RESOLVED, in any letter case.
@@ -105,14 +107,15 @@ public static class IncidentEndpoints
 
         var page = found.Take(size).ToList();
         var lookup = await names.FindAsync(page.Select(i => i.OpenedById).Distinct().ToList(), context.RequestAborted);
+        var changeIds = await store.LinkedChangeIdsAsync(page.Select(i => i.Id).ToList(), context.RequestAborted);
         var next = found.Count > size ? new PageCursor(page[^1].OpenedAt, page[^1].Id).Encode() : null;
-        return Results.Ok(new IncidentPageDto(page.Select(i => IncidentDto.From(i, lookup)).ToList(), next));
+        return Results.Ok(new IncidentPageDto(page.Select(i => IncidentDto.From(i, lookup, changeIds)).ToList(), next));
     }
 
     private static async Task<IResult> Read(Guid incidentId, HttpContext context, IncidentStore store, IAccountNames names)
     {
         var incident = await store.FindAsync(incidentId, context.RequestAborted);
-        return incident is null ? UnknownIncident() : Results.Ok(await ToDtoAsync(incident, names, context));
+        return incident is null ? UnknownIncident() : Results.Ok(await ToDtoAsync(incident, store, names, context));
     }
 
     // Who did what to this incident and when, oldest first, at most limit entries.
@@ -129,8 +132,12 @@ public static class IncidentEndpoints
         return Results.Ok(new IncidentAuditDto(incidentId, entries));
     }
 
-    private static async Task<IncidentDto> ToDtoAsync(Incident incident, IAccountNames names, HttpContext context) =>
-        IncidentDto.From(incident, await names.FindAsync([incident.OpenedById], context.RequestAborted));
+    private static async Task<IncidentDto> ToDtoAsync(
+        Incident incident, IncidentStore store, IAccountNames names, HttpContext context) =>
+        IncidentDto.From(
+            incident,
+            await names.FindAsync([incident.OpenedById], context.RequestAborted),
+            await store.LinkedChangeIdsAsync([incident.Id], context.RequestAborted));
 
     private static IResult Bad(string detail) =>
         Results.Problem(title: "Invalid incident request", detail: detail, statusCode: StatusCodes.Status400BadRequest);

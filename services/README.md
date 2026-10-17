@@ -152,6 +152,42 @@ transaction. Denied staff actions are audited too. A SysAdmin cannot change thei
 
 `GET /api/me` shows the signed-in account's roles and effective permissions.
 
+### Driver reports, incidents and linked service changes
+
+Staff and driver routes for the operations workflow. Every route needs a signed-in, enabled
+account, and the permission is rechecked from the database on each request, so losing a grant or an
+assignment applies on the next call. Denied attempts are audited. Actors and times always come from
+the server, never from the request body.
+
+| Request | Who | Result |
+| --- | --- | --- |
+| `POST /api/driver/journeys/{journeyId}/reports` `{ "clientReportId", "reasonCode" }` | assigned driver (`driver.reports.create`) | `201` new, `200` an identical retry with the report's current state. Reason codes: `TRAIN_FAULT`, `SIGNAL_DELAY`, `OBSTRUCTION`, `CANNOT_CONTINUE`. A key already used for different input is a generic `409`. |
+| `GET /api/driver/journeys/{journeyId}/reports[?clientReportId=&limit=&cursor=]` and `.../{reportId}` | assigned driver (`driver.reports.read`) | Only the caller's own reports; another driver's report is `404`. |
+| `GET /api/operations/reports[?journeyId=&acknowledged=&limit=&cursor=]` and `.../{reportId}` | Controller (`incidents.manage`) | The report inbox, newest first. |
+| `POST /api/operations/reports/{reportId}/acknowledge` (empty body) | Controller (`incidents.manage`) | `200` with the first controller's name and time; repeats and later controllers change nothing. |
+| `POST /api/operations/incidents` `{ "sourceReportId" }` or `{ "reasonCode" }` | Controller (`incidents.manage`) | `201` new; `200` if the report already started an incident (even a resolved one). |
+| `GET /api/operations/incidents[?state=OPEN\|RESOLVED&limit=&cursor=]` and `.../{incidentId}` | Controller or Auditor (`incidents.read`) | Includes `changeIds`, the changes the incident explains. |
+| `POST /api/operations/incidents/{incidentId}/resolve` (empty body) | Controller (`incidents.manage`) | `200`, including a repeat; the first resolution time stays. |
+| `GET /api/operations/incidents/{incidentId}/audit[?limit=]` | Auditor (`audit.read`) | The incident's history, oldest first. |
+| `GET /api/operations/journeys/{journeyId}/audit[?limit=]` | Auditor (`audit.read`) | The journey's history, which also follows its reports and the incidents they started. |
+
+A report is `SENT_AWAITING_CONTROL` as soon as the server stores it and `ACKNOWLEDGED` only after a
+controller acknowledges it. Opening or resolving an incident never acknowledges a report or changes
+a published service change; each is a separate action. "Not sent" exists only on a driver's device.
+
+Lists page by a stable `(time, id)` order: `limit` defaults to 50 (maximum 100) and `nextCursor`, when
+present, is an opaque token to send back as `cursor`.
+
+Publishing or withdrawing a service change (`POST /api/operations/journeys/{journeyId}/changes` and
+its `/preview`) accepts an optional `"incidentId"` on a **publish**. The incident must be open, and a
+report-backed incident only explains changes on its report's journey; a standalone one may explain
+changes on several journeys and one incident may explain many changes. Unknown incidents are `404`,
+resolved or wrong-journey ones are `400`, and naming an incident also needs `incidents.manage`
+(station staff cannot). The link is checked in the preview and again when confirming, and a
+resolution that wins first stops the publish with a `400`. A withdrawal never takes an `incidentId`:
+it keeps the link of the change it withdraws, even after the incident is resolved. Public reads
+(`GET /api/journeys/{journeyId}/changes`) and Catering messages never include incident IDs.
+
 ### Passenger and driver apps (Flutter)
 
 Both apps sign in with Authorization Code + PKCE through the system browser

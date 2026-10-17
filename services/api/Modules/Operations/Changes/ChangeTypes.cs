@@ -87,7 +87,8 @@ public sealed record ChangeDetails(
 
 // One row of changes.service_changes. History is only ever appended to. A withdrawal carries
 // the kind of the change it withdraws, no type-specific fields, and points at that change.
-// JourneyId, PublishedById and PublishedAt are set by the server when a row is stored.
+// JourneyId, PublishedById, PublishedAt and IncidentId are set by the server when a row is stored.
+// A withdrawal keeps the incident of the change it withdraws, even if that incident is resolved.
 public sealed class ServiceChange
 {
     private ServiceChange()
@@ -117,6 +118,10 @@ public sealed class ServiceChange
     public Guid? TargetStopId { get; private set; }
     public Guid? FinalStopId { get; private set; }
     public Guid? SupersedesChangeId { get; private set; }
+
+    // The incident that explains this change, if the controller linked one.
+    public Guid? IncidentId { get; init; }
+
     public Guid PublishedById { get; init; }
     public DateTimeOffset PublishedAt { get; init; }
 

@@ -1,7 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using SmartRail.Api.Infrastructure;
+using SmartRail.Api.Modules.Operations.Changes;
 
 namespace SmartRail.Api.Modules.Operations.Incidents;
+
+// What a new change needs to know about the incident it wants to name: whether it is still open
+// and, if it came from a report, the journey of that report.
+public sealed record IncidentLinkTarget(string Status, Guid? SourceJourneyId);
 
 // Reads the incident table. Every read goes to the database; nothing is cached between requests.
 public sealed class IncidentStore(SmartRailDbContext db)
@@ -31,6 +36,28 @@ public sealed class IncidentStore(SmartRailDbContext db)
         return await query.OrderByDescending(i => i.OpenedAt).ThenByDescending(i => i.Id)
             .Take(size + 1)
             .ToListAsync(cancellationToken);
+    }
+
+    public Task<IncidentLinkTarget?> FindLinkTargetAsync(Guid incidentId, CancellationToken cancellationToken) =>
+        db.Incidents.AsNoTracking()
+            .Where(i => i.Id == incidentId)
+            .Select(i => new IncidentLinkTarget(
+                i.Status,
+                db.DriverReports.Where(r => r.Id == i.SourceReportId).Select(r => (Guid?)r.JourneyId).FirstOrDefault()))
+            .SingleOrDefaultAsync(cancellationToken);
+
+    // The changes each incident explains, oldest first: the published changes and the withdrawals
+    // that kept their link.
+    public async Task<IReadOnlyDictionary<Guid, IReadOnlyList<Guid>>> LinkedChangeIdsAsync(
+        IReadOnlyCollection<Guid> incidentIds, CancellationToken cancellationToken)
+    {
+        var rows = await db.ServiceChanges.AsNoTracking()
+            .Where(c => c.IncidentId != null && incidentIds.Contains(c.IncidentId.Value))
+            .OrderBy(c => c.PublishedAt).ThenBy(c => c.Id)
+            .Select(c => new { IncidentId = c.IncidentId!.Value, c.Id })
+            .ToListAsync(cancellationToken);
+        return rows.GroupBy(r => r.IncidentId)
+            .ToDictionary(g => g.Key, g => (IReadOnlyList<Guid>)g.Select(r => r.Id).ToList());
     }
 
     // The incidents that started from a report sent on this journey.
