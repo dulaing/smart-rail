@@ -1,4 +1,5 @@
 using SmartRail.Api.Modules.Operations.Changes;
+using SmartRail.Api.Modules.Operations.Reports;
 using SmartRail.Api.Modules.Rail;
 
 namespace SmartRail.Api.Modules.Operations;
@@ -12,6 +13,9 @@ public static class OperationsSetup
             builder.Services.AddScoped<ChangeStore>();
             builder.Services.AddScoped<ChangeConfirmer>();
             builder.Services.AddScoped<IConfirmedChangeReader, ConfirmedChangeReader>();
+            builder.Services.AddScoped<ReportStore>();
+            builder.Services.AddScoped<ReportSubmitter>();
+            builder.Services.AddScoped<JourneyAuditTargets>();
         }
     }
 
@@ -19,5 +23,6 @@ public static class OperationsSetup
     {
         app.MapPublicChanges();
         app.MapStaffChanges();
+        app.MapDriverReports();
     }
 }

@@ -36,7 +36,7 @@ public class AccessRulesTests
     public static TheoryData<string, string[]> RoleMatrixRows => new()
     {
         { Roles.Passenger, [Permissions.SavedRoutesManage, Permissions.FollowsManage, Permissions.AlertsRead, Permissions.OrdersManage] },
-        { Roles.Driver, [Permissions.DriverBriefingRead, Permissions.DriverReportsCreate] },
+        { Roles.Driver, [Permissions.DriverBriefingRead, Permissions.DriverReportsCreate, Permissions.DriverReportsRead] },
         { Roles.Controller, [Permissions.ChangesPublish, Permissions.IncidentsManage, Permissions.IncidentsRead] },
         { Roles.StationStaff, [Permissions.PlatformChangesPublish] },
         { Roles.Auditor, [Permissions.IncidentsRead, Permissions.AuditRead] },
@@ -241,7 +241,9 @@ public class AccessRulesTests
         var disabled = Account(AccountStatus.Disabled, grants: Grant(Roles.Controller));
 
         var driverPermissions = EffectivePermissions.Of(driver, Now);
-        Assert.Equal([Permissions.DriverBriefingRead, Permissions.DriverReportsCreate], driverPermissions.Select(p => p.Code));
+        Assert.Equal(
+            [Permissions.DriverBriefingRead, Permissions.DriverReportsCreate, Permissions.DriverReportsRead],
+            driverPermissions.Select(p => p.Code));
         Assert.All(driverPermissions, p => Assert.Equal([JourneyOne], p.JourneyIds));
 
         var staffPermission = Assert.Single(EffectivePermissions.Of(staff, Now));

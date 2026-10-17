@@ -25,9 +25,11 @@ public static class StaffChangeEndpoints
     }
 
     // Who did what to this journey and when, oldest first, at most limit entries. Denied
-    // attempts are listed beside successful changes. Request bodies are never kept, so none show.
+    // attempts are listed beside successful changes, and so are the journey's driver reports.
+    // Request bodies are never kept, so none show.
     private static async Task<IResult> ReadAudit(
-        Guid journeyId, int? limit, HttpContext context, IJourneyStopReader journeys, IAuditTrail audit)
+        Guid journeyId, int? limit, HttpContext context,
+        IJourneyStopReader journeys, IAuditTrail audit, JourneyAuditTargets targets)
     {
         if (await journeys.FindAsync(journeyId, context.RequestAborted) is null)
         {
@@ -36,7 +38,8 @@ public static class StaffChangeEndpoints
         }
 
         var take = Math.Clamp(limit ?? DefaultAuditLimit, 1, MaxAuditLimit);
-        var entries = await audit.ReadForTargetAsync(JourneyTarget, journeyId, take, context.RequestAborted);
+        var entries = await audit.ReadForTargetsAsync(
+            await targets.ForJourneyAsync(journeyId, context.RequestAborted), take, context.RequestAborted);
         return Results.Ok(new JourneyAuditDto(journeyId, entries));
     }
 

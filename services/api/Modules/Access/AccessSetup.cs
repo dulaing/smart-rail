@@ -88,6 +88,7 @@ public static class AccessSetup
             builder.Services.AddScoped<IAuthorizationHandler, ActiveAccountHandler>();
             builder.Services.AddScoped<AccessGuard>();
             builder.Services.AddScoped<IAuditTrail, AuditTrail>();
+            builder.Services.AddScoped<IAccountNames, AccountNames>();
             builder.Services.AddScoped<IAuthorizationHandler, PermissionHandler>();
         }
     }

@@ -371,6 +371,62 @@ namespace SmartRail.Api.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("SmartRail.Api.Modules.Operations.Reports.DriverReport", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset?>("AcknowledgedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("acknowledged_at");
+
+                    b.Property<Guid?>("AcknowledgedById")
+                        .HasColumnType("uuid")
+                        .HasColumnName("acknowledged_by_id");
+
+                    b.Property<Guid>("ClientReportId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("client_report_id");
+
+                    b.Property<Guid>("JourneyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("journey_id");
+
+                    b.Property<string>("ReasonCode")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("reason_code");
+
+                    b.Property<DateTimeOffset>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("received_at");
+
+                    b.Property<Guid>("SubmittedById")
+                        .HasColumnType("uuid")
+                        .HasColumnName("submitted_by_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AcknowledgedById");
+
+                    b.HasIndex("ClientReportId")
+                        .IsUnique()
+                        .HasDatabaseName("ux_driver_reports_client_report_id");
+
+                    b.HasIndex("SubmittedById");
+
+                    b.HasIndex("JourneyId", "SubmittedById", "ReceivedAt", "Id");
+
+                    b.ToTable("driver_reports", "changes", t =>
+                        {
+                            t.HasCheckConstraint("ck_driver_reports_acknowledgement", "(acknowledged_by_id IS NULL) = (acknowledged_at IS NULL)");
+
+                            t.HasCheckConstraint("ck_driver_reports_reason", "reason_code IN ('TRAIN_FAULT', 'SIGNAL_DELAY', 'OBSTRUCTION', 'CANNOT_CONTINUE')");
+                        });
+                });
+
             modelBuilder.Entity("SmartRail.Api.Modules.Rail.Running.Observation", b =>
                 {
                     b.Property<Guid>("Id")
@@ -702,6 +758,26 @@ namespace SmartRail.Api.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("TargetStopId")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("SmartRail.Api.Modules.Operations.Reports.DriverReport", b =>
+                {
+                    b.HasOne("SmartRail.Api.Modules.Access.Account", null)
+                        .WithMany()
+                        .HasForeignKey("AcknowledgedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SmartRail.Api.Modules.Rail.Timetable.ScheduledJourney", null)
+                        .WithMany()
+                        .HasForeignKey("JourneyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartRail.Api.Modules.Access.Account", null)
+                        .WithMany()
+                        .HasForeignKey("SubmittedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SmartRail.Api.Modules.Rail.Running.Observation", b =>

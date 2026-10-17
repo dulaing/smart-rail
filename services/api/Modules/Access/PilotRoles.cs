@@ -41,6 +41,7 @@ public static class Permissions
 
     public const string DriverBriefingRead = "driver.briefing.read";
     public const string DriverReportsCreate = "driver.reports.create";
+    public const string DriverReportsRead = "driver.reports.read";
 
     public const string ChangesPublish = "changes.publish";
     public const string PlatformChangesPublish = "changes.publish_platform";
@@ -62,6 +63,7 @@ public static class Permissions
         [OrdersManage] = ScopeKind.Own,
         [DriverBriefingRead] = ScopeKind.Journey,
         [DriverReportsCreate] = ScopeKind.Journey,
+        [DriverReportsRead] = ScopeKind.Journey,
         [ChangesPublish] = ScopeKind.Network,
         [PlatformChangesPublish] = ScopeKind.Station,
         [IncidentsManage] = ScopeKind.Network,
@@ -83,7 +85,7 @@ public static class RoleMatrix
         new Dictionary<string, IReadOnlyList<string>>
         {
             [Roles.Passenger] = [Permissions.SavedRoutesManage, Permissions.FollowsManage, Permissions.AlertsRead, Permissions.OrdersManage],
-            [Roles.Driver] = [Permissions.DriverBriefingRead, Permissions.DriverReportsCreate],
+            [Roles.Driver] = [Permissions.DriverBriefingRead, Permissions.DriverReportsCreate, Permissions.DriverReportsRead],
             [Roles.Controller] = [Permissions.ChangesPublish, Permissions.IncidentsManage, Permissions.IncidentsRead],
             [Roles.StationStaff] = [Permissions.PlatformChangesPublish],
             [Roles.Auditor] = [Permissions.IncidentsRead, Permissions.AuditRead],
