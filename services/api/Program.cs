@@ -13,7 +13,9 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
-var builder = WebApplication.CreateBuilder(args);
+// This is a mode flag, not a configuration key/value pair. Leave subsequent seed settings
+// available to the standard configuration parser.
+var builder = WebApplication.CreateBuilder(args.Where(arg => arg != "--seed-operations-demo").ToArray());
 
 builder.Services.AddOpenApi();
 
@@ -68,6 +70,33 @@ builder.Services.AddCors(cors => cors.AddDefaultPolicy(policy => policy
     .WithExposedHeaders("ETag", RunningEndpoints.ServerTimeHeader)));
 
 var app = builder.Build();
+
+// Explicit local fixtures; ordinary startup and production never seed Operations evidence.
+if (args.Contains("--seed-operations-demo"))
+{
+    if (!app.Environment.IsDevelopment())
+    {
+        throw new InvalidOperationException("Operations demo data can only be seeded in the Development environment.");
+    }
+
+    var time = app.Services.GetRequiredService<TimeProvider>();
+    var anchorText = app.Configuration["Seed:OperationsAnchor"];
+    var anchor = time.GetUtcNow();
+    if (anchorText is not null && !InstantText.TryParse(anchorText, out anchor))
+    {
+        throw new InvalidOperationException("Seed:OperationsAnchor must be an ISO timestamp with Z or an explicit offset.");
+    }
+
+    await using var scope = app.Services.CreateAsyncScope();
+    var db = scope.ServiceProvider.GetRequiredService<SmartRailDbContext>();
+    var journeys = await OperationsDemoSeeder.SeedAsync(db, time, anchor);
+    Console.WriteLine($"Operations seed anchor: {DateTimeOffset.FromUnixTimeSeconds(anchor.ToUnixTimeSeconds()):O}");
+    foreach (var journey in journeys)
+    {
+        Console.WriteLine($"{journey.TrainNumber} | service date {journey.ServiceDate:yyyy-MM-dd} | /journeys/{journey.JourneyId}");
+    }
+    return;
+}
 
 // `dotnet run --project services/api -- --migrate-and-seed` prepares the database, then exits.
 if (args.Contains("--migrate-and-seed"))
