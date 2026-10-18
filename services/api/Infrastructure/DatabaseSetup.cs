@@ -25,13 +25,18 @@ public static class DatabaseSetup
 
     // Runs when the API is started with --migrate-and-seed. Migrations are applied by
     // this explicit command, never silently at ordinary startup. Safe to run repeatedly.
-    public static async Task MigrateAndSeedAsync(this WebApplication app)
+    public static Task MigrateAndSeedAsync(this WebApplication app) => app.MigrateAndSeedAsync(null);
+
+    // The same steps from an explicit start date, used by --seed-demo to anchor the timetable to
+    // the presentation's Colombo service date.
+    public static async Task MigrateAndSeedAsync(this WebApplication app, DateOnly? startDate)
     {
         await using var scope = app.Services.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<SmartRailDbContext>();
         await db.Database.MigrateAsync();
 
-        var start = app.Configuration.GetValue<DateOnly?>("Seed:StartDate")
+        var start = startDate
+            ?? app.Configuration.GetValue<DateOnly?>("Seed:StartDate")
             ?? ColomboTime.ServiceDateOf(TimeProvider.System.GetUtcNow());
         var days = app.Configuration.GetValue("Seed:Days", 7);
         await SeedAsync(db, start, days);

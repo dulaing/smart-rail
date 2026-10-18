@@ -257,6 +257,30 @@ Delete the folder and remove "SmartRail Development CA" from the certificate sto
 The seed step reads each user's subject from Keycloak and links the local account to it, and it
 refuses to run if Keycloak's issuer differs from `Identity:Issuer`.
 
+### Presentation scenario (pilot acceptance)
+
+The pilot acceptance rehearsal uses a small, repeatable scenario anchored to the presentation
+start. Prepare the database from the anchor's Colombo service date (Development only, safe to
+repeat; it adds only missing journeys and never resets history or changes):
+
+    dotnet run --project services/api -- --seed-demo --anchor 2026-10-20T08:00:00+05:30
+
+`--anchor` is required and must carry a UTC offset. Run the command from the repository root: it
+writes a manifest of the dated journey, stop and station IDs, routes, times, intended identities
+and the RailBites collection points to `artifacts/pilot-scenario-<run>.json`, and prints the same
+IDs. Override the label with `--run <name>` and the path with `--manifest <path>`. The two named
+routes are the guest opening route `SIM-1003` Gampaha → Fort, and the outbound food route
+`SIM-3001` Fort → Peradeniya. `SIM-3001` passes Polgahawela before Peradeniya, so ending it early
+at Polgahawela leaves Peradeniya unserved and cancels the pickup beyond it.
+
+Identity and provider data stay separate, because each needs its own service running:
+
+1. `--seed-demo-identities` (above) creates the Keycloak users and local accounts the manifest lists.
+2. The RailBites seed (`services/railbites`) owns the Polgahawela and Peradeniya menu, stock and
+   cutoff. SmartRail never writes it.
+
+The command touches PostgreSQL only, so it runs while Keycloak is stopped.
+
 ### Changing the realm
 
 `services/apphost/realms/smartrail-realm.json` is imported only when the realm does **not**
