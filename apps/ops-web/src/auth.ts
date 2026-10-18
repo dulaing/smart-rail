@@ -25,7 +25,11 @@ export type Me = {
 export type SignInState =
   | { kind: 'signed-out' }
   | { kind: 'signed-in'; me: Me }
+  // The credentials were rejected or can no longer be refreshed: sign in again.
+  | { kind: 'expired' }
+  // Signed in with Keycloak, but the API says there is no enabled SmartRail account.
   | { kind: 'no-account' }
+  // The sign-in service or API could not be reached: retry. This is never a permission denial.
   | { kind: 'error'; message: string }
 
 let initialised: Promise<boolean> | undefined
@@ -56,17 +60,28 @@ export async function loadAccount(forceRefresh = false): Promise<SignInState> {
   try {
     // A negative minimum validity refreshes now; otherwise refresh only when about to expire.
     await keycloak.updateToken(forceRefresh ? -1 : 30)
+  } catch {
+    // The refresh failed. With an expired token the session is over; otherwise the sign-in
+    // service is probably just unreachable, so offer a retry instead.
+    return keycloak.isTokenExpired()
+      ? { kind: 'expired' }
+      : { kind: 'error', message: 'Could not reach the sign-in service.' }
+  }
+  try {
     const response = await fetch(`${apiUrl}/api/me`, {
       headers: { Authorization: `Bearer ${keycloak.token}` },
     })
     if (response.ok) {
       return { kind: 'signed-in', me: (await response.json()) as Me }
     }
+    if (response.status === 401) {
+      return { kind: 'expired' }
+    }
     if (response.status === 403) {
       return { kind: 'no-account' }
     }
     return { kind: 'error', message: `The API answered ${response.status}.` }
   } catch {
-    return { kind: 'error', message: 'Could not reach the sign-in service or the API.' }
+    return { kind: 'error', message: 'Could not reach the API.' }
   }
 }

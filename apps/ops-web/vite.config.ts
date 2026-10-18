@@ -5,5 +5,6 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   plugins: [react()],
   // The Keycloak client registers exactly this origin, so never fall back to another port.
-  server: { port: 5173, strictPort: true },
+  // The shared design files live in ../../shared and ../../packages (fonts), outside this app.
+  server: { port: 5173, strictPort: true, fs: { allow: ['../..'] } },
 })

@@ -1,9 +1,19 @@
 import { useCallback, useEffect, useState } from 'react'
+import { Checking, Expired, NoAccount, SignedOut, Unreachable } from './AuthStates'
 import { initAuth, loadAccount, signIn, signOut, type SignInState } from './auth'
+import { StatusSample } from './design/StatusSample'
+import { forgetDestination, navigate, rememberDestination, rememberedDestination, usePath } from './router'
+import { Shell } from './Shell'
 import './App.css'
 
+// A deep link survives the round trips to Keycloak, which always return to the site root.
+rememberDestination()
+
+type AppState = SignInState | { kind: 'loading' } | { kind: 'init-failed' }
+
 function App() {
-  const [state, setState] = useState<SignInState | 'loading'>('loading')
+  const [state, setState] = useState<AppState>({ kind: 'loading' })
+  const path = usePath()
 
   const load = useCallback(async (forceRefresh = false) => {
     setState(await loadAccount(forceRefresh))
@@ -15,93 +25,73 @@ function App() {
       .then((signedIn) => {
         if (cancelled) return
         if (signedIn) {
+          // Back from Keycloak: reopen the page that was asked for before signing in.
+          const wanted = rememberedDestination()
+          if (wanted) navigate(wanted, { replace: true })
+          forgetDestination()
           void load()
         } else {
           setState({ kind: 'signed-out' })
         }
       })
       .catch(() => {
-        if (!cancelled) {
-          setState({ kind: 'error', message: 'Could not reach the sign-in service.' })
-        }
+        if (!cancelled) setState({ kind: 'init-failed' })
       })
     return () => {
       cancelled = true
     }
   }, [load])
 
-  return (
-    <main>
-      <h1>SmartRail operations</h1>
-      {state === 'loading' && <p>Checking your session…</p>}
+  const startSignIn = () => void signIn()
+  const startSignOut = () => {
+    forgetDestination()
+    void signOut()
+  }
 
-      {state !== 'loading' && state.kind === 'signed-out' && (
-        <section>
-          <p>Sign in with your SmartRail staff account.</p>
-          <button type="button" onClick={() => void signIn()}>
-            Sign in
-          </button>
-        </section>
-      )}
-
-      {state !== 'loading' && state.kind === 'no-account' && (
-        <section>
-          <p>
-            You are signed in, but there is no active SmartRail account for you. Ask a
-            system administrator to enable one.
-          </p>
-          <button type="button" onClick={() => void signOut()}>
-            Sign out
-          </button>
-        </section>
-      )}
-
-      {state !== 'loading' && state.kind === 'error' && (
-        <section>
-          <p role="alert">{state.message}</p>
-          <button type="button" onClick={() => void load()}>
-            Try again
-          </button>{' '}
-          <button type="button" onClick={() => void signOut()}>
-            Sign out
-          </button>
-        </section>
-      )}
-
-      {state !== 'loading' && state.kind === 'signed-in' && (
-        <section aria-label="Your account">
-          <h2>{state.me.displayName}</h2>
-          <p>
-            Status: <strong>{state.me.status}</strong>
-          </p>
-          <h3>Roles</h3>
-          <ul>
-            {state.me.grants.map((grant) => (
-              <li key={`${grant.role}-${grant.stationId ?? 'all'}`}>
-                {grant.role}
-                {grant.stationId ? ' (one station)' : ''}
-                {grant.validUntil ? ` until ${grant.validUntil}` : ''}
-              </li>
-            ))}
-          </ul>
-          <h3>What you can do</h3>
-          <ul>
-            {state.me.permissions.map((permission) => (
-              <li key={permission.code}>
-                <code>{permission.code}</code> — {permission.scope.toLowerCase()}
-              </li>
-            ))}
-          </ul>
-          <button type="button" onClick={() => void load(true)}>
-            Refresh session
-          </button>{' '}
-          <button type="button" onClick={() => void signOut()}>
-            Sign out
-          </button>
-        </section>
-      )}
-    </main>
-  )
+  switch (state.kind) {
+    case 'loading':
+      return <Checking />
+    case 'signed-out':
+      return <SignedOut onSignIn={startSignIn} />
+    case 'expired':
+      return <Expired onSignIn={startSignIn} />
+    case 'no-account':
+      return <NoAccount onSignOut={startSignOut} />
+    case 'init-failed':
+      // The Keycloak adapter can only be started once per page, so retrying means reloading.
+      return (
+        <Unreachable
+          message="Could not reach the sign-in service."
+          onRetry={() => window.location.reload()}
+          onSignOut={startSignOut}
+        />
+      )
+    case 'error':
+      return (
+        <Unreachable
+          message={state.message}
+          onRetry={() => {
+            setState({ kind: 'loading' })
+            void load()
+          }}
+          onSignOut={startSignOut}
+        />
+      )
+    case 'signed-in':
+      return (
+        <Shell
+          me={state.me}
+          path={path}
+          onRefresh={() => void load(true)}
+          onSignOut={startSignOut}
+        />
+      )
+  }
 }
 
-export default App
+// ?design-sample opens the shared status sample in a development build only.
+const showSample = import.meta.env.DEV && new URLSearchParams(window.location.search).has('design-sample')
+
+export default function Root() {
+  return showSample ? <StatusSample /> : <App />
+}
