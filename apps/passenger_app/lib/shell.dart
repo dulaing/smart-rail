@@ -5,6 +5,8 @@ import 'account/account_controller.dart';
 import 'account/account_page.dart';
 import 'l10n/app_localizations.dart';
 import 'preferences.dart';
+import 'trains/train_controller.dart';
+import 'trains/train_pages.dart';
 
 /// The four passenger destinations, in this order. Home and Trains stay separate screens.
 enum PassengerTab { home, trains, food, account }
@@ -12,17 +14,42 @@ enum PassengerTab { home, trains, food, account }
 /// Header, the four tabs and the floating navigation bar. Opens on Trains. Every tab except
 /// Account is public: nothing here waits for sign-in or the account request.
 class PassengerShell extends StatefulWidget {
-  const PassengerShell({super.key, required this.account, required this.preferences});
+  const PassengerShell({
+    super.key,
+    required this.account,
+    required this.preferences,
+    required this.trains,
+  });
 
   final AccountController account;
   final PreferencesController preferences;
+  final TrainController trains;
 
   @override
   State<PassengerShell> createState() => _PassengerShellState();
 }
 
-class _PassengerShellState extends State<PassengerShell> {
+class _PassengerShellState extends State<PassengerShell>
+    with WidgetsBindingObserver {
   PassengerTab _tab = PassengerTab.trains;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    widget.trains.paused = state != AppLifecycleState.resumed;
+    if (state == AppLifecycleState.resumed) widget.trains.refresh();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,9 +81,13 @@ class _PassengerShellState extends State<PassengerShell> {
                   ),
                   Flexible(
                     child: Text(
-                      srMessages['footer.simulation']![locale] ?? srMessages['footer.simulation']!['en']!,
+                      srMessages['footer.simulation']![locale] ??
+                          srMessages['footer.simulation']!['en']!,
                       textAlign: TextAlign.end,
-                      style: theme.text('caption', color: theme.palette.textSecondary),
+                      style: theme.text(
+                        'caption',
+                        color: theme.palette.textSecondary,
+                      ),
                     ),
                   ),
                 ],
@@ -70,7 +101,19 @@ class _PassengerShellState extends State<PassengerShell> {
                     ExcludeFocus(
                       excluding: tab != _tab,
                       child: tab == PassengerTab.account
-                          ? AccountPage(controller: widget.account, preferences: widget.preferences)
+                          ? AccountPage(
+                              controller: widget.account,
+                              preferences: widget.preferences,
+                            )
+                          : tab == PassengerTab.home
+                          ? TrainsPage(
+                              controller: widget.trains,
+                              home: true,
+                              onShowTrains: () =>
+                                  setState(() => _tab = PassengerTab.trains),
+                            )
+                          : tab == PassengerTab.trains
+                          ? TrainsPage(controller: widget.trains)
                           : _ComingSoon(title: label(tab), body: t.comingSoon),
                     ),
                 ],
@@ -105,7 +148,10 @@ class _ComingSoon extends StatelessWidget {
       children: [
         Semantics(header: true, child: Text(title, style: theme.text('title'))),
         SizedBox(height: gap / 2),
-        Text(body, style: theme.text('body', color: theme.palette.textSecondary)),
+        Text(
+          body,
+          style: theme.text('body', color: theme.palette.textSecondary),
+        ),
       ],
     );
   }
@@ -120,7 +166,12 @@ const _icons = {
 
 /// The floating pill navigation from the hi-fi design.
 class _NavBar extends StatelessWidget {
-  const _NavBar({required this.label, required this.tabs, required this.selected, required this.onSelect});
+  const _NavBar({
+    required this.label,
+    required this.tabs,
+    required this.selected,
+    required this.onSelect,
+  });
 
   final String label;
   final List<(PassengerTab, String)> tabs;
@@ -145,9 +196,17 @@ class _NavBar extends StatelessWidget {
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: palette.bgSurface,
-              borderRadius: BorderRadius.circular(theme.metrics.radius['xl']! + 8),
+              borderRadius: BorderRadius.circular(
+                theme.metrics.radius['xl']! + 8,
+              ),
               border: Border.all(color: palette.lineHairline),
-              boxShadow: [BoxShadow(color: palette.effectShadowKey, blurRadius: 24, offset: const Offset(0, 8))],
+              boxShadow: [
+                BoxShadow(
+                  color: palette.effectShadowKey,
+                  blurRadius: 24,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
             child: Padding(
               padding: EdgeInsets.all(gap / 4),
@@ -174,7 +233,13 @@ class _NavBar extends StatelessWidget {
 }
 
 class _NavItem extends StatelessWidget {
-  const _NavItem({super.key, required this.label, required this.icons, required this.selected, required this.onTap});
+  const _NavItem({
+    super.key,
+    required this.label,
+    required this.icons,
+    required this.selected,
+    required this.onTap,
+  });
 
   final String label;
   final (IconData, IconData) icons;
@@ -202,7 +267,9 @@ class _NavItem extends StatelessWidget {
             borderRadius: BorderRadius.circular(theme.metrics.radius['full']!),
             onTap: onTap,
             child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: theme.metrics.minTarget + 8),
+              constraints: BoxConstraints(
+                minHeight: theme.metrics.minTarget + 8,
+              ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
                 child: Column(
@@ -211,7 +278,10 @@ class _NavItem extends StatelessWidget {
                     Icon(selected ? icons.$2 : icons.$1, color: ink, size: 24),
                     const SizedBox(height: 2),
                     // Shrinks a long Sinhala or Tamil label instead of clipping it.
-                    FittedBox(fit: BoxFit.scaleDown, child: Text(label, style: style, maxLines: 1)),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(label, style: style, maxLines: 1),
+                    ),
                   ],
                 ),
               ),

@@ -100,7 +100,17 @@ void main() {
     for (final (key, title) in [('home', 'Home'), ('food', 'Food'), ('trains', 'Trains')]) {
       await tester.tap(find.byKey(Key('tab-$key')));
       await tester.pump(const Duration(milliseconds: 100));
-      expect(find.text('Coming soon'), findsOneWidget, reason: '$title is reachable while restoring');
+      expect(
+        find.text(
+          title == 'Home'
+              ? 'Your next trains'
+              : title == 'Trains'
+              ? 'Trains'
+              : 'Coming soon',
+        ),
+        title == 'Trains' ? findsWidgets : findsOneWidget,
+        reason: '$title is reachable while restoring',
+      );
     }
     await _openAccount(tester);
     expect(find.text('Guest'), findsOneWidget);
@@ -154,7 +164,7 @@ void main() {
 
     await tester.tap(find.byKey(const Key('tab-trains')));
     await tester.pumpAndSettle();
-    expect(find.text('Coming soon'), findsOneWidget);
+    expect(find.text('Trains'), findsWidgets);
   });
 
   testWidgets('a signed-in identity with no (or a disabled) local account can go back to guest', (tester) async {
