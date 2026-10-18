@@ -8,15 +8,19 @@ public sealed class ConfirmedChangeReader(ChangeStore store) : IConfirmedChangeR
     public async Task<ConfirmedOverrides> ReadAsync(Guid journeyId, CancellationToken cancellationToken)
     {
         var changes = await store.LoadAsync(journeyId, cancellationToken);
-        return changes is null ? ConfirmedOverrides.None : From(ConfirmedState.Fold(changes.History));
+        return changes is null ? ConfirmedOverrides.None : From(ConfirmedState.Fold(changes.History), changes.Version);
     }
 
-    public static ConfirmedOverrides From(ConfirmedState state) =>
+    public static ConfirmedOverrides From(ConfirmedState state, int? version = null) =>
         new(
             state.Delay?.DelayMinutes,
             state.Cancel is not null,
             state.EarlyEnd?.FinalStopId,
             state.Active
                 .Where(c => c.Kind == ChangeKind.Platform)
-                .ToDictionary(c => c.TargetStopId!.Value, c => new ConfirmedPlatform(c.NewPlatform!, c.PublishedAt)));
+                .ToDictionary(c => c.TargetStopId!.Value, c => new ConfirmedPlatform(c.NewPlatform!, c.PublishedAt)),
+            state.Delay?.PublishedAt,
+            state.Cancel?.PublishedAt,
+            state.EarlyEnd?.PublishedAt,
+            version);
 }

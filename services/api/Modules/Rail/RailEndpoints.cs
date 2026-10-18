@@ -12,8 +12,8 @@ public static class RailEndpoints
 
     // An overnight train that left up to two service dates ago can still be running, and the
     // next service date supplies trains when none are left today.
-    private const int ServiceDatesBack = 2;
-    private const int ServiceDatesAhead = 1;
+    public const int ServiceDatesBack = 2;
+    public const int ServiceDatesAhead = 1;
 
     public static void MapRailEndpoints(this IEndpointRouteBuilder app)
     {

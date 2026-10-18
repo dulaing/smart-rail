@@ -61,19 +61,42 @@ public static class NextTrainFinder
         Guid destinationStationId,
         DateTimeOffset at)
     {
+        // A train that has already arrived but not yet left is still catchable.
+        var match = Matches(journey, originStationId, destinationStationId).FirstOrDefault(m => m.OriginDeparture >= at);
+        if (match is null)
+        {
+            return null;
+        }
+
+        return new ScheduledTrain(
+            journey.Id,
+            journey.ServiceDate,
+            journey.Pattern.TrainNumber,
+            journey.Pattern.SourceKind,
+            journey.Pattern.SourceUrl,
+            journey.Pattern.SourceCheckedAt,
+            match.Origin.Id,
+            match.OriginArrival,
+            match.OriginDeparture,
+            match.Origin.PlannedPlatform,
+            match.Destination.Id,
+            match.DestinationArrival);
+    }
+
+    // Every origin occurrence of the journey that has a departure and a later destination
+    // occurrence with an arrival, in running order and with no time filter. Each origin pairs with
+    // the first destination after it. The live read uses this too, so it matches occurrences
+    // exactly as the scheduled read does.
+    public static IReadOnlyList<RouteMatch> Matches(
+        ScheduledJourney journey, Guid originStationId, Guid destinationStationId)
+    {
         var stops = journey.Pattern.Stops.OrderBy(s => s.Sequence).ToList();
+        var matches = new List<RouteMatch>();
 
         for (var i = 0; i < stops.Count; i++)
         {
             var origin = stops[i];
             if (origin.StationId != originStationId || origin.DepartureLocal is not { } departureLocal)
-            {
-                continue;
-            }
-
-            // A train that has already arrived but not yet left is still catchable.
-            var departure = ColomboTime.ToInstant(journey.ServiceDate, departureLocal, origin.DayOffset);
-            if (departure < at)
             {
                 continue;
             }
@@ -87,23 +110,29 @@ public static class NextTrainFinder
                 }
 
                 var (originArrival, _) = ColomboTime.StopInstants(journey.ServiceDate, origin);
-
-                return new ScheduledTrain(
-                    journey.Id,
-                    journey.ServiceDate,
-                    journey.Pattern.TrainNumber,
-                    journey.Pattern.SourceKind,
-                    journey.Pattern.SourceUrl,
-                    journey.Pattern.SourceCheckedAt,
-                    origin.Id,
+                matches.Add(new RouteMatch(
+                    origin,
+                    destination,
+                    i,
+                    j,
                     originArrival,
-                    departure,
-                    origin.PlannedPlatform,
-                    destination.Id,
-                    ColomboTime.ToInstant(journey.ServiceDate, arrivalLocal, destination.DayOffset));
+                    ColomboTime.ToInstant(journey.ServiceDate, departureLocal, origin.DayOffset),
+                    ColomboTime.ToInstant(journey.ServiceDate, arrivalLocal, destination.DayOffset)));
+                break;
             }
         }
 
-        return null;
+        return matches;
     }
 }
+
+// One origin stop occurrence paired with the destination occurrence after it. The indexes are
+// positions in the journey's stops ordered by sequence.
+public sealed record RouteMatch(
+    PatternStop Origin,
+    PatternStop Destination,
+    int OriginIndex,
+    int DestinationIndex,
+    DateTimeOffset? OriginArrival,
+    DateTimeOffset OriginDeparture,
+    DateTimeOffset DestinationArrival);
