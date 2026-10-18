@@ -1,18 +1,12 @@
-import { useEffect, useState } from 'react'
-
-const format = (time: Date) =>
-  `${String(time.getHours()).padStart(2, '0')}:${String(time.getMinutes()).padStart(2, '0')}`
+import { formatClock } from './time.ts'
 
 /**
- * The board clock, to the minute. It checks every few seconds but only redraws when the minute
- * changes, so the screen never flickers, and it is plain text rather than a chatty live region.
+ * The board clock, to the minute, in Colombo time. `now` is already corrected with the server
+ * clock; the text only changes when the minute does, so the screen never flickers, and it is plain
+ * text rather than a chatty live region.
  */
-export function Clock() {
-  const [text, setText] = useState(() => format(new Date()))
-  useEffect(() => {
-    const timer = window.setInterval(() => setText(format(new Date())), 5000)
-    return () => window.clearInterval(timer)
-  }, [])
+export function Clock({ now }: { now: number }) {
+  const text = formatClock(now)
   return (
     <time className="clock" dateTime={text}>
       {text}
