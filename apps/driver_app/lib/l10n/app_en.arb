@@ -1,0 +1,21 @@
+{
+  "@@locale": "en",
+  "appTitle": "SmartRail Driver",
+  "checkingSession": "Checking your session…",
+  "signInPrompt": "Sign in to see your journeys.",
+  "signIn": "Sign in",
+  "signOut": "Sign out",
+  "signInFailed": "Sign-in was cancelled or failed.",
+  "noAccount": "You are signed in, but there is no SmartRail account for you.",
+  "sessionExpired": "Your session has expired. Sign in again.",
+  "retry": "Try again",
+  "navLabel": "Driver navigation",
+  "tabJourneys": "Journeys",
+  "tabUpdates": "Updates",
+  "tabReports": "Reports",
+  "tabAccount": "Account",
+  "notAvailableYet": "Not available yet",
+  "noDriverAccess": "This account has no driver access. Sign out and use a driver account.",
+  "accessDenied": "Your account does not have access to this screen.",
+  "statusSample": "Status sample"
+}

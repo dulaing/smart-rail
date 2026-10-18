@@ -1,7 +1,13 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
 
+import 'package:flutter/material.dart';
+import 'package:smartrail_core/smartrail_core.dart';
+
+import 'account/account_controller.dart';
 import 'auth/account_api.dart';
 import 'auth/auth_service.dart';
+import 'gate.dart';
+import 'l10n/app_localizations.dart';
 
 void main() {
   const config = AuthConfig();
@@ -13,145 +19,41 @@ void main() {
   );
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   const MainApp({super.key, required this.auth, required this.accounts});
 
   final AuthService auth;
   final AccountApi accounts;
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'SmartRail Driver',
-      home: HomePage(auth: auth, accounts: accounts),
-    );
-  }
+  State<MainApp> createState() => _MainAppState();
 }
 
-/// Drivers must sign in: there is no guest mode here.
-class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.auth, required this.accounts});
-
-  final AuthService auth;
-  final AccountApi accounts;
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  AccountResult? _result;
-  String? _notice;
-  bool _busy = false;
+class _MainAppState extends State<MainApp> {
+  late final AccountController _account = AccountController(auth: widget.auth, accounts: widget.accounts);
 
   @override
   void initState() {
     super.initState();
-    _restore();
+    unawaited(_account.restore());
   }
 
-  Future<void> _restore() async {
-    if (await widget.auth.restore()) {
-      await _loadAccount();
-    }
-  }
-
-  Future<void> _loadAccount() async {
-    final token = await widget.auth.accessToken();
-    final result = await widget.accounts.fetchMe(token);
-    if (mounted) setState(() => _result = result);
-  }
-
-  Future<void> _signIn() async {
-    setState(() {
-      _busy = true;
-      _notice = null;
-    });
-    try {
-      await widget.auth.signIn();
-      await _loadAccount();
-    } catch (_) {
-      if (mounted) setState(() => _notice = 'Sign-in was cancelled or failed.');
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
-  }
-
-  Future<void> _signOut() async {
-    setState(() => _busy = true);
-    try {
-      await widget.auth.signOut();
-    } catch (_) {
-      // Local tokens are already cleared; the browser step may have been cancelled.
-    }
-    if (mounted) {
-      setState(() {
-        _result = null;
-        _busy = false;
-      });
-    }
+  @override
+  void dispose() {
+    _account.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final result = _result;
-    return Scaffold(
-      appBar: AppBar(title: const Text('SmartRail Driver')),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: switch (result) {
-            AccountFound(:final account) => _signedIn(account),
-            AccountMissing() => _message(
-              'You are signed in, but there is no SmartRail account for you.',
-            ),
-            AccountFailed(:final message) => _message(message),
-            null => _signedOut(),
-          },
-        ),
-      ),
+    return MaterialApp(
+      onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
+      // The driver app has one light theme with large text and 56 dp targets; no theme picker.
+      theme: srTheme(SrProfile.driver, Brightness.light),
+      themeMode: ThemeMode.light,
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      home: DriverGate(controller: _account),
     );
   }
-
-  Widget _signedOut() => Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      const Text('Sign in to see your journeys.'),
-      if (_notice != null) ...[
-        const SizedBox(height: 8),
-        Text(_notice!, key: const Key('notice')),
-      ],
-      const SizedBox(height: 16),
-      FilledButton(
-        onPressed: _busy ? null : _signIn,
-        child: const Text('Sign in'),
-      ),
-    ],
-  );
-
-  Widget _signedIn(Account account) => Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Text(account.displayName, style: const TextStyle(fontSize: 22)),
-      const SizedBox(height: 8),
-      Text(account.roles.join(', ')),
-      const SizedBox(height: 16),
-      OutlinedButton(
-        onPressed: _busy ? null : _signOut,
-        child: const Text('Sign out'),
-      ),
-    ],
-  );
-
-  Widget _message(String text) => Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Text(text, textAlign: TextAlign.center),
-      const SizedBox(height: 16),
-      OutlinedButton(
-        onPressed: _busy ? null : _signOut,
-        child: const Text('Sign out'),
-      ),
-    ],
-  );
 }

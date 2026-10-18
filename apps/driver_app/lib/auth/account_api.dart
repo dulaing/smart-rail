@@ -40,6 +40,11 @@ class AccountMissing extends AccountResult {
   const AccountMissing();
 }
 
+/// The API rejected the access token (401): the session ended and the person must sign in again.
+class AccountExpired extends AccountResult {
+  const AccountExpired();
+}
+
 class AccountFailed extends AccountResult {
   const AccountFailed(this.message);
   final String message;
@@ -72,6 +77,9 @@ class HttpAccountApi implements AccountApi {
         return AccountFound(
           Account.fromJson(jsonDecode(response.body) as Map<String, dynamic>),
         );
+      }
+      if (response.statusCode == 401) {
+        return const AccountExpired();
       }
       if (response.statusCode == 403) {
         return const AccountMissing();
