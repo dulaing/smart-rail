@@ -1,0 +1,638 @@
+openapi: 3.1.0
+info:
+  title: RailBites provider contract
+  version: 1.0.0
+  description: |
+    The agreed shape of the boundary between SmartRail and RailBites. Neither service shares code
+    or data classes with the other; both implement this document.
+
+    **Who calls whom.** The passenger app calls only SmartRail. SmartRail calls RailBites service
+    routes. Kiosks call RailBites kiosk routes. RailBites calls SmartRail with signed status
+    callbacks and one authenticated read.
+
+    **Credentials** come from secrets or the environment, never from clients or Git. A missing
+    credential on the server side refuses every call (fail closed).
+
+    | Caller | Header | Scope |
+    | --- | --- | --- |
+    | SmartRail -> RailBites | `X-RailBites-Service-Key` | All service routes |
+    | Kiosk -> RailBites | `X-RailBites-Kiosk-Key` | One collection point; a key for another point gets 403 |
+    | RailBites -> SmartRail (callback) | `X-RailBites-Signature` + `X-RailBites-Timestamp` | HMAC, see the callback |
+    | RailBites -> SmartRail (read) | `X-RailBites-Service-Key` (a separate key from the one above) | Passage read only |
+
+    **Identity.** SmartRail's generated `order_links.id` is the provider's idempotency key
+    (`orderLinkId`). The passenger's request key and every passenger detail stay in SmartRail:
+    no name, contact detail or Keycloak token ever reaches RailBites.
+
+    **Money and time.** Prices are integers in minor LKR (65000 = Rs 650.00). Instants are UTC
+    ISO-8601 with milliseconds (`2026-10-18T09:30:00.000Z`). `serviceDate` is the Asia/Colombo date.
+
+    **Errors** are always `{ "code", "message", "details"? }`. `code` is stable. Placement rejection
+    is `422`; a conflict with existing state is `409`; a missing or wrong credential is `401`
+    (kiosk key for another collection point: `403`); a malformed request is `400`.
+
+    | Code | Status | Meaning |
+    | --- | --- | --- |
+    | `UNAUTHORIZED` | 401 | Missing, wrong or unconfigured credential |
+    | `FORBIDDEN_COLLECTION_POINT` | 403 | Kiosk key is not for this collection point |
+    | `INVALID_REQUEST` | 400 | Malformed JSON, field or identifier |
+    | `COLLECTION_POINT_NOT_FOUND` | 404 | Unknown or inactive collection point |
+    | `ORDER_NOT_FOUND` | 404 | No order for that link ID or order ID |
+    | `ITEM_UNAVAILABLE` | 422 | Unknown, inactive or other-point menu item |
+    | `STOCK_INSUFFICIENT` | 422 | Not enough stock for an item |
+    | `CUTOFF_PASSED` | 422 on placement, 409 on cancel | `now >= ETA - cutoff` (equality is closed) |
+    | `TRAIN_UNKNOWN` | 422 on placement, 409 on cancel | No ETA, or ETA evidence older than 240 seconds |
+    | `STOP_NOT_SERVED` | 422 | Journey closed or pickup stop blocked |
+    | `PICKUP_MISMATCH` | 422 | Station, stop or collection point do not belong together |
+    | `IDEMPOTENCY_CONFLICT` | 409 | Same link ID with a different collection point, journey, pickup stop or items |
+    | `JOURNEY_STATE_CONFLICT` | 409 | Same journey version with a different eligibility snapshot |
+    | `EVENT_CONFLICT` | 409 | Same event ID with different content |
+    | `INVALID_STATE` | 409 | Action not allowed from the order's current status |
+    | `PICKUP_CODE_MISMATCH` | 422 | Wrong pickup code at collection |
+    | `TRAIN_NOT_PASSED` | 409 | No-show refused: SmartRail does not confirm the train passed the stop |
+    | `SMARTRAIL_UNAVAILABLE` | 503 | No-show could not be confirmed; retry later |
+
+    **Order status** is `ACCEPTED`, `READY`, `COLLECTED`, `NO_SHOW` or `CANCELLED`. Allowed moves:
+    ACCEPTED -> READY -> COLLECTED; ACCEPTED or READY -> CANCELLED or NO_SHOW. Repeating the
+    action that produced the current status is a harmless 200; a conflicting terminal action is 409.
+    `statusSequence` starts at 1 and increases by one on every externally visible change,
+    including a pickup-time (ETA) change. Placement uncertainty (a timeout) belongs to SmartRail's
+    link, not to a provider order.
+
+    **Cancellation reasons** are `PASSENGER_CANCELLED`, `TRAIN_CANCELLED` and `TRAIN_ENDED_EARLY`.
+servers:
+  - url: http://localhost:5200
+    description: Local RailBites
+tags:
+  - name: Menu
+    description: SmartRail -> RailBites, collection points and menu
+  - name: Orders
+    description: SmartRail -> RailBites, placement, lookup and cancellation
+  - name: Train changes
+    description: SmartRail -> RailBites, confirmed service changes
+  - name: Kiosk
+    description: Kiosk -> RailBites
+  - name: SmartRail
+    description: Implemented by SmartRail, called by RailBites
+security:
+  - serviceKey: []
+paths:
+  /health/live:
+    get:
+      operationId: getLiveness
+      summary: Process liveness, no dependencies checked
+      security: []
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema: { type: object, required: [status], properties: { status: { const: Healthy } } }
+
+  /v1/collection-points:
+    get:
+      operationId: listCollectionPoints
+      tags: [Menu]
+      summary: Active collection points
+      description: Never cache the response; it carries the provider-owned cutoff.
+      parameters:
+        - name: smartRailStationId
+          in: query
+          required: false
+          description: Return only the collection point mapped to this SmartRail station.
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: "Collection points, possibly empty. `Cache-Control: no-store`."
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [collectionPoints]
+                properties:
+                  collectionPoints:
+                    type: array
+                    items: { $ref: "#/components/schemas/CollectionPoint" }
+              example:
+                collectionPoints:
+                  - id: peradeniya-junction
+                    smartRailStationId: 04111fa9-fc9c-3657-e13b-d606dbe37c55
+                    name: Peradeniya Junction
+                    cutoffMinutes: 30
+        "400": { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/Error" }
+
+  /v1/collection-points/{collectionPointId}:
+    get:
+      operationId: getCollectionPoint
+      tags: [Menu]
+      summary: One collection point with its current cutoff
+      parameters: [{ $ref: "#/components/parameters/CollectionPointId" }]
+      responses:
+        "200":
+          description: "The collection point. `Cache-Control: no-store`."
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CollectionPoint" }
+        "401": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+
+  /v1/collection-points/{collectionPointId}/menu:
+    get:
+      operationId: getMenu
+      tags: [Menu]
+      summary: Active menu items with price and stock
+      description: |
+        SmartRail may cache this for 60 seconds (`Cache-Control: private, max-age=60`). Stock is
+        rechecked atomically at placement, so a cached menu can only be optimistic.
+      parameters: [{ $ref: "#/components/parameters/CollectionPointId" }]
+      responses:
+        "200":
+          description: Menu. Sold-out items stay listed with `stockQuantity` 0.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Menu" }
+              example:
+                collectionPointId: peradeniya-junction
+                currency: LKR
+                items:
+                  - { id: pdn-lamprais, name: Lamprais, priceMinorLkr: 85000, stockQuantity: 25 }
+        "401": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+
+  /v1/order-links/{orderLinkId}:
+    parameters: [{ $ref: "#/components/parameters/OrderLinkId" }]
+    put:
+      operationId: placeOrder
+      tags: [Orders]
+      summary: Place one order, safe to repeat
+      description: |
+        Idempotent on `orderLinkId`. If an order already exists for this link ID, return it with
+        its **current** status (including CANCELLED) and run no stock, cutoff or eligibility check.
+        Repeating with a different collection point, journey, pickup stop or items is
+        `IDEMPOTENCY_CONFLICT`; the ETA and journey snapshot may differ between attempts.
+
+        A new order is placed in one SQLite `BEGIN IMMEDIATE` transaction that: applies the request's
+        journey snapshot if its version is newer than the provider's (an older version is judged
+        against the provider's newer state, so a placement cannot bypass a restriction already
+        received; the same version with a different snapshot is `JOURNEY_STATE_CONFLICT`); checks the
+        collection point, station and stop belong together; checks items are active with positive
+        quantity and enough stock; checks the journey is open, the stop is not blocked, the ETA is
+        present with evidence no older than 240 seconds, and `now < estimatedArrival - cutoff`;
+        then deducts stock and inserts the order, its items and the initial callback together.
+        A timeout is unknown, never proof of rejection: reconcile with `getOrderByLink`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PlaceOrderRequest" }
+            example:
+              collectionPointId: peradeniya-junction
+              journey:
+                journeyId: 7c1d5f4e-3c41-4f0a-9d63-2f7b8d0a1111
+                trainNumber: SIM-3001
+                serviceDate: "2026-10-18"
+                version: 3
+                orderClosed: false
+                blockedPickupStopIds: []
+              pickup:
+                stopId: 5d2d6a52-0a56-4a06-8c33-9a4c1f0e2222
+                stationId: 04111fa9-fc9c-3657-e13b-d606dbe37c55
+                scheduledArrival: "2026-10-18T07:10:00.000Z"
+                estimatedArrival: "2026-10-18T07:25:00.000Z"
+                etaEvidenceAt: "2026-10-18T06:21:30.000Z"
+              items:
+                - { menuItemId: pdn-lamprais, quantity: 1 }
+      responses:
+        "201":
+          description: New order created.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Order" }
+        "200":
+          description: An order for this link ID already existed; its current state.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Order" }
+        "400": { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+    get:
+      operationId: getOrderByLink
+      tags: [Orders]
+      summary: Look up an order by SmartRail link ID
+      description: Used to reconcile a timed-out placement. Returns the order's current status.
+      responses:
+        "200":
+          description: The order.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Order" }
+        "401": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+
+  /v1/order-links/{orderLinkId}/cancellation:
+    post:
+      operationId: cancelOrder
+      tags: [Orders]
+      summary: Passenger cancellation
+      description: |
+        The body carries a **fresh** eligibility and ETA snapshot taken by SmartRail. Allowed only
+        while `now < estimatedArrival - cutoff`. Without an ETA (or with evidence older than
+        240 seconds) the cutoff cannot be approved: `TRAIN_UNKNOWN`. Repeating on a CANCELLED
+        order is a harmless 200; COLLECTED or NO_SHOW is `INVALID_STATE`. Restores reserved stock once.
+      parameters: [{ $ref: "#/components/parameters/OrderLinkId" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CancelOrderRequest" }
+      responses:
+        "200":
+          description: Order is CANCELLED with reason `PASSENGER_CANCELLED`.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Order" }
+        "400": { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+
+  /v1/journey-events:
+    post:
+      operationId: deliverJourneyEvent
+      tags: [Train changes]
+      summary: Deliver one confirmed train change
+      description: |
+        Delivered from SmartRail's outbox; retries keep the event ID and body. In one
+        `BEGIN IMMEDIATE` transaction RailBites records the event, advances the journey snapshot
+        only if `journey.version` is newer than the applied one, updates open orders (new pickup
+        times; cancellation with a reason where the journey is closed or the stop is blocked) and
+        queues their callbacks. A duplicate or older event is a successful no-op so delivery can
+        finish. Cancelled orders are never revived by a withdrawal. A `null` ETA is unknown and is
+        never replaced with the schedule. Respond only after commit. 5xx and timeouts are retried.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/JourneyEvent" }
+      responses:
+        "200":
+          description: Processed.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [result]
+                properties:
+                  result: { enum: [APPLIED, DUPLICATE, STALE] }
+        "400": { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+
+  /v1/kiosk/collection-points/{collectionPointId}/orders:
+    get:
+      operationId: listKioskOrders
+      tags: [Kiosk]
+      summary: Orders for this collection point
+      description: Never includes pickup codes; staff check the code the passenger shows.
+      security: [{ kioskKey: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/CollectionPointId" }
+        - name: status
+          in: query
+          required: false
+          schema: { $ref: "#/components/schemas/OrderStatus" }
+      responses:
+        "200":
+          description: Orders, oldest pickup first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [orders]
+                properties:
+                  orders:
+                    type: array
+                    items: { $ref: "#/components/schemas/KioskOrder" }
+        "401": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+
+  /v1/kiosk/collection-points/{collectionPointId}/orders/{orderId}/ready:
+    post:
+      operationId: markReady
+      tags: [Kiosk]
+      summary: ACCEPTED -> READY
+      security: [{ kioskKey: [] }]
+      parameters: [{ $ref: "#/components/parameters/CollectionPointId" }, { $ref: "#/components/parameters/OrderId" }]
+      responses:
+        "200":
+          description: Order is READY (also when it already was).
+          content: { application/json: { schema: { $ref: "#/components/schemas/KioskOrder" } } }
+        "401": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+
+  /v1/kiosk/collection-points/{collectionPointId}/orders/{orderId}/collected:
+    post:
+      operationId: markCollected
+      tags: [Kiosk]
+      summary: READY -> COLLECTED with the matching pickup code
+      security: [{ kioskKey: [] }]
+      parameters: [{ $ref: "#/components/parameters/CollectionPointId" }, { $ref: "#/components/parameters/OrderId" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pickupCode]
+              properties: { pickupCode: { type: string } }
+      responses:
+        "200":
+          description: Order is COLLECTED (also when it already was and the code matches).
+          content: { application/json: { schema: { $ref: "#/components/schemas/KioskOrder" } } }
+        "400": { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+
+  /v1/kiosk/collection-points/{collectionPointId}/orders/{orderId}/no-show:
+    post:
+      operationId: markNoShow
+      tags: [Kiosk]
+      summary: ACCEPTED or READY -> NO_SHOW after the train has passed
+      description: |
+        RailBites makes a fresh authenticated read of SmartRail (`getPickupPassage`) and accepts
+        only a confirmed `PASSED`. A scheduled time or anything the kiosk sends is not evidence.
+      security: [{ kioskKey: [] }]
+      parameters: [{ $ref: "#/components/parameters/CollectionPointId" }, { $ref: "#/components/parameters/OrderId" }]
+      responses:
+        "200":
+          description: Order is NO_SHOW (also when it already was).
+          content: { application/json: { schema: { $ref: "#/components/schemas/KioskOrder" } } }
+        "401": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "503": { $ref: "#/components/responses/Error" }
+
+  /internal/catering/order-updates:
+    servers:
+      - url: http://localhost:5111
+        description: Local SmartRail API
+    post:
+      operationId: receiveOrderUpdate
+      tags: [SmartRail]
+      summary: Signed status, ETA and reason callback (RailBites -> SmartRail)
+      description: |
+        **Signature.** `X-RailBites-Signature: v1=<lower-case hex>` is HMAC-SHA256, keyed with the
+        shared callback secret, over the UTF-8 string `<timestamp>.<raw body>`: the value of
+        `X-RailBites-Timestamp` (Unix seconds), one full stop, then the exact bytes of the request
+        body. The receiver compares in constant time, rejects timestamps more than five minutes
+        from its clock, bounds the body size, and authenticates before duplicate handling. Every
+        retry carries a fresh timestamp and signature but the same event ID and body.
+
+        **Receiver.** In one PostgreSQL transaction, record the receipt (unique `eventId`) and apply
+        the update only if `statusSequence` is greater than the link's. A valid duplicate or older
+        sequence gets `200` with `result` `DUPLICATE` or `STALE` so delivery can finish. An invalid
+        signature or timestamp gets `401` and is counted. The same event ID with different content
+        is `409`. Acknowledge only after commit; RailBites retries on timeout and 5xx with capped,
+        increasing delays. Pickup codes, signatures, secrets and payloads are never logged.
+      security: []
+      parameters:
+        - { name: X-RailBites-Timestamp, in: header, required: true, schema: { type: integer } }
+        - { name: X-RailBites-Signature, in: header, required: true, schema: { type: string, pattern: "^v1=[0-9a-f]{64}$" } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/OrderUpdate" }
+      responses:
+        "200":
+          description: Receipt committed.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [result]
+                properties: { result: { enum: [APPLIED, DUPLICATE, STALE] } }
+        "400": { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "413": { $ref: "#/components/responses/Error" }
+
+  /internal/catering/journeys/{journeyId}/stops/{stopId}/passage:
+    servers:
+      - url: http://localhost:5111
+        description: Local SmartRail API
+    get:
+      operationId: getPickupPassage
+      tags: [SmartRail]
+      summary: Has the train passed this pickup stop? (RailBites -> SmartRail)
+      description: |
+        A fresh read from SmartRail's confirmed running state, authenticated with RailBites' own
+        service key (`X-RailBites-Service-Key`, a different secret from the one SmartRail sends).
+        `PASSED` means confirmed departure from that stop occurrence. `UNKNOWN` covers stale
+        evidence and is never treated as passed.
+      security: [{ serviceKey: [] }]
+      parameters:
+        - { name: journeyId, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: stopId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: Passage state with the instant SmartRail evaluated it.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [state, evaluatedAt]
+                properties:
+                  state: { enum: [AHEAD, PASSED, UNKNOWN] }
+                  evaluatedAt: { type: string, format: date-time }
+        "401": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+
+components:
+  securitySchemes:
+    serviceKey: { type: apiKey, in: header, name: X-RailBites-Service-Key }
+    kioskKey: { type: apiKey, in: header, name: X-RailBites-Kiosk-Key }
+  parameters:
+    CollectionPointId: { name: collectionPointId, in: path, required: true, schema: { type: string } }
+    OrderLinkId: { name: orderLinkId, in: path, required: true, schema: { type: string, format: uuid } }
+    OrderId: { name: orderId, in: path, required: true, description: Provider order ID, schema: { type: string } }
+  responses:
+    Error:
+      description: Standard error. See the code table in the description.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+          example: { code: STOCK_INSUFFICIENT, message: Not enough stock., details: { menuItemId: pdn-lamprais, available: 0 } }
+  schemas:
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string }
+        message: { type: string }
+        details: { type: object }
+    CollectionPoint:
+      type: object
+      required: [id, smartRailStationId, name, cutoffMinutes]
+      properties:
+        id: { type: string }
+        smartRailStationId: { type: string, format: uuid }
+        name: { type: string }
+        cutoffMinutes: { type: integer, minimum: 0, maximum: 240 }
+    Menu:
+      type: object
+      required: [collectionPointId, currency, items]
+      properties:
+        collectionPointId: { type: string }
+        currency: { const: LKR }
+        items:
+          type: array
+          items:
+            type: object
+            required: [id, name, priceMinorLkr, stockQuantity]
+            properties:
+              id: { type: string }
+              name: { type: string }
+              priceMinorLkr: { type: integer, minimum: 0 }
+              stockQuantity: { type: integer, minimum: 0 }
+    OrderStatus:
+      enum: [ACCEPTED, READY, COLLECTED, NO_SHOW, CANCELLED]
+    JourneySnapshot:
+      type: object
+      description: |
+        The full eligibility of one dated journey at one version. Versions need not be consecutive.
+        RailBites applies only newer versions.
+      required: [journeyId, version, orderClosed, blockedPickupStopIds]
+      properties:
+        journeyId: { type: string, format: uuid }
+        trainNumber: { type: string }
+        serviceDate: { type: string, format: date }
+        version: { type: integer, minimum: 0 }
+        orderClosed: { type: boolean, description: "True when the whole journey is cancelled." }
+        blockedPickupStopIds:
+          type: array
+          description: Stop occurrences no longer served (beyond an early end, or all of them on cancellation).
+          items: { type: string, format: uuid }
+    Pickup:
+      type: object
+      description: |
+        When the train reaches the pickup stop. `estimatedArrival` and `etaEvidenceAt` are both
+        null (unknown) or both set; `etaEvidenceAt` is the observation time behind the ETA.
+      required: [stopId, stationId, scheduledArrival, estimatedArrival, etaEvidenceAt]
+      properties:
+        stopId: { type: string, format: uuid }
+        stationId: { type: string, format: uuid }
+        scheduledArrival: { type: string, format: date-time }
+        estimatedArrival: { type: [string, "null"], format: date-time }
+        etaEvidenceAt: { type: [string, "null"], format: date-time }
+    OrderItemRequest:
+      type: object
+      required: [menuItemId, quantity]
+      properties:
+        menuItemId: { type: string }
+        quantity: { type: integer, minimum: 1 }
+    PlaceOrderRequest:
+      type: object
+      required: [collectionPointId, journey, pickup, items]
+      properties:
+        collectionPointId: { type: string }
+        journey: { $ref: "#/components/schemas/JourneySnapshot" }
+        pickup: { $ref: "#/components/schemas/Pickup" }
+        items:
+          type: array
+          minItems: 1
+          items: { $ref: "#/components/schemas/OrderItemRequest" }
+    CancelOrderRequest:
+      type: object
+      required: [journey, pickup]
+      properties:
+        journey: { $ref: "#/components/schemas/JourneySnapshot" }
+        pickup: { $ref: "#/components/schemas/Pickup" }
+    OrderItem:
+      type: object
+      required: [menuItemId, name, quantity, unitPriceMinorLkr]
+      properties:
+        menuItemId: { type: string }
+        name: { type: string }
+        quantity: { type: integer }
+        unitPriceMinorLkr: { type: integer }
+    PickupTime:
+      type: object
+      description: The provider's last reported pickup time and the evidence time behind it.
+      required: [scheduledArrival, estimatedArrival, etaEvidenceAt]
+      properties:
+        scheduledArrival: { type: string, format: date-time }
+        estimatedArrival: { type: [string, "null"], format: date-time }
+        etaEvidenceAt: { type: [string, "null"], format: date-time }
+    Order:
+      type: object
+      description: Returned only to SmartRail, which shows `pickupCode` to the owning passenger alone.
+      required: [id, orderLinkId, collectionPointId, journeyId, pickupStopId, status, statusSequence, pickupCode, items, totalMinorLkr, pickupTime, cancellationReason, createdAt, updatedAt]
+      properties:
+        id: { type: string, description: Provider order reference }
+        orderLinkId: { type: string, format: uuid }
+        collectionPointId: { type: string }
+        journeyId: { type: string, format: uuid }
+        pickupStopId: { type: string, format: uuid }
+        status: { $ref: "#/components/schemas/OrderStatus" }
+        statusSequence: { type: integer, minimum: 1 }
+        pickupCode: { type: string }
+        items: { type: array, items: { $ref: "#/components/schemas/OrderItem" } }
+        totalMinorLkr: { type: integer }
+        pickupTime: { $ref: "#/components/schemas/PickupTime" }
+        cancellationReason:
+          type: [string, "null"]
+          enum: [PASSENGER_CANCELLED, TRAIN_CANCELLED, TRAIN_ENDED_EARLY, null]
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    KioskOrder:
+      type: object
+      description: An order as kiosk staff see it. No pickup code, no passenger data.
+      required: [id, collectionPointId, status, statusSequence, items, pickupTime, cancellationReason]
+      properties:
+        id: { type: string }
+        collectionPointId: { type: string }
+        status: { $ref: "#/components/schemas/OrderStatus" }
+        statusSequence: { type: integer }
+        items: { type: array, items: { $ref: "#/components/schemas/OrderItem" } }
+        pickupTime: { $ref: "#/components/schemas/PickupTime" }
+        cancellationReason: { type: [string, "null"] }
+    JourneyEvent:
+      type: object
+      description: |
+        Every event carries the full eligibility and the pickup-time snapshot of every stop on the
+        journey, so a newer version supersedes older events, including a delay withdrawal.
+      required: [eventId, eventType, journey, stops, occurredAt]
+      properties:
+        eventId: { type: string, description: Stable across retries }
+        eventType: { enum: [DELAY, CANCEL, EARLY_END, WITHDRAWAL] }
+        journey: { $ref: "#/components/schemas/JourneySnapshot" }
+        stops:
+          type: array
+          items: { $ref: "#/components/schemas/Pickup" }
+        occurredAt: { type: string, format: date-time }
+    OrderUpdate:
+      type: object
+      description: Never contains the pickup code.
+      required: [eventId, orderLinkId, providerOrderRef, status, statusSequence, reasonCode, pickupTime, occurredAt]
+      properties:
+        eventId: { type: string, description: Stable across retries }
+        orderLinkId: { type: string, format: uuid }
+        providerOrderRef: { type: string }
+        status: { $ref: "#/components/schemas/OrderStatus" }
+        statusSequence: { type: integer, minimum: 1 }
+        reasonCode:
+          type: [string, "null"]
+          enum: [PASSENGER_CANCELLED, TRAIN_CANCELLED, TRAIN_ENDED_EARLY, null]
+        pickupTime: { $ref: "#/components/schemas/PickupTime" }
+        occurredAt: { type: string, format: date-time }

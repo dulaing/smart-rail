@@ -1,27 +1,32 @@
 import assert from "node:assert/strict";
-import type { AddressInfo } from "node:net";
 import { after, before, test } from "node:test";
-import { createApp } from "./server";
+import { startApp, temporaryDatabasePath, type TestApp } from "./test-support";
 
-const server = createApp();
-let baseUrl = "";
+const database = temporaryDatabasePath();
+let app: TestApp;
 
 before(async () => {
-  await new Promise<void>((resolve) => server.listen(0, resolve));
-  baseUrl = `http://localhost:${(server.address() as AddressInfo).port}`;
+  app = await startApp({ databasePath: database.path });
 });
 
-after(() => {
-  server.close();
+after(async () => {
+  await app.close();
+  database.remove();
 });
 
-test("GET /health/live returns 200 Healthy", async () => {
-  const res = await fetch(`${baseUrl}/health/live`);
+test("GET /health/live returns 200 Healthy without credentials", async () => {
+  const res = await fetch(`${app.baseUrl}/health/live`);
   assert.equal(res.status, 200);
   assert.deepEqual(await res.json(), { status: "Healthy" });
 });
 
-test("unknown route returns 404", async () => {
-  const res = await fetch(`${baseUrl}/nope`);
+test("unknown route returns 404 in the standard error shape", async () => {
+  const res = await fetch(`${app.baseUrl}/nope`);
   assert.equal(res.status, 404);
+  assert.equal(((await res.json()) as { code: string }).code, "NOT_FOUND");
+});
+
+test("a known path with the wrong method returns 405", async () => {
+  const res = await fetch(`${app.baseUrl}/health/live`, { method: "POST" });
+  assert.equal(res.status, 405);
 });

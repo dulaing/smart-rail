@@ -67,3 +67,6 @@ artifacts/
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# RailBites local SQLite files
+services/railbites/data/

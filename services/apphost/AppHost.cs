@@ -32,7 +32,12 @@ builder.AddProject<Projects.SmartRail_Api>("api")
     .WaitFor(smartrailDb)
     .WithHttpHealthCheck("/health/ready");
 
+// RailBites keeps its own SQLite file outside the build output, so orders and stock survive a
+// restart of the AppHost. Delete services/railbites/data to start fresh.
+var railbitesDatabase = Path.GetFullPath(Path.Combine(builder.AppHostDirectory, "..", "railbites", "data", "railbites.db"));
+
 builder.AddJavaScriptApp("railbites", "../railbites", "dev")
+    .WithEnvironment("RAILBITES_DB_PATH", railbitesDatabase)
     .WithHttpEndpoint(env: "PORT")
     .WithHttpHealthCheck("/health/live");
 

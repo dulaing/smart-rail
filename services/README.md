@@ -24,6 +24,24 @@ This starts PostgreSQL, Keycloak, the API and RailBites, and opens the Aspire da
 
 Without the AppHost the API has no database, so `/health/ready` reports healthy with no checks.
 
+## RailBites (food ordering provider)
+
+RailBites is a separate Node service with its own SQLite file; its HTTP contract is
+`services/railbites/openapi.yaml`. It uses Node's built-in `node:sqlite`, so there is nothing native to
+build (Node may print an experimental-feature warning).
+
+| Setting | Default | Meaning |
+| --- | --- | --- |
+| `RAILBITES_DB_PATH` | `data/railbites.db` | SQLite file. The AppHost sets it to `services/railbites/data/railbites.db`; delete that folder to start fresh. The Docker image uses `/data/railbites.db`, which must be a mounted volume. |
+| `RAILBITES_SERVICE_KEY` | none | Credential SmartRail sends as `X-RailBites-Service-Key`. With none set every service route answers 401. |
+| `PORT` | `5200` | HTTP port. |
+
+Start-up creates the tables (`schema_migrations` records what ran) and seeds the two collection
+points and their menus. Re-seeding on every start never resets stock or the cutoff.
+
+    RAILBITES_SERVICE_KEY=demo-key npm --prefix services/railbites run dev
+    curl -H "X-RailBites-Service-Key: demo-key" http://localhost:5200/v1/collection-points
+
 ## Simulated running (demo trains)
 
 The API can pretend the fictional seeded trains are running: every 30 seconds it reports where
