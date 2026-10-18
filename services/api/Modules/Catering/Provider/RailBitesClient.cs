@@ -23,6 +23,12 @@ public interface IRailBitesClient
 
     // Whether RailBites says it is ready (its /health/ready, which needs no credential).
     Task<ProviderReadiness> CheckReadyAsync(CancellationToken cancellationToken);
+
+    // The Development-only outage switch. Its own route stays reachable while the provider is
+    // "down", so a stale outage can always be ended in one call.
+    Task<ProviderResponse<ProviderOutage>> GetOutageAsync(CancellationToken cancellationToken);
+
+    Task<ProviderResponse<ProviderOutage>> SetOutageAsync(bool active, CancellationToken cancellationToken);
 }
 
 public enum ProviderReadiness
@@ -54,6 +60,12 @@ public sealed class RailBitesClient(HttpClient http, IConfiguration configuratio
 
     public Task<ProviderResponse<EventReceipt>> DeliverEventAsync(string payloadJson, CancellationToken cancellationToken) =>
         SendAsync<EventReceipt>(HttpMethod.Post, "/v1/journey-events", payloadJson, cancellationToken);
+
+    public Task<ProviderResponse<ProviderOutage>> GetOutageAsync(CancellationToken cancellationToken) =>
+        SendAsync<ProviderOutage>(HttpMethod.Get, "/internal/dev/outage", null, cancellationToken);
+
+    public Task<ProviderResponse<ProviderOutage>> SetOutageAsync(bool active, CancellationToken cancellationToken) =>
+        SendAsync<ProviderOutage>(HttpMethod.Put, "/internal/dev/outage", new { active }, cancellationToken);
 
     public async Task<ProviderReadiness> CheckReadyAsync(CancellationToken cancellationToken)
     {
