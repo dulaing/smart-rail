@@ -27,10 +27,14 @@ class DriverJourneysScreen extends StatefulWidget {
     super.key,
     required this.api,
     this.offlineOwnerId,
+    this.cache,
   });
 
   final DriverBriefingApi api;
   final String? offlineOwnerId;
+
+  /// Where saved briefings are read from; tests pass a fake, the app uses the default.
+  final BriefingCache? cache;
 
   @override
   State<DriverJourneysScreen> createState() => _DriverJourneysScreenState();
@@ -46,7 +50,7 @@ class _DriverJourneysScreenState extends State<DriverJourneysScreen>
   bool _loading = true;
   bool _refreshing = false;
   Timer? _poll;
-  final BriefingCache _cache = BriefingCache();
+  late final BriefingCache _cache = widget.cache ?? BriefingCache();
   List<Map<String, dynamic>> _savedRows = [];
   bool _usingSaved = false;
   String? _ownerId;
@@ -87,6 +91,14 @@ class _DriverJourneysScreenState extends State<DriverJourneysScreen>
     if (!mounted) return;
     switch (result) {
       case DriverReadOk<List<DriverJourney>>(:final value, :final etag):
+        // A journey saved for this date but no longer listed means its assignment was removed.
+        final owner = await widget.api.ownerId();
+        if (owner != null) {
+          await _cache.removeUnlisted(owner, _date, {
+            for (final journey in value) journey.id,
+          });
+        }
+        if (!mounted) return;
         setState(() {
           _usingSaved = false;
           _journeys = value;
@@ -212,10 +224,19 @@ class _DriverJourneysScreenState extends State<DriverJourneysScreen>
                   : () => unawaited(_load()),
             ),
           if (_journeys != null && _journeys!.isEmpty)
-            const _Notice(
-              key: Key('no-assigned-journeys'),
-              message: 'No assigned journeys for this service date.',
-            ),
+            // Offline the app cannot know whether anything is assigned, so it must not say
+            // "none assigned"; only a successful online read can say that.
+            if (widget.offlineOwnerId != null || _usingSaved)
+              const _Notice(
+                key: Key('no-saved-journeys'),
+                message:
+                    'No saved briefing for this date. Reconnect to check your assignments.',
+              )
+            else
+              const _Notice(
+                key: Key('no-assigned-journeys'),
+                message: 'No assigned journeys for this service date.',
+              ),
           for (final journey in _journeys ?? const <DriverJourney>[]) ...[
             SizedBox(height: gap),
             _JourneyCard(

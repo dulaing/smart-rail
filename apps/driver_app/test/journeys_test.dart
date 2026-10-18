@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:driver_app/auth/auth_service.dart';
 import 'package:driver_app/journeys/briefing_api.dart';
+import 'package:driver_app/journeys/briefing_cache.dart';
 import 'package:driver_app/journeys/journey_screens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -20,6 +21,12 @@ class _Auth implements AuthService {
   Future<void> signIn() async {}
   @override
   Future<void> signOut() async {}
+}
+
+/// A signed-in owner, as a restored session would report it.
+class _OwnedAuth extends _Auth {
+  @override
+  Future<String?> ownerId() async => 'owner-1';
 }
 
 const _journeyId = '11111111-1111-4111-8111-111111111111';
@@ -118,7 +125,101 @@ Widget _app(DriverBriefingApi api) => MaterialApp(
 DriverBriefingApi _api(Future<http.Response> Function(http.Request) handler) =>
     DriverBriefingApi('https://api.test', _Auth(), client: MockClient(handler));
 
+/// A saved-briefing store that already holds [rows], without touching device storage.
+class _FakeCache extends BriefingCache {
+  _FakeCache(this.rows);
+
+  final List<Map<String, dynamic>> rows;
+  final List<Set<String>> prunedWith = [];
+
+  @override
+  Future<List<Map<String, dynamic>>> readAll(String ownerId) async => rows;
+
+  @override
+  Future<void> removeUnlisted(
+    String ownerId,
+    DateTime serviceDate,
+    Set<String> listedIds,
+  ) async => prunedWith.add(listedIds);
+}
+
 void main() {
+  test('a saved journey the server no longer lists is dropped, other days are kept', () {
+    final rows = [
+      {'journeyId': 'a', 'serviceDate': '2026-10-19'},
+      {'journeyId': 'b', 'serviceDate': '2026-10-19'},
+      {'journeyId': 'c', 'serviceDate': '2026-10-20'},
+    ];
+    final kept = BriefingCache.withoutUnlisted(rows, '2026-10-19', {'a'});
+    expect(kept.map((r) => r['journeyId']), ['a', 'c']);
+    // Nothing listed for the day means every saved briefing of that day goes.
+    expect(
+      BriefingCache.withoutUnlisted(rows, '2026-10-19', {}).map((r) => r['journeyId']),
+      ['c'],
+    );
+  });
+
+  testWidgets(
+    'an online list that omits a saved journey tells the cache to drop it',
+    (tester) async {
+      final cache = _FakeCache([]);
+      final api = DriverBriefingApi(
+        'https://api.test',
+        _OwnedAuth(),
+        client: MockClient((_) async => http.Response(_journeys(), 200)),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: srTheme(SrProfile.driver, Brightness.light),
+          home: DriverJourneysScreen(api: api, cache: cache),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // The server listed exactly one journey, so only that one may stay saved.
+      expect(cache.prunedWith, [
+        {_journeyId},
+      ]);
+    },
+  );
+
+  testWidgets(
+    'offline, a date with no saved copy says so instead of claiming nothing is assigned',
+    (tester) async {
+      // The only saved briefing is for a different day than the one shown (today).
+      final cache = _FakeCache([
+        {
+          'journeyId': _journeyId,
+          'serviceDate': '2020-01-01',
+          'trainNumber': 'SIM-1001',
+          'timetableLabel': 'Morning express',
+          'originName': 'Gampaha',
+          'scheduledDeparture': '2020-01-01T02:00:00Z',
+          'destinationName': 'Colombo Fort',
+          'scheduledArrival': '2020-01-01T03:00:00Z',
+          'availability': 'AS_SCHEDULED',
+        },
+      ]);
+      // No network at all: a call would fail the test.
+      final api = _api((_) async => throw StateError('offline'));
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: srTheme(SrProfile.driver, Brightness.light),
+          home: DriverJourneysScreen(
+            api: api,
+            offlineOwnerId: 'owner-1',
+            cache: cache,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('no-saved-journeys')), findsOneWidget);
+      expect(find.byKey(const Key('no-assigned-journeys')), findsNothing);
+      expect(find.textContaining('Reconnect'), findsOneWidget);
+    },
+  );
+
   testWidgets('shows an explicit empty assignment state', (tester) async {
     final api = _api(
       (_) async => http.Response(_journeys(includeJourney: false), 200),

@@ -78,6 +78,34 @@ class BriefingCache {
     }
   }
 
+  /// The saved rows that remain after a successful online list for [day] left some of that day's
+  /// saved journeys out. An assignment removed on the server must not leave readable content behind.
+  static List<Map<String, dynamic>> withoutUnlisted(
+    List<Map<String, dynamic>> rows,
+    String day,
+    Set<String> listedIds,
+  ) => [
+    for (final row in rows)
+      if (row['serviceDate'] != day || listedIds.contains(row['journeyId']))
+        row,
+  ];
+
+  /// Drops saved briefings for [serviceDate] that the server no longer lists for this driver.
+  /// Only call it with a successful online list, never after a connection failure.
+  Future<void> removeUnlisted(
+    String ownerId,
+    DateTime serviceDate,
+    Set<String> listedIds,
+  ) async {
+    final rows = await readAll(ownerId);
+    final kept = withoutUnlisted(rows, _day(serviceDate), listedIds);
+    if (kept.length == rows.length) return;
+    if (kept.isEmpty) return clear();
+    await (await _file()).writeAsString(
+      jsonEncode({'schemaVersion': 1, 'ownerId': ownerId, 'journeys': kept}),
+    );
+  }
+
   Future<bool> hasSaved(String ownerId) async =>
       (await readAll(ownerId)).isNotEmpty;
 
