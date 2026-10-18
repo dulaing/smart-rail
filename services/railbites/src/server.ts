@@ -10,6 +10,8 @@ import { receiveJourneyEvent } from "./events";
 import { ApiError, Router } from "./http";
 import { listOrders, markCollected, markNoShow, markReady } from "./kiosk";
 import { isUuid, readJson } from "./parse";
+import { SessionStore } from "./sessions";
+import { RateLimiter, registerStaffRoutes } from "./staff";
 import { parseClockRequest, type TestClock } from "./test-clock";
 import { cancelOrder, getOrderByLink, placeOrder } from "./placement";
 import { httpPassageReader, type PassageReader } from "./smartrail";
@@ -32,6 +34,17 @@ export function createApp({ config, db, clock: suppliedClock, passage = httpPass
   const service = (handler: Parameters<typeof requireService>[1]) => requireService(config, handler);
   const admin = (handler: Parameters<typeof requireAdmin>[1]) => requireAdmin(config, handler);
   const kiosk = (handler: Parameters<typeof requireKiosk>[1]) => requireKiosk(config, handler);
+
+  // The staff page keeps its own in-memory sessions and login rate limit. One login is shared by a
+  // collection point's staff; no browser ever sees an internal key.
+  registerStaffRoutes(router, {
+    config,
+    db,
+    sessions: new SessionStore(),
+    loginLimiter: new RateLimiter(config.staffLoginMaxAttempts, config.staffLoginWindowMs),
+    clock,
+    passage,
+  });
 
   // Health only says the process started; it checks no dependencies.
   router.add("GET", "/health/live", () => ({ status: 200, body: { status: "Healthy" } }));

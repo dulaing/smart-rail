@@ -23,7 +23,9 @@ export interface RequestContext {
 export interface Reply {
   status: number;
   body?: unknown;
-  headers?: Record<string, string>;
+  /** A ready-to-send body (such as an HTML page) that is not JSON and must not be serialised. */
+  raw?: string;
+  headers?: Record<string, string | string[]>;
 }
 
 export type Handler = (ctx: RequestContext) => Reply | Promise<Reply>;
@@ -112,6 +114,11 @@ export class Router {
 }
 
 function send(res: ServerResponse, reply: Reply): void {
+  if (reply.raw !== undefined) {
+    res.writeHead(reply.status, reply.headers);
+    res.end(reply.raw);
+    return;
+  }
   const payload = reply.body === undefined ? undefined : JSON.stringify(reply.body);
   res.writeHead(reply.status, {
     ...(payload === undefined ? {} : { "Content-Type": "application/json" }),

@@ -6,6 +6,20 @@ export interface Config {
   serviceKey: string | undefined;
   /** One credential per collection point; a key opens only its own kiosk routes. */
   kioskKeys: ReadonlyMap<string, string>;
+  /**
+   * One shared human staff login per collection point, as point-id -> salted password hash. This is a
+   * different secret from `kioskKeys`: the browser types the password, and only the hash is stored.
+   * Empty means the staff login cannot be used at all.
+   */
+  kioskStaff: ReadonlyMap<string, string>;
+  /** How long a staff session lasts before it must be renewed by logging in again. */
+  staffSessionLifetimeMs: number;
+  /** Send the session cookie Secure. False is allowed only for explicit local HTTP development. */
+  staffSecureCookies: boolean;
+  /** Most staff login attempts allowed from one address inside `staffLoginWindowMs`. */
+  staffLoginMaxAttempts: number;
+  /** Length of the staff login rate-limit window. */
+  staffLoginWindowMs: number;
   /** Where RailBites reads train passage and (later) posts status callbacks. */
   smartRailBaseUrl: string | undefined;
   /** RailBites' own credential for reading SmartRail; a different secret from `serviceKey`. */
@@ -36,6 +50,20 @@ function parseKioskKeys(value: string | undefined): Map<string, string> {
   return keys;
 }
 
+// "polgahawela-junction=scrypt$...,peradeniya-junction=scrypt$...". The hash never contains `=`
+// (base64url), so splitting on the first `=` keeps every part of the hash intact.
+function parseKioskStaff(value: string | undefined): Map<string, string> {
+  const staff = new Map<string, string>();
+  for (const pair of (value ?? "").split(",").map((p) => p.trim()).filter(Boolean)) {
+    const at = pair.indexOf("=");
+    const point = pair.slice(0, at).trim();
+    const hash = pair.slice(at + 1).trim();
+    if (at < 1 || !hash) throw new Error("RAILBITES_KIOSK_STAFF must look like point-id=password-hash,point-id=password-hash.");
+    staff.set(point, hash);
+  }
+  return staff;
+}
+
 // Secrets come from the environment (user secrets / Aspire parameters), never from Git or clients.
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   return {
@@ -43,6 +71,12 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     databasePath: env["RAILBITES_DB_PATH"] || "data/railbites.db",
     serviceKey: env["RAILBITES_SERVICE_KEY"] || undefined,
     kioskKeys: parseKioskKeys(env["RAILBITES_KIOSK_KEYS"]),
+    kioskStaff: parseKioskStaff(env["RAILBITES_KIOSK_STAFF"]),
+    staffSessionLifetimeMs: Number(env["RAILBITES_KIOSK_SESSION_MINUTES"] ?? 60) * 60_000,
+    // Secure by default. The only way to drop it is an explicit local-development flag outside production.
+    staffSecureCookies: !(env["RAILBITES_KIOSK_INSECURE_COOKIES"] === "1" && env["NODE_ENV"] !== "production"),
+    staffLoginMaxAttempts: Number(env["RAILBITES_KIOSK_LOGIN_MAX_ATTEMPTS"] ?? 10),
+    staffLoginWindowMs: Number(env["RAILBITES_KIOSK_LOGIN_WINDOW_MS"] ?? 300_000),
     smartRailBaseUrl: env["SMARTRAIL_BASE_URL"] || undefined,
     smartRailServiceKey: env["SMARTRAIL_SERVICE_KEY"] || undefined,
     adminKey: env["RAILBITES_ADMIN_KEY"] || undefined,

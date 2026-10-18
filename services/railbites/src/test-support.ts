@@ -8,12 +8,22 @@ import { migrate } from "./migrations";
 import { seedCatalog } from "./seed";
 import type { DevControls } from "./dev-controls";
 import { createApp } from "./server";
+import { hashPassword } from "./staff-auth";
 import type { PassageReader, PassageState } from "./smartrail";
 
 export const SERVICE_KEY = "test-service-key";
 export const KIOSK_KEYS = new Map([
   ["polgahawela-junction", "kiosk-key-polgahawela"],
   ["peradeniya-junction", "kiosk-key-peradeniya"],
+]);
+
+// The shared staff password used by tests. The hash below is what the config carries; the password
+// itself never appears in a stored value.
+export const STAFF_PASSWORD = "staff-password";
+const STAFF_HASH = hashPassword(STAFF_PASSWORD);
+export const KIOSK_STAFF = new Map([
+  ["polgahawela-junction", STAFF_HASH],
+  ["peradeniya-junction", STAFF_HASH],
 ]);
 
 export interface TestApp {
@@ -48,6 +58,11 @@ export async function startApp(options: {
     databasePath: options.databasePath,
     serviceKey: "serviceKey" in options ? options.serviceKey : SERVICE_KEY,
     kioskKeys: KIOSK_KEYS,
+    kioskStaff: KIOSK_STAFF,
+    staffSessionLifetimeMs: 3_600_000,
+    staffSecureCookies: false,
+    staffLoginMaxAttempts: 100,
+    staffLoginWindowMs: 300_000,
     smartRailBaseUrl: undefined,
     smartRailServiceKey: undefined,
     adminKey: undefined,
