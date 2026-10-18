@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SmartRail.Api.Modules.Access;
+using SmartRail.Api.Modules.Catering.Callbacks;
 using SmartRail.Api.Modules.Catering.Orders;
 using SmartRail.Api.Modules.Catering.Outbox;
 using SmartRail.Api.Modules.Operations.Changes;
@@ -14,6 +15,18 @@ public static class CateringModel
 
     public static void ApplyCateringModel(this ModelBuilder model)
     {
+        model.Entity<WebhookReceipt>(receipt =>
+        {
+            receipt.ToTable("webhook_receipts", Schema);
+            receipt.HasKey(r => r.ProviderEventId);
+            receipt.Property(r => r.ProviderEventId).HasColumnName("provider_event_id").HasMaxLength(100);
+            receipt.Property(r => r.OrderLinkId).HasColumnName("order_link_id");
+            receipt.Property(r => r.StatusSequence).HasColumnName("status_sequence");
+            receipt.Property(r => r.ContentDigest).HasColumnName("content_digest").HasMaxLength(64);
+            receipt.Property(r => r.ReceivedAt).HasColumnName("received_at");
+            receipt.HasOne<OrderLink>().WithMany().HasForeignKey(r => r.OrderLinkId).OnDelete(DeleteBehavior.Restrict);
+        });
+
         model.Entity<OutboxMessage>(message =>
         {
             message.ToTable("outbox_messages", Schema, table =>

@@ -43,7 +43,7 @@ public interface IPickupReader
     Task<PassageState?> ReadPassageAsync(Guid journeyId, Guid stopId, CancellationToken cancellationToken);
 }
 
-public sealed class PickupReader(SmartRailDbContext db, IConfirmedChangeReader confirmed) : IPickupReader
+public sealed class PickupReader(SmartRailDbContext db, IConfirmedChangeReader confirmed, TimeProvider time) : IPickupReader
 {
     public async Task<PickupJourney?> ReadAsync(
         Guid journeyId, DateTimeOffset now, ConfirmedOverrides? overrides, CancellationToken cancellationToken)
@@ -90,7 +90,9 @@ public sealed class PickupReader(SmartRailDbContext db, IConfirmedChangeReader c
         }
 
         var order = journey.Pattern.Stops.OrderBy(s => s.Sequence).Select(s => s.Id).ToList();
-        return HasLeft(order, observation.ToRunning(), stopId) ? PassageState.Passed : PassageState.Ahead;
+        if (HasLeft(order, observation.ToRunning(), stopId)) return PassageState.Passed;
+        return FreshnessRules.Classify(observation.ObservedAt, time.GetUtcNow()) == Freshness.Unknown
+            ? PassageState.Unknown : PassageState.Ahead;
     }
 
     // On a segment below full progress the train has left the From stop and everything before it.

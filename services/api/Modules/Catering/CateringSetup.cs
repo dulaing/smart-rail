@@ -1,3 +1,4 @@
+using SmartRail.Api.Modules.Catering.Callbacks;
 using SmartRail.Api.Modules.Catering.Orders;
 using SmartRail.Api.Modules.Catering.Outbox;
 using SmartRail.Api.Modules.Catering.Provider;
@@ -20,6 +21,7 @@ public static class CateringSetup
 
             builder.Services.Configure<PlacementOptions>(builder.Configuration.GetSection(PlacementOptions.Section));
             builder.Services.AddScoped<OrderLinkWrites>();
+            builder.Services.AddScoped<OrderUpdateReceiver>();
             builder.Services.AddScoped<PickupAssessor>();
             builder.Services.AddScoped<PlacementProcessor>();
             builder.Services.AddScoped<OrderCreator>();
@@ -37,5 +39,7 @@ public static class CateringSetup
     {
         app.MapBrowse();
         app.MapOrders();
+        app.MapCallbacks();
+        app.MapPickupPassage();
     }
 }

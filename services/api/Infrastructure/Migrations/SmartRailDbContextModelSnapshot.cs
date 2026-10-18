@@ -213,6 +213,38 @@ namespace SmartRail.Api.Infrastructure.Migrations
                     b.ToTable("role_permissions", "identity");
                 });
 
+            modelBuilder.Entity("SmartRail.Api.Modules.Catering.Callbacks.WebhookReceipt", b =>
+                {
+                    b.Property<string>("ProviderEventId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("provider_event_id");
+
+                    b.Property<string>("ContentDigest")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("content_digest");
+
+                    b.Property<Guid>("OrderLinkId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_link_id");
+
+                    b.Property<DateTimeOffset>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("received_at");
+
+                    b.Property<int>("StatusSequence")
+                        .HasColumnType("integer")
+                        .HasColumnName("status_sequence");
+
+                    b.HasKey("ProviderEventId");
+
+                    b.HasIndex("OrderLinkId");
+
+                    b.ToTable("webhook_receipts", "catering");
+                });
+
             modelBuilder.Entity("SmartRail.Api.Modules.Catering.Orders.OrderLink", b =>
                 {
                     b.Property<Guid>("Id")
@@ -926,6 +958,15 @@ namespace SmartRail.Api.Infrastructure.Migrations
                         .WithMany("Permissions")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SmartRail.Api.Modules.Catering.Callbacks.WebhookReceipt", b =>
+                {
+                    b.HasOne("SmartRail.Api.Modules.Catering.Orders.OrderLink", null)
+                        .WithMany()
+                        .HasForeignKey("OrderLinkId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 

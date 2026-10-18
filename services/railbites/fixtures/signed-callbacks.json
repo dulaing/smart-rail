@@ -1,0 +1,85 @@
+{
+  "secret": "fixture-callback-secret",
+  "now": "2026-10-18T05:00:00.000Z",
+  "orderLinkId": "3f6c0f1e-8f4e-4a6e-9a43-7d1b2c3d4e5f",
+  "signed": "HMAC-SHA256 over '<timestamp>.<raw body>', hex, prefixed v1=",
+  "cases": [
+    {
+      "name": "valid READY at sequence 2",
+      "timestamp": 1792299600,
+      "body": "{\"eventId\":\"ord_fixture-2\",\"orderLinkId\":\"3f6c0f1e-8f4e-4a6e-9a43-7d1b2c3d4e5f\",\"providerOrderRef\":\"ord_fixture\",\"status\":\"READY\",\"statusSequence\":2,\"reasonCode\":null,\"pickupTime\":{\"scheduledArrival\":\"2026-10-18T07:10:00.000Z\",\"estimatedArrival\":\"2026-10-18T07:25:00.000Z\",\"etaEvidenceAt\":\"2026-10-18T04:59:00.000Z\"},\"occurredAt\":\"2026-10-18T05:00:00.000Z\"}",
+      "signature": "v1=735887bb55d06deafc384f2515f2c39ae2a6b9bb624f08f8b63cb3c692e38576",
+      "accepted": true
+    },
+    {
+      "name": "valid COLLECTED at sequence 3",
+      "timestamp": 1792299600,
+      "body": "{\"eventId\":\"ord_fixture-3\",\"orderLinkId\":\"3f6c0f1e-8f4e-4a6e-9a43-7d1b2c3d4e5f\",\"providerOrderRef\":\"ord_fixture\",\"status\":\"COLLECTED\",\"statusSequence\":3,\"reasonCode\":null,\"pickupTime\":{\"scheduledArrival\":\"2026-10-18T07:10:00.000Z\",\"estimatedArrival\":\"2026-10-18T07:25:00.000Z\",\"etaEvidenceAt\":\"2026-10-18T04:59:00.000Z\"},\"occurredAt\":\"2026-10-18T05:00:00.000Z\"}",
+      "signature": "v1=cbcc7aaad9c8a10a11baa8ff4f40f23754c159c5dd3d34ad5c312aacd1e06c6e",
+      "accepted": true
+    },
+    {
+      "name": "valid at the oldest accepted timestamp (300 seconds old)",
+      "timestamp": 1792299300,
+      "body": "{\"eventId\":\"ord_fixture-2\",\"orderLinkId\":\"3f6c0f1e-8f4e-4a6e-9a43-7d1b2c3d4e5f\",\"providerOrderRef\":\"ord_fixture\",\"status\":\"READY\",\"statusSequence\":2,\"reasonCode\":null,\"pickupTime\":{\"scheduledArrival\":\"2026-10-18T07:10:00.000Z\",\"estimatedArrival\":\"2026-10-18T07:25:00.000Z\",\"etaEvidenceAt\":\"2026-10-18T04:59:00.000Z\"},\"occurredAt\":\"2026-10-18T05:00:00.000Z\"}",
+      "signature": "v1=ff411b16eb448b5552f17609ca376199c9eb550414b587e565fb1163c0ce31ad",
+      "accepted": true
+    },
+    {
+      "name": "valid at the newest accepted timestamp (300 seconds ahead)",
+      "timestamp": 1792299900,
+      "body": "{\"eventId\":\"ord_fixture-2\",\"orderLinkId\":\"3f6c0f1e-8f4e-4a6e-9a43-7d1b2c3d4e5f\",\"providerOrderRef\":\"ord_fixture\",\"status\":\"READY\",\"statusSequence\":2,\"reasonCode\":null,\"pickupTime\":{\"scheduledArrival\":\"2026-10-18T07:10:00.000Z\",\"estimatedArrival\":\"2026-10-18T07:25:00.000Z\",\"etaEvidenceAt\":\"2026-10-18T04:59:00.000Z\"},\"occurredAt\":\"2026-10-18T05:00:00.000Z\"}",
+      "signature": "v1=dadf7971c2d26b6e406a9a6d9abcbe76d8565a82ee8f7e4c85538bb3204efb61",
+      "accepted": true
+    },
+    {
+      "name": "body changed after signing",
+      "timestamp": 1792299600,
+      "body": "{\"eventId\":\"ord_fixture-2\",\"orderLinkId\":\"3f6c0f1e-8f4e-4a6e-9a43-7d1b2c3d4e5f\",\"providerOrderRef\":\"ord_fixture\",\"status\":\"READY\",\"statusSequence\":9,\"reasonCode\":null,\"pickupTime\":{\"scheduledArrival\":\"2026-10-18T07:10:00.000Z\",\"estimatedArrival\":\"2026-10-18T07:25:00.000Z\",\"etaEvidenceAt\":\"2026-10-18T04:59:00.000Z\"},\"occurredAt\":\"2026-10-18T05:00:00.000Z\"}",
+      "signature": "v1=735887bb55d06deafc384f2515f2c39ae2a6b9bb624f08f8b63cb3c692e38576",
+      "accepted": false
+    },
+    {
+      "name": "signed with another secret",
+      "timestamp": 1792299600,
+      "body": "{\"eventId\":\"ord_fixture-2\",\"orderLinkId\":\"3f6c0f1e-8f4e-4a6e-9a43-7d1b2c3d4e5f\",\"providerOrderRef\":\"ord_fixture\",\"status\":\"READY\",\"statusSequence\":2,\"reasonCode\":null,\"pickupTime\":{\"scheduledArrival\":\"2026-10-18T07:10:00.000Z\",\"estimatedArrival\":\"2026-10-18T07:25:00.000Z\",\"etaEvidenceAt\":\"2026-10-18T04:59:00.000Z\"},\"occurredAt\":\"2026-10-18T05:00:00.000Z\"}",
+      "signature": "v1=7a09d9f3d75963be17f0a7e3391a3e1000d3d5ea2d7c8e588d988b5bbb937eff",
+      "accepted": false
+    },
+    {
+      "name": "timestamp changed after signing",
+      "timestamp": 1792299601,
+      "body": "{\"eventId\":\"ord_fixture-2\",\"orderLinkId\":\"3f6c0f1e-8f4e-4a6e-9a43-7d1b2c3d4e5f\",\"providerOrderRef\":\"ord_fixture\",\"status\":\"READY\",\"statusSequence\":2,\"reasonCode\":null,\"pickupTime\":{\"scheduledArrival\":\"2026-10-18T07:10:00.000Z\",\"estimatedArrival\":\"2026-10-18T07:25:00.000Z\",\"etaEvidenceAt\":\"2026-10-18T04:59:00.000Z\"},\"occurredAt\":\"2026-10-18T05:00:00.000Z\"}",
+      "signature": "v1=735887bb55d06deafc384f2515f2c39ae2a6b9bb624f08f8b63cb3c692e38576",
+      "accepted": false
+    },
+    {
+      "name": "expired: signed correctly but 301 seconds old",
+      "timestamp": 1792299299,
+      "body": "{\"eventId\":\"ord_fixture-2\",\"orderLinkId\":\"3f6c0f1e-8f4e-4a6e-9a43-7d1b2c3d4e5f\",\"providerOrderRef\":\"ord_fixture\",\"status\":\"READY\",\"statusSequence\":2,\"reasonCode\":null,\"pickupTime\":{\"scheduledArrival\":\"2026-10-18T07:10:00.000Z\",\"estimatedArrival\":\"2026-10-18T07:25:00.000Z\",\"etaEvidenceAt\":\"2026-10-18T04:59:00.000Z\"},\"occurredAt\":\"2026-10-18T05:00:00.000Z\"}",
+      "signature": "v1=bfa59a496cc747e1e22fa06bdc5745f4534bfde5e90efa2109eda6bff2c6ec15",
+      "accepted": false
+    },
+    {
+      "name": "too far ahead: signed correctly but 301 seconds in the future",
+      "timestamp": 1792299901,
+      "body": "{\"eventId\":\"ord_fixture-2\",\"orderLinkId\":\"3f6c0f1e-8f4e-4a6e-9a43-7d1b2c3d4e5f\",\"providerOrderRef\":\"ord_fixture\",\"status\":\"READY\",\"statusSequence\":2,\"reasonCode\":null,\"pickupTime\":{\"scheduledArrival\":\"2026-10-18T07:10:00.000Z\",\"estimatedArrival\":\"2026-10-18T07:25:00.000Z\",\"etaEvidenceAt\":\"2026-10-18T04:59:00.000Z\"},\"occurredAt\":\"2026-10-18T05:00:00.000Z\"}",
+      "signature": "v1=f966b4172f639cebe544acd7d91b636f428f0ac372e1b70745eec8893872abf5",
+      "accepted": false
+    },
+    {
+      "name": "unknown signature version",
+      "timestamp": 1792299600,
+      "body": "{\"eventId\":\"ord_fixture-2\",\"orderLinkId\":\"3f6c0f1e-8f4e-4a6e-9a43-7d1b2c3d4e5f\",\"providerOrderRef\":\"ord_fixture\",\"status\":\"READY\",\"statusSequence\":2,\"reasonCode\":null,\"pickupTime\":{\"scheduledArrival\":\"2026-10-18T07:10:00.000Z\",\"estimatedArrival\":\"2026-10-18T07:25:00.000Z\",\"etaEvidenceAt\":\"2026-10-18T04:59:00.000Z\"},\"occurredAt\":\"2026-10-18T05:00:00.000Z\"}",
+      "signature": "v2=735887bb55d06deafc384f2515f2c39ae2a6b9bb624f08f8b63cb3c692e38576",
+      "accepted": false
+    },
+    {
+      "name": "signature without a version",
+      "timestamp": 1792299600,
+      "body": "{\"eventId\":\"ord_fixture-2\",\"orderLinkId\":\"3f6c0f1e-8f4e-4a6e-9a43-7d1b2c3d4e5f\",\"providerOrderRef\":\"ord_fixture\",\"status\":\"READY\",\"statusSequence\":2,\"reasonCode\":null,\"pickupTime\":{\"scheduledArrival\":\"2026-10-18T07:10:00.000Z\",\"estimatedArrival\":\"2026-10-18T07:25:00.000Z\",\"etaEvidenceAt\":\"2026-10-18T04:59:00.000Z\"},\"occurredAt\":\"2026-10-18T05:00:00.000Z\"}",
+      "signature": "735887bb55d06deafc384f2515f2c39ae2a6b9bb624f08f8b63cb3c692e38576",
+      "accepted": false
+    }
+  ]
+}

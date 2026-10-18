@@ -406,10 +406,14 @@ paths:
         signature or timestamp gets `401` and is counted. The same event ID with different content
         is `409`. Acknowledge only after commit; RailBites retries on timeout and 5xx with capped,
         increasing delays. Pickup codes, signatures, secrets and payloads are never logged.
+        The raw body is limited to 32768 bytes. If a callback beats the placement response,
+        SmartRail privately looks up the full order before committing; an unavailable lookup gets
+        503 with no receipt, so RailBites retries without losing the pickup code or item details.
       security: []
       parameters:
         - { name: X-RailBites-Timestamp, in: header, required: true, schema: { type: integer } }
         - { name: X-RailBites-Signature, in: header, required: true, schema: { type: string, pattern: "^v1=[0-9a-f]{64}$" } }
+        - { name: X-RailBites-Event-Id, in: header, required: false, schema: { type: string }, description: If supplied, must match the signed body's eventId. }
       requestBody:
         required: true
         content:
@@ -426,8 +430,18 @@ paths:
                 properties: { result: { enum: [APPLIED, DUPLICATE, STALE] } }
         "400": { $ref: "#/components/responses/Error" }
         "401": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
         "413": { $ref: "#/components/responses/Error" }
+        "503":
+          description: |
+            `ORDER_NOT_RECONCILED`. The link has no order details yet (the callback beat the placement
+            answer, or the order had been called refused) and SmartRail could not fetch them from RailBites.
+            Nothing was recorded; RailBites keeps the callback and sends it again.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "503": { $ref: "#/components/responses/Error" }
 
   /internal/catering/journeys/{journeyId}/stops/{stopId}/passage:
     servers:
@@ -440,8 +454,9 @@ paths:
       description: |
         A fresh read from SmartRail's confirmed running state, authenticated with RailBites' own
         service key (`X-RailBites-Service-Key`, a different secret from the one SmartRail sends).
-        `PASSED` means confirmed departure from that stop occurrence. `UNKNOWN` covers stale
-        evidence and is never treated as passed.
+        `PASSED` means an observed departure from that stop occurrence, which remains a fact when
+        the observation ages. With no proven departure, missing/stale evidence is `UNKNOWN` and is
+        never treated as passed. Responses are not cacheable.
       security: [{ serviceKey: [] }]
       parameters:
         - { name: journeyId, in: path, required: true, schema: { type: string, format: uuid } }

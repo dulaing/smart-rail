@@ -39,6 +39,8 @@ public sealed class FlakyProxy : IAsyncDisposable
 
     public ProxyMode Mode { get; set; } = ProxyMode.Forward;
 
+    public Func<HttpRequestMessage, Task>? BeforeResponse { get; set; }
+
     // Requests that reached RailBites.
     public int Forwarded { get; private set; }
 
@@ -82,6 +84,7 @@ public sealed class FlakyProxy : IAsyncDisposable
 
             using var response = await upstream.SendAsync(request);
             proxy.Forwarded++;
+            if (proxy.BeforeResponse is not null) await proxy.BeforeResponse(request);
             if (proxy.Mode == ProxyMode.DropResponse)
             {
                 context.Abort();

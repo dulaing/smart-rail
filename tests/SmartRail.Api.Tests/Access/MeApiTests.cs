@@ -142,12 +142,13 @@ public class MeApiTests(AccessApi api) : IClassFixture<AccessApi>
             .ToList();
 
         // The internal observation and simulator routes skip the signed-in-user rule because a
-        // service key guards them instead; the Observation and Simulator tests prove each one
-        // refuses everything without the key.
+        // service key guards them instead. Catering's callback uses HMAC and its passage read a
+        // separate service key; their endpoint tests prove they also fail closed.
         Assert.Equal(
             [
                 "/api/food/collection-points/{collectionPointId}/menu",
                 "/api/journeys", "/api/journeys/{journeyId:guid}/changes", "/api/journeys/{journeyId:guid}/collection-options", "/api/journeys/{journeyId}/running", "/api/next-trains", "/api/stations", "/health/live", "/health/ready",
+                "/internal/catering/journeys/{journeyId:guid}/stops/{stopId:guid}/passage", "/internal/catering/order-updates",
                 "/internal/rail/observations",
                 "/internal/rail/simulator/journeys/{journeyId}/pause", "/internal/rail/simulator/journeys/{journeyId}/resume",
                 "/openapi/{documentName}.json",

@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using SmartRail.Api.Modules.Access;
 using SmartRail.Api.Modules.Catering;
+using SmartRail.Api.Modules.Catering.Callbacks;
 using SmartRail.Api.Modules.Catering.Orders;
 using SmartRail.Api.Modules.Catering.Outbox;
+using SmartRail.Api.Modules.Catering.Callbacks;
 using SmartRail.Api.Modules.Operations.Changes;
 using SmartRail.Api.Modules.Operations.Incidents;
 using SmartRail.Api.Modules.Operations.Reports;
@@ -35,6 +37,7 @@ public sealed class SmartRailDbContext(DbContextOptions<SmartRailDbContext> opti
 
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
     public DbSet<OrderLink> OrderLinks => Set<OrderLink>();
+    public DbSet<WebhookReceipt> WebhookReceipts => Set<WebhookReceipt>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

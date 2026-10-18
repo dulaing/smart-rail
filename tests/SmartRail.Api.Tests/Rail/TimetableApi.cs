@@ -80,6 +80,19 @@ public class TimetableApi : IAsyncLifetime
     {
     }
 
+    // Recreates the HTTP host against the same durable database, without migrating or reseeding.
+    public async Task RestartHostAsync()
+    {
+        Client.Dispose();
+        await _factory!.DisposeAsync();
+        _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+        {
+            builder.UseSetting("ConnectionStrings:smartrail", ConnectionString);
+            ConfigureHost(builder);
+        });
+        Client = _factory.CreateClient();
+    }
+
     // Same steps as --migrate-and-seed; safe to call again.
     public async Task MigrateAndSeedAsync()
     {

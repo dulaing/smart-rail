@@ -42,12 +42,20 @@ public sealed class PlacementProcessor(
     public async Task<OrderLink> AttemptAsync(Guid linkId, CancellationToken cancellationToken)
     {
         var link = await db.OrderLinks.AsNoTracking().SingleAsync(l => l.Id == linkId, cancellationToken);
-        if (link.PlacementState != PlacementStates.Pending || link.RequestPayload is null)
+        if (link.PlacementState != PlacementStates.Pending)
         {
             return link;
         }
 
         var now = time.GetUtcNow();
+        if (link.RequestPayload is null)
+        {
+            // Reopened by a callback for an order we had called refused. There is nothing left to
+            // place; only the provider's order (with its code and items) is fetched.
+            await FetchAsync(link, now, cancellationToken);
+            return await db.OrderLinks.AsNoTracking().SingleAsync(l => l.Id == linkId, cancellationToken);
+        }
+
         var assessment = await assessor.AssessAsync(link.JourneyId, link.PickupStopId, cancellationToken);
 
         if (assessment.Problem is not null)
@@ -94,6 +102,19 @@ public sealed class PlacementProcessor(
             default:
                 await writes.DeferAsync(link.Id, now.AddSeconds(BackoffSeconds(link.AttemptCount + 1)), response.Error?.Code, now, cancellationToken);
                 break;
+        }
+    }
+
+    private async Task FetchAsync(OrderLink link, DateTimeOffset now, CancellationToken cancellationToken)
+    {
+        var found = await provider.LookupAsync(link.Id, cancellationToken);
+        if (found.Outcome == ProviderOutcome.Success)
+        {
+            await writes.ApplyProviderOrderAsync(link.Id, found.Value!, now, cancellationToken);
+        }
+        else
+        {
+            await writes.DeferAsync(link.Id, now.AddSeconds(BackoffSeconds(link.AttemptCount + 1)), found.Error?.Code, now, cancellationToken);
         }
     }
 

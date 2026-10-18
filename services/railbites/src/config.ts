@@ -10,6 +10,14 @@ export interface Config {
   smartRailBaseUrl: string | undefined;
   /** RailBites' own credential for reading SmartRail; a different secret from `serviceKey`. */
   smartRailServiceKey: string | undefined;
+  /** Shared secret that signs status callbacks. Unset means no callback is sent. */
+  callbackSecret: string | undefined;
+  /** How often the callback loop looks for queued callbacks; 0 turns the loop off. */
+  callbackPollMs: number;
+  /** Longest wait between retries after a timeout or 5xx. */
+  callbackMaxBackoffSeconds: number;
+  /** Wait before retrying a callback SmartRail refused for good (for example a wrong secret). */
+  callbackFailedRetrySeconds: number;
 }
 
 // "polgahawela-junction=key1,peradeniya-junction=key2"
@@ -35,5 +43,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     kioskKeys: parseKioskKeys(env["RAILBITES_KIOSK_KEYS"]),
     smartRailBaseUrl: env["SMARTRAIL_BASE_URL"] || undefined,
     smartRailServiceKey: env["SMARTRAIL_SERVICE_KEY"] || undefined,
+    callbackSecret: env["RAILBITES_CALLBACK_SECRET"] || undefined,
+    callbackPollMs: Number(env["RAILBITES_CALLBACK_POLL_MS"] ?? 2000),
+    callbackMaxBackoffSeconds: Number(env["RAILBITES_CALLBACK_MAX_BACKOFF_SECONDS"] ?? 60),
+    callbackFailedRetrySeconds: Number(env["RAILBITES_CALLBACK_FAILED_RETRY_SECONDS"] ?? 600),
   };
 }

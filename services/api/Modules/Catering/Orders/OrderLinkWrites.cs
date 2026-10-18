@@ -25,14 +25,17 @@ public sealed class OrderLinkWrites(SmartRailDbContext db)
                 .SetProperty(l => l.RejectionCode, (string?)null)
                 .SetProperty(l => l.RequestPayload, (string?)null)
                 .SetProperty(l => l.ProviderOrderRef, order.Id)
-                .SetProperty(l => l.ProviderStatus, order.Status)
-                .SetProperty(l => l.StatusSequence, order.StatusSequence)
-                .SetProperty(l => l.CancellationReason, order.CancellationReason)
+                // The code and items only ever come from here, so they are always filled in. The
+                // status and time follow the newer of this answer and what a callback already told us:
+                // a callback that beat the placement response must not be undone by it.
                 .SetProperty(l => l.PickupCode, order.PickupCode)
                 .SetProperty(l => l.ItemsJson, items)
-                .SetProperty(l => l.ScheduledArrival, order.PickupTime.ScheduledArrival)
-                .SetProperty(l => l.EstimatedArrival, order.PickupTime.EstimatedArrival)
-                .SetProperty(l => l.EtaEvidenceAt, order.PickupTime.EtaEvidenceAt)
+                .SetProperty(l => l.ProviderStatus, l => order.StatusSequence >= l.StatusSequence ? order.Status : l.ProviderStatus)
+                .SetProperty(l => l.CancellationReason, l => order.StatusSequence >= l.StatusSequence ? order.CancellationReason : l.CancellationReason)
+                .SetProperty(l => l.ScheduledArrival, l => order.StatusSequence >= l.StatusSequence ? order.PickupTime.ScheduledArrival : l.ScheduledArrival)
+                .SetProperty(l => l.EstimatedArrival, l => order.StatusSequence >= l.StatusSequence ? order.PickupTime.EstimatedArrival : l.EstimatedArrival)
+                .SetProperty(l => l.EtaEvidenceAt, l => order.StatusSequence >= l.StatusSequence ? order.PickupTime.EtaEvidenceAt : l.EtaEvidenceAt)
+                .SetProperty(l => l.StatusSequence, l => order.StatusSequence >= l.StatusSequence ? order.StatusSequence : l.StatusSequence)
                 .SetProperty(l => l.LastError, (string?)null)
                 .SetProperty(l => l.UpdatedAt, now), cancellationToken);
         return rows > 0;

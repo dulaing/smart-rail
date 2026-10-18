@@ -2,6 +2,7 @@ import { createServer, type Server } from "node:http";
 import { requireKiosk, requireService } from "./auth";
 import { getCollectionPoint, getMenu, listCollectionPoints } from "./catalog";
 import type { Config } from "./config";
+import { deliverDueCallbacks } from "./callbacks";
 import type { Db } from "./db";
 import { receiveJourneyEvent } from "./events";
 import { ApiError, Router } from "./http";
@@ -63,6 +64,14 @@ export function createApp({ config, db, clock: suppliedClock, passage = httpPass
       testClock.set(parseClockRequest(await readJson(req)));
       return { status: 200, body: { now: clock().toISOString() } };
     }));
+  }
+
+  // Test and local-drill control: run one callback delivery pass now, at the pinned clock.
+  if (testClock) {
+    router.add("POST", "/internal/test/callbacks/run", service(async () => ({
+      status: 200,
+      body: await deliverDueCallbacks(db, config, clock()),
+    })));
   }
 
   return createServer((req, res) => void router.handle(req, res));

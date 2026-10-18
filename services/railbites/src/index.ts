@@ -1,3 +1,4 @@
+import { startCallbackLoop } from "./callbacks";
 import { loadConfig } from "./config";
 import { openDatabase } from "./db";
 import { migrate } from "./migrations";
@@ -19,8 +20,11 @@ const server = createApp({ config, db, ...(testClock ? { testClock } : {}) }).li
   console.log(`RailBites listening on http://localhost:${config.port} (database ${config.databasePath})`);
 });
 
+const stopCallbacks = startCallbackLoop(db, config, () => (testClock ? testClock.now() : new Date()));
+
 // Stop accepting requests, then close SQLite so the WAL is checkpointed.
 function shutdown(): void {
+  stopCallbacks();
   server.close(() => {
     db.close();
     process.exit(0);

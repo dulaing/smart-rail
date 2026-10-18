@@ -16,6 +16,7 @@ export const KIOSK_KEYS = new Map([
 ]);
 
 export interface TestApp {
+  config: Config;
   baseUrl: string;
   db: Db;
   databasePath: string;
@@ -38,6 +39,7 @@ export async function startApp(options: {
   databasePath: string;
   serviceKey?: string | undefined;
   now?: string;
+  overrides?: Partial<Config>;
 }): Promise<TestApp> {
   const config: Config = {
     port: 0,
@@ -46,6 +48,11 @@ export async function startApp(options: {
     kioskKeys: KIOSK_KEYS,
     smartRailBaseUrl: undefined,
     smartRailServiceKey: undefined,
+    callbackSecret: undefined,
+    callbackPollMs: 0,
+    callbackMaxBackoffSeconds: 60,
+    callbackFailedRetrySeconds: 600,
+    ...options.overrides,
   };
   const db = openDatabase(config.databasePath);
   migrate(db);
@@ -63,6 +70,7 @@ export async function startApp(options: {
   const server = createApp({ config, db, clock: () => new Date(now), passage: passageReader });
   await new Promise<void>((resolve) => server.listen(0, resolve));
   return {
+    config,
     baseUrl: `http://localhost:${(server.address() as AddressInfo).port}`,
     db,
     databasePath: config.databasePath,

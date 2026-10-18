@@ -35,8 +35,12 @@ build (Node may print an experimental-feature warning).
 | `RAILBITES_DB_PATH` | `data/railbites.db` | SQLite file. The AppHost sets it to `services/railbites/data/railbites.db`; delete that folder to start fresh. The Docker image uses `/data/railbites.db`, which must be a mounted volume. |
 | `RAILBITES_SERVICE_KEY` | none | Credential SmartRail sends as `X-RailBites-Service-Key`. With none set every service route answers 401. |
 | `RAILBITES_KIOSK_KEYS` | none | `point-id=key,point-id=key`. Each key opens only its own collection point's kiosk routes, sent as `X-RailBites-Kiosk-Key`. |
-| `SMARTRAIL_BASE_URL` | none | SmartRail API address. RailBites asks it whether a train has passed a stop before marking a no-show. |
+| `SMARTRAIL_BASE_URL` | none | SmartRail API address for signed callbacks and the no-show passage read. |
 | `SMARTRAIL_SERVICE_KEY` | none | RailBites' own credential for that read; not the same secret as `RAILBITES_SERVICE_KEY`. |
+| `RAILBITES_CALLBACK_SECRET` | none | HMAC secret shared with SmartRail's `RailBites:CallbackSecret`. Missing secret/address leaves callbacks queued. |
+| `RAILBITES_CALLBACK_POLL_MS` | `2000` | Callback queue polling interval; `0` disables automatic delivery for controlled tests. |
+| `RAILBITES_CALLBACK_MAX_BACKOFF_SECONDS` | `60` | Retry cap after connection failures, 408/429 or 5xx (2, 4, 8 ... seconds). |
+| `RAILBITES_CALLBACK_FAILED_RETRY_SECONDS` | `600` | Slow retry after a permanent refusal, such as an incorrect signing secret. |
 | `PORT` | `5200` | HTTP port. |
 
 Start-up creates the tables (`schema_migrations` records what ran) and seeds the two collection
@@ -95,6 +99,8 @@ link ID until the provider answers.
 | `RailBites:BaseUrl` | none | RailBites address, for example `http://localhost:5200`. |
 | `RailBites:ServiceKey` | none | Must equal RailBites' `RAILBITES_SERVICE_KEY`. With either unset nothing is sent and orders stay pending. |
 | `RailBites:TimeoutSeconds` | `5` | How long one provider call may take before the order is treated as pending. |
+| `RailBites:CallbackSecret` | none | Must equal RailBites' `RAILBITES_CALLBACK_SECRET`; otherwise callbacks get 401. |
+| `RailBites:InboundServiceKey` | none | Must equal RailBites' `SMARTRAIL_SERVICE_KEY`, for its authenticated passage read only. |
 | `Catering:Placement:PollSeconds` | `5` | How often the retry loop looks for pending orders. |
 | `Catering:Placement:SettleSeconds` | `30` | After a lost request, how long to wait before a missing provider order is called refused. |
 | `Catering:Placement:WorkerEnabled` | `true` | Turns the retry loop off (tests run it by hand). |
@@ -108,9 +114,41 @@ for RailBites in one PostgreSQL transaction, so RailBites can be down without lo
 carries the post-change eligibility and every stop's pickup time. `dotnet run --project services/api -- --migrate-and-seed`
 also rewrites any undelivered message queued before pickup times existed (it is never marked delivered by that step).
 
+RailBites delivers its SQLite `webhook_outbox` to `POST /internal/catering/order-updates`, signing
+the timestamp and exact body with HMAC-SHA256. SmartRail checks the five-minute timestamp window,
+then commits a unique receipt and any greater status sequence together. Replays and older sequences
+are acknowledged without changing the order. A callback that beats the placement response privately
+looks up the provider order first, so its pickup code/items are available and a late response cannot
+regress the status. If that lookup fails, no receipt is committed and RailBites retries.
+
+For No-show, RailBites calls `GET /internal/catering/journeys/{journeyId}/stops/{stopId}/passage`
+using its inbound service key. Only an observed departure proves `PASSED`; stale evidence that has
+not shown departure returns `UNKNOWN`. A proven departure remains a fact when its observation ages.
+Neither endpoint uses passenger tokens. Apply the new receipt migration with the usual explicit
+`--migrate-and-seed` command. Keep all three service/signing secrets outside Git; AppHost address and
+secret wiring and the operator failure drill remain T6.
+
 The corridor train `SIM-3001` (Fort 09:00, Polgahawela 11:00, Peradeniya 11:50, daily) is seeded for
 food ordering. The API tests start the real RailBites, so build it first
 (`npm --prefix services/railbites ci && npm --prefix services/railbites run build`); a missing build fails the tests.
+
+### Status callbacks and the passage read
+
+RailBites tells SmartRail when an order changes (Ready, Collected, No-show, Cancelled, a new pickup time).
+Each callback is a JSON body signed with HMAC-SHA256 over `<unix timestamp>.<raw body>`, sent as
+`X-RailBites-Signature: v1=<hex>` with `X-RailBites-Timestamp`; SmartRail checks the raw bytes, a
+five-minute timestamp window and a constant-time comparison before it reads the body. The shared
+examples are in `services/railbites/fixtures/signed-callbacks.json` (regenerate with
+`node services/railbites/scripts/make-callback-fixtures.js`); both services' tests run them.
+
+| Where | Setting | Meaning |
+| --- | --- | --- |
+| API | `RailBites:CallbackSecret` | HMAC secret. Unset refuses every callback. |
+| API | `RailBites:InboundServiceKey` | Key RailBites presents to read whether a train has passed a stop (`GET /internal/catering/journeys/{journeyId}/stops/{stopId}/passage`). Unset refuses every read. |
+| RailBites | `RAILBITES_CALLBACK_SECRET` | Same secret as `RailBites:CallbackSecret`. Unset sends nothing. |
+| RailBites | `SMARTRAIL_BASE_URL`, `SMARTRAIL_SERVICE_KEY` | Where to send callbacks and the passage read, and the key for it (= `RailBites:InboundServiceKey`). |
+| RailBites | `RAILBITES_CALLBACK_POLL_MS` | How often queued callbacks are sent (default 2000; 0 turns the loop off). |
+| RailBites | `RAILBITES_CALLBACK_MAX_BACKOFF_SECONDS`, `RAILBITES_CALLBACK_FAILED_RETRY_SECONDS` | Cap on retry delays after a timeout or 5xx (60), and the slow retry after a refusal (600). |
 
 ## Signing in (Keycloak)
 
