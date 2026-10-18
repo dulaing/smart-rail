@@ -3,8 +3,8 @@ import { collectionPointName } from "./catalog";
 import type { Config } from "./config";
 import type { Db } from "./db";
 import { ApiError, type Reply, type Router } from "./http";
-import { listOrders } from "./kiosk";
-import { readForm } from "./parse";
+import { listOrders, markCollected, markNoShow, markReady } from "./kiosk";
+import { readForm, readJson } from "./parse";
 import type { StaffSession } from "./sessions";
 import { randomToken, type SessionStore } from "./sessions";
 import { sameToken, verifyPassword } from "./staff-auth";
@@ -193,7 +193,7 @@ export function registerStaffRoutes(router: Router, deps: StaffDeps): void {
         pointId: session.collectionPointId,
         csrfToken: session.csrfToken,
         content: staffOrdersContent(),
-        script: staffOrdersScript(),
+        script: staffOrdersScript(session.csrfToken),
       }),
       headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" },
     };
@@ -203,5 +203,31 @@ export function registerStaffRoutes(router: Router, deps: StaffDeps): void {
   router.add("GET", "/staff/orders", (ctx) => {
     const session = requireSession(deps, ctx.req);
     return { ...listOrders(deps.db, session.collectionPointId, ctx.url.searchParams.get("status")), headers: { "Cache-Control": "no-store" } };
+  });
+
+  // Actions reuse the kiosk business functions with the session's point. They check the point, the
+  // current state, the pickup code and (for no-show) SmartRail's passage read exactly as the kiosk
+  // API does; they only add the session, same-origin and CSRF checks of the browser boundary.
+  const order = "/staff/orders/:orderId";
+
+  router.add("POST", `${order}/ready`, (ctx) => {
+    const session = requireSession(deps, ctx.req);
+    requireSameOrigin(ctx.req);
+    requireCsrf(session, ctx.req);
+    return markReady(deps.db, now(), session.collectionPointId, ctx.params["orderId"]!);
+  });
+
+  router.add("POST", `${order}/collected`, async (ctx) => {
+    const session = requireSession(deps, ctx.req);
+    requireSameOrigin(ctx.req);
+    requireCsrf(session, ctx.req);
+    return markCollected(deps.db, now(), session.collectionPointId, ctx.params["orderId"]!, await readJson(ctx.req));
+  });
+
+  router.add("POST", `${order}/no-show`, (ctx) => {
+    const session = requireSession(deps, ctx.req);
+    requireSameOrigin(ctx.req);
+    requireCsrf(session, ctx.req);
+    return markNoShow(deps.db, now, deps.passage, session.collectionPointId, ctx.params["orderId"]!);
   });
 }

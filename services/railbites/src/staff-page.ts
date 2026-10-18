@@ -142,10 +142,15 @@ export function staffOrdersContent(): string {
 
 // The page script. It polls while the tab is visible, keeps the highest status sequence it has seen
 // per order so a late read cannot undo a terminal result, and treats a lost session as a sign-out.
-export function staffOrdersScript(): string {
+// Actions are sent with the session CSRF token; the pickup code is entered here and checked by the
+// server, never displayed or stored.
+export function staffOrdersScript(csrfToken: string): string {
   return `(function () {
+  var CSRF = ${JSON.stringify(csrfToken)};
   var sequences = {};
   var timer = null;
+  var collecting = null;
+  var codeValue = "";
   var statusEl = document.getElementById("status");
   var messageEl = document.getElementById("message");
   var ordersEl = document.getElementById("orders");
@@ -163,6 +168,11 @@ export function staffOrdersScript(): string {
     if (seconds < 240) return "ageing (" + seconds + "s)";
     return "stale, position unknown (" + seconds + "s)";
   }
+  function textNode(tag, className) {
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    return node;
+  }
   function matches(order) {
     var filter = statusEl.value;
     if (!filter || filter === "ALL") return true;
@@ -170,10 +180,34 @@ export function staffOrdersScript(): string {
     if (filter === "COMPLETED") return order.status === "COLLECTED" || order.status === "NO_SHOW" || order.status === "CANCELLED";
     return order.status === filter;
   }
-  function textNode(tag, className) {
-    var node = document.createElement(tag);
+  function button(label, className, onClick) {
+    var node = document.createElement("button");
+    node.type = "button";
+    node.textContent = label;
     if (className) node.className = className;
+    node.addEventListener("click", onClick);
     return node;
+  }
+  function collectForm(order) {
+    var row = textNode("div", "row");
+    var input = document.createElement("input");
+    input.type = "text";
+    input.inputMode = "numeric";
+    input.autocomplete = "off";
+    input.placeholder = "Pickup code";
+    input.setAttribute("aria-label", "Pickup code");
+    input.value = codeValue;
+    input.addEventListener("input", function () { codeValue = input.value; });
+    var confirm = button("Confirm collection", "", function () {
+      act(order.id, "collected", { pickupCode: input.value }, confirm, function (ok) {
+        if (ok) { collecting = null; codeValue = ""; }
+      });
+    });
+    var cancel = button("Cancel", "secondary", function () { collecting = null; codeValue = ""; renderAll(lastOrders); });
+    row.appendChild(input);
+    row.appendChild(confirm);
+    row.appendChild(cancel);
+    return row;
   }
   function orderCard(order) {
     var card = textNode("section", "card");
@@ -207,9 +241,31 @@ export function staffOrdersScript(): string {
       reason.textContent = "Cancelled: " + String(order.cancellationReason).replace(/_/g, " ").toLowerCase();
       card.appendChild(reason);
     }
+
+    var actions = textNode("div", "row");
+    if (order.status === "ACCEPTED") {
+      actions.appendChild(button("Mark ready", "", function (event) {
+        act(order.id, "ready", {}, event.currentTarget, function (ok) { if (ok) renderAll(lastOrders); });
+      }));
+      actions.appendChild(button("No-show", "secondary", function (event) {
+        act(order.id, "no-show", {}, event.currentTarget, function (ok) { if (ok) refresh(); });
+      }));
+    } else if (order.status === "READY") {
+      if (collecting === order.id) {
+        actions.appendChild(collectForm(order));
+      } else {
+        actions.appendChild(button("Collect", "", function () { collecting = order.id; codeValue = ""; renderAll(lastOrders); }));
+        actions.appendChild(button("No-show", "secondary", function (event) {
+          act(order.id, "no-show", {}, event.currentTarget, function (ok) { if (ok) refresh(); });
+        }));
+      }
+    }
+    if (actions.childNodes.length) card.appendChild(actions);
     return card;
   }
-  function render(orders) {
+  var lastOrders = [];
+  function renderAll(orders) {
+    lastOrders = orders;
     ordersEl.textContent = "";
     var visible = orders.filter(matches);
     if (!visible.length) {
@@ -219,12 +275,35 @@ export function staffOrdersScript(): string {
       return;
     }
     visible.forEach(function (order) {
-      if (sequences[order.id] !== undefined && order.statusSequence < sequences[order.id]) return;
+      if (sequences[order.id] !== undefined && order.statusSequence < sequences[order.id] && collecting !== order.id) return;
       sequences[order.id] = order.statusSequence;
       ordersEl.appendChild(orderCard(order));
     });
   }
+  function act(orderId, action, body, node, done) {
+    if (node) node.disabled = true;
+    return fetch("/staff/orders/" + encodeURIComponent(orderId) + "/" + action, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-RailBites-CSRF": CSRF, "Accept": "application/json" },
+      body: JSON.stringify(body || {}),
+    })
+      .then(function (res) {
+        if (res.status === 401) { window.location.assign("/staff/login"); return null; }
+        return res.json().catch(function () { return {}; }).then(function (data) {
+          if (res.ok) { setMessage(""); return true; }
+          setMessage(data.message || "The action could not be completed.", true);
+          if (res.status === 409) refresh();
+          return false;
+        });
+      })
+      .catch(function () {
+        setMessage("The action could not be sent. Check the connection and try again.", true);
+        return false;
+      })
+      .then(function (ok) { if (node) node.disabled = false; if (done) done(ok); return ok; });
+  }
   function refresh() {
+    if (collecting !== null) return Promise.resolve();
     return fetch("/staff/orders", { headers: { "Accept": "application/json" }, cache: "no-store" })
       .then(function (res) {
         if (res.status === 401) { window.location.assign("/staff/login"); throw { signedOut: true }; }
@@ -233,7 +312,7 @@ export function staffOrdersScript(): string {
       })
       .then(function (data) {
         setMessage("");
-        render(data.orders || []);
+        renderAll(data.orders || []);
         refreshedEl.textContent = "Updated " + new Date().toLocaleTimeString();
       })
       .catch(function (error) {
