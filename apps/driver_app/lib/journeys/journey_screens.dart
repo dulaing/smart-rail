@@ -273,13 +273,16 @@ class _JourneyCard extends StatelessWidget {
             children: [
               Row(
                 children: [
+                  Text(journey.trainNumber, style: theme.text('heading')),
+                  SizedBox(width: gap),
                   Expanded(
                     child: Text(
-                      journey.trainNumber,
-                      style: theme.text('heading'),
+                      journey.label,
+                      style: theme.text('body'),
+                      textAlign: TextAlign.end,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  Text(journey.label, style: theme.text('body')),
                 ],
               ),
               SizedBox(height: gap),

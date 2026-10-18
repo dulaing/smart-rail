@@ -82,11 +82,13 @@ class _DriverShellState extends State<DriverShell> {
     final content = _Content(
       title: label(_tab),
       child: switch (_tab) {
-        DriverTab.account => _AccountBody(
-          account: widget.account,
-          controller: widget.controller,
-          hasDriverAccess: tabs.length > 1,
-          offline: widget.offlineOwnerId != null,
+        DriverTab.account => SingleChildScrollView(
+          child: _AccountBody(
+            account: widget.account,
+            controller: widget.controller,
+            hasDriverAccess: tabs.length > 1,
+            offline: widget.offlineOwnerId != null,
+          ),
         ),
         _ when !canOpen(_tab, widget.account) => Text(t.accessDenied),
         DriverTab.journeys || DriverTab.updates =>
@@ -155,18 +157,30 @@ class _Content extends StatelessWidget {
     final theme = SrTheme.of(context);
     final locale = Localizations.localeOf(context).languageCode;
     final gap = theme.metrics.space[24]!;
-    return ListView(
-      padding: EdgeInsets.all(gap),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          srMessages['footer.simulation']![locale] ??
-              srMessages['footer.simulation']!['en']!,
-          style: theme.text('caption', color: theme.palette.textSecondary),
+        Padding(
+          padding: EdgeInsets.fromLTRB(gap, gap, gap, gap / 2),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                srMessages['footer.simulation']![locale] ??
+                    srMessages['footer.simulation']!['en']!,
+                style: theme.text('caption', color: theme.palette.textSecondary),
+              ),
+              SizedBox(height: gap / 2),
+              Semantics(
+                header: true,
+                child: Text(title, style: theme.text('title')),
+              ),
+            ],
+          ),
         ),
-        SizedBox(height: gap / 2),
-        Semantics(header: true, child: Text(title, style: theme.text('title'))),
-        SizedBox(height: gap / 2),
-        child,
+        // The child owns its own scrolling (a list or a column), so it must get a bounded
+        // height: an unbounded one collapses a nested scrollable to nothing.
+        Expanded(child: child),
       ],
     );
   }

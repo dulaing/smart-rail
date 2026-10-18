@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../auth/auth_service.dart';
+import '../platform_client.dart';
 
 class DriverJourney {
   const DriverJourney({
@@ -194,7 +195,7 @@ class DriverReadFailure<T> extends DriverRead<T> {
 /// for every request and never stored in this feature layer.
 class DriverBriefingApi {
   DriverBriefingApi(this._baseUrl, this._auth, {http.Client? client})
-    : _client = client ?? http.Client();
+    : _client = client ?? platformHttpClient();
 
   final String _baseUrl;
   final AuthService _auth;
