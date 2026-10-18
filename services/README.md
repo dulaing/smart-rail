@@ -34,6 +34,9 @@ build (Node may print an experimental-feature warning).
 | --- | --- | --- |
 | `RAILBITES_DB_PATH` | `data/railbites.db` | SQLite file. The AppHost sets it to `services/railbites/data/railbites.db`; delete that folder to start fresh. The Docker image uses `/data/railbites.db`, which must be a mounted volume. |
 | `RAILBITES_SERVICE_KEY` | none | Credential SmartRail sends as `X-RailBites-Service-Key`. With none set every service route answers 401. |
+| `RAILBITES_KIOSK_KEYS` | none | `point-id=key,point-id=key`. Each key opens only its own collection point's kiosk routes, sent as `X-RailBites-Kiosk-Key`. |
+| `SMARTRAIL_BASE_URL` | none | SmartRail API address. RailBites asks it whether a train has passed a stop before marking a no-show. |
+| `SMARTRAIL_SERVICE_KEY` | none | RailBites' own credential for that read; not the same secret as `RAILBITES_SERVICE_KEY`. |
 | `PORT` | `5200` | HTTP port. |
 
 Start-up creates the tables (`schema_migrations` records what ran) and seeds the two collection

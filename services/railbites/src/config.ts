@@ -4,6 +4,26 @@ export interface Config {
   databasePath: string;
   /** Credential SmartRail sends on service routes. Unset means every service call is refused. */
   serviceKey: string | undefined;
+  /** One credential per collection point; a key opens only its own kiosk routes. */
+  kioskKeys: ReadonlyMap<string, string>;
+  /** Where RailBites reads train passage and (later) posts status callbacks. */
+  smartRailBaseUrl: string | undefined;
+  /** RailBites' own credential for reading SmartRail; a different secret from `serviceKey`. */
+  smartRailServiceKey: string | undefined;
+}
+
+// "polgahawela-junction=key1,peradeniya-junction=key2"
+function parseKioskKeys(value: string | undefined): Map<string, string> {
+  const keys = new Map<string, string>();
+  for (const pair of (value ?? "").split(",").map((p) => p.trim()).filter(Boolean)) {
+    const at = pair.indexOf("=");
+    const point = pair.slice(0, at).trim();
+    const key = pair.slice(at + 1).trim();
+    if (at < 1 || !key) throw new Error("RAILBITES_KIOSK_KEYS must look like point-id=key,point-id=key.");
+    if ([...keys.values()].includes(key)) throw new Error("Each kiosk needs its own key.");
+    keys.set(point, key);
+  }
+  return keys;
 }
 
 // Secrets come from the environment (user secrets / Aspire parameters), never from Git or clients.
@@ -12,5 +32,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     port: Number(env["PORT"] ?? 5200),
     databasePath: env["RAILBITES_DB_PATH"] || "data/railbites.db",
     serviceKey: env["RAILBITES_SERVICE_KEY"] || undefined,
+    kioskKeys: parseKioskKeys(env["RAILBITES_KIOSK_KEYS"]),
+    smartRailBaseUrl: env["SMARTRAIL_BASE_URL"] || undefined,
+    smartRailServiceKey: env["SMARTRAIL_SERVICE_KEY"] || undefined,
   };
 }

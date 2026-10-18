@@ -36,6 +36,7 @@ info:
     | `UNAUTHORIZED` | 401 | Missing, wrong or unconfigured credential |
     | `FORBIDDEN_COLLECTION_POINT` | 403 | Kiosk key is not for this collection point |
     | `INVALID_REQUEST` | 400 | Malformed JSON, field or identifier |
+    | `PAYLOAD_TOO_LARGE` | 413 | Body over 64 KiB |
     | `COLLECTION_POINT_NOT_FOUND` | 404 | Unknown or inactive collection point |
     | `ORDER_NOT_FOUND` | 404 | No order for that link ID or order ID |
     | `ITEM_UNAVAILABLE` | 422 | Unknown, inactive or other-point menu item |
@@ -259,6 +260,7 @@ paths:
         "401": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
 
   /v1/journey-events:
     post:

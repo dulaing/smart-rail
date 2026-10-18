@@ -34,6 +34,73 @@ const migrations: Migration[] = [
       CREATE INDEX menu_items_by_collection_point ON menu_items (collection_point_id, sort_order);
     `,
   },
+  {
+    id: 2,
+    name: "orders, journey eligibility and callback outbox",
+    sql: `
+      -- One row per journey, created by the first order attempt or train-change event.
+      -- blocked_pickup_stop_ids is a JSON array of lower-case UUIDs.
+      CREATE TABLE journey_order_states (
+        journey_id TEXT PRIMARY KEY,
+        applied_journey_version INTEGER NOT NULL CHECK (applied_journey_version >= 0),
+        order_closed INTEGER NOT NULL CHECK (order_closed IN (0, 1)),
+        blocked_pickup_stop_ids TEXT NOT NULL CHECK (json_valid(blocked_pickup_stop_ids)),
+        updated_at TEXT NOT NULL
+      ) STRICT;
+
+      CREATE TABLE orders (
+        id TEXT PRIMARY KEY,
+        order_link_id TEXT NOT NULL UNIQUE,
+        request_digest TEXT NOT NULL,
+        journey_id TEXT NOT NULL REFERENCES journey_order_states (journey_id),
+        train_number TEXT NOT NULL,
+        service_date TEXT NOT NULL,
+        pickup_stop_id TEXT NOT NULL,
+        collection_point_id TEXT NOT NULL REFERENCES collection_points (id),
+        pickup_code TEXT NOT NULL UNIQUE,
+        status TEXT NOT NULL CHECK (status IN ('ACCEPTED', 'READY', 'COLLECTED', 'NO_SHOW', 'CANCELLED')),
+        status_sequence INTEGER NOT NULL CHECK (status_sequence >= 1),
+        cancellation_reason TEXT CHECK (cancellation_reason IN ('PASSENGER_CANCELLED', 'TRAIN_CANCELLED', 'TRAIN_ENDED_EARLY')),
+        scheduled_arrival TEXT NOT NULL,
+        current_eta TEXT,
+        eta_evidence_at TEXT,
+        pickup_version INTEGER NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      ) STRICT;
+
+      CREATE INDEX orders_by_collection_point ON orders (collection_point_id, status);
+      CREATE INDEX orders_by_journey ON orders (journey_id, status);
+
+      CREATE TABLE order_items (
+        id TEXT PRIMARY KEY,
+        order_id TEXT NOT NULL REFERENCES orders (id),
+        menu_item_id TEXT NOT NULL REFERENCES menu_items (id),
+        name TEXT NOT NULL,
+        quantity INTEGER NOT NULL CHECK (quantity > 0),
+        unit_price_minor_lkr INTEGER NOT NULL CHECK (unit_price_minor_lkr >= 0)
+      ) STRICT;
+
+      CREATE INDEX order_items_by_order ON order_items (order_id);
+
+      -- Written in the same transaction as the status change it describes. payload is the exact
+      -- JSON body to send, so every retry carries the same bytes.
+      CREATE TABLE webhook_outbox (
+        event_id TEXT PRIMARY KEY,
+        order_id TEXT NOT NULL REFERENCES orders (id),
+        status_sequence INTEGER NOT NULL,
+        payload TEXT NOT NULL CHECK (json_valid(payload)),
+        attempt_count INTEGER NOT NULL DEFAULT 0,
+        next_attempt_at TEXT NOT NULL,
+        delivered_at TEXT,
+        last_error TEXT,
+        created_at TEXT NOT NULL,
+        UNIQUE (order_id, status_sequence)
+      ) STRICT;
+
+      CREATE INDEX webhook_outbox_pending ON webhook_outbox (next_attempt_at) WHERE delivered_at IS NULL;
+    `,
+  },
 ];
 
 // Explicit setup, run once at start-up. Safe to run again: applied migrations are skipped.
