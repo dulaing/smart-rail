@@ -4,11 +4,11 @@ using SmartRail.Api.Modules.Rail;
 
 namespace SmartRail.Api.Modules.Access;
 
-// The signed-in passenger's own saved commutes and followed dated journeys. The owner is always
-// the active local account from the token: no route takes an account from the request. A save is
-// a reusable origin/destination pair; a follow is one dated journey, not every train with its
-// number. Every call rechecks the matching Own permission from the database, so losing a grant
-// takes effect on the next call.
+// The signed-in passenger's own saved commutes and followed dated journeys, plus the personal
+// changes in force on what they follow. The owner is always the active local account from the
+// token: no route takes an account from the request. A save is a reusable origin/destination
+// pair; a follow is one dated journey, not every train with its number. Every call rechecks the
+// matching Own permission from the database, so losing a grant takes effect on the next call.
 public static class PassengerEndpoints
 {
     private const int DefaultPageSize = 50;
@@ -25,6 +25,8 @@ public static class PassengerEndpoints
         me.MapGet("/followed-journeys", ListFollows);
         me.MapPut("/followed-journeys/{journeyId:guid}", Follow);
         me.MapDelete("/followed-journeys/{journeyId:guid}", Unfollow);
+
+        me.MapGet("/alerts", ListAlerts);
     }
 
     private static async Task<IResult> ListSavedRoutes(
@@ -207,6 +209,32 @@ public static class PassengerEndpoints
         return Results.NoContent();
     }
 
+    // The changes currently in force on what this account follows. A withdrawal removes its item
+    // and a replacement leaves only the change now in force. Sorted by confirmation time then
+    // stable IDs, so a repeated poll returns the same body and the same ETag.
+    private static async Task<IResult> ListAlerts(
+        HttpContext context, SmartRailDbContext db, CurrentAccount current,
+        AccessGuard guard, IPersonalChangeReader changes)
+    {
+        if (await PermitAsync(context, Permissions.AlertsRead, current, guard) is not { } account)
+        {
+            return Results.Forbid();
+        }
+
+        var journeyIds = await db.FollowedJourneys.AsNoTracking()
+            .Where(f => f.AccountId == account.Id)
+            .Select(f => f.JourneyId)
+            .ToListAsync(context.RequestAborted);
+
+        var journeys = await changes.ReadAsync(journeyIds, context.RequestAborted);
+        var alerts = journeys
+            .SelectMany(j => j.Changes.Select(c => new AlertDto(
+                j.JourneyId, c.ChangeId, c.Kind, j.JourneyVersion, c.AffectedStopIds, c.ConfirmedAt)))
+            .OrderBy(a => a.ConfirmedAt).ThenBy(a => a.JourneyId).ThenBy(a => a.ChangeId)
+            .ToList();
+        return ETagResults.JsonWithETag(context, alerts);
+    }
+
     // The active local account when it holds the Own permission, otherwise null so the caller
     // forbids. A refusal is audited by the guard against the caller's own account.
     private static async Task<LocalAccount?> PermitAsync(
@@ -255,4 +283,8 @@ public static class PassengerEndpoints
         public static FollowedJourneyDto From(FollowedJourney follow) =>
             new(follow.JourneyId, follow.FollowedAt);
     }
+
+    private sealed record AlertDto(
+        Guid JourneyId, Guid ChangeId, string Kind, int JourneyVersion,
+        IReadOnlyList<Guid> AffectedStopIds, DateTimeOffset ConfirmedAt);
 }

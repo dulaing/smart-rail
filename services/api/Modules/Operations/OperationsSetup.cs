@@ -1,3 +1,4 @@
+using SmartRail.Api.Modules.Access;
 using SmartRail.Api.Modules.Operations.Changes;
 using SmartRail.Api.Modules.Operations.Incidents;
 using SmartRail.Api.Modules.Operations.Reports;
@@ -14,6 +15,7 @@ public static class OperationsSetup
             builder.Services.AddScoped<ChangeStore>();
             builder.Services.AddScoped<ChangeConfirmer>();
             builder.Services.AddScoped<IConfirmedChangeReader, ConfirmedChangeReader>();
+            builder.Services.AddScoped<IPersonalChangeReader, PersonalChangeReader>();
             builder.Services.AddScoped<IJourneyEligibilityReader, JourneyEligibilityReader>();
             builder.Services.AddScoped<ReportStore>();
             builder.Services.AddScoped<ReportSubmitter>();
