@@ -32,6 +32,9 @@ class FakeAuth implements AuthService {
   Future<String> accessToken() async => 'access-token';
 
   @override
+  Future<String?> ownerId() async => signedIn ? 'driver-subject' : null;
+
+  @override
   Future<void> signOut() async {
     signedIn = false;
     signOuts++;
