@@ -25,6 +25,14 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
+      # The API tests start the real RailBites service, so it must be built first.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: services/railbites/package-lock.json
+      - run: npm --prefix services/railbites ci
+      - run: npm --prefix services/railbites run build
       - run: dotnet build services/api/SmartRail.Api.csproj --configuration Release
       - run: dotnet test tests/SmartRail.Api.Tests --configuration Release
       - run: docker build -f services/api/Dockerfile .

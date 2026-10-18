@@ -8,6 +8,7 @@ public static class RailSetup
         if (hasDatabase)
         {
             builder.Services.AddScoped<IJourneyStopReader, JourneyStopReader>();
+            builder.Services.AddScoped<IPickupReader, PickupReader>();
         }
     }
 }

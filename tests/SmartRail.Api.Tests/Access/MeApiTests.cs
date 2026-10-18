@@ -146,7 +146,8 @@ public class MeApiTests(AccessApi api) : IClassFixture<AccessApi>
         // refuses everything without the key.
         Assert.Equal(
             [
-                "/api/journeys", "/api/journeys/{journeyId:guid}/changes", "/api/journeys/{journeyId}/running", "/api/next-trains", "/api/stations", "/health/live", "/health/ready",
+                "/api/food/collection-points/{collectionPointId}/menu",
+                "/api/journeys", "/api/journeys/{journeyId:guid}/changes", "/api/journeys/{journeyId:guid}/collection-options", "/api/journeys/{journeyId}/running", "/api/next-trains", "/api/stations", "/health/live", "/health/ready",
                 "/internal/rail/observations",
                 "/internal/rail/simulator/journeys/{journeyId}/pause", "/internal/rail/simulator/journeys/{journeyId}/resume",
                 "/openapi/{documentName}.json",

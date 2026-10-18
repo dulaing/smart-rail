@@ -14,6 +14,7 @@ public static class OperationsSetup
             builder.Services.AddScoped<ChangeStore>();
             builder.Services.AddScoped<ChangeConfirmer>();
             builder.Services.AddScoped<IConfirmedChangeReader, ConfirmedChangeReader>();
+            builder.Services.AddScoped<IJourneyEligibilityReader, JourneyEligibilityReader>();
             builder.Services.AddScoped<ReportStore>();
             builder.Services.AddScoped<ReportSubmitter>();
             builder.Services.AddScoped<ReportAcknowledger>();

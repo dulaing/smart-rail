@@ -213,6 +213,144 @@ namespace SmartRail.Api.Infrastructure.Migrations
                     b.ToTable("role_permissions", "identity");
                 });
 
+            modelBuilder.Entity("SmartRail.Api.Modules.Catering.Orders.OrderLink", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("account_id");
+
+                    b.Property<int>("AttemptCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("attempt_count");
+
+                    b.Property<string>("CancellationReason")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("cancellation_reason");
+
+                    b.Property<string>("ClientRequestKey")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("client_request_key");
+
+                    b.Property<string>("CollectionPointId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("collection_point_id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTimeOffset?>("EstimatedArrival")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("estimated_arrival");
+
+                    b.Property<DateTimeOffset?>("EtaEvidenceAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("eta_evidence_at");
+
+                    b.Property<string>("ItemsJson")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("items");
+
+                    b.Property<Guid>("JourneyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("journey_id");
+
+                    b.Property<DateTimeOffset?>("LastAttemptAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_attempt_at");
+
+                    b.Property<string>("LastError")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("last_error");
+
+                    b.Property<DateTimeOffset>("NextAttemptAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("next_attempt_at");
+
+                    b.Property<string>("PickupCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("pickup_code");
+
+                    b.Property<Guid>("PickupStopId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("pickup_stop_id");
+
+                    b.Property<string>("PlacementState")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("placement_state");
+
+                    b.Property<string>("ProviderOrderRef")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("provider_order_ref");
+
+                    b.Property<string>("ProviderStatus")
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("provider_status");
+
+                    b.Property<string>("RejectionCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("rejection_code");
+
+                    b.Property<string>("RequestDigest")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("request_digest");
+
+                    b.Property<string>("RequestPayload")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("request_payload");
+
+                    b.Property<DateTimeOffset?>("ScheduledArrival")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("scheduled_arrival");
+
+                    b.Property<int>("StatusSequence")
+                        .HasColumnType("integer")
+                        .HasColumnName("status_sequence");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JourneyId");
+
+                    b.HasIndex("PickupStopId");
+
+                    b.HasIndex("ProviderOrderRef")
+                        .IsUnique();
+
+                    b.HasIndex("AccountId", "ClientRequestKey")
+                        .IsUnique();
+
+                    b.HasIndex("PlacementState", "NextAttemptAt");
+
+                    b.ToTable("order_links", "catering", t =>
+                        {
+                            t.HasCheckConstraint("ck_order_links_sequence", "status_sequence >= 0 AND attempt_count >= 0");
+
+                            t.HasCheckConstraint("ck_order_links_state", "placement_state IN ('PENDING', 'CONFIRMED', 'REJECTED')");
+                        });
+                });
+
             modelBuilder.Entity("SmartRail.Api.Modules.Catering.Outbox.OutboxMessage", b =>
                 {
                     b.Property<Guid>("Id")
@@ -771,6 +909,27 @@ namespace SmartRail.Api.Infrastructure.Migrations
                         .WithMany("Permissions")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SmartRail.Api.Modules.Catering.Orders.OrderLink", b =>
+                {
+                    b.HasOne("SmartRail.Api.Modules.Access.Account", null)
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartRail.Api.Modules.Rail.Timetable.ScheduledJourney", null)
+                        .WithMany()
+                        .HasForeignKey("JourneyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartRail.Api.Modules.Rail.Timetable.PatternStop", null)
+                        .WithMany()
+                        .HasForeignKey("PickupStopId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 

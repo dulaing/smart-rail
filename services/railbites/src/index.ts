@@ -3,6 +3,7 @@ import { openDatabase } from "./db";
 import { migrate } from "./migrations";
 import { seedCatalog } from "./seed";
 import { createApp } from "./server";
+import { createTestClock } from "./test-clock";
 
 const config = loadConfig();
 if (!config.serviceKey) {
@@ -13,7 +14,8 @@ const db = openDatabase(config.databasePath);
 migrate(db);
 seedCatalog(db);
 
-const server = createApp({ config, db }).listen(config.port, () => {
+const testClock = process.env["RAILBITES_TEST_CLOCK"] === "1" && process.env["NODE_ENV"] !== "production" ? createTestClock() : undefined;
+const server = createApp({ config, db, ...(testClock ? { testClock } : {}) }).listen(config.port, () => {
   console.log(`RailBites listening on http://localhost:${config.port} (database ${config.databasePath})`);
 });
 

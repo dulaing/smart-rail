@@ -51,7 +51,7 @@ public class TimetableApi : IAsyncLifetime
     public string ConnectionString =>
         new NpgsqlConnectionStringBuilder(_adminConnection) { Database = _databaseName }.ConnectionString;
 
-    public async Task InitializeAsync()
+    public virtual async Task InitializeAsync()
     {
         if (_adminConnection is null)
         {

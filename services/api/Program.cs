@@ -97,6 +97,7 @@ if (hasDatabase)
     app.MapAccessEndpoints();
     app.MapAccessAdminEndpoints();
     app.MapOperationsEndpoints();
+    app.MapCateringEndpoints();
 
     // Demo-only controls: never available outside Development.
     if (app.Environment.IsDevelopment())

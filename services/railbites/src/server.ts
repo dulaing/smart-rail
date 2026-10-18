@@ -6,6 +6,7 @@ import type { Db } from "./db";
 import { ApiError, Router } from "./http";
 import { listOrders, markCollected, markNoShow, markReady } from "./kiosk";
 import { isUuid, readJson } from "./parse";
+import { parseClockRequest, type TestClock } from "./test-clock";
 import { cancelOrder, getOrderByLink, placeOrder } from "./placement";
 import { httpPassageReader, type PassageReader } from "./smartrail";
 
@@ -15,9 +16,12 @@ export interface AppDependencies {
   /** Time source; tests control it to check cutoffs exactly. */
   clock?: () => Date;
   passage?: PassageReader;
+  /** Present only in tests and local drills; adds a route to pin the clock. */
+  testClock?: TestClock;
 }
 
-export function createApp({ config, db, clock = () => new Date(), passage = httpPassageReader(config) }: AppDependencies): Server {
+export function createApp({ config, db, clock: suppliedClock, passage = httpPassageReader(config), testClock }: AppDependencies): Server {
+  const clock = suppliedClock ?? (testClock ? () => testClock.now() : () => new Date());
   const router = new Router();
   const service = (handler: Parameters<typeof requireService>[1]) => requireService(config, handler);
   const kiosk = (handler: Parameters<typeof requireKiosk>[1]) => requireKiosk(config, handler);
@@ -50,6 +54,13 @@ export function createApp({ config, db, clock = () => new Date(), passage = http
     `${orders}/:orderId/no-show`,
     kiosk(({ params }) => markNoShow(db, clock, passage, params["collectionPointId"]!, params["orderId"]!)),
   );
+
+  if (testClock) {
+    router.add("PUT", "/internal/test/clock", service(async ({ req }) => {
+      testClock.set(parseClockRequest(await readJson(req)));
+      return { status: 200, body: { now: clock().toISOString() } };
+    }));
+  }
 
   return createServer((req, res) => void router.handle(req, res));
 }

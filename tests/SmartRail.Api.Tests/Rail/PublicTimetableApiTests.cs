@@ -25,11 +25,11 @@ public class StationsApiTests(TimetableApi api) : IClassFixture<TimetableApi>
         await api.MigrateAndSeedAsync();
         var second = await GetStationsAsync();
 
-        Assert.Equal(5, first.GetArrayLength());
+        Assert.Equal(7, first.GetArrayLength());
         Assert.Equal(first.GetRawText(), second.GetRawText());
 
         var codes = first.EnumerateArray().Select(s => s.GetProperty("code").GetString()).ToList();
-        Assert.Equal(["FOT", "GPH", "MDA", "RGM", "VEY"], codes);
+        Assert.Equal(["FOT", "GPH", "MDA", "PDN", "PLG", "RGM", "VEY"], codes);
         Assert.Equal(codes.Count, first.EnumerateArray().Select(s => s.GetProperty("id").GetGuid()).Distinct().Count());
         Assert.Equal("Gampaha", first.EnumerateArray().Single(s => s.GetProperty("code").GetString() == "GPH")
             .GetProperty("nameEn").GetString());
@@ -52,7 +52,7 @@ public class StationsApiTests(TimetableApi api) : IClassFixture<TimetableApi>
             Assert.Equal(patterns, await db.ServicePatterns.CountAsync());
             Assert.Equal(journeys, await db.Journeys.CountAsync());
         });
-        Assert.Equal(5, patterns);
+        Assert.Equal(6, patterns);
     }
 }
 
@@ -74,9 +74,9 @@ public class JourneysApiTests(TimetableApi api) : IClassFixture<TimetableApi>
         var wednesday = await GetJourneysAsync("2026-10-14");
         var saturday = await GetJourneysAsync("2026-10-17");
 
-        Assert.Equal(["SIM-1001", "SIM-1002", "SIM-1003", "SIM-2001", "SIM-9001"], Trains(wednesday));
+        Assert.Equal(["SIM-1001", "SIM-1002", "SIM-1003", "SIM-2001", "SIM-3001", "SIM-9001"], Trains(wednesday));
         // The weekday-only trains do not run on Saturday.
-        Assert.Equal(["SIM-1003", "SIM-2001", "SIM-9001"], Trains(saturday));
+        Assert.Equal(["SIM-1003", "SIM-2001", "SIM-3001", "SIM-9001"], Trains(saturday));
     }
 
     [RequiresDatabaseFact]

@@ -19,7 +19,7 @@ namespace SmartRail.Api.Tests.Access;
 
 // The API with a test token signer standing in for Keycloak: the API validates tokens the
 // same way, but trusts this fixture's key instead of fetching Keycloak's.
-public sealed class AccessApi : TimetableApi
+public class AccessApi : TimetableApi
 {
     public const string Issuer = "https://keycloak.test/realms/smartrail";
     public const string Audience = "smartrail-api";

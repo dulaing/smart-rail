@@ -74,12 +74,34 @@ Short local run (with the stack from "Whole stack (Aspire)" and the database pre
     curl -X POST -H "X-SmartRail-Service-Key: demo-key" http://localhost:5111/internal/rail/simulator/journeys/<journeyId>/resume
 
 A train reports only while it is in service (Colombo time): `SIM-1003` 07:20-08:15, `SIM-1001`
-07:35-08:30, `SIM-1002` 08:05-09:00, `SIM-2001` 17:10-18:30 and `SIM-9001` 23:45-00:45. It reports
+07:35-08:30, `SIM-1002` 08:05-09:00, `SIM-2001` 17:10-18:30, `SIM-3001` 09:00-11:50 and `SIM-9001` 23:45-00:45. It reports
 nothing before it first departs and stops after it reaches its last stop; at a stop it waits at
 progress 1000 until the scheduled departure. Pausing stops that journey's reports but not the clock,
 so it goes ageing after three minutes and unknown after four; resuming reports where the train is
 now and does not replay the missed 30-second steps. Reports already stored are never deleted. Pauses
 are kept in memory, so restarting the API resumes every train.
+
+## Food ordering through SmartRail
+
+Passengers order through the API; the API talks to RailBites. Browsing is public: `GET
+/api/journeys/{journeyId}/collection-options` and `GET /api/food/collection-points/{id}/menu`. Ordering
+needs a signed-in passenger: `POST /api/food/orders`, `GET /api/food/orders`, `GET
+/api/food/orders/{id}` and `POST /api/food/orders/{id}/cancellation`. A `202` means RailBites has not
+answered yet; poll the `Location`. The API retries a pending order in the background with the same
+link ID until the provider answers.
+
+| Setting | Default | Meaning |
+| --- | --- | --- |
+| `RailBites:BaseUrl` | none | RailBites address, for example `http://localhost:5200`. |
+| `RailBites:ServiceKey` | none | Must equal RailBites' `RAILBITES_SERVICE_KEY`. With either unset nothing is sent and orders stay pending. |
+| `RailBites:TimeoutSeconds` | `5` | How long one provider call may take before the order is treated as pending. |
+| `Catering:Placement:PollSeconds` | `5` | How often the retry loop looks for pending orders. |
+| `Catering:Placement:SettleSeconds` | `30` | After a lost request, how long to wait before a missing provider order is called refused. |
+| `Catering:Placement:WorkerEnabled` | `true` | Turns the retry loop off (tests run it by hand). |
+
+The corridor train `SIM-3001` (Fort 09:00, Polgahawela 11:00, Peradeniya 11:50, daily) is seeded for
+food ordering. The API tests start the real RailBites, so build it first
+(`npm --prefix services/railbites ci && npm --prefix services/railbites run build`); a missing build fails the tests.
 
 ## Signing in (Keycloak)
 

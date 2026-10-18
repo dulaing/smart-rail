@@ -23,6 +23,9 @@ public static class DemoTimetableSeeder
         ("RGM", "Ragama", "රාගම", "ராகமை"),
         ("GPH", "Gampaha", "ගම්පහ", "கம்பஹா"),
         ("VEY", "Veyangoda", "වේයන්ගොඩ", "வேயங்கொடை"),
+        // The two RailBites collection points. Their IDs are copied into services/railbites/src/seed.ts.
+        ("PLG", "Polgahawela Junction", "පොල්ගහවෙල හන්දිය", "பொல்கஹவெல சந்தி"),
+        ("PDN", "Peradeniya Junction", "පේරාදෙණිය හන්දිය", "பேராதனை சந்தி"),
     ];
 
     private static readonly PatternSpec[] Patterns =
@@ -54,6 +57,17 @@ public static class DemoTimetableSeeder
             new("RGM", "17:55", "17:56", Platform: "1"),
             new("GPH", "18:15", "18:16", Platform: "2"),
             new("VEY", "18:30", null, Platform: "1"),
+        ]),
+        // The up-country corridor RailBites serves. It ends at Peradeniya, so ending it early at
+        // Polgahawela leaves a food pickup beyond the new final stop.
+        new("SIM-3001", OperatingDays.Every,
+        [
+            new("FOT", null, "09:00", Platform: "6"),
+            new("RGM", "09:25", "09:26", Platform: "1"),
+            new("GPH", "09:45", "09:46", Platform: "2"),
+            new("VEY", "10:05", "10:06", Platform: "1"),
+            new("PLG", "11:00", "11:05", Platform: "3"),
+            new("PDN", "11:50", null, Platform: "1"),
         ]),
         // Crosses midnight: day offset 1 puts the later stops on the next calendar day.
         new("SIM-9001", OperatingDays.Every,

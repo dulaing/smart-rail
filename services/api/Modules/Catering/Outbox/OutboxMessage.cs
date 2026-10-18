@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using SmartRail.Api.Infrastructure;
-using SmartRail.Api.Modules.Operations.Changes;
 
 namespace SmartRail.Api.Modules.Catering.Outbox;
 
@@ -57,36 +56,6 @@ public sealed class CateringOutbox(SmartRailDbContext db, TimeProvider time) : I
             AttemptCount = 0,
             NextAttemptAt = now,
             CreatedAt = now,
-        });
-    }
-}
-
-// Maps the Catering module's tables in the catering schema. Only the outbox exists so far.
-public static class CateringModel
-{
-    public const string Schema = "catering";
-
-    public static void ApplyCateringModel(this ModelBuilder model)
-    {
-        model.Entity<OutboxMessage>(message =>
-        {
-            message.ToTable("outbox_messages", Schema, table =>
-            {
-                table.HasCheckConstraint("ck_outbox_messages_state", "delivery_state IN ('PENDING', 'DELIVERED', 'FAILED')");
-                table.HasCheckConstraint("ck_outbox_messages_attempts", "attempt_count >= 0");
-            });
-            message.HasKey(m => m.Id);
-            message.Property(m => m.Id).HasColumnName("id").ValueGeneratedNever();
-            message.Property(m => m.ServiceChangeId).HasColumnName("service_change_id");
-            message.Property(m => m.EventId).HasColumnName("event_id").HasMaxLength(100);
-            message.Property(m => m.Payload).HasColumnName("payload").HasColumnType("jsonb");
-            message.Property(m => m.DeliveryState).HasColumnName("delivery_state").HasMaxLength(16);
-            message.Property(m => m.AttemptCount).HasColumnName("attempt_count");
-            message.Property(m => m.NextAttemptAt).HasColumnName("next_attempt_at");
-            message.Property(m => m.CreatedAt).HasColumnName("created_at");
-            message.HasIndex(m => m.EventId).IsUnique();
-            message.HasIndex(m => new { m.DeliveryState, m.NextAttemptAt });
-            message.HasOne<ServiceChange>().WithMany().HasForeignKey(m => m.ServiceChangeId).OnDelete(DeleteBehavior.Restrict);
         });
     }
 }
