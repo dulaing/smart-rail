@@ -118,18 +118,33 @@ public static class IncidentEndpoints
         return incident is null ? UnknownIncident() : Results.Ok(await ToDtoAsync(incident, store, names, context));
     }
 
-    // Who did what to this incident and when, oldest first, at most limit entries.
+    // Who did what to this incident and when, oldest first, one bounded page at a time. The
+    // optional cursor continues from a previous page; nextCursor is null at the end of the trail.
     private static async Task<IResult> ReadAudit(
-        Guid incidentId, int? limit, HttpContext context, IncidentStore store, IAuditTrail audit)
+        Guid incidentId, int? limit, string? cursor, HttpContext context, IncidentStore store, IAuditTrail audit)
     {
         if (await store.FindAsync(incidentId, context.RequestAborted) is null)
         {
             return UnknownIncident();
         }
 
+        PageCursor? after = null;
+        if (cursor is not null)
+        {
+            if (!PageCursor.TryDecode(cursor, out var decoded))
+            {
+                return Bad("cursor is not a continuation token from this list.");
+            }
+
+            after = decoded;
+        }
+
         var take = Math.Clamp(limit ?? DefaultAuditLimit, 1, MaxAuditLimit);
-        var entries = await audit.ReadForTargetAsync(IncidentOpener.IncidentTarget, incidentId, take, context.RequestAborted);
-        return Results.Ok(new IncidentAuditDto(incidentId, entries));
+        var page = await audit.ReadPageAsync(
+            [new AuditTargets(IncidentOpener.IncidentTarget, [incidentId])],
+            after?.Time, after?.Id, take, context.RequestAborted);
+        var next = page.HasMore ? new PageCursor(page.Entries[^1].OccurredAt, page.Entries[^1].Id).Encode() : null;
+        return Results.Ok(new IncidentAuditDto(incidentId, page.Entries, next, !page.HasMore));
     }
 
     private static async Task<IncidentDto> ToDtoAsync(

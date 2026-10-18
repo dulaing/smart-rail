@@ -12,8 +12,10 @@ public sealed record ChangeRequest(ChangeDraft? Draft, Guid? WithdrawChangeId, i
 // and the incident it carries, if any. This is a staff response; public reads never show it.
 public sealed record ChangeConfirmedDto(Guid ChangeId, int JourneyVersion, ConfirmedStateDto State, Guid? IncidentId = null);
 
-// The audit trail of one journey, oldest first.
-public sealed record JourneyAuditDto(Guid JourneyId, IReadOnlyList<AuditRecord> Entries);
+// One oldest-first page of a journey's audit trail. nextCursor continues to the next page and is
+// null at the end of the history; complete says whether this page reached that end.
+public sealed record JourneyAuditDto(
+    Guid JourneyId, IReadOnlyList<AuditRecord> Entries, string? NextCursor, bool Complete);
 
 public sealed record ChangeDetailsDto(
     string Kind, int? DelayMinutes, string? NewPlatform, Guid? TargetStopId, Guid? FinalStopId)
