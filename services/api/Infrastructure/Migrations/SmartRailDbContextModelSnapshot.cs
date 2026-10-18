@@ -117,6 +117,34 @@ namespace SmartRail.Api.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("SmartRail.Api.Modules.Access.FollowedJourney", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("account_id");
+
+                    b.Property<DateTimeOffset>("FollowedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("followed_at");
+
+                    b.Property<Guid>("JourneyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("journey_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JourneyId");
+
+                    b.HasIndex("AccountId", "JourneyId")
+                        .IsUnique();
+
+                    b.ToTable("followed_journeys", "passenger");
+                });
+
             modelBuilder.Entity("SmartRail.Api.Modules.Access.JourneyAssignment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -211,6 +239,36 @@ namespace SmartRail.Api.Infrastructure.Migrations
                     b.HasKey("RoleId", "PermissionCode");
 
                     b.ToTable("role_permissions", "identity");
+                });
+
+            modelBuilder.Entity("SmartRail.Api.Modules.Access.SavedRoute", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("account_id");
+
+                    b.Property<Guid>("DestinationStationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("destination_station_id");
+
+                    b.Property<Guid>("OriginStationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("origin_station_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DestinationStationId");
+
+                    b.HasIndex("OriginStationId");
+
+                    b.HasIndex("AccountId", "OriginStationId", "DestinationStationId")
+                        .IsUnique();
+
+                    b.ToTable("saved_routes", "passenger");
                 });
 
             modelBuilder.Entity("SmartRail.Api.Modules.Catering.Callbacks.WebhookReceipt", b =>
@@ -915,6 +973,21 @@ namespace SmartRail.Api.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SmartRail.Api.Modules.Access.FollowedJourney", b =>
+                {
+                    b.HasOne("SmartRail.Api.Modules.Access.Account", null)
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartRail.Api.Modules.Rail.Timetable.ScheduledJourney", null)
+                        .WithMany()
+                        .HasForeignKey("JourneyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("SmartRail.Api.Modules.Access.JourneyAssignment", b =>
                 {
                     b.HasOne("SmartRail.Api.Modules.Access.Account", null)
@@ -958,6 +1031,27 @@ namespace SmartRail.Api.Infrastructure.Migrations
                         .WithMany("Permissions")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SmartRail.Api.Modules.Access.SavedRoute", b =>
+                {
+                    b.HasOne("SmartRail.Api.Modules.Access.Account", null)
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartRail.Api.Modules.Rail.Timetable.Station", null)
+                        .WithMany()
+                        .HasForeignKey("DestinationStationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartRail.Api.Modules.Rail.Timetable.Station", null)
+                        .WithMany()
+                        .HasForeignKey("OriginStationId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 

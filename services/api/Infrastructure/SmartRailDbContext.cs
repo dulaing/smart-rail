@@ -29,6 +29,8 @@ public sealed class SmartRailDbContext(DbContextOptions<SmartRailDbContext> opti
     public DbSet<RoleGrant> RoleGrants => Set<RoleGrant>();
     public DbSet<JourneyAssignment> JourneyAssignments => Set<JourneyAssignment>();
     public DbSet<AuditEntry> AuditEntries => Set<AuditEntry>();
+    public DbSet<SavedRoute> SavedRoutes => Set<SavedRoute>();
+    public DbSet<FollowedJourney> FollowedJourneys => Set<FollowedJourney>();
 
     public DbSet<JourneyChangeVersion> JourneyVersions => Set<JourneyChangeVersion>();
     public DbSet<ServiceChange> ServiceChanges => Set<ServiceChange>();
@@ -43,6 +45,7 @@ public sealed class SmartRailDbContext(DbContextOptions<SmartRailDbContext> opti
     {
         modelBuilder.ApplyRailModel();
         modelBuilder.ApplyAccessModel();
+        modelBuilder.ApplyPassengerModel();
         modelBuilder.ApplyOperationsModel();
         modelBuilder.ApplyReportsModel();
         modelBuilder.ApplyIncidentsModel();
