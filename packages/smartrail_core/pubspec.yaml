@@ -1,0 +1,31 @@
+name: smartrail_core
+description: "SmartRail design foundation for the Flutter apps: generated tokens, theme, StatusBadge, FreshnessLine and the freshness rule."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.13.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  # Noto Sans, Noto Sans Sinhala and Noto Sans Tamil are bundled so text renders offline.
+  # Licences (SIL OFL 1.1) sit next to the files in fonts/. Each file is a variable font; the
+  # theme sets the weight axis explicitly.
+  fonts:
+    - family: NotoSans
+      fonts:
+        - asset: fonts/NotoSans-Variable.ttf
+    - family: NotoSansSinhala
+      fonts:
+        - asset: fonts/NotoSansSinhala-Variable.ttf
+    - family: NotoSansTamil
+      fonts:
+        - asset: fonts/NotoSansTamil-Variable.ttf

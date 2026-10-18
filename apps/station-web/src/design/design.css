@@ -1,0 +1,51 @@
+/* Thin renderers for the shared status language. Colours and sizes come from
+   shared/design/generated/tokens.css; this file only lays them out. */
+
+.sr-tone-neutral { --tone-bg: var(--sr-tone-neutral-bg); --tone-ink: var(--sr-tone-neutral-ink); --tone-edge: var(--sr-tone-neutral-edge); }
+.sr-tone-accent { --tone-bg: var(--sr-tone-accent-bg); --tone-ink: var(--sr-tone-accent-ink); --tone-edge: var(--sr-tone-accent-edge); }
+.sr-tone-success { --tone-bg: var(--sr-tone-success-bg); --tone-ink: var(--sr-tone-success-ink); --tone-edge: var(--sr-tone-success-edge); }
+.sr-tone-warning { --tone-bg: var(--sr-tone-warning-bg); --tone-ink: var(--sr-tone-warning-ink); --tone-edge: var(--sr-tone-warning-edge); }
+.sr-tone-danger { --tone-bg: var(--sr-tone-danger-bg); --tone-ink: var(--sr-tone-danger-ink); --tone-edge: var(--sr-tone-danger-edge); }
+
+.sr-icon {
+  flex: none;
+  width: 1.2em;
+  height: 1.2em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sr-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  max-width: 100%;
+  padding: 0.2em 0.75em;
+  border: 1.5px solid var(--tone-edge);
+  border-radius: var(--sr-radius-full);
+  background: var(--tone-bg);
+  color: var(--tone-ink);
+  font-size: var(--sr-badge-size, 14px);
+  font-weight: 600;
+  line-height: calc(1.35 * var(--sr-script-line-scale));
+  overflow-wrap: anywhere;
+}
+
+.sr-freshness {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.4em;
+  max-width: 100%;
+  color: var(--tone-ink);
+  font-size: var(--sr-badge-size, 14px);
+  line-height: calc(1.35 * var(--sr-script-line-scale));
+}
+.sr-freshness.sr-tone-neutral { --tone-ink: var(--sr-color-text-secondary); }
+.sr-freshness .sr-icon { margin-top: 0.1em; }
+
+.sr-sample { display: grid; gap: var(--sr-space-24); }
+.sr-sample section { display: grid; gap: var(--sr-space-8); }
+.sr-sample .sr-row { display: flex; flex-wrap: wrap; gap: var(--sr-space-8); }
