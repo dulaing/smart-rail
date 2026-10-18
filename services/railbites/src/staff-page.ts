@@ -115,3 +115,143 @@ ${input.content}
 <script>${input.script}</script>`,
   );
 }
+
+const STATUS_OPTIONS: { value: string; label: string }[] = [
+  { value: "OPEN", label: "Open" },
+  { value: "COMPLETED", label: "Completed" },
+  { value: "ALL", label: "All" },
+  { value: "ACCEPTED", label: "Accepted" },
+  { value: "READY", label: "Ready" },
+  { value: "COLLECTED", label: "Collected" },
+  { value: "NO_SHOW", label: "No show" },
+  { value: "CANCELLED", label: "Cancelled" },
+];
+
+// The orders view: a status filter and a list that the page script keeps current.
+export function staffOrdersContent(): string {
+  const options = STATUS_OPTIONS.map((option) => `<option value="${escape(option.value)}">${escape(option.label)}</option>`).join("");
+  return `<div class="row">
+  <label for="status">Show</label>
+  <select id="status">${options}</select>
+  <button id="refresh" type="button" class="secondary">Refresh</button>
+  <span id="refreshed" class="muted" aria-live="polite"></span>
+</div>
+<p id="message" class="muted" role="status" aria-live="polite"></p>
+<div id="orders" aria-live="polite"></div>`;
+}
+
+// The page script. It polls while the tab is visible, keeps the highest status sequence it has seen
+// per order so a late read cannot undo a terminal result, and treats a lost session as a sign-out.
+export function staffOrdersScript(): string {
+  return `(function () {
+  var sequences = {};
+  var timer = null;
+  var statusEl = document.getElementById("status");
+  var messageEl = document.getElementById("message");
+  var ordersEl = document.getElementById("orders");
+  var refreshedEl = document.getElementById("refreshed");
+
+  function setMessage(text, isError) {
+    messageEl.textContent = text || "";
+    messageEl.className = isError ? "error" : "muted";
+  }
+  function fmt(instant) { return instant ? new Date(instant).toLocaleString() : "unknown"; }
+  function age(evidenceAt) {
+    if (!evidenceAt) return "no evidence";
+    var seconds = Math.max(0, Math.round((Date.now() - Date.parse(evidenceAt)) / 1000));
+    if (seconds < 180) return seconds + "s old";
+    if (seconds < 240) return "ageing (" + seconds + "s)";
+    return "stale, position unknown (" + seconds + "s)";
+  }
+  function matches(order) {
+    var filter = statusEl.value;
+    if (!filter || filter === "ALL") return true;
+    if (filter === "OPEN") return order.status === "ACCEPTED" || order.status === "READY";
+    if (filter === "COMPLETED") return order.status === "COLLECTED" || order.status === "NO_SHOW" || order.status === "CANCELLED";
+    return order.status === filter;
+  }
+  function textNode(tag, className) {
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    return node;
+  }
+  function orderCard(order) {
+    var card = textNode("section", "card");
+    card.setAttribute("data-order", order.id);
+    var head = textNode("div", "row");
+    var title = textNode("strong", "grow");
+    title.textContent = order.trainNumber + " · " + order.serviceDate;
+    var status = textNode("span", "status status-" + order.status);
+    status.textContent = order.status;
+    head.appendChild(title);
+    head.appendChild(status);
+    card.appendChild(head);
+
+    var items = textNode("ul", "items");
+    (order.items || []).forEach(function (item) {
+      var line = document.createElement("li");
+      line.textContent = item.quantity + " × " + item.name;
+      items.appendChild(line);
+    });
+    card.appendChild(items);
+
+    var times = textNode("p", "muted");
+    var pickup = order.pickupTime || {};
+    times.textContent = "Pickup: scheduled " + fmt(pickup.scheduledArrival) +
+      (pickup.estimatedArrival ? " · last reported " + fmt(pickup.estimatedArrival) : " · reported time unknown") +
+      " · evidence " + age(pickup.etaEvidenceAt);
+    card.appendChild(times);
+
+    if (order.cancellationReason) {
+      var reason = textNode("p", "status status-CANCELLED");
+      reason.textContent = "Cancelled: " + String(order.cancellationReason).replace(/_/g, " ").toLowerCase();
+      card.appendChild(reason);
+    }
+    return card;
+  }
+  function render(orders) {
+    ordersEl.textContent = "";
+    var visible = orders.filter(matches);
+    if (!visible.length) {
+      var empty = textNode("p", "muted");
+      empty.textContent = "No orders to show.";
+      ordersEl.appendChild(empty);
+      return;
+    }
+    visible.forEach(function (order) {
+      if (sequences[order.id] !== undefined && order.statusSequence < sequences[order.id]) return;
+      sequences[order.id] = order.statusSequence;
+      ordersEl.appendChild(orderCard(order));
+    });
+  }
+  function refresh() {
+    return fetch("/staff/orders", { headers: { "Accept": "application/json" }, cache: "no-store" })
+      .then(function (res) {
+        if (res.status === 401) { window.location.assign("/staff/login"); throw { signedOut: true }; }
+        if (!res.ok) throw new Error("load failed");
+        return res.json();
+      })
+      .then(function (data) {
+        setMessage("");
+        render(data.orders || []);
+        refreshedEl.textContent = "Updated " + new Date().toLocaleTimeString();
+      })
+      .catch(function (error) {
+        if (error && error.signedOut) return;
+        setMessage("Could not load orders. Retrying…", true);
+      });
+  }
+  function schedule() {
+    if (timer) clearInterval(timer);
+    if (document.visibilityState === "visible") timer = setInterval(refresh, 15000);
+  }
+  document.getElementById("refresh").addEventListener("click", refresh);
+  statusEl.addEventListener("change", refresh);
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible") refresh();
+    schedule();
+  });
+  refresh();
+  schedule();
+})();`;
+}

@@ -115,3 +115,36 @@ export function serviceHeaders(key: string = SERVICE_KEY): Record<string, string
 export function kioskHeaders(collectionPointId: string): Record<string, string> {
   return { "X-RailBites-Kiosk-Key": KIOSK_KEYS.get(collectionPointId)! };
 }
+
+function setCookie(response: Response, name: string): string {
+  const raw = response.headers.getSetCookie().find((value) => value.startsWith(`${name}=`));
+  if (!raw) throw new Error(`expected a ${name} cookie`);
+  return raw.split(";")[0]!;
+}
+
+function csrfField(html: string): string {
+  const match = /name="csrf" value="([^"]+)"/.exec(html);
+  if (!match) throw new Error("expected a CSRF token in the page");
+  return match[1]!;
+}
+
+// Sign in through the real login form and return the session cookie plus its CSRF token, so a test
+// can reach the session-protected staff routes exactly as the browser does.
+export async function staffSignIn(
+  app: TestApp,
+  point = "peradeniya-junction",
+  password = STAFF_PASSWORD,
+): Promise<{ status: number; cookie: string; csrf: string }> {
+  const form = await fetch(`${app.baseUrl}/staff/login`, { redirect: "manual" });
+  const loginCookie = setCookie(form, "railbites_kiosk_login");
+  const loginCsrf = csrfField(await form.text());
+  const response = await fetch(`${app.baseUrl}/staff/login`, {
+    method: "POST",
+    redirect: "manual",
+    headers: { "Content-Type": "application/x-www-form-urlencoded", Cookie: loginCookie },
+    body: new URLSearchParams({ collectionPointId: point, password, csrf: loginCsrf }),
+  });
+  const cookie = setCookie(response, "railbites_kiosk_session");
+  const page = await fetch(`${app.baseUrl}/staff`, { headers: { Cookie: cookie } });
+  return { status: response.status, cookie, csrf: csrfField(await page.text()) };
+}

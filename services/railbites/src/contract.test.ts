@@ -58,6 +58,17 @@ test("the contract covers the operations the boundary needs", () => {
   }
 });
 
+test("the kiosk order schema stays secret-free and carries train identity", () => {
+  const kiosk = contract.components["schemas"]!["KioskOrder"] as {
+    required?: string[];
+    properties?: Record<string, unknown>;
+  };
+  assert.ok(kiosk.required?.includes("trainNumber"));
+  assert.ok(kiosk.required?.includes("serviceDate"));
+  assert.ok(kiosk.required?.includes("pickupStopId"));
+  assert.ok(!("pickupCode" in (kiosk.properties ?? {})), "the kiosk schema must never expose the pickup code");
+});
+
 test("only the health routes and the signed callback skip a credential", () => {
   const open = operations()
     .filter((o) => Array.isArray(o.operation.security) && o.operation.security.length === 0)

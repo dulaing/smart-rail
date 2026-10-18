@@ -3,11 +3,12 @@ import { collectionPointName } from "./catalog";
 import type { Config } from "./config";
 import type { Db } from "./db";
 import { ApiError, type Reply, type Router } from "./http";
+import { listOrders } from "./kiosk";
 import { readForm } from "./parse";
 import type { StaffSession } from "./sessions";
 import { randomToken, type SessionStore } from "./sessions";
 import { sameToken, verifyPassword } from "./staff-auth";
-import { loginPage, staffPage } from "./staff-page";
+import { loginPage, staffOrdersContent, staffOrdersScript, staffPage } from "./staff-page";
 import type { PassageReader } from "./smartrail";
 
 export const SESSION_COOKIE = "railbites_kiosk_session";
@@ -191,10 +192,16 @@ export function registerStaffRoutes(router: Router, deps: StaffDeps): void {
         pointName: collectionPointName(deps.db, session.collectionPointId),
         pointId: session.collectionPointId,
         csrfToken: session.csrfToken,
-        content: `<p class="muted">Signed in. The order list is being prepared.</p>`,
-        script: "void 0;",
+        content: staffOrdersContent(),
+        script: staffOrdersScript(),
       }),
       headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" },
     };
+  });
+
+  // The page polls this list. The point comes from the session, so another point's orders are absent.
+  router.add("GET", "/staff/orders", (ctx) => {
+    const session = requireSession(deps, ctx.req);
+    return { ...listOrders(deps.db, session.collectionPointId, ctx.url.searchParams.get("status")), headers: { "Cache-Control": "no-store" } };
   });
 }

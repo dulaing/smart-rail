@@ -83,11 +83,15 @@ export function orderView(db: Db, order: OrderRow) {
   };
 }
 
-// What kiosk staff see: no pickup code and nothing about the passenger.
+// What kiosk staff see: no pickup code and nothing about the passenger. Train identity is useful
+// and not secret, so staff can match an order to the train and date they are working.
 export function kioskView(db: Db, order: OrderRow) {
   return {
     id: order.id,
     collectionPointId: order.collection_point_id,
+    trainNumber: order.train_number,
+    serviceDate: order.service_date,
+    pickupStopId: order.pickup_stop_id,
     status: order.status,
     statusSequence: order.status_sequence,
     items: itemsOf(db, order.id),
