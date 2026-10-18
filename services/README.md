@@ -303,6 +303,8 @@ the server, never from the request body.
 
 | Request | Who | Result |
 | --- | --- | --- |
+| `GET /api/driver/journeys?serviceDate=yyyy-MM-dd` | assigned driver (`driver.briefing.read`) | The caller's own journeys on that date; `200` with an empty list when none, `403` without the permission. ETag, `private`. |
+| `GET /api/driver/journeys/{journeyId}/briefing` | assigned driver (`driver.briefing.read`) | Dated stop IDs, timetable, running evidence with its thresholds and the confirmed changes with who confirmed each and when (`confirmedByName` is `null` when unknown). `404` unknown journey, `403` not assigned. ETag and `X-SmartRail-Server-Time`. The public `/api/journeys/{id}/changes` still names nobody. |
 | `POST /api/driver/journeys/{journeyId}/reports` `{ "clientReportId", "reasonCode" }` | assigned driver (`driver.reports.create`) | `201` new, `200` an identical retry with the report's current state. Reason codes: `TRAIN_FAULT`, `SIGNAL_DELAY`, `OBSTRUCTION`, `CANNOT_CONTINUE`. A key already used for different input is a generic `409`. |
 | `GET /api/driver/journeys/{journeyId}/reports[?clientReportId=&limit=&cursor=]` and `.../{reportId}` | assigned driver (`driver.reports.read`) | Only the caller's own reports; another driver's report is `404`. |
 | `GET /api/operations/reports[?journeyId=&acknowledged=&limit=&cursor=]` and `.../{reportId}` | Controller (`incidents.manage`) | The report inbox, newest first. |
