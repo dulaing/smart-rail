@@ -25,6 +25,11 @@ public static class CateringSetup
             builder.Services.AddScoped<OrderCreator>();
             builder.Services.AddScoped<OrderCanceller>();
             builder.Services.AddHostedService<PlacementWorker>();
+
+            builder.Services.Configure<OutboxOptions>(builder.Configuration.GetSection(OutboxOptions.Section));
+            builder.Services.AddScoped<OutboxUpgrader>();
+            builder.Services.AddScoped<OutboxDispatcher>();
+            builder.Services.AddHostedService<OutboxWorker>();
         }
     }
 

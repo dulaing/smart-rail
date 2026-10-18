@@ -614,7 +614,7 @@ components:
       description: |
         Every event carries the full eligibility and the pickup-time snapshot of every stop on the
         journey, so a newer version supersedes older events, including a delay withdrawal.
-      required: [eventId, eventType, journey, stops, occurredAt]
+      required: [eventId, eventType, journey, stops, calculatedAt, occurredAt]
       properties:
         eventId: { type: string, description: Stable across retries }
         eventType: { enum: [DELAY, CANCEL, EARLY_END, WITHDRAWAL] }
@@ -622,6 +622,10 @@ components:
         stops:
           type: array
           items: { $ref: "#/components/schemas/Pickup" }
+        calculatedAt:
+          type: string
+          format: date-time
+          description: When SmartRail calculated the pickup times, from the post-change state.
         occurredAt: { type: string, format: date-time }
     OrderUpdate:
       type: object

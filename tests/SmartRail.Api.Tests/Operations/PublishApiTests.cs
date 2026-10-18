@@ -56,7 +56,7 @@ public class PublishApiTests(AccessApi api) : IClassFixture<AccessApi>
     public async Task A_delay_is_confirmed_with_its_audit_row_and_catering_message()
     {
         var actor = await api.AddAccountAsync("pub-controller-1", roles: Roles.Controller);
-        var (journeyId, _) = await NextJourneyAsync();
+        var (journeyId, stops) = await NextJourneyAsync();
 
         var version = await PreviewedVersionAsync("pub-controller-1", journeyId, ChangeBodies.Delay(25));
         var response = await api.ConfirmAsync("pub-controller-1", journeyId, ChangeBodies.Delay(25).WithVersion(version));
@@ -77,11 +77,24 @@ public class PublishApiTests(AccessApi api) : IClassFixture<AccessApi>
         Assert.Equal(("change.publish.delay", "SUCCEEDED", "JOURNEY", (Guid?)journeyId), (audit.Action, audit.Outcome, audit.TargetType, audit.TargetId));
 
         var message = Assert.Single(await OutboxPayloadsAsync(journeyId)).RootElement;
-        Assert.Equal(1, message.GetProperty("journey_version").GetInt32());
-        Assert.Equal("DELAY", message.GetProperty("change_kind").GetString());
-        Assert.Equal(25, message.GetProperty("confirmed_delay_minutes").GetInt32());
-        Assert.False(message.GetProperty("order_closed").GetBoolean());
-        Assert.Equal(0, message.GetProperty("blocked_pickup_stop_ids").GetArrayLength());
+        var journey = message.GetProperty("journey");
+        Assert.Equal(1, journey.GetProperty("version").GetInt32());
+        Assert.Equal("DELAY", message.GetProperty("eventType").GetString());
+        Assert.Equal($"train-change:{changeId}", message.GetProperty("eventId").GetString());
+        Assert.False(journey.GetProperty("orderClosed").GetBoolean());
+        Assert.Equal(0, journey.GetProperty("blockedPickupStopIds").GetArrayLength());
+
+        // Every stop with a scheduled arrival carries its time. This seeded journey has no sighting,
+        // so the estimates are unknown (null), never filled in from the schedule.
+        var pickups = message.GetProperty("stops").EnumerateArray().ToList();
+        Assert.Equal(stops.Count - 1, pickups.Count);
+        Assert.All(pickups, stop =>
+        {
+            Assert.NotEqual(JsonValueKind.Null, stop.GetProperty("scheduledArrival").ValueKind);
+            Assert.Equal(JsonValueKind.Null, stop.GetProperty("estimatedArrival").ValueKind);
+            Assert.Equal(JsonValueKind.Null, stop.GetProperty("etaEvidenceAt").ValueKind);
+        });
+        Assert.NotEqual(JsonValueKind.Null, message.GetProperty("calculatedAt").ValueKind);
 
         // The public read now shows it, with no staff identity.
         var state = await (await api.Client.GetAsync($"/api/journeys/{journeyId}/changes")).JsonAsync();
@@ -100,15 +113,16 @@ public class PublishApiTests(AccessApi api) : IClassFixture<AccessApi>
         await api.ConfirmAsync("pub-controller-2", earlyJourney, ChangeBodies.EarlyEnd(stops[1].StopId).WithVersion(0));
 
         var cancel = Assert.Single(await OutboxPayloadsAsync(cancelJourney)).RootElement;
-        Assert.True(cancel.GetProperty("order_closed").GetBoolean());
-        Assert.Equal(0, cancel.GetProperty("blocked_pickup_stop_ids").GetArrayLength());
+        Assert.True(cancel.GetProperty("journey").GetProperty("orderClosed").GetBoolean());
+        Assert.Equal("CANCEL", cancel.GetProperty("eventType").GetString());
+        Assert.Equal(0, cancel.GetProperty("journey").GetProperty("blockedPickupStopIds").GetArrayLength());
 
         var early = Assert.Single(await OutboxPayloadsAsync(earlyJourney)).RootElement;
-        Assert.False(early.GetProperty("order_closed").GetBoolean());
-        Assert.Equal("EARLY_END", early.GetProperty("change_kind").GetString());
+        Assert.False(early.GetProperty("journey").GetProperty("orderClosed").GetBoolean());
+        Assert.Equal("EARLY_END", early.GetProperty("eventType").GetString());
         Assert.Equal(
             stops.Skip(2).Select(s => s.StopId),
-            early.GetProperty("blocked_pickup_stop_ids").EnumerateArray().Select(e => e.GetGuid()));
+            early.GetProperty("journey").GetProperty("blockedPickupStopIds").EnumerateArray().Select(e => e.GetGuid()));
     }
 
     [RequiresDatabaseFact]

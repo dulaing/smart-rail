@@ -16,6 +16,9 @@ public enum ProxyMode
 
     // RailBites handles the request and commits, but the caller never gets the answer.
     DropResponse,
+
+    // RailBites is reached but answers 503, as a service does while it is overloaded or restarting.
+    ServiceUnavailable,
 }
 
 // A forwarding proxy that can lose a request or its response, to reproduce a timeout on either
@@ -53,6 +56,12 @@ public sealed class FlakyProxy : IAsyncDisposable
             if (proxy!.Mode == ProxyMode.DropRequest)
             {
                 context.Abort();
+                return;
+            }
+
+            if (proxy.Mode == ProxyMode.ServiceUnavailable)
+            {
+                context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
                 return;
             }
 

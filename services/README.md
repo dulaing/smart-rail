@@ -98,6 +98,15 @@ link ID until the provider answers.
 | `Catering:Placement:PollSeconds` | `5` | How often the retry loop looks for pending orders. |
 | `Catering:Placement:SettleSeconds` | `30` | After a lost request, how long to wait before a missing provider order is called refused. |
 | `Catering:Placement:WorkerEnabled` | `true` | Turns the retry loop off (tests run it by hand). |
+| `Catering:Outbox:PollSeconds` | `5` | How often confirmed train changes are sent to RailBites. |
+| `Catering:Outbox:MaxBackoffSeconds` | `300` | Longest wait between retries after a timeout or 503 (waits grow 2, 4, 8 ... seconds). |
+| `Catering:Outbox:FailedRetrySeconds` | `600` | Wait before retrying a change RailBites refused or a rejected credential; the change is kept, never dropped. |
+| `Catering:Outbox:WorkerEnabled` | `true` | Turns the delivery loop off (tests run it by hand). |
+
+A confirmed delay, cancellation, early ending or withdrawal is saved with its audit row and a message
+for RailBites in one PostgreSQL transaction, so RailBites can be down without losing it. The message
+carries the post-change eligibility and every stop's pickup time. `dotnet run --project services/api -- --migrate-and-seed`
+also rewrites any undelivered message queued before pickup times existed (it is never marked delivered by that step).
 
 The corridor train `SIM-3001` (Fort 09:00, Polgahawela 11:00, Peradeniya 11:50, daily) is seeded for
 food ordering. The API tests start the real RailBites, so build it first

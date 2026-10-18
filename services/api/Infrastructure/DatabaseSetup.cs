@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SmartRail.Api.Modules.Access;
+using SmartRail.Api.Modules.Catering.Outbox;
 using SmartRail.Api.Modules.Operations.Changes;
 using SmartRail.Api.Modules.Rail;
 using SmartRail.Api.Modules.Rail.Timetable;
@@ -34,6 +35,10 @@ public static class DatabaseSetup
             ?? ColomboTime.ServiceDateOf(TimeProvider.System.GetUtcNow());
         var days = app.Configuration.GetValue("Seed:Days", 7);
         await SeedAsync(db, start, days);
+
+        // Messages queued for RailBites before pickup times existed are rewritten, never dropped or
+        // sent as they are.
+        await scope.ServiceProvider.GetRequiredService<OutboxUpgrader>().UpgradeAllAsync(default);
     }
 
     // The seed data every database needs: the role matrix, the demo timetable and a change

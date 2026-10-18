@@ -97,3 +97,22 @@ export function stockOf(app: TestApp, menuItemId: string): number {
 export function count(app: TestApp, table: string): number {
   return (app.db.prepare(`SELECT count(*) n FROM ${table}`).get() as { n: number }).n;
 }
+
+// A confirmed train change as SmartRail delivers it: full eligibility plus every stop's pickup time.
+export function journeyEvent(overrides: Body = {}): Body {
+  return {
+    eventId: `train-change:${randomUUID()}`,
+    eventType: "DELAY",
+    journey: snapshot({ version: 2 }),
+    stops: [polgahawelaPickup(), peradeniyaPickup()],
+    calculatedAt: "2026-10-18T05:00:00.000Z",
+    occurredAt: "2026-10-18T05:00:00.000Z",
+    ...overrides,
+  };
+}
+
+export const deliver = (app: TestApp, body: unknown) =>
+  call(app, "POST", "/v1/journey-events", { headers: serviceHeaders(), body });
+
+export const placePolgahawela = (app: TestApp, linkId: string) =>
+  place(app, linkId, placement({ collectionPointId: "polgahawela-junction", pickup: polgahawelaPickup(), items: [{ menuItemId: "plg-plain-tea", quantity: 1 }] }));

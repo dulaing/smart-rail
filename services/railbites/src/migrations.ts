@@ -101,6 +101,25 @@ const migrations: Migration[] = [
       CREATE INDEX webhook_outbox_pending ON webhook_outbox (next_attempt_at) WHERE delivered_at IS NULL;
     `,
   },
+  {
+    id: 3,
+    name: "received train-change events",
+    sql: `
+      -- One row per train-change event ever received, written in the same transaction as its effects.
+      -- content_digest lets a repeat of the same event id be told from a different message under it.
+      CREATE TABLE received_events (
+        event_id TEXT PRIMARY KEY,
+        journey_id TEXT NOT NULL,
+        journey_version INTEGER NOT NULL,
+        event_type TEXT NOT NULL,
+        content_digest TEXT NOT NULL,
+        result TEXT NOT NULL CHECK (result IN ('APPLIED', 'STALE')),
+        received_at TEXT NOT NULL
+      ) STRICT;
+
+      CREATE INDEX received_events_by_journey ON received_events (journey_id, journey_version);
+    `,
+  },
 ];
 
 // Explicit setup, run once at start-up. Safe to run again: applied migrations are skipped.

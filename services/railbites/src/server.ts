@@ -3,6 +3,7 @@ import { requireKiosk, requireService } from "./auth";
 import { getCollectionPoint, getMenu, listCollectionPoints } from "./catalog";
 import type { Config } from "./config";
 import type { Db } from "./db";
+import { receiveJourneyEvent } from "./events";
 import { ApiError, Router } from "./http";
 import { listOrders, markCollected, markNoShow, markReady } from "./kiosk";
 import { isUuid, readJson } from "./parse";
@@ -40,6 +41,8 @@ export function createApp({ config, db, clock: suppliedClock, passage = httpPass
     "/v1/order-links/:orderLinkId/cancellation",
     service(async ({ req, params }) => cancelOrder(db, clock(), linkId(params), await readJson(req))),
   );
+
+  router.add("POST", "/v1/journey-events", service(async ({ req }) => receiveJourneyEvent(db, clock(), await readJson(req))));
 
   const orders = "/v1/kiosk/collection-points/:collectionPointId/orders";
   router.add("GET", orders, kiosk(({ url, params }) => listOrders(db, params["collectionPointId"]!, url.searchParams.get("status"))));

@@ -2,6 +2,7 @@ using SmartRail.Api.Infrastructure;
 using SmartRail.Api.Modules.Access;
 using SmartRail.Api.Modules.Catering;
 using SmartRail.Api.Modules.Operations.Incidents;
+using SmartRail.Api.Modules.Rail;
 using Microsoft.EntityFrameworkCore;
 
 namespace SmartRail.Api.Modules.Operations.Changes;
@@ -23,7 +24,7 @@ public abstract record ConfirmResult
 // incident also holds that incident open for the transaction, so a resolution cannot slip in
 // between the check and the commit.
 public sealed class ChangeConfirmer(
-    SmartRailDbContext db, IAuditTrail audit, ICateringOutbox outbox, ChangeStore store, TimeProvider time)
+    SmartRailDbContext db, IAuditTrail audit, ICateringOutbox outbox, IPickupReader pickups, ChangeStore store, TimeProvider time)
 {
     public async Task<ConfirmResult> ConfirmAsync(
         HttpContext context, Guid actorId, OperationsJourney journey, JourneyChanges loaded, ChangePreview preview,
@@ -85,15 +86,25 @@ public sealed class ChangeConfirmer(
         // A platform change is not food-related, so RailBites needs no message for it.
         if (kind != ChangeKind.Platform)
         {
+            // Pickup times are calculated now, from the state after this change, and queued with the
+            // change itself, so RailBites never has to guess them and a retry never recalculates.
+            var after = ConfirmedChangeReader.From(ConfirmedState.Fold([.. loaded.History, change]));
+            var times = await pickups.ReadAsync(journey.Id, now, after, cancellationToken)
+                ?? throw new InvalidOperationException("The journey disappeared while its change was being confirmed.");
             outbox.Enqueue(new TrainChangeMessage(
                 change.Id,
                 journey.Id,
+                times.TrainNumber,
+                times.ServiceDate,
                 change.JourneyVersion,
                 kind.ToCode(),
                 preview.Action.ToCode(),
-                preview.After.ConfirmedDelayMinutes,
                 preview.After.OrderClosed,
-                preview.After.BlockedPickupStopIds));
+                preview.After.BlockedPickupStopIds,
+                now,
+                times.Stops.Where(s => s.ScheduledArrival is not null)
+                    .Select(s => new TrainChangeStop(s.StopId, s.StationId, s.ScheduledArrival!.Value, s.EstimatedArrival, s.EtaEvidenceAt))
+                    .ToList()));
         }
 
         await db.SaveChangesAsync(cancellationToken);

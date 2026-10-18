@@ -86,12 +86,12 @@ public class WithdrawAndAuditApiTests(AccessApi api) : IClassFixture<AccessApi>
         Assert.Equal(3, messages.Count);
         var ending = messages[1];
         var withdrawal = messages[2];
-        Assert.Equal(3, ending.GetProperty("journey_version").GetInt32());
-        Assert.Equal(stops.Count - 2, ending.GetProperty("blocked_pickup_stop_ids").GetArrayLength());
-        Assert.Equal(4, withdrawal.GetProperty("journey_version").GetInt32());
-        Assert.Equal("WITHDRAW", withdrawal.GetProperty("action").GetString());
-        Assert.Equal(0, withdrawal.GetProperty("blocked_pickup_stop_ids").GetArrayLength());
-        Assert.False(withdrawal.GetProperty("order_closed").GetBoolean());
+        Assert.Equal(3, ending.GetProperty("journey").GetProperty("version").GetInt32());
+        Assert.Equal(stops.Count - 2, ending.GetProperty("journey").GetProperty("blockedPickupStopIds").GetArrayLength());
+        Assert.Equal(4, withdrawal.GetProperty("journey").GetProperty("version").GetInt32());
+        Assert.Equal("WITHDRAWAL", withdrawal.GetProperty("eventType").GetString());
+        Assert.Equal(0, withdrawal.GetProperty("journey").GetProperty("blockedPickupStopIds").GetArrayLength());
+        Assert.False(withdrawal.GetProperty("journey").GetProperty("orderClosed").GetBoolean());
     }
 
     [RequiresDatabaseFact]

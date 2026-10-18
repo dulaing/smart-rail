@@ -365,6 +365,10 @@ namespace SmartRail.Api.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
+                    b.Property<DateTimeOffset?>("DeliveredAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("delivered_at");
+
                     b.Property<string>("DeliveryState")
                         .IsRequired()
                         .HasMaxLength(16)
@@ -377,6 +381,11 @@ namespace SmartRail.Api.Infrastructure.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("event_id");
 
+                    b.Property<string>("LastError")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("last_error");
+
                     b.Property<DateTimeOffset>("NextAttemptAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("next_attempt_at");
@@ -385,6 +394,12 @@ namespace SmartRail.Api.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("jsonb")
                         .HasColumnName("payload");
+
+                    b.Property<int>("PayloadVersion")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasColumnName("payload_version");
 
                     b.Property<Guid>("ServiceChangeId")
                         .HasColumnType("uuid")
@@ -402,6 +417,8 @@ namespace SmartRail.Api.Infrastructure.Migrations
                     b.ToTable("outbox_messages", "catering", t =>
                         {
                             t.HasCheckConstraint("ck_outbox_messages_attempts", "attempt_count >= 0");
+
+                            t.HasCheckConstraint("ck_outbox_messages_payload_version", "payload_version IN (1, 2)");
 
                             t.HasCheckConstraint("ck_outbox_messages_state", "delivery_state IN ('PENDING', 'DELIVERED', 'FAILED')");
                         });

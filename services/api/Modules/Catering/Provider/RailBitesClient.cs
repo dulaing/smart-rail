@@ -16,6 +16,10 @@ public interface IRailBitesClient
     Task<ProviderResponse<ProviderOrder>> LookupAsync(Guid orderLinkId, CancellationToken cancellationToken);
 
     Task<ProviderResponse<ProviderOrder>> CancelAsync(Guid orderLinkId, CancelOrderBody body, CancellationToken cancellationToken);
+
+    // Sends one stored train-change message exactly as it was written. Success means RailBites has
+    // committed it (as new or as a repeat); anything else leaves it to be sent again.
+    Task<ProviderResponse<EventReceipt>> DeliverEventAsync(string payloadJson, CancellationToken cancellationToken);
 }
 
 public sealed class RailBitesClient(HttpClient http, IConfiguration configuration, ILogger<RailBitesClient> logger) : IRailBitesClient
@@ -37,6 +41,9 @@ public sealed class RailBitesClient(HttpClient http, IConfiguration configuratio
     public Task<ProviderResponse<ProviderOrder>> CancelAsync(Guid orderLinkId, CancelOrderBody body, CancellationToken cancellationToken) =>
         SendAsync<ProviderOrder>(HttpMethod.Post, $"/v1/order-links/{orderLinkId}/cancellation", body, cancellationToken);
 
+    public Task<ProviderResponse<EventReceipt>> DeliverEventAsync(string payloadJson, CancellationToken cancellationToken) =>
+        SendAsync<EventReceipt>(HttpMethod.Post, "/v1/journey-events", payloadJson, cancellationToken);
+
     private async Task<ProviderResponse<T>> SendAsync<T>(HttpMethod method, string path, object? body, CancellationToken cancellationToken)
     {
         var baseUrl = configuration["RailBites:BaseUrl"];
@@ -52,7 +59,10 @@ public sealed class RailBitesClient(HttpClient http, IConfiguration configuratio
         request.Headers.Add(ServiceKeyHeader, key);
         if (body is not null)
         {
-            request.Content = JsonContent.Create(body, body.GetType(), options: ProviderJson.Options);
+            // A string is a body that was already written and must not be reformatted.
+            request.Content = body is string json
+                ? new StringContent(json, System.Text.Encoding.UTF8, "application/json")
+                : JsonContent.Create(body, body.GetType(), options: ProviderJson.Options);
         }
 
         try

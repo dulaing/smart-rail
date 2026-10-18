@@ -20,15 +20,19 @@ public static class CateringModel
             {
                 table.HasCheckConstraint("ck_outbox_messages_state", "delivery_state IN ('PENDING', 'DELIVERED', 'FAILED')");
                 table.HasCheckConstraint("ck_outbox_messages_attempts", "attempt_count >= 0");
+                table.HasCheckConstraint("ck_outbox_messages_payload_version", "payload_version IN (1, 2)");
             });
             message.HasKey(m => m.Id);
             message.Property(m => m.Id).HasColumnName("id").ValueGeneratedNever();
             message.Property(m => m.ServiceChangeId).HasColumnName("service_change_id");
             message.Property(m => m.EventId).HasColumnName("event_id").HasMaxLength(100);
             message.Property(m => m.Payload).HasColumnName("payload").HasColumnType("jsonb");
+            message.Property(m => m.PayloadVersion).HasColumnName("payload_version").HasDefaultValue(1);
             message.Property(m => m.DeliveryState).HasColumnName("delivery_state").HasMaxLength(16);
             message.Property(m => m.AttemptCount).HasColumnName("attempt_count");
             message.Property(m => m.NextAttemptAt).HasColumnName("next_attempt_at");
+            message.Property(m => m.DeliveredAt).HasColumnName("delivered_at");
+            message.Property(m => m.LastError).HasColumnName("last_error").HasMaxLength(200);
             message.Property(m => m.CreatedAt).HasColumnName("created_at");
             message.HasIndex(m => m.EventId).IsUnique();
             message.HasIndex(m => new { m.DeliveryState, m.NextAttemptAt });

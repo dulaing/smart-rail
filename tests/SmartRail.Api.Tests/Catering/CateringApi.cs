@@ -7,10 +7,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SmartRail.Api.Modules.Access;
 using SmartRail.Api.Modules.Catering.Orders;
+using SmartRail.Api.Modules.Catering.Outbox;
 using SmartRail.Api.Modules.Operations.Changes;
 using SmartRail.Api.Modules.Rail.Running;
 using SmartRail.Api.Modules.Rail.Timetable;
 using SmartRail.Api.Tests.Access;
+using SmartRail.Api.Tests.Operations;
 using SmartRail.Api.Tests.Rail;
 
 namespace SmartRail.Api.Tests.Catering;
@@ -72,6 +74,7 @@ public class CateringApi : AccessApi
 
         // The tests run the retry pass by hand, at times they choose.
         builder.UseSetting("Catering:Placement:WorkerEnabled", "false");
+        builder.UseSetting("Catering:Outbox:WorkerEnabled", "false");
         builder.ConfigureTestServices(services =>
         {
             services.RemoveAll<TimeProvider>();
@@ -189,6 +192,35 @@ public class CateringApi : AccessApi
         var tried = 0;
         await WithScopeAsync(async services => tried = await services.GetRequiredService<PlacementProcessor>().RunDueAsync(default));
         return tried;
+    }
+
+    // Runs one delivery pass of the train-change outbox, as the background loop would.
+    public async Task<int> RunOutboxPassAsync()
+    {
+        var tried = 0;
+        await WithScopeAsync(async services => tried = await services.GetRequiredService<OutboxDispatcher>().RunDueAsync(default));
+        return tried;
+    }
+
+    // Publishes a change as a controller would (preview, then confirm) and returns its change ID.
+    public async Task<Guid> PublishAsync(Corridor corridor, object body)
+    {
+        var subject = $"publisher-{Guid.NewGuid():N}";
+        await AddAccountAsync(subject, roles: Roles.Controller);
+        var preview = await (await this.PreviewAsync(subject, corridor.JourneyId, body)).JsonAsync();
+        var version = preview.GetProperty("previewedVersion").GetInt32();
+        var confirmed = await this.ConfirmAsync(subject, corridor.JourneyId, body.WithVersion(version));
+        confirmed.EnsureSuccessStatusCode();
+        return (await confirmed.JsonAsync()).GetProperty("changeId").GetGuid();
+    }
+
+    public async Task<List<OutboxMessage>> OutboxOfAsync(Corridor corridor)
+    {
+        var rows = new List<OutboxMessage>();
+        await WithDbAsync(async db => rows = await db.OutboxMessages.AsNoTracking()
+            .Where(m => db.ServiceChanges.Any(c => c.Id == m.ServiceChangeId && c.JourneyId == corridor.JourneyId))
+            .OrderBy(m => m.CreatedAt).ThenBy(m => m.Id).ToListAsync());
+        return rows;
     }
 
     public async Task WithScopeAsync(Func<IServiceProvider, Task> action)

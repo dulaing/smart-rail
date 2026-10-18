@@ -57,6 +57,10 @@ public sealed record CancelOrderBody(JourneySnapshot Journey, PickupSnapshot Pic
 
 public sealed record ProviderError(string Code, string Message);
 
+// RailBites' answer to a delivered train-change message: APPLIED, DUPLICATE or STALE. All three
+// mean it was committed.
+public sealed record EventReceipt(string Result);
+
 public enum ProviderOutcome
 {
     // 200 or 201 with a body.
