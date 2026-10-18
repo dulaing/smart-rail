@@ -56,8 +56,12 @@ export function visibleDestinations(me: Me): Destination[] {
   return destinations.filter((d) => canOpen(me, d))
 }
 
+/** A journey opened from the corridor: /corridor/journeys/{journeyId}. It needs the Corridor permissions. */
+export const journeyPathPattern = /^\/corridor\/journeys\/([^/]+)$/
+
 export function findDestination(path: string): Destination | undefined {
-  return destinations.find((d) => d.path === path)
+  const own = destinations.find((d) => d.path === path)
+  return own ?? (journeyPathPattern.test(path) ? destinations.find((d) => d.path === '/corridor') : undefined)
 }
 
 /** Where someone lands when they open the site root. */

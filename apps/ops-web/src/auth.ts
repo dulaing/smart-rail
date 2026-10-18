@@ -9,7 +9,7 @@ const keycloak = new Keycloak({
   clientId: import.meta.env.VITE_KEYCLOAK_CLIENT_ID ?? 'smartrail-ops-web',
 })
 
-const apiUrl = import.meta.env.VITE_API_URL ?? 'https://localhost:7074'
+export const apiUrl = import.meta.env.VITE_API_URL ?? 'https://localhost:7074'
 
 // The redirect URI is registered exactly in the realm, so send exactly that.
 const appUrl = `${window.location.origin}/`
@@ -53,6 +53,12 @@ export function signIn() {
 /** Clears the in-memory tokens and ends the Keycloak session, then returns to the app. */
 export function signOut() {
   return keycloak.logout({ redirectUri: appUrl })
+}
+
+/** A current access token for staff routes, refreshed when about to expire. Throws when it cannot be refreshed. */
+export async function getAccessToken(): Promise<string | null> {
+  await keycloak.updateToken(30)
+  return keycloak.token ?? null
 }
 
 /** Reads the caller's local account. Always sends an access token, never the ID token. */
