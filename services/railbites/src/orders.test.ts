@@ -600,7 +600,7 @@ describe("durability", () => {
     assert.equal(again.body.status, "READY");
     assert.equal(stockOf(app, "pdn-lamprais"), 24, "reseeding on restart did not reset stock");
     assert.equal(outbox().length, 2);
-    assert.equal((app.db.prepare("SELECT count(*) n FROM schema_migrations").get() as { n: number }).n, 3);
+    assert.equal((app.db.prepare("SELECT count(*) n FROM schema_migrations").get() as { n: number }).n, 4);
     assert.equal(JOURNEY_ID, order.journeyId);
     assert.equal(PERADENIYA_STOP, order.pickupStopId);
   });

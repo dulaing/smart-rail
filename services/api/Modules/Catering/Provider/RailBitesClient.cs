@@ -20,6 +20,17 @@ public interface IRailBitesClient
     // Sends one stored train-change message exactly as it was written. Success means RailBites has
     // committed it (as new or as a repeat); anything else leaves it to be sent again.
     Task<ProviderResponse<EventReceipt>> DeliverEventAsync(string payloadJson, CancellationToken cancellationToken);
+
+    // Whether RailBites says it is ready (its /health/ready, which needs no credential).
+    Task<ProviderReadiness> CheckReadyAsync(CancellationToken cancellationToken);
+}
+
+public enum ProviderReadiness
+{
+    Ready,
+    NotReady,
+    Unreachable,
+    NotConfigured,
 }
 
 public sealed class RailBitesClient(HttpClient http, IConfiguration configuration, ILogger<RailBitesClient> logger) : IRailBitesClient
@@ -43,6 +54,28 @@ public sealed class RailBitesClient(HttpClient http, IConfiguration configuratio
 
     public Task<ProviderResponse<EventReceipt>> DeliverEventAsync(string payloadJson, CancellationToken cancellationToken) =>
         SendAsync<EventReceipt>(HttpMethod.Post, "/v1/journey-events", payloadJson, cancellationToken);
+
+    public async Task<ProviderReadiness> CheckReadyAsync(CancellationToken cancellationToken)
+    {
+        var baseUrl = configuration["RailBites:BaseUrl"];
+        if (string.IsNullOrWhiteSpace(baseUrl))
+        {
+            return ProviderReadiness.NotConfigured;
+        }
+
+        // A health probe must not hang: it gives up well before the order timeout.
+        using var limit = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        limit.CancelAfter(TimeSpan.FromSeconds(2));
+        try
+        {
+            using var response = await http.GetAsync(new Uri(new Uri(baseUrl), "/health/ready"), limit.Token);
+            return response.IsSuccessStatusCode ? ProviderReadiness.Ready : ProviderReadiness.NotReady;
+        }
+        catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException && !cancellationToken.IsCancellationRequested)
+        {
+            return ProviderReadiness.Unreachable;
+        }
+    }
 
     private async Task<ProviderResponse<T>> SendAsync<T>(HttpMethod method, string path, object? body, CancellationToken cancellationToken)
     {

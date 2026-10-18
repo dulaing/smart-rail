@@ -34,6 +34,8 @@ jobs:
       - run: npm --prefix services/railbites ci
       - run: npm --prefix services/railbites run build
       - run: dotnet build services/api/SmartRail.Api.csproj --configuration Release
+      # The local stack's wiring (addresses, secrets, storage) must keep compiling.
+      - run: dotnet build services/apphost/SmartRail.AppHost.csproj --configuration Release
       - run: dotnet test tests/SmartRail.Api.Tests --configuration Release
       - run: docker build -f services/api/Dockerfile .
 
@@ -52,4 +54,6 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm test
+      # The signed callback examples both services check must match the script that makes them.
+      - run: node scripts/make-callback-fixtures.js && git diff --exit-code -- fixtures
       - run: docker build -f ../../services/railbites/Dockerfile ../..

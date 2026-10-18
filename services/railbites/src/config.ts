@@ -10,6 +10,8 @@ export interface Config {
   smartRailBaseUrl: string | undefined;
   /** RailBites' own credential for reading SmartRail; a different secret from `serviceKey`. */
   smartRailServiceKey: string | undefined;
+  /** Credential for the provider's own policy changes, such as the ordering cutoff. Unset refuses them all. */
+  adminKey: string | undefined;
   /** Shared secret that signs status callbacks. Unset means no callback is sent. */
   callbackSecret: string | undefined;
   /** How often the callback loop looks for queued callbacks; 0 turns the loop off. */
@@ -43,6 +45,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     kioskKeys: parseKioskKeys(env["RAILBITES_KIOSK_KEYS"]),
     smartRailBaseUrl: env["SMARTRAIL_BASE_URL"] || undefined,
     smartRailServiceKey: env["SMARTRAIL_SERVICE_KEY"] || undefined,
+    adminKey: env["RAILBITES_ADMIN_KEY"] || undefined,
     callbackSecret: env["RAILBITES_CALLBACK_SECRET"] || undefined,
     callbackPollMs: Number(env["RAILBITES_CALLBACK_POLL_MS"] ?? 2000),
     callbackMaxBackoffSeconds: Number(env["RAILBITES_CALLBACK_MAX_BACKOFF_SECONDS"] ?? 60),

@@ -11,7 +11,7 @@ async function withApp(testClock: ReturnType<typeof createTestClock> | undefined
   const path = temporaryDatabasePath();
   const db = openDatabase(path.path);
   migrate(db);
-  const config = { port: 0, databasePath: path.path, serviceKey: SERVICE_KEY, kioskKeys: new Map(), smartRailBaseUrl: undefined, smartRailServiceKey: undefined, callbackSecret: undefined, callbackPollMs: 0, callbackMaxBackoffSeconds: 60, callbackFailedRetrySeconds: 600 };
+  const config = { port: 0, databasePath: path.path, serviceKey: SERVICE_KEY, kioskKeys: new Map(), smartRailBaseUrl: undefined, smartRailServiceKey: undefined, adminKey: undefined, callbackSecret: undefined, callbackPollMs: 0, callbackMaxBackoffSeconds: 60, callbackFailedRetrySeconds: 600 };
   const server = createApp({ config, db, ...(testClock ? { testClock } : {}) });
   await new Promise<void>((resolve) => server.listen(0, resolve));
   try {

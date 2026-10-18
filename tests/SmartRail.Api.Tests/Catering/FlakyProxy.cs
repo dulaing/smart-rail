@@ -44,6 +44,9 @@ public sealed class FlakyProxy : IAsyncDisposable
     // Requests that reached RailBites.
     public int Forwarded { get; private set; }
 
+    // The trace identity (W3C traceparent) of every request this proxy forwarded, in order.
+    public List<string?> Traceparents { get; } = [];
+
     public static async Task<FlakyProxy> StartAsync(string upstreamBaseUrl)
     {
         var builder = WebApplication.CreateSlimBuilder();
@@ -68,7 +71,7 @@ public sealed class FlakyProxy : IAsyncDisposable
             }
 
             using var request = new HttpRequestMessage(new HttpMethod(context.Request.Method), context.Request.Path + context.Request.QueryString);
-            foreach (var header in context.Request.Headers.Where(h => h.Key.StartsWith("X-RailBites", StringComparison.OrdinalIgnoreCase)))
+            foreach (var header in context.Request.Headers.Where(h => h.Key.StartsWith("X-RailBites", StringComparison.OrdinalIgnoreCase) || h.Key.Equals("traceparent", StringComparison.OrdinalIgnoreCase)))
             {
                 request.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
             }
@@ -82,6 +85,7 @@ public sealed class FlakyProxy : IAsyncDisposable
                 }
             }
 
+            proxy.Traceparents.Add(context.Request.Headers["traceparent"].FirstOrDefault());
             using var response = await upstream.SendAsync(request);
             proxy.Forwarded++;
             if (proxy.BeforeResponse is not null) await proxy.BeforeResponse(request);

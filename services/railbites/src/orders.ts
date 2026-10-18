@@ -1,4 +1,5 @@
 import type { Db } from "./db";
+import { currentTraceparent } from "./telemetry";
 
 export type OrderStatus = "ACCEPTED" | "READY" | "COLLECTED" | "NO_SHOW" | "CANCELLED";
 export type CancellationReason = "PASSENGER_CANCELLED" | "TRAIN_CANCELLED" | "TRAIN_ENDED_EARLY";
@@ -149,7 +150,7 @@ export function enqueueUpdate(db: Db, order: OrderRow, now: Date): void {
     occurredAt: now.toISOString(),
   };
   db.prepare(
-    `INSERT INTO webhook_outbox (event_id, order_id, status_sequence, payload, next_attempt_at, created_at)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-  ).run(eventId, order.id, order.status_sequence, JSON.stringify(payload), now.toISOString(), now.toISOString());
+    `INSERT INTO webhook_outbox (event_id, order_id, status_sequence, payload, next_attempt_at, created_at, traceparent)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+  ).run(eventId, order.id, order.status_sequence, JSON.stringify(payload), now.toISOString(), now.toISOString(), currentTraceparent() ?? null);
 }

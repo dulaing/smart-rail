@@ -160,7 +160,7 @@ describe("setup and reseed", () => {
       [count("SELECT count(*) n FROM collection_points"), count("SELECT count(*) n FROM menu_items")],
       before,
     );
-    assert.equal(count("SELECT count(*) n FROM schema_migrations"), 3);
+    assert.equal(count("SELECT count(*) n FROM schema_migrations"), 4);
   });
 
   test("a restart-style reseed keeps live stock, cutoff and availability but restores catalogue facts", () => {

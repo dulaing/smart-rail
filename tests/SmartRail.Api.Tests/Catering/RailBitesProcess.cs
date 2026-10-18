@@ -13,6 +13,7 @@ public sealed class RailBitesProcess : IAsyncDisposable
 {
     public const string ServiceKey = "test-railbites-service-key";
     public const string CallbackSecret = "test-railbites-callback-secret";
+    public const string AdminKey = "test-railbites-admin-key";
     public const string PolgahawelaKioskKey = "kiosk-key-polgahawela";
     public const string PeradeniyaKioskKey = "kiosk-key-peradeniya";
 
@@ -62,6 +63,8 @@ public sealed class RailBitesProcess : IAsyncDisposable
         start.Environment["RAILBITES_SERVICE_KEY"] = ServiceKey;
         start.Environment["RAILBITES_KIOSK_KEYS"] = $"polgahawela-junction={PolgahawelaKioskKey},peradeniya-junction={PeradeniyaKioskKey}";
         start.Environment["RAILBITES_TEST_CLOCK"] = "1";
+        start.Environment["RAILBITES_ADMIN_KEY"] = AdminKey;
+        start.Environment["RAILBITES_DEV_CONTROLS"] = "1";
         foreach (var (name, value) in Environment)
         {
             start.Environment[name] = value;

@@ -5,6 +5,7 @@ import { ApiError, type Reply } from "./http";
 import { applyEligibility, parsePickup, parseSnapshot, type Pickup } from "./journey";
 import { advance, isOpen, type OrderRow } from "./orders";
 import * as parse from "./parse";
+import { eventsReceived } from "./telemetry";
 
 const EVENT_TYPES = ["DELAY", "CANCEL", "EARLY_END", "WITHDRAWAL"];
 
@@ -54,6 +55,7 @@ export function receiveJourneyEvent(db: Db, now: Date, body: unknown): Reply {
       if (seen.content_digest !== digest) {
         throw new ApiError(409, "EVENT_CONFLICT", "This event id was already received with different content.");
       }
+      eventsReceived.add(1, { result: "DUPLICATE" });
       return { status: 200, body: { result: "DUPLICATE" } };
     }
 
@@ -72,6 +74,7 @@ export function receiveJourneyEvent(db: Db, now: Date, body: unknown): Reply {
       `INSERT INTO received_events (event_id, journey_id, journey_version, event_type, content_digest, result, received_at)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
     ).run(event.eventId, event.journey.journeyId, event.journey.version, event.eventType, digest, result, now.toISOString());
+    eventsReceived.add(1, { result });
     return { status: 200, body: { result } };
   });
 }

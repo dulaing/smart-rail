@@ -26,19 +26,49 @@ var keycloak = builder.AddKeycloak("keycloak", 8080)
     .WithEnvironment("KC_DB_PASSWORD", postgres.Resource.PasswordParameter)
     .WaitFor(keycloakDb);
 
-builder.AddProject<Projects.SmartRail_Api>("api")
+// Secrets for the food-ordering boundary. Aspire generates each one on first run and keeps it in the
+// AppHost's user secrets, so nothing is written to Git. They are shown, hidden by default, in the
+// dashboard's parameters list: the drill in services/README.md reads them from there.
+IResourceBuilder<ParameterResource> Secret(string name) =>
+    builder.AddParameter(name, new GenerateParameterDefault { MinLength = 32, Special = false }, secret: true, persist: true);
+
+var railbitesServiceKey = Secret("railbites-service-key");      // SmartRail -> RailBites
+var railbitesAdminKey = Secret("railbites-admin-key");          // RailBites' own policy changes (the cutoff)
+var smartrailInboundKey = Secret("smartrail-inbound-key");      // RailBites -> SmartRail passage read
+var callbackSecret = Secret("railbites-callback-secret");       // HMAC secret for status callbacks
+var kioskKeyPolgahawela = Secret("kiosk-key-polgahawela");
+var kioskKeyPeradeniya = Secret("kiosk-key-peradeniya");
+
+var api = builder.AddProject<Projects.SmartRail_Api>("api")
     .WithHttpsCertificate(httpsCertificate)
     .WithReference(smartrailDb)
     .WaitFor(smartrailDb)
-    .WithHttpHealthCheck("/health/ready");
+    .WithHttpHealthCheck("/health/ready")
+    .WithEnvironment("RailBites__ServiceKey", railbitesServiceKey)
+    .WithEnvironment("RailBites__CallbackSecret", callbackSecret)
+    .WithEnvironment("RailBites__InboundServiceKey", smartrailInboundKey);
 
 // RailBites keeps its own SQLite file outside the build output, so orders and stock survive a
 // restart of the AppHost. Delete services/railbites/data to start fresh.
 var railbitesDatabase = Path.GetFullPath(Path.Combine(builder.AppHostDirectory, "..", "railbites", "data", "railbites.db"));
 
-builder.AddJavaScriptApp("railbites", "../railbites", "dev")
+var railbites = builder.AddJavaScriptApp("railbites", "../railbites", "dev")
     .WithEnvironment("RAILBITES_DB_PATH", railbitesDatabase)
+    .WithEnvironment("RAILBITES_SERVICE_KEY", railbitesServiceKey)
+    .WithEnvironment("RAILBITES_ADMIN_KEY", railbitesAdminKey)
+    .WithEnvironment("RAILBITES_CALLBACK_SECRET", callbackSecret)
+    .WithEnvironment("SMARTRAIL_SERVICE_KEY", smartrailInboundKey)
+    .WithEnvironment("RAILBITES_KIOSK_KEYS", ReferenceExpression.Create(
+        $"polgahawela-junction={kioskKeyPolgahawela},peradeniya-junction={kioskKeyPeradeniya}"))
+    // Local drills only: the 503 outage switch. Never set outside this local stack.
+    .WithEnvironment("RAILBITES_DEV_CONTROLS", "1")
     .WithHttpEndpoint(env: "PORT")
-    .WithHttpHealthCheck("/health/live");
+    // Ready, not just alive: the dashboard shows RailBites unhealthy during a simulated outage.
+    .WithHttpHealthCheck("/health/ready");
+
+// Each service finds the other by the address Aspire gives it. Neither waits for the other: the API
+// serves train information with RailBites down, and RailBites queues what it cannot send yet.
+api.WithEnvironment("RailBites__BaseUrl", railbites.GetEndpoint("http"));
+railbites.WithEnvironment("SMARTRAIL_BASE_URL", api.GetEndpoint("http"));
 
 builder.Build().Run();

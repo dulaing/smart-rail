@@ -120,7 +120,18 @@ const migrations: Migration[] = [
       CREATE INDEX received_events_by_journey ON received_events (journey_id, journey_version);
     `,
   },
+  {
+    id: 4,
+    name: "trace identity on queued callbacks",
+    sql: `
+      -- The W3C traceparent of the request that caused a status change, so the callback that tells
+      -- SmartRail about it continues the same trace. Null for rows queued before this existed.
+      ALTER TABLE webhook_outbox ADD COLUMN traceparent TEXT;
+    `,
+  },
 ];
+
+export const LATEST_MIGRATION = migrations[migrations.length - 1]!.id;
 
 // Explicit setup, run once at start-up. Safe to run again: applied migrations are skipped.
 export function migrate(db: Db): void {

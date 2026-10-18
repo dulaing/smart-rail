@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SmartRail.Api.Infrastructure;
+using SmartRail.Api.Modules.Catering.Callbacks;
 using SmartRail.Api.Modules.Catering.Provider;
 
 namespace SmartRail.Api.Modules.Catering.Outbox;
@@ -69,7 +70,11 @@ public sealed class OutboxDispatcher(
         }
 
         var now = time.GetUtcNow();
+        using var activity = CateringMetrics.Source.StartActivity("catering.outbox.deliver");
+        activity?.SetTag("catering.event_id", message.EventId);
+        activity?.SetTag("catering.attempt", message.AttemptCount + 1);
         var response = await provider.DeliverEventAsync(message.Payload, cancellationToken);
+        activity?.SetTag("catering.result", response.Outcome.ToString());
         switch (response.Outcome)
         {
             case ProviderOutcome.Success:
@@ -78,6 +83,7 @@ public sealed class OutboxDispatcher(
                 message.LastError = null;
                 message.AttemptCount++;
                 await db.SaveChangesAsync(cancellationToken);
+                CateringMetrics.OutboxAttempts.Add(1, new KeyValuePair<string, object?>("result", "delivered"));
                 break;
 
             case ProviderOutcome.Refused:
@@ -85,6 +91,7 @@ public sealed class OutboxDispatcher(
                 // other content). Retrying unchanged cannot help, but dropping it would lose the change.
                 logger.LogError("RailBites refused train-change {EventId} with {Code}.", message.EventId, response.Error!.Code);
                 await ScheduleAsync(message, options.Value.FailedRetrySeconds, DeliveryStates.Failed, response.Error.Code, cancellationToken);
+                CateringMetrics.OutboxAttempts.Add(1, new KeyValuePair<string, object?>("result", "failed"));
                 break;
 
             default:
@@ -93,6 +100,7 @@ public sealed class OutboxDispatcher(
                 var permanent = response.HttpStatus == StatusCodes.Status401Unauthorized;
                 var seconds = permanent ? options.Value.FailedRetrySeconds : Backoff(message.AttemptCount + 1);
                 await ScheduleAsync(message, seconds, permanent ? DeliveryStates.Failed : DeliveryStates.Pending, response.Error?.Code, cancellationToken);
+                CateringMetrics.OutboxAttempts.Add(1, new KeyValuePair<string, object?>("result", permanent ? "failed" : "retry"));
                 break;
         }
     }

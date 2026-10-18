@@ -3,11 +3,13 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using SmartRail.Api.Infrastructure;
 using SmartRail.Api.Modules.Access;
 using SmartRail.Api.Modules.Catering;
+using SmartRail.Api.Modules.Catering.Callbacks;
 using SmartRail.Api.Modules.Operations;
 using SmartRail.Api.Modules.Rail;
 using SmartRail.Api.Modules.Rail.Running;
 using OpenTelemetry;
 using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
@@ -34,7 +36,15 @@ builder.Logging.AddOpenTelemetry(logging =>
 
 var telemetry = builder.Services.AddOpenTelemetry()
     .ConfigureResource(resource => resource.AddService("smartrail-api"))
-    .WithTracing(tracing => tracing.AddAspNetCoreInstrumentation());
+    .WithTracing(tracing => tracing
+        .AddAspNetCoreInstrumentation()
+        // Outgoing calls to RailBites carry the caller's trace, so one trace spans both services.
+        .AddHttpClientInstrumentation()
+        .AddSource(CateringMetrics.ActivitySourceName))
+    .WithMetrics(metrics => metrics
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddMeter(CateringMetrics.MeterName));
 
 if (!string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]))
 {
@@ -108,7 +118,13 @@ if (hasDatabase)
 
 // Live only says the process is running, so it runs no checks.
 app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false }).AllowAnonymous();
-app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = check => check.Tags.Contains("ready") }).AllowAnonymous();
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready"),
+    // Degraded still answers 200: the API can serve train information. The body says what is degraded
+    // and, for food ordering, how much is waiting.
+    ResponseWriter = HealthResponseWriter.WriteAsync,
+}).AllowAnonymous();
 
 app.Run();
 

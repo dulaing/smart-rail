@@ -70,7 +70,7 @@ public sealed class CallbackBridge : IAsyncDisposable
                 return;
             }
             using var request = new HttpRequestMessage(new HttpMethod(context.Request.Method), context.Request.Path + context.Request.QueryString);
-            foreach (var header in context.Request.Headers.Where(h => h.Key.StartsWith("X-RailBites", StringComparison.OrdinalIgnoreCase)))
+            foreach (var header in context.Request.Headers.Where(h => h.Key.StartsWith("X-RailBites", StringComparison.OrdinalIgnoreCase) || h.Key.Equals("traceparent", StringComparison.OrdinalIgnoreCase)))
                 request.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
             if (context.Request.Method == "POST")
             {

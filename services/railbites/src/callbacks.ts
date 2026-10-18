@@ -1,11 +1,13 @@
 import type { Config } from "./config";
 import type { Db } from "./db";
 import { EVENT_ID_HEADER, SIGNATURE_HEADER, TIMESTAMP_HEADER, sign } from "./signature";
+import { callbackAttempts, injectTraceparent, SpanKind, withSpan } from "./telemetry";
 
 interface OutboxRow {
   event_id: string;
   payload: string;
   attempt_count: number;
+  traceparent: string | null;
 }
 
 export interface CallbackPass {
@@ -30,15 +32,17 @@ export async function deliverDueCallbacks(
   config: Config,
   now: Date,
   send: typeof fetch = fetch,
+  paused: () => boolean = () => false,
 ): Promise<CallbackPass> {
-  if (!config.smartRailBaseUrl || !config.callbackSecret) {
+  // A stopped provider sends nothing; what is queued waits, as it would through a real outage.
+  if (paused() || !config.smartRailBaseUrl || !config.callbackSecret) {
     // Fail closed: with no address or no secret nothing is sent and nothing is lost.
     return { attempted: 0, delivered: 0 };
   }
 
   const due = db
     .prepare(
-      `SELECT event_id, payload, attempt_count FROM webhook_outbox
+      `SELECT event_id, payload, attempt_count, traceparent FROM webhook_outbox
        WHERE delivered_at IS NULL AND next_attempt_at <= ? ORDER BY created_at, rowid LIMIT ?`,
     )
     .all(now.toISOString(), BATCH_SIZE) as unknown as OutboxRow[];
@@ -47,45 +51,60 @@ export async function deliverDueCallbacks(
   let delivered = 0;
   for (const row of due) {
     const timestamp = Math.floor(now.getTime() / 1000);
-    let outcome: "delivered" | "transient" | "permanent";
-    let error: string | null = null;
-    try {
-      const response = await send(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          [TIMESTAMP_HEADER]: String(timestamp),
-          [SIGNATURE_HEADER]: sign(config.callbackSecret, timestamp, row.payload),
-          [EVENT_ID_HEADER]: row.event_id,
-        },
-        body: row.payload,
-        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-      });
-      if (response.status === 200) {
-        const receipt = (await response.json()) as { result?: unknown } | null;
-        if (receipt && ["APPLIED", "DUPLICATE", "STALE"].includes(String(receipt.result))) {
-          outcome = "delivered";
-        } else {
-          outcome = "transient";
-          error = "INVALID_ACKNOWLEDGEMENT";
+    // The span continues the trace of whatever caused this status change, and that trace identity is
+    // sent on, so SmartRail's receipt of the callback joins the same trace.
+    const { outcome, error } = await withSpan(
+      "railbites.callback.deliver",
+      row.traceparent ?? undefined,
+      { "railbites.callback.attempt": row.attempt_count + 1 },
+      async (span) => {
+        let result: "delivered" | "transient" | "permanent";
+        let failure: string | null = null;
+        try {
+          const response = await send(url, {
+            method: "POST",
+            headers: injectTraceparent({
+              "Content-Type": "application/json",
+              [TIMESTAMP_HEADER]: String(timestamp),
+              [SIGNATURE_HEADER]: sign(config.callbackSecret!, timestamp, row.payload),
+              [EVENT_ID_HEADER]: row.event_id,
+            }),
+            body: row.payload,
+            signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+          });
+          span.setAttribute("http.response.status_code", response.status);
+          if (response.status === 200) {
+            // Only a committed receipt counts as delivered; any other 2xx body is retried.
+            const receipt = (await response.json()) as { result?: unknown } | null;
+            if (receipt && ["APPLIED", "DUPLICATE", "STALE"].includes(String(receipt.result))) {
+              result = "delivered";
+            } else {
+              result = "transient";
+              failure = "INVALID_ACKNOWLEDGEMENT";
+            }
+          } else if (response.status >= 500 || response.status === 408 || response.status === 429) {
+            result = "transient";
+            failure = `HTTP_${response.status}`;
+            await response.body?.cancel();
+          } else if (response.ok) {
+            result = "transient";
+            failure = "INVALID_ACKNOWLEDGEMENT";
+            await response.body?.cancel();
+          } else {
+            result = "permanent";
+            failure = `HTTP_${response.status}`;
+            await response.body?.cancel();
+          }
+        } catch {
+          result = "transient";
+          failure = "UNREACHABLE";
         }
-      } else if (response.status >= 500 || response.status === 408 || response.status === 429) {
-        outcome = "transient";
-        error = `HTTP_${response.status}`;
-        await response.body?.cancel();
-      } else if (response.ok) {
-        outcome = "transient";
-        error = "INVALID_ACKNOWLEDGEMENT";
-        await response.body?.cancel();
-      } else {
-        outcome = "permanent";
-        error = `HTTP_${response.status}`;
-        await response.body?.cancel();
-      }
-    } catch {
-      outcome = "transient";
-      error = "UNREACHABLE";
-    }
+        span.setAttribute("railbites.callback.result", result);
+        callbackAttempts.add(1, { result });
+        return { outcome: result, error: failure };
+      },
+      SpanKind.CLIENT,
+    );
 
     if (outcome === "delivered") {
       db.prepare(
@@ -108,14 +127,14 @@ export async function deliverDueCallbacks(
 
 // The background loop. Its queue is the webhook_outbox table, so stopping and starting the process
 // loses nothing. Passes never overlap.
-export function startCallbackLoop(db: Db, config: Config, clock: () => Date): () => void {
+export function startCallbackLoop(db: Db, config: Config, clock: () => Date, paused: () => boolean = () => false): () => void {
   if (config.callbackPollMs <= 0) return () => undefined;
 
   let running = false;
   const timer = setInterval(() => {
     if (running) return;
     running = true;
-    deliverDueCallbacks(db, config, clock())
+    deliverDueCallbacks(db, config, clock(), fetch, paused)
       .catch((error: unknown) => console.error(`Callback pass failed: ${error instanceof Error ? error.name : "unknown"}`))
       .finally(() => {
         running = false;

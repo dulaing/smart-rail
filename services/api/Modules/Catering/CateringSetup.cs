@@ -3,6 +3,8 @@ using SmartRail.Api.Modules.Catering.Orders;
 using SmartRail.Api.Modules.Catering.Outbox;
 using SmartRail.Api.Modules.Catering.Provider;
 
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+
 namespace SmartRail.Api.Modules.Catering;
 
 public static class CateringSetup
@@ -18,6 +20,7 @@ public static class CateringSetup
             builder.Services.AddHttpClient<IRailBitesClient, RailBitesClient>(client =>
                 client.Timeout = TimeSpan.FromSeconds(builder.Configuration.GetValue("RailBites:TimeoutSeconds", 5)));
             builder.Services.AddMemoryCache();
+            builder.Services.AddHealthChecks().AddCheck<CateringHealthCheck>("catering", failureStatus: HealthStatus.Degraded, tags: ["ready"]);
 
             builder.Services.Configure<PlacementOptions>(builder.Configuration.GetSection(PlacementOptions.Section));
             builder.Services.AddScoped<OrderLinkWrites>();

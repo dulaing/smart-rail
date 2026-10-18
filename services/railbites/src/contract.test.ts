@@ -58,10 +58,10 @@ test("the contract covers the operations the boundary needs", () => {
   }
 });
 
-test("only liveness and the signed callback skip the service/kiosk key", () => {
+test("only the health routes and the signed callback skip a credential", () => {
   const open = operations()
     .filter((o) => Array.isArray(o.operation.security) && o.operation.security.length === 0)
     .map((o) => o.path)
     .sort();
-  assert.deepEqual(open, ["/health/live", "/internal/catering/order-updates"]);
+  assert.deepEqual(open, ["/health/live", "/health/ready", "/internal/catering/order-updates"]);
 });

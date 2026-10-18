@@ -4,6 +4,7 @@ import { ApiError, type Handler } from "./http";
 
 export const SERVICE_KEY_HEADER = "x-railbites-service-key";
 export const KIOSK_KEY_HEADER = "x-railbites-kiosk-key";
+export const ADMIN_KEY_HEADER = "x-railbites-admin-key";
 
 // Compare digests, not the keys, so the check takes the same time whatever the input length.
 function sameKey(configured: string, provided: string): boolean {
@@ -38,6 +39,18 @@ export function requireKiosk(config: Config, handler: Handler): Handler {
     if (owner === undefined) throw new ApiError(401, "UNAUTHORIZED", "A valid kiosk credential is required.");
     if (owner !== ctx.params["collectionPointId"]) {
       throw new ApiError(403, "FORBIDDEN_COLLECTION_POINT", "This kiosk credential is for another collection point.");
+    }
+    return handler(ctx);
+  };
+}
+
+// The provider's own policy changes (the cutoff) need a credential of their own: SmartRail's service
+// key cannot change what RailBites decides. With none configured, every such call is refused.
+export function requireAdmin(config: Config, handler: Handler): Handler {
+  return (ctx) => {
+    const provided = ctx.req.headers[ADMIN_KEY_HEADER];
+    if (!config.adminKey || typeof provided !== "string" || !sameKey(config.adminKey, provided)) {
+      throw new ApiError(401, "UNAUTHORIZED", "A valid admin credential is required.");
     }
     return handler(ctx);
   };

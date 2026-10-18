@@ -6,6 +6,7 @@ import type { Config } from "./config";
 import { openDatabase, type Db } from "./db";
 import { migrate } from "./migrations";
 import { seedCatalog } from "./seed";
+import type { DevControls } from "./dev-controls";
 import { createApp } from "./server";
 import type { PassageReader, PassageState } from "./smartrail";
 
@@ -40,6 +41,7 @@ export async function startApp(options: {
   serviceKey?: string | undefined;
   now?: string;
   overrides?: Partial<Config>;
+  dev?: DevControls;
 }): Promise<TestApp> {
   const config: Config = {
     port: 0,
@@ -48,6 +50,7 @@ export async function startApp(options: {
     kioskKeys: KIOSK_KEYS,
     smartRailBaseUrl: undefined,
     smartRailServiceKey: undefined,
+    adminKey: undefined,
     callbackSecret: undefined,
     callbackPollMs: 0,
     callbackMaxBackoffSeconds: 60,
@@ -67,7 +70,7 @@ export async function startApp(options: {
     },
   };
 
-  const server = createApp({ config, db, clock: () => new Date(now), passage: passageReader });
+  const server = createApp({ config, db, clock: () => new Date(now), passage: passageReader, ...(options.dev ? { dev: options.dev } : {}) });
   await new Promise<void>((resolve) => server.listen(0, resolve));
   return {
     config,

@@ -52,6 +52,7 @@ info:
     | `PICKUP_CODE_MISMATCH` | 422 | Wrong pickup code at collection |
     | `TRAIN_NOT_PASSED` | 409 | No-show refused: SmartRail does not confirm the train passed the stop |
     | `SMARTRAIL_UNAVAILABLE` | 503 | No-show could not be confirmed; retry later |
+    | `SIMULATED_OUTAGE` | 503 | Local drill only: the provider is in a simulated outage |
 
     **Order status** is `ACCEPTED`, `READY`, `COLLECTED`, `NO_SHOW` or `CANCELLED`. Allowed moves:
     ACCEPTED -> READY -> COLLECTED; ACCEPTED or READY -> CANCELLED or NO_SHOW. Repeating the
@@ -89,6 +90,94 @@ paths:
           content:
             application/json:
               schema: { type: object, required: [status], properties: { status: { const: Healthy } } }
+
+  /health/ready:
+    get:
+      operationId: getReadiness
+      summary: Can this process do its job? Checks its database and that its tables are up to date
+      security: []
+      responses:
+        "200":
+          description: Ready.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Readiness" }
+        "503":
+          description: Not ready (database unavailable, tables behind, or a simulated outage).
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Readiness" }
+
+  /v1/admin/collection-points/{collectionPointId}/cutoff:
+    put:
+      operationId: setCutoff
+      tags: [Menu]
+      summary: Change the provider-owned ordering cutoff
+      description: |
+        The cutoff is RailBites' own policy, so it needs RailBites' own admin credential, not SmartRail's
+        service key. SmartRail reads the cutoff fresh on every browse, order and cancellation and never
+        caches it, so the change is live for the next request with no SmartRail release. Orders already
+        accepted keep their place.
+      security: [{ adminKey: [] }]
+      parameters: [{ $ref: "#/components/parameters/CollectionPointId" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [cutoffMinutes]
+              properties: { cutoffMinutes: { type: integer, minimum: 0, maximum: 240 } }
+      responses:
+        "200":
+          description: Changed.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id, cutoffMinutes]
+                properties: { id: { type: string }, cutoffMinutes: { type: integer } }
+        "400": { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+
+  /internal/dev/outage:
+    put:
+      operationId: setSimulatedOutage
+      tags: [Menu]
+      summary: Local drills only. Start or end a simulated RailBites outage
+      description: |
+        Exists only when the process is started with `RAILBITES_DEV_CONTROLS=1` outside production, and
+        needs the service key. While active every `/v1` route answers 503 `SIMULATED_OUTAGE`, queued
+        callbacks wait and `/health/ready` is 503. This route, `GET` of it and `/health/live` stay
+        reachable so the outage can be ended without a restart.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [active]
+              properties: { active: { type: boolean } }
+      responses:
+        "200":
+          description: The new state.
+          content:
+            application/json:
+              schema: { type: object, required: [outage], properties: { outage: { type: boolean } } }
+        "400": { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/Error" }
+    get:
+      operationId: getSimulatedOutage
+      tags: [Menu]
+      summary: Local drills only. Is the simulated outage active?
+      responses:
+        "200":
+          description: The state.
+          content:
+            application/json:
+              schema: { type: object, required: [outage], properties: { outage: { type: boolean } } }
+        "401": { $ref: "#/components/responses/Error" }
 
   /v1/collection-points:
     get:
@@ -441,7 +530,6 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Error" }
-        "503": { $ref: "#/components/responses/Error" }
 
   /internal/catering/journeys/{journeyId}/stops/{stopId}/passage:
     servers:
@@ -479,6 +567,7 @@ components:
   securitySchemes:
     serviceKey: { type: apiKey, in: header, name: X-RailBites-Service-Key }
     kioskKey: { type: apiKey, in: header, name: X-RailBites-Kiosk-Key }
+    adminKey: { type: apiKey, in: header, name: X-RailBites-Admin-Key }
   parameters:
     CollectionPointId: { name: collectionPointId, in: path, required: true, schema: { type: string } }
     OrderLinkId: { name: orderLinkId, in: path, required: true, schema: { type: string, format: uuid } }
@@ -491,6 +580,12 @@ components:
           schema: { $ref: "#/components/schemas/Error" }
           example: { code: STOCK_INSUFFICIENT, message: Not enough stock., details: { menuItemId: pdn-lamprais, available: 0 } }
   schemas:
+    Readiness:
+      type: object
+      required: [status, checks]
+      properties:
+        status: { enum: [Healthy, Unhealthy] }
+        checks: { type: object, additionalProperties: { type: string } }
     Error:
       type: object
       required: [code, message]

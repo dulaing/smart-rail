@@ -150,6 +150,58 @@ examples are in `services/railbites/fixtures/signed-callbacks.json` (regenerate 
 | RailBites | `RAILBITES_CALLBACK_POLL_MS` | How often queued callbacks are sent (default 2000; 0 turns the loop off). |
 | RailBites | `RAILBITES_CALLBACK_MAX_BACKOFF_SECONDS`, `RAILBITES_CALLBACK_FAILED_RETRY_SECONDS` | Cap on retry delays after a timeout or 5xx (60), and the slow retry after a refusal (600). |
 
+### Failure and recovery drill (food ordering)
+
+A short walk through "RailBites stops, nothing is lost, it comes back" on the local stack. Start it with
+`dotnet run --project services/apphost` and prepare the database as in "One-time local setup". Aspire
+generates the service keys on first run and keeps them in the AppHost's user secrets; reveal them in the
+dashboard under the parameters (`railbites-service-key`, `railbites-admin-key`, `kiosk-key-peradeniya`).
+Below, `$RB` is the RailBites address and `$API` the API address from the dashboard, and `$TOKEN` is a
+signed-in passenger's access token (sign in with `demo-passenger`).
+
+1. **Normal.** `curl $API/health/ready` reports `Healthy`, and its `catering` entry shows
+   `outboxPending: 0` and `ordersPending: 0`. `curl $RB/health/ready` is the same for RailBites.
+2. **Order.** Find a journey of train `SIM-3001` dated today, make sure it has a recent sighting
+   (the simulator reports it between 09:00 and 11:50, or post one as in "Simulated running"), then
+   `curl $API/api/journeys/<id>/collection-options` and `POST $API/api/food/orders` with your token.
+   You get `201` and a pickup code.
+3. **Stop the provider.** Either stop the `railbites` resource in the dashboard, or, without stopping
+   anything, switch on the Development-only outage:
+   `curl -X PUT -H "X-RailBites-Service-Key: <service key>" -H "Content-Type: application/json" -d '{"active":true}' $RB/internal/dev/outage`.
+   RailBites now answers `503 SIMULATED_OUTAGE` on every provider route and its `/health/ready`;
+   `/health/live` and the switch itself stay reachable.
+4. **Watch it degrade, not fail.** `curl $API/health/ready` is still `200` but `Degraded`, with
+   `provider: Unreachable` (or `NotReady` for the switch). `curl $API/api/journeys/<id>/running` and
+   `.../changes` keep working: train information does not depend on food.
+5. **Make a backlog.** Place another order (you get `202` and a link to poll) and, as a controller,
+   publish a delay or an early ending for the journey. The readiness `catering` entry now counts the
+   waiting orders and train changes and how many seconds the oldest has waited; the Aspire dashboard
+   shows the `catering.outbox.attempts{result=retry}` and `catering.placement.attempts{result=retry}`
+   counters rising and RailBites unhealthy.
+6. **Recover.** End the outage with `{"active":false}` (or start the resource). Within seconds the
+   dispatcher delivers the change and the retry loop confirms the order under the same link ID: the
+   backlog drains to zero, `catering` returns to `Healthy`, and a cancellation caused by an early ending
+   reaches the passenger once, with its reason.
+7. **Read the trace.** In the dashboard's Traces view open the order request: one trace runs from the
+   API through RailBites and back through the signed callback (`catering.callbacks.received`). A kiosk
+   action (`POST $RB/v1/kiosk/collection-points/peradeniya-junction/orders/<orderId>/ready` with
+   `X-RailBites-Kiosk-Key`) starts its own trace that ends at the passenger's updated order.
+8. **Change the cutoff without a SmartRail release.** `curl -X PUT -H "X-RailBites-Admin-Key: <admin key>" -H "Content-Type: application/json" -d '{"cutoffMinutes":45}' $RB/v1/admin/collection-points/peradeniya-junction/cutoff`.
+   The next `collection-options` shows 45 and an earlier `orderBy`; an order or cancellation inside the
+   last 45 minutes is refused with `CUTOFF_PASSED`. Orders already accepted keep their place. Neither
+   service is restarted or reconfigured.
+
+Restart either service at any point (stop it in the dashboard, or `Ctrl+C` the AppHost and start it
+again): RailBites' orders, stock and queued callbacks are in `services/railbites/data/railbites.db`, and the
+API's queue and receipts are in PostgreSQL, so everything resumes where it stopped.
+
+| RailBites setting | Meaning |
+| --- | --- |
+| `RAILBITES_ADMIN_KEY` | Credential for RailBites' own policy changes (the cutoff). Unset refuses them. |
+| `RAILBITES_DEV_CONTROLS=1` | Adds the outage switch. Ignored when `NODE_ENV=production`. The AppHost sets it; no deployed environment should. |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | Where RailBites sends spans and metrics (the AppHost sets it). Trace propagation works without it. |
+| API `Catering:Health:BacklogDegradedSeconds` | How long a change or order may wait before readiness says `Degraded` (default 120). |
+
 ## Signing in (Keycloak)
 
 Keycloak owns the passwords, sessions and tokens. The API validates its access tokens

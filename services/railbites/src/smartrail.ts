@@ -1,4 +1,5 @@
 import type { Config } from "./config";
+import { injectTraceparent } from "./telemetry";
 
 export type PassageState = "AHEAD" | "PASSED" | "UNKNOWN";
 
@@ -20,7 +21,7 @@ export function httpPassageReader(config: Config): PassageReader {
         config.smartRailBaseUrl,
       );
       const res = await fetch(url, {
-        headers: { "X-RailBites-Service-Key": config.smartRailServiceKey },
+        headers: injectTraceparent({ "X-RailBites-Service-Key": config.smartRailServiceKey }),
         signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       });
       if (!res.ok) throw new Error(`SmartRail answered ${res.status}.`);

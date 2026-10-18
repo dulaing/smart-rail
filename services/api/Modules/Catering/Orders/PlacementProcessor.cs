@@ -2,6 +2,7 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SmartRail.Api.Infrastructure;
+using SmartRail.Api.Modules.Catering.Callbacks;
 using SmartRail.Api.Modules.Catering.Provider;
 
 namespace SmartRail.Api.Modules.Catering.Orders;
@@ -78,7 +79,16 @@ public sealed class PlacementProcessor(
         await writes.MarkAttemptAsync(link.Id, now, cancellationToken);
 
         var body = new PlaceOrderBody(request.CollectionPointId, assessment.Journey!, assessment.Pickup!, request.Items);
+        using var activity = CateringMetrics.Source.StartActivity("catering.placement.attempt");
+        activity?.SetTag("catering.attempt", link.AttemptCount + 1);
         var response = await provider.PlaceAsync(link.Id, body, cancellationToken);
+        activity?.SetTag("catering.result", response.Outcome.ToString());
+        CateringMetrics.PlacementAttempts.Add(1, new KeyValuePair<string, object?>("result", response.Outcome switch
+        {
+            ProviderOutcome.Success => "confirmed",
+            ProviderOutcome.Refused when response.HttpStatus is 422 or 404 => "refused",
+            _ => "retry",
+        }));
 
         switch (response.Outcome)
         {
