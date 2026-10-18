@@ -1,0 +1,37 @@
+# Station boards
+
+## Outcome and context
+
+One passive React app shows an entrance overview and a platform's next train, with timetable, platform, expected time and truthful changes readable together in Sinhala, Tamil and English. It reloads offline into timetable-only information and recovers without making old evidence fresh. Follow [the handoff](../docs/app-spec-plan.md#4-station-boards--copy-this-prompt), [display rules](../docs/Features/05-station-display-features.md), [busy-station rules](../docs/06-scope-decision.md#design-work-and-screen-rules) and [app foundation](app-foundation.md).
+
+## Existing source and contract choice
+
+`apps/station-web/src/App.tsx` is a Vite starter. Public `/api/stations`, `/api/journeys?serviceDate=...`, `/api/journeys/{id}/running` and `.../changes` exist in Rail/Operations. The running contract already includes served stops, planned/effective platforms, evidence thresholds and confirmation times; public changes have no staff identities or free-text delay reason. Start with bounded composition of these existing reads and a small concurrency limit, not another board endpoint. Fetch the full bounded timetable before selecting rows, so scheduled-only `/api/next-trains` cannot hide a delayed train. Use the same server-derived running fields and interpretation as [passenger trains](passenger-trains.md), never a TypeScript ETA engine.
+
+Configuration uses station ID, `entrance`/`platform` view and a platform value, through a documented local URL/configuration. Validate the station/platform; show a configuration error rather than silently selecting another station. No login or secret is needed. Waiting areas reuse entrance. User confirmed Light-only station-display designs on 18 October; follow [station display hi-fi](station-display-hi-fi.md). This is a fixed display theme, with no passenger theme picker. Use the existing Figma station wireframes.
+
+## Board rules
+
+- Entrance lists upcoming arrivals/departures from dated stop occurrences, distinguishing a starting train with no arrival and a terminating train with no departure. Platform focuses on its next relevant train with stops and notices. Keep scheduled time visible and expected time separate; first meaning is time/platform/icon, then destination/status. No carousel, ticker, flashing or rotating page.
+- Cancelled/unserved trains are never presented as operating departures. Keep a clear cancellation/early-ending notice for affected upcoming trains, preserving earlier served stops and the new final stop. Avoid row selection based solely on scheduled departure: delayed trains remain until evidence proves passage/departure. UNKNOWN trains say unknown and are not described as on-time.
+- A platform move must be understandable at both platforms: retain a **Moved from X to Y** notice at the original platform and show the effective platform at the new one. Keep the notice while that stop is still relevant; clear it after fresh evidence proves departure, withdrawal or service-date expiry, not an arbitrary short timeout. Use journey+stop IDs and confirmation time to avoid duplicate notices. Whole-feed offline mode must not present a saved override as the current platform.
+- **User-confirmed attribution:** Staff-confirmed change · [time], translated. Do not expose individual names. If only the kind/delay value is public, show **Staff-confirmed delay**; do not invent a cause from protected reports/incidents. Any future public reason field belongs to Operations and needs a separate decision.
+- Show English/Sinhala/Tamil together for key statuses, allow long text, bundle foundation fonts and maintain a clock and fixed **SmartRail simulation** footer. Pilot target is a 1920×1080 display; verify its physical readability at four metres rather than assuming pixel size proves it. Native-reader review is recorded only when actual readers participate.
+
+## Offline and updating
+
+Poll visible boards every 15 seconds with per-resource ETags. Continue local observation ageing through 304s and between polls using server clock correction; UNKNOWN begins at 240 seconds or missing evidence. A single stale/failed train row is not a whole-board outage; preserve independent successful data and confirmation times.
+
+If no complete refresh can be obtained, retain the successful snapshot but clearly mark its failed sections. On whole-feed loss, use one **Live updates unavailable** banner and timetable-only rows everywhere: no cached ETA/current marker/effective override masquerading as current. Persist public timetable, station names, service dates/provenance and download time in a small versioned browser store. A service worker caches the app shell and bundled fonts for offline reload, not authenticated content or indiscriminately every API response. Keep cached confirmed notices separately as historical if displayed at all. First boot without cache shows clock/footer and a clear no-timetable state.
+
+On reconnect refetch authoritative timetable/running/changes, then remove the offline banner. Do not reset observation age from fetch time. Cover Asia/Colombo midnight: prefetch the next required service dates when connected, retain previous-date overnight trains and label an expired snapshot honestly if the new date is missing. Avoid overlap and superseded station/configuration responses.
+
+## Tasks
+
+- [ ] **T1 — Show an entrance board from public reads.** Depends on app-foundation T1/T5. Replace the starter with app-local read/state and the entrance layout in `apps/station-web/`. Check real seeded stations and dates, delayed-after-schedule selection, starting/ending trains, empty station and bad config, partial failures and anonymous operation without Keycloak. **First task; Blocked until foundation is implemented.**
+- [ ] **T2 — Show the platform view and service changes.** Depends on T1. Add stop-occurrence/platform filtering and bilingual/trilingual status rendering. Check original/new platform move notices, cancellation, early ending/final-stop inclusion, continued confirmed platform at UNKNOWN, and removal only after supported departure/withdrawal. Public labels contain no invented person/cause.
+- [ ] **T3 — Reload offline and recover honestly.** Depends on T1/T2. Add the small public cache and service worker. Check real browser offline reload with/without cache, 304 threshold boundaries, one stale row versus whole connection loss, no cached ETA/override presented as current, automatic reconnect and Colombo midnight/overnight retention. Reuse the shared freshness fixture.
+- [ ] **T4 — Prove display legibility and connected propagation.** Depends on T1–T3 and operations-workspace T2 for a screen-to-screen drill. Run build/lint and focused browser tests, accessibility/contrast scan, colour-vision emulation and long-language rendering at target resolution. A real staff change reaches both board views; record a physical four-metre check and actual Sinhala/Tamil feedback, or mark those specific checks blocked/pending. Include the fixed simulation footer in evidence.
+
+Planning only; no checks have run. No interactive terminal/search, free-text notice editor, staff management UI, offline operational writes or new realtime transport. Runtime public reads need only their existing backend, not completion of the passenger UI.
+

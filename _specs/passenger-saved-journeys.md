@@ -1,0 +1,38 @@
+# Saved commutes, follows and in-app changes
+
+## Outcome and settled scope
+
+A passenger can save an origin/destination commute, follow/unfollow a specific dated journey and see its personal service changes while the app is open. Public route notices remain available to guests. Saving a commute does not subscribe to every future train with that number.
+
+Follow [handoff 7](../docs/app-spec-plan.md#7-passenger-saved-journeys-and-in-app-alerts--copy-this-prompt), [passenger trains](passenger-trains.md), [app foundation](app-foundation.md), [identity](identity-and-permissions.md) and [the passenger data model](../docs/architecture/erd/03-accounts-passengers.mmd). Preserve the original four tabs; use the existing Figma follow/account flow, not an added navigation tab or notification service.
+
+## Current gap and common backend work
+
+`Access/PilotRoles.cs` declares `passenger.saved_routes.manage`, `passenger.follows.manage` and `passenger.alerts.read`. Current Access endpoints implement account/grant management and `/api/me`; its model and `SmartRailDbContext` do not yet map saved routes/follows. The ERD is a plan, not working account-owned persistence.
+
+Add only the missing Access-owned `passenger.saved_routes` and `passenger.followed_journeys` mappings/migration in the existing context. Saved route is `(id, accountId, originStationId, destinationStationId)` with unique `(accountId,origin,destination)`; follow is unique `(accountId,journeyId)` with server `followedAt`. Validate real stations, distinct origin/destination, dated journey existence and repeat-safe saves/follows. Access validates Rail IDs through a named interface. Do not introduce repositories, another service/broker or local-only subscriptions presented as account-owned.
+
+Proposed own-account routes under `/api/me`: GET/POST `/saved-routes`, DELETE `/saved-routes/{id}`, GET `/followed-journeys`, PUT/DELETE `/followed-journeys/{journeyId}`, and GET `/alerts` using the confirmed current-change projection below. Resolve owner from the active local account, not request data. Check the corresponding Own permission on every call; another passenger's saved record is 404, guests 401, disabled/permission-denied callers 403. Use unique constraints for races, bounded pages for lists and stable identities/ETags for unchanged reads. Do not copy protected driver issuer names into personal passenger responses: use the user-confirmed **Staff-confirmed change · [time]** label.
+
+## Current-change alerts — user confirmed
+
+Show a list of **currently effective changes** for followed dated journeys. Withdrawals remove them; there are no unread badges, read/unread state or notification history.
+
+`/api/me/alerts` is an ownership-protected projection, using a named Operations change-reader interface. Each item has journey ID, active change ID/kind, journey version, affected stop IDs and confirmation time. A withdrawal removes the withdrawn fact; replacement shows only its effective replacement. Joining a follow shows currently relevant changes, even if confirmed before the follow. Sort deterministically by confirmation time and stable IDs. No extra alert/history/read-state table or notification broker is needed.
+
+## Screens and states
+
+From route/train detail, Save commute or Follow prompts Keycloak only when needed. Retain the intended route/dated journey through login, then show a clear confirmation action; cancelled login offers a guest return and cannot create a subscription. Account contains saved commutes/followed trains using the Figma layout; Home may show that same signed-in summary. Route changes and dated journey expiry do not silently move a follow to a new train.
+
+While visible, poll personal changes every 30 seconds and refresh on resume/reconnect and writes. Deduplicate by stable journey/change identity and version; repeated identical responses must not repeat an announcement. Unfollow stops subsequent personal alerts for that journey, including responses already in flight. Withdrawn facts disappear on the next successful refresh, and early endings remain while effective; public notices are unaffected by whether the passenger follows. No push/email/SMS or closed-app delivery promise.
+
+Keep a small per-account saved-information cache with its last-check time, separate from public timetable and food data. An optional cached change snapshot is only the last checked current list, never an accumulating notification history; offline it is explicitly saved information, not a claim those changes are still effective. Logout/account switch clears or isolates the previous owner's cache and invalidates outstanding responses; never briefly flash the former user's data. Offline content cannot claim a follow/save was committed until server success. Reconnect validates account and permissions before refreshing private state. Handle empty account lists, 401/403, vanished journeys, duplicate saves, network failure and ambiguous save/follow results with same-target reread/retry, not duplicate records.
+
+## Tasks
+
+- [ ] **T1 — Save and follow as the authenticated owner.** Add Access's two small tables/migration and own-account routes/tests. **First ready task.** Check real PostgreSQL uniqueness/concurrent retries, valid station/journey IDs, repeated delete, disabled account and another passenger's list/read/change denial. A save alone never creates a follow.
+- [ ] **T2 — Read current personal changes.** Depends on T1; **Blocked until T1 is implemented.** Add the named Operations change-reader boundary and own-account projection, with no alert-history/read-state persistence. Check follow/unfollow, replacement/withdrawal, early ending, stable identity/version, repeated polls and cross-account denial without exposing protected names. Withdrawals remove items, and no unread badge/history appears.
+- [ ] **T3 — Save/follow from the passenger screens.** Depends on T1, app-foundation T1/T2 and passenger-trains T2. Apply the existing Figma follow/account layouts and preserve intent through optional login. Check guest return, correct dated journey, two routes/directions, duplicate action and empty account states. No new tab or automatic subscription to all services with the same number.
+- [ ] **T4 — Integrate personal changes and private cache.** Depends on T2/T3. Check real screens through poll/reconnect/304, no repeated announcement, an in-flight response after unfollow/logout, account switch, offline labels and permission loss. API checks prove another passenger cannot access the stored data; Flutter widgets and an actual Android login/save/follow/unfollow flow prove the UI. Run analysis/tests and accessibility/both-theme checks.
+
+Planning only; the alert-model decision is settled. No new checks have run. Client tasks are blocked on their named unimplemented foundation/train prerequisites. No registration, push infrastructure, journey planner or storage of pickup codes/tokens in a public cache.

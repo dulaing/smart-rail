@@ -1,0 +1,38 @@
+# Operations demo controls and health
+
+## Outcome and scope
+
+An explicitly authorised demo operator can pause/resume one simulated train, simulate/restore RailBites availability and see dependency/backlog recovery without exposing internal credentials. This is a small light Operations panel, not a replacement Aspire dashboard. Follow [handoff 9](../docs/app-spec-plan.md#9-operations-demo-controls-and-health--copy-this-prompt), [operations workspace](operations-workspace.md), [running backend](simulated-running.md), [RailBites T6](railbites.md), [local setup/drill](../services/README.md) and [app foundation](app-foundation.md).
+
+## Current code and ownership
+
+- `Rail/Running/SimulatorSetup.cs` supplies service-key-protected POST `/internal/rail/simulator/journeys/{id}/pause` and `/resume`, with in-memory `SimulatorControl`. `Program.cs` maps them only in Development. `Simulator:Enabled` controls the worker; a paused flag is not evidence freshness or proof the train stopped physically.
+- Access has `simulation.control`, seeded only for SimOperator. There are no browser-safe signed-in control routes in the inspected mappings. Never send `X-SmartRail-Service-Key` or any provider key from React, a VITE variable, URL or browser storage.
+- RailBites `dev-controls.ts`/`server.ts` has GET/PUT `/internal/dev/outage`, guarded by its service key and enabled only for local non-production drills. PUT takes `{active: boolean}`; restore and health remain reachable during outage. The switch is memory state, not durable provider availability.
+- `CateringHealthCheck.cs` and `Infrastructure/HealthResponseWriter.cs` expose readiness, provider state and counts/ages: `outboxPending`, `outboxFailed`, `oldestOutboxSeconds`, `ordersPending`, `oldestPendingOrderSeconds`. Provider failure degrades food dependency without breaking public train reads or liveness. Do not interpret an unavailable count as zero.
+- `services/apphost/AppHost.cs` already wires separate keys, service addresses and a file-backed SQLite path. `DrillApiTests.cs` and `FeatureAcceptanceApiTests.cs` exist. RailBites T6 is checked, but its final evidence paragraph still says the local drill/AppHost/hosted CI have not been verified. Recheck and reconcile that evidence in its owning task; do not build duplicate workers, telemetry or recovery tests here.
+- Seed source has fixed train times/configurable dates, not a presentation-anchor command. [Pilot acceptance](pilot-app-acceptance.md) owns the minimal repeatable presentation-relative fixture. This panel selects known dated IDs; it does not edit the timetable, shift browser clocks or invent in-service trains.
+
+## Demo permissions — user confirmed
+
+SimOperator can use **all Development-only demo controls and diagnostics**. Use the existing network-scoped `simulation.control` permission for train pause/resume, simulated provider outage/restore and the panel's diagnostic read. Other accounts need an explicit grant of that permission; Controller/SysAdmin status or `accounts.manage` alone grants none. No additional provider/health permission codes or automatic SysAdmin grant are needed for this panel.
+
+Recheck active account, permission and grant expiry on every adapter request. This decision does not grant operational train-change authority or relax Development-only gating. Existing anonymous health endpoints retain their existing public contract; the new staff panel/adapter uses the selected policy.
+
+## Server adapter and UI
+
+Add small authenticated routes under `/api/demo`: read selected journey simulation state, POST its pause/resume, GET/PUT provider outage, and read sanitised dependency/backlog diagnostics. Enforce `simulation.control` on the server, active account and Development-only availability; train simulation actions also require `Simulator:Enabled`. Do not let client parameters choose an arbitrary upstream host or command. Rail actions use the existing control/ticker services; provider actions use a fixed configured server-side client with its existing service credential. Add successful/denied action audit entries without secrets/payloads. State-changing calls are idempotent assignments of desired state, not toggles.
+
+The provider adapter's restore action must remain reachable during the simulated outage; do not gate it on provider readiness. Distinguish an actual stopped process (cannot restore with an HTTP switch; direct the operator to Aspire) from a simulated outage. Missing config, non-demo environment, denied access, provider timeout and unknown state have honest responses. Never display success before confirmation; after a lost response reread desired/actual control state before allowing a retry.
+
+The panel shows simulation Enabled/Paused/Running separately from observation CURRENT/AGEING/UNKNOWN and provider Healthy/Degraded/Unavailable/Unknown. Show last checked time, backlog counts/oldest ages and permanent failure count. Poll every 15 seconds while visible, refresh after actions/resume and prevent overlapping requests. A failed read keeps last values clearly historical. Link configured local trace/dashboard URLs without credentials; do not embed or recreate the dashboard. No provider cutoff editor is added here; its owner-controlled CLI/API drill remains in RailBites T6.
+
+## Tasks
+
+- [ ] **T1 — Expose the confirmed staff control policy safely.** **First ready task.** Reuse Access's `simulation.control` policy and add the Development-only adapter in the existing Rail/Catering modules/host wiring. Check API tests allow SimOperator and another account with an explicit grant, deny guest/ungranted Controller/SysAdmin and revoked/expired grants, disable production/disabled-simulator actions, reject unknown journeys and prove no secret appears in responses. Reuse current services, not HTTP calls to this API's own internal route.
+- [ ] **T2 — Operate the panel from Operations.** Depends on T1, app-foundation T1/T3 and operations-workspace T1. Check actual staff login, selected dated journey, pause/resume and provider outage/restore, in-flight guards and read-after-timeout reconciliation. Inspect browser bundle/network/storage to confirm internal credentials stay server-side. **First UI task, blocked on those prerequisites.**
+- [ ] **T3 — Show honest dependency and backlog state.** Depends on T1/T2. Adapt existing health data and trace links, keeping failed/unknown separate from zero/healthy. Check provider outage → backlog increase → restore → drain, permanently failed delivery, unavailable API and independent public train reads. Do not duplicate the backend's recovery proof; reference its recorded evidence and test only the staff-facing integration.
+- [ ] **T4 — Rehearse both failures on the local stack.** Depends on T2/T3, RailBites T6 evidence reconciliation and pilot-app-acceptance T1 fixture. Pause → age to UNKNOWN → resume; outage → pending delivery → restore while outage active → recovery with durable data. Record real elapsed observation times, build/lint, keyboard/accessibility checks and specific blockers. A simulated paused flag alone does not pass the freshness check.
+
+Planning only; demo permissions are settled. Client/rehearsal tasks remain blocked by their named unimplemented prerequisites. No new checks have run. Local demo controls do not imply Azure deployment, production readiness, real railway controls or timetable management.
+

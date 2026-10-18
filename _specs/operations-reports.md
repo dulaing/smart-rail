@@ -1,0 +1,35 @@
+# Control reports, incidents and audit
+
+## Outcome and context
+
+Control can read a driver's report, explicitly acknowledge it, open/resolve an incident and publish a linked change. The driver sees the winning acknowledgement's name/time. An Auditor can inspect the permitted history. Each action remains separate: reading a report, opening an incident and resolving one do not acknowledge a report or publish/withdraw a change.
+
+Follow [handoff 6](../docs/app-spec-plan.md#6-control-reports-incidents-and-audit--copy-this-prompt), [driver-report backend](driver-reports.md), [operations workspace](operations-workspace.md), [app foundation](app-foundation.md) and current Figma staff wireframes. Extend the existing light Operations app, not another deployable. All existing rules in the handoff are settled scope; no extra workflow is being selected here.
+
+## Existing contracts and small gap
+
+`services/api/Modules/Operations/Reports/ControlReportEndpoints.cs` already maps GET `/api/operations/reports`, GET `.../{reportId}` and POST `.../{reportId}/acknowledge`. Lists support journey, acknowledged state, limit and opaque cursor. DTOs return submitter/acknowledger identity and timestamps; repeated acknowledgement returns the first controller's recorded result.
+
+`Incidents/IncidentEndpoints.cs` maps POST `/api/operations/incidents`, GET list/detail, POST `.../{id}/resolve` and GET `.../{id}/audit`. Creation accepts either `sourceReportId` or an existing reason code; repeat opening from the same report returns the same incident. Repeated resolution preserves the first resolution time. A standalone create is not currently guaranteed idempotent: guard in-flight clicks, never automatically replay an ambiguous create, and reload the list before another user action.
+
+`Changes/StaffChangeEndpoints.cs` provides the composer link and journey audit route. Incident/journey audit currently returns an oldest-first bounded list, at most 200, without a continuation cursor. Plan a small Access audit-read pagination extension used by both routes so later events cannot become inaccessible. Preserve authorization and existing response compatibility; add optional cursor/limit and continuation metadata, stable `(occurredAt,id)` ordering, and explicit end-of-history. Do not add another audit table or duplicate logging.
+
+## Screens and permissions
+
+- **Report inbox:** default unacknowledged, filters for acknowledged/all and journey, newest-first pages. Show received time independently from acknowledgement time. Opening detail is a read only. Refresh the first page every 15 seconds while visible, retain the selected report and deduplicate by report ID. Explicit load-more uses the returned cursor; changing filter resets it. Refresh does not splice incompatible cursor snapshots together.
+- **Report detail:** show driver, journey, existing reason and server receipt. An explicit Acknowledge button calls the server; disable while in flight. If another controller already won, show that person's original name/time. A timeout is uncertain until a read reconciles it; never invent a new acknowledgement actor/time.
+- **Incident workspace:** Open/Resolved list, detail, optional source-report link, and an explicit create/resolve action. Reuse the current four reason codes, not a formal railway classification. Opening from a report may precede or follow acknowledgement. Resolution leaves the report acknowledgement and all published changes untouched. Preserve the selected incident if filters refresh it out of the Open list.
+- **Composer handoff:** choose an existing open incident in operations-workspace only with `incidents.manage`. The selected incident ID travels with the exact previewed request. If it resolves while a draft is open, invalidate review, show the server error and let the controller remove/change the link and preview again. Withdrawal retains its inherited incident link and must not submit a replacement incident ID.
+- **Auditor:** read-only incident list/detail and cursor-paged incident/journey history with actor/action/outcome/time/correlation ID as supplied. Link related journeys/reports only when the account has the target permission. Auditor does not receive the raw Control inbox. Controller has `incidents.manage/read`, but not automatically `audit.read`; do not request or expose audit behind a controller-only screen.
+
+Use effective `/api/me` permissions and server denial for direct URLs, revoked grants and disabled accounts. 401 prompts sign-in; 403 is an access state. Loading, empty success, vanished records, network failure and stale detail are distinct. Operations has no offline writes; do not clear a draft on a recoverable read failure or expose one account's content after switching account.
+
+## Tasks
+
+- [ ] **T1 — Read complete bounded audit pages.** Add optional cursor pagination to Access audit storage/reader and existing Operations audit routes. **First ready task; no client foundation prerequisite.** Check API tests with more than 200 entries prove stable traversal, no omitted later actions, invalid cursor handling and continued incident/journey authorization. Preserve old callers' bounded default behaviour; no silent claim of complete history when only one page was fetched.
+- [ ] **T2 — Work the Control inbox and acknowledgement.** Depends on app-foundation T1/T3 and operations-workspace T1. Build report list/detail and acknowledgement in `apps/ops-web/src/`. Check real reports, filters/cursors, empty/error states, duplicate clicks, competing acknowledgements, timeout/read reconciliation and permission loss. Opening the page cannot send an acknowledgement.
+- [ ] **T3 — Manage incidents and link a reviewed change.** Depends on T2 and operations-workspace T2. Add incident list/detail/create/resolve and the composer selector. Check report-derived create is repeat-safe, standalone ambiguous create is not auto-replayed, resolution leaves delay/report states unchanged, and an incident resolving after preview forces fresh review.
+- [ ] **T4 — Inspect Auditor history without write controls.** Depends on T1, app-foundation T3 and operations-workspace T1; independent of report UI completion. Check actual Auditor can traverse linked incident/journey pages and denied attempts, while Controller without audit permission, SysAdmin and direct unauthorized URLs are refused appropriately. Do not leak raw reports through link navigation.
+- [ ] **T5 — Verify the connected report loop.** Depends on T2–T4 and driver-journeys reporting. Real flow: driver submits → Control reads → explicit acknowledgement → driver displays name/time → linked reviewed delay → incident resolution leaves delay active → Auditor reads history. Run build/lint, focused browser tests, keyboard/screen-reader and accessibility checks. Label API-substituted mobile steps honestly; record unavailable devices/services as blockers.
+
+Planning only; no new checks have run. UI tasks are blocked by their named unimplemented shell/workspace prerequisites. No automatic acknowledgement/escalation/publishing, formal operational classification, analytics or account/grant administration.
