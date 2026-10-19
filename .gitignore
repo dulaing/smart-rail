@@ -70,3 +70,9 @@ Desktop.ini
 
 # RailBites local SQLite files
 services/railbites/data/
+
+# Generated image workspace (curated assets live in shared/design)
+/output/
+
+# Local agent worktrees
+/.claude/worktrees/
