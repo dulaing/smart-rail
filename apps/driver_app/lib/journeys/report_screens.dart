@@ -490,10 +490,7 @@ class _DriverReportJourneyScreenState extends State<DriverReportJourneyScreen>
     final selected = _reports
         .where((r) => r.id == _selectedReportId)
         .firstOrNull;
-    final wide =
-        MediaQuery.sizeOf(context).width >= 1000 &&
-        MediaQuery.textScalerOf(context).scale(20) <= 28;
-    if (_history && wide) {
+    if (_history) {
       void open({String? reportId}) => setState(() {
         _selectedReportId = reportId;
         _history = false;
@@ -510,6 +507,7 @@ class _DriverReportJourneyScreenState extends State<DriverReportJourneyScreen>
         displayName: widget.displayName,
         now: DateTime.now(),
         checkedAt: _checkedAt,
+        onBack: () => Navigator.of(context).pop(),
         // A report that is not yet confirmed must be checked or retried, never duplicated.
         onReport: _draft != null ? null : open,
         onOpenReport: (report) => open(reportId: report.id),
@@ -521,48 +519,6 @@ class _DriverReportJourneyScreenState extends State<DriverReportJourneyScreen>
             (widget.onUpdates ?? widget.onBriefing ?? () {})();
           }
         },
-      );
-    }
-    if (_history && _draft == null) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Your reports')),
-        body: ListView(
-          padding: const EdgeInsets.all(24),
-          children: [
-            Text('${widget.journey.trainNumber} reports'),
-            if (_busy) const LinearProgressIndicator(),
-            if (_message != null) Text(_message!),
-            if (_accessLost)
-              const Text('Access ended. Sign in again or contact Control.'),
-            if (_reports.isEmpty && !_busy && _message == null && !_accessLost)
-              const Text('No reports for this journey.'),
-            for (final report in _reports)
-              Card(
-                child: ListTile(
-                  minTileHeight: 64,
-                  title: Text(
-                    reportReasons[report.reasonCode] ?? report.reasonCode,
-                  ),
-                  subtitle: Text(
-                    'Server received ${reportTime(report.receivedAt)}',
-                  ),
-                  onTap: () => setState(() {
-                    _selectedReportId = report.id;
-                    _history = false;
-                  }),
-                ),
-              ),
-            FilledButton(
-              onPressed: _accessLost || _busy || !widget.canCreate
-                  ? null
-                  : () => setState(() {
-                      _selectedReportId = null;
-                      _history = false;
-                    }),
-              child: const Text('Report a problem'),
-            ),
-          ],
-        ),
       );
     }
     // A removed report cannot silently become another receipt. Return to the list.

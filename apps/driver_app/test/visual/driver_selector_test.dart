@@ -199,13 +199,18 @@ void main() {
         .load();
   });
 
-  final bounds =
-      jsonDecode(
-            File(
-              'test/visual/comparisons/2026-10-19/selector-reports.reference-bounds.json',
-            ).readAsStringSync(),
-          )
-          as Map;
+  final bounds = {
+    ...jsonDecode(
+      File(
+        'test/visual/comparisons/2026-10-19/selector-reports.reference-bounds.json',
+      ).readAsStringSync(),
+    ) as Map,
+    ...jsonDecode(
+      File(
+        'test/visual/comparisons/2026-10-19/phone-navigation.reference-bounds.json',
+      ).readAsStringSync(),
+    ) as Map,
+  };
 
   final captures = <String, (Widget Function(), bool)>{
     'tablet-selector': (_selector, false),
@@ -219,11 +224,11 @@ void main() {
       false,
     ),
     'tablet-no-saved': (
-      () =>
-          _selector(empty: SelectorEmpty.noSaved, saved: true, now: _six30),
+      () => _selector(empty: SelectorEmpty.noSaved, saved: true, now: _six30),
       false,
     ),
     'phone-selector': (_selector, true),
+    'phone-updates-selector': (() => _selector(destination: 'updates'), true),
     'phone-reports-chooser': (
       () => _selector(destination: 'reports', chooser: true),
       true,
@@ -265,9 +270,9 @@ void main() {
       );
       final bytes = await tester.runAsync(() async {
         final image = await boundary.toImage(pixelRatio: phone ? 3 : 2);
-        final bytes = (await image.toByteData(
-          format: ui.ImageByteFormat.png,
-        ))!.buffer.asUint8List();
+        final bytes = (await image.toByteData(format: ui.ImageByteFormat.png))!
+            .buffer
+            .asUint8List();
         await File('test/visual/comparisons/2026-10-19/$name.actual.png')
             .writeAsBytes(bytes);
         await File(
@@ -295,24 +300,27 @@ void main() {
     });
   }
 
-  testWidgets('date buttons move the service date and rows open their journey', (
-    tester,
-  ) async {
-    final calls = <String>[];
-    await _pump(
-      tester,
-      _selector(
-        onPrevious: () => calls.add('previous'),
-        onNext: () => calls.add('next'),
-        items: [journeyItem(_b1, saved: false, onTap: () => calls.add('open'))],
-      ),
-    );
-    await tester.tap(find.byKey(const Key('date-previous')));
-    await tester.tap(find.byKey(const Key('date-next')));
-    await tester.tap(find.byKey(const Key('journey-DS-B1')));
-    expect(calls, ['previous', 'next', 'open']);
-    expect(find.text('Mon 12 Oct'), findsWidgets);
-  });
+  testWidgets(
+    'date buttons move the service date and rows open their journey',
+    (tester) async {
+      final calls = <String>[];
+      await _pump(
+        tester,
+        _selector(
+          onPrevious: () => calls.add('previous'),
+          onNext: () => calls.add('next'),
+          items: [
+            journeyItem(_b1, saved: false, onTap: () => calls.add('open')),
+          ],
+        ),
+      );
+      await tester.tap(find.byKey(const Key('date-previous')));
+      await tester.tap(find.byKey(const Key('date-next')));
+      await tester.tap(find.byKey(const Key('journey-DS-B1')));
+      expect(calls, ['previous', 'next', 'open']);
+      expect(find.text('Mon 12 Oct'), findsWidgets);
+    },
+  );
 
   testWidgets('availability and saved copies are labelled, never inferred', (
     tester,

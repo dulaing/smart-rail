@@ -1,0 +1,5 @@
+{
+  "meanAbsoluteChannelError": 1.532472750528306,
+  "pixelsWithChannelDeltaAbove16": 0.014758925592258925,
+  "interpretation": "Diagnostic only. Geometry and text raster differences reviewed separately."
+}

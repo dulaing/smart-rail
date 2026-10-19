@@ -1,0 +1,199 @@
+{
+  "approvedOn": "2026-10-19",
+  "approval": "User approved permission-gated Open updates/Open reports in phone Account; Reports opens chooser/history; offline restrictions and scrolling at 200%.",
+  "coordinatorConversation": "cnv_7232e63f7fab4824bb38",
+  "createdNodeIds": [
+    "363:986",
+    "I363:986;187:603",
+    "363:988",
+    "I363:988;187:603",
+    "363:990",
+    "I363:990;187:603",
+    "363:992",
+    "I363:992;187:603"
+  ],
+  "mutatedNodeIds": [
+    "189:505",
+    "189:506",
+    "189:503",
+    "341:786",
+    "I341:786;187:603",
+    "363:986",
+    "I363:986;187:603",
+    "363:988",
+    "I363:988;187:603",
+    "190:6860",
+    "190:6861",
+    "190:6858",
+    "341:788",
+    "I341:788;187:603",
+    "363:990",
+    "I363:990;187:603",
+    "363:992",
+    "I363:992;187:603",
+    "366:996",
+    "366:1002"
+  ],
+  "records": [
+    {
+      "frameId": "189:483",
+      "cardId": "189:503",
+      "bounds": {
+        "x": 55,
+        "y": 872,
+        "width": 970,
+        "height": 968
+      },
+      "children": [
+        {
+          "id": "189:505",
+          "name": "DS-B1 \u00e2\u2020\u2019 Colombo Fort",
+          "bounds": {
+            "x": 95,
+            "y": 912,
+            "width": 890,
+            "height": 84
+          }
+        },
+        {
+          "id": "189:506",
+          "name": "Mon 12 Oct \u00c2\u00b7 simulated duty",
+          "bounds": {
+            "x": 95,
+            "y": 1020,
+            "width": 890,
+            "height": 132
+          }
+        },
+        {
+          "id": "341:786",
+          "name": "Open briefings",
+          "bounds": {
+            "x": 95,
+            "y": 1176,
+            "width": 890,
+            "height": 192
+          }
+        },
+        {
+          "id": "363:986",
+          "name": "Open updates",
+          "bounds": {
+            "x": 95,
+            "y": 1392,
+            "width": 890,
+            "height": 192
+          }
+        },
+        {
+          "id": "363:988",
+          "name": "Open reports",
+          "bounds": {
+            "x": 95,
+            "y": 1608,
+            "width": 890,
+            "height": 192
+          }
+        }
+      ]
+    },
+    {
+      "frameId": "190:6842",
+      "cardId": "190:6858",
+      "bounds": {
+        "x": 55,
+        "y": 872,
+        "width": 970,
+        "height": 968
+      },
+      "children": [
+        {
+          "id": "190:6860",
+          "name": "DS-B1 \u00e2\u2020\u2019 Colombo Fort",
+          "bounds": {
+            "x": 95,
+            "y": 912,
+            "width": 890,
+            "height": 84
+          }
+        },
+        {
+          "id": "190:6861",
+          "name": "Mon 12 Oct \u00c2\u00b7 simulated duty",
+          "bounds": {
+            "x": 95,
+            "y": 1020,
+            "width": 890,
+            "height": 132
+          }
+        },
+        {
+          "id": "341:788",
+          "name": "Open briefings",
+          "bounds": {
+            "x": 95,
+            "y": 1176,
+            "width": 890,
+            "height": 192
+          }
+        },
+        {
+          "id": "363:990",
+          "name": "Open updates",
+          "bounds": {
+            "x": 95,
+            "y": 1392,
+            "width": 890,
+            "height": 192
+          }
+        },
+        {
+          "id": "363:992",
+          "name": "Open reports",
+          "bounds": {
+            "x": 95,
+            "y": 1608,
+            "width": 890,
+            "height": 192
+          }
+        }
+      ]
+    }
+  ],
+  "borderRepair": "Cloned actions retain line/hairline variable binding and its resolved Light/Dark paint.",
+  "historicalEvidence": "Original phone-account reference, captures and golden retained; phone-account-navigation is the amended baseline.",
+  "updatesSelector": {
+    "id": "366:990",
+    "derivedFrom": "349:911",
+    "changes": "Existing phone selector composition reused with Updates title and confirmed-updates lead; no new workflow",
+    "createdNodeIds": [
+      "366:990",
+      "366:991",
+      "366:992",
+      "366:993",
+      "366:994",
+      "366:995",
+      "366:996",
+      "366:997",
+      "366:998",
+      "366:999",
+      "366:1000",
+      "366:1001",
+      "366:1002",
+      "366:1003",
+      "366:1004",
+      "366:1005",
+      "366:1006",
+      "366:1007",
+      "366:1008",
+      "366:1009",
+      "366:1010",
+      "366:1011"
+    ]
+  },
+  "prototypeDestinations": {
+    "Open briefings": "349:911",
+    "Open updates": "366:990",
+    "Open reports": "349:972"
+  }
+}

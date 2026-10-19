@@ -37,6 +37,8 @@ Widget _account({
   String? noAccess,
   bool offline = false,
   bool journeys = true,
+  bool reports = true,
+  bool busy = false,
   ValueChanged<String>? onSelect,
   VoidCallback? onSignOut,
 }) => DriverAccountView(
@@ -45,6 +47,8 @@ Widget _account({
   noAccessMessage: noAccess,
   offline: offline,
   showJourneys: journeys,
+  showReports: reports,
+  busy: busy,
   now: _clock,
   checkedAt: _clock,
   onSignOut: onSignOut ?? () {},
@@ -120,17 +124,22 @@ void main() {
         .load();
   });
 
-  final bounds =
-      jsonDecode(
-            File(
-              'test/visual/comparisons/2026-10-19/account-reports.reference-bounds.json',
-            ).readAsStringSync(),
-          )
-          as Map;
+  final bounds = {
+    ...jsonDecode(
+      File(
+        'test/visual/comparisons/2026-10-19/account-reports.reference-bounds.json',
+      ).readAsStringSync(),
+    ) as Map,
+    ...jsonDecode(
+      File(
+        'test/visual/comparisons/2026-10-19/phone-navigation.reference-bounds.json',
+      ).readAsStringSync(),
+    ) as Map,
+  };
 
   final captures = <String, (Widget Function(), bool)>{
     'tablet-account': (_account, false),
-    'phone-account': (_account, true),
+    'phone-account-navigation': (_account, true),
     'tablet-reports-list': (() => _list(draft: true), false),
     'tablet-reports-empty': (() => _list(empty: true), false),
   };
@@ -164,9 +173,9 @@ void main() {
       );
       final bytes = await tester.runAsync(() async {
         final image = await boundary.toImage(pixelRatio: phone ? 3 : 2);
-        final bytes = (await image.toByteData(
-          format: ui.ImageByteFormat.png,
-        ))!.buffer.asUint8List();
+        final bytes = (await image.toByteData(format: ui.ImageByteFormat.png))!
+            .buffer
+            .asUint8List();
         await File('test/visual/comparisons/2026-10-19/$name.actual.png')
             .writeAsBytes(bytes);
         await File(
@@ -224,6 +233,7 @@ void main() {
       _account(
         noAccess: 'This account has no driver access.',
         journeys: false,
+        reports: false,
         offline: true,
       ),
     );
@@ -239,12 +249,85 @@ void main() {
   ) async {
     await _pump(
       tester,
-      _account(noAccess: 'No access.', journeys: false),
+      _account(noAccess: 'No access.', journeys: false, reports: false),
       phone: true,
     );
     expect(find.byKey(const Key('account-briefings')), findsNothing);
     expect(find.byTooltip('Back'), findsNothing);
   });
+
+  testWidgets(
+    'phone Account exposes permitted destinations and keeps Reports offline-safe',
+    (tester) async {
+      final selected = <String>[];
+      await _pump(tester, _account(onSelect: selected.add), phone: true);
+      for (final target in ['briefings', 'updates', 'reports']) {
+        final link = find.byKey(Key('account-open-$target'));
+        await tester.ensureVisible(link);
+        await tester.tap(link);
+        await tester.pumpAndSettle();
+      }
+      expect(selected, ['journeys', 'updates', 'reports']);
+      await _pump(
+        tester,
+        _account(onSelect: selected.add, offline: true),
+        phone: true,
+      );
+      await tester.ensureVisible(find.byKey(const Key('account-open-reports')));
+      final reportButton = tester.widget<FilledButton>(
+        find.descendant(
+          of: find.byKey(const Key('account-open-reports')),
+          matching: find.byType(FilledButton),
+        ),
+      );
+      expect(reportButton.onPressed, isNull);
+      expect(find.text('Connect to open reports'), findsOneWidget);
+      await _pump(tester, _account(reports: false), phone: true);
+      expect(find.text('Open updates'), findsOneWidget);
+      expect(find.text('Open reports'), findsNothing);
+      expect(find.text('Connect to open reports'), findsNothing);
+      await _pump(tester, _account(journeys: false), phone: true);
+      expect(find.text('Open briefings'), findsNothing);
+      expect(find.text('Open updates'), findsNothing);
+      expect(find.text('Open reports'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'phone Account navigation and Sign out remain reachable at 200 percent',
+    (tester) async {
+      final selected = <String>[];
+      await _pump(
+        tester,
+        _account(onSelect: selected.add),
+        phone: true,
+        scale: 2,
+      );
+      for (final target in ['briefings', 'updates', 'reports']) {
+        final link = find.byKey(Key('account-open-$target'));
+        await tester.ensureVisible(link);
+        expect(link.hitTestable(), findsOneWidget);
+        await tester.tap(link);
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      }
+      expect(selected, ['journeys', 'updates', 'reports']);
+      expect(
+        find.byKey(const Key('account-signout')).hitTestable(),
+        findsOneWidget,
+      );
+      await _pump(tester, _account(busy: true), phone: true);
+      for (final target in ['briefings', 'updates', 'reports']) {
+        final button = tester.widget<FilledButton>(
+          find.descendant(
+            of: find.byKey(Key('account-open-$target')),
+            matching: find.byType(FilledButton),
+          ),
+        );
+        expect(button.onPressed, isNull);
+      }
+    },
+  );
 
   testWidgets('a draft is listed first and blocks a second report', (
     tester,
@@ -266,7 +349,9 @@ void main() {
     );
     expect(
       tester.getTopLeft(find.byKey(const Key('report-row-draft'))).dy,
-      lessThan(tester.getTopLeft(find.byKey(const Key('report-row-RPT-118'))).dy),
+      lessThan(
+        tester.getTopLeft(find.byKey(const Key('report-row-RPT-118'))).dy,
+      ),
     );
     expect(find.text('RECEIPT NOT CONFIRMED'), findsOneWidget);
     expect(find.text('Saved on this device'), findsOneWidget);

@@ -4,12 +4,16 @@ import 'dart:convert';
 import 'package:driver_app/auth/account_api.dart';
 import 'package:driver_app/auth/auth_service.dart';
 import 'package:driver_app/journeys/briefing_api.dart';
+import 'package:driver_app/journeys/report_api.dart';
+import 'package:driver_app/journeys/reports_view.dart';
+import 'package:driver_app/journeys/selector_view.dart';
 import 'package:driver_app/main.dart';
 import 'package:flutter/material.dart';
 
 import 'dart:ui' show Tristate;
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
@@ -61,6 +65,13 @@ class FakeAccounts implements AccountApi {
     calls++;
     return result;
   }
+}
+
+class _OfflineAuth extends FakeAuth {
+  @override
+  Future<bool> restore() async => throw const AuthRestoreUnavailable();
+  @override
+  Future<String?> ownerId() async => 'saved-owner';
 }
 
 const _driver = Account(
@@ -273,6 +284,139 @@ void main() {
   });
 
   group('driver shell', () {
+    testWidgets(
+      'phone Account reaches Updates with no change card and Reports history without sending',
+      (tester) async {
+        _phone(tester);
+        FlutterSecureStorage.setMockInitialValues({});
+        final auth = FakeAuth(restores: true)..signedIn = true;
+        final reportMethods = <String>[];
+        final journeys = DriverBriefingApi(
+          'https://api.test',
+          auth,
+          client: MockClient(
+            (_) async => http.Response(_assignedJourneys(), 200),
+          ),
+        );
+        final reports = DriverReportApi(
+          'https://api.test',
+          auth,
+          client: MockClient((request) async {
+            reportMethods.add(request.method);
+            return http.Response(
+              jsonEncode({
+                'items': [
+                  {
+                    'reportId': 'receipt-1',
+                    'clientReportId': 'client-1',
+                    'journeyId': _journeyId,
+                    'reasonCode': 'SIGNAL_DELAY',
+                    'receivedAt': '2026-10-18T02:01:00Z',
+                    'state': 'SENT_AWAITING_CONTROL',
+                    'acknowledgedByName': null,
+                    'acknowledgedAt': null,
+                  },
+                ],
+              }),
+              200,
+            );
+          }),
+        );
+        await tester.pumpWidget(
+          MainApp(
+            auth: auth,
+            accounts: FakeAccounts(const AccountFound(_driver)),
+            journeyApi: journeys,
+            reportApi: reports,
+          ),
+        );
+        await tester.pumpAndSettle();
+        // No briefing or change card is required to navigate to Updates.
+        await _openAccount(tester);
+        await tester.ensureVisible(
+          find.byKey(const Key('account-open-updates')),
+        );
+        await tester.tap(find.byKey(const Key('account-open-updates')));
+        await tester.pumpAndSettle();
+        expect(
+          tester
+              .widget<DriverSelectorView>(find.byType(DriverSelectorView))
+              .destination,
+          'updates',
+        );
+        await _openAccount(tester);
+        await tester.ensureVisible(
+          find.byKey(const Key('account-open-reports')),
+        );
+        await tester.tap(find.byKey(const Key('account-open-reports')));
+        await tester.pumpAndSettle();
+        expect(
+          tester
+              .widget<DriverSelectorView>(find.byType(DriverSelectorView))
+              .destination,
+          'reports',
+        );
+        await tester.tap(find.byKey(const Key('journey-$_journeyId')));
+        await tester.pumpAndSettle();
+        expect(find.byType(DriverReportsListView), findsOneWidget);
+        expect(find.byKey(const Key('report-row-receipt-1')), findsOneWidget);
+        expect(find.text('Send report'), findsNothing);
+        expect(reportMethods, ['GET']);
+        await tester.tap(find.byTooltip('Back'));
+        await tester.pumpAndSettle();
+        expect(
+          tester
+              .widget<DriverSelectorView>(find.byType(DriverSelectorView))
+              .destination,
+          'reports',
+        );
+        await tester.pumpWidget(const SizedBox());
+      },
+    );
+
+    testWidgets(
+      'phone cold-offline Account keeps saved Updates available and hides Reports without a grant',
+      (tester) async {
+        _phone(tester);
+        FlutterSecureStorage.setMockInitialValues({});
+        final auth = _OfflineAuth();
+        var requests = 0;
+        await tester.pumpWidget(
+          MainApp(
+            auth: auth,
+            accounts: FakeAccounts(const AccountFound(_driver)),
+            journeyApi: DriverBriefingApi(
+              'https://api.test',
+              auth,
+              client: MockClient((_) async {
+                requests++;
+                return http.Response('', 503);
+              }),
+            ),
+            hasSavedData: (_) async => true,
+          ),
+        );
+        await tester.pumpAndSettle();
+        await _openAccount(tester);
+        expect(find.text('Open reports'), findsNothing);
+        expect(find.text('Reconnect and sign in'), findsOneWidget);
+        await tester.ensureVisible(
+          find.byKey(const Key('account-open-updates')),
+        );
+        await tester.tap(find.byKey(const Key('account-open-updates')));
+        await tester.pumpAndSettle();
+        expect(
+          tester
+              .widget<DriverSelectorView>(find.byType(DriverSelectorView))
+              .destination,
+          'updates',
+        );
+        expect(find.text('No saved briefing available'), findsOneWidget);
+        expect(requests, 0);
+        await tester.pumpWidget(const SizedBox());
+      },
+    );
+
     testWidgets(
       'shows only the destinations this account may use, with honest empty content',
       (tester) async {

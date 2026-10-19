@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-19",
+  "device": "emulator-5554, Android API35, 1080x2400 at 420dpi",
+  "build": "Current debug APK installed with adb install -r; no application data cleared",
+  "checks": {
+    "accountDestinations": "passed: demo-driver Account exposes Open briefings, Open updates and Open reports",
+    "noChangeJourney": "passed: Open updates opens dated selector; SIM-1001 opens Updates from Control / No confirmed changes for this journey",
+    "reportsHistory": "passed: Open reports opens chooser then approved phone Your reports list, including prior Signal delay server receipt 21:37 and Demo Controller acknowledgement 21:39; no new report submitted",
+    "systemText200Percent": "passed: grew/scrolled Account, operated both links, retained reachable Sign out; restored font scale 1.0",
+    "coldOffline": "passed: blocked identity/API reverse ports and restarted; Account retained Open updates and Reconnect and sign in while hiding Reports without an authenticated grant; saved Updates selector remained reachable",
+    "nativeReader": "audible traversal remains pending",
+    "authenticatedRecovery": "passed: after restoring both reverse ports, existing system-browser sign-in returned to authenticated Account with Open reports and Sign out"
+  },
+  "screenshots": [
+    "native-phone-navigation-account.png",
+    "native-phone-navigation-no-updates.png",
+    "native-phone-navigation-reports-history.png",
+    "native-phone-navigation-200pct.png",
+    "native-phone-navigation-cold-account.png"
+  ],
+  "cleanup": "System text scale restored to 1.0, reverse ports 7074 and 8080 restored. No device clock or server data changes.",
+  "interpretation": "Native smoke evidence only; synthetic goldens and audible reader acceptance are separate.",
+  "apkSha256": "2e263f6bfcc4a5b53048e01df929a00b2d12294dfb7cced0406d9129d9df2ec3"
+}

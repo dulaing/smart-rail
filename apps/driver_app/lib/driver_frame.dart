@@ -462,10 +462,11 @@ class DriverAction extends StatelessWidget {
     required this.onPressed,
     this.phone = false,
     this.outlined = false,
+    this.bordered = false,
   });
   final String label;
   final VoidCallback? onPressed;
-  final bool phone, outlined;
+  final bool phone, outlined, bordered;
   @override
   Widget build(BuildContext context) {
     final p = SrTheme.of(context).palette;
@@ -473,7 +474,9 @@ class DriverAction extends StatelessWidget {
       style: FilledButton.styleFrom(
         backgroundColor: outlined ? p.bgSurface : p.navActive,
         foregroundColor: outlined ? p.textPrimary : p.navActiveInk,
-        side: outlined && !phone ? BorderSide(color: p.lineHairline) : null,
+        side: outlined && (!phone || bordered)
+            ? BorderSide(color: p.lineHairline)
+            : null,
         minimumSize: Size(double.infinity, phone ? 64 : 96),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         shape: RoundedRectangleBorder(

@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-19",
+  "approval": "User-approved phone Account navigation correction",
+  "captures": [
+    "phone-account-navigation",
+    "phone-updates-selector"
+  ],
+  "figmaNodes": [
+    "189:483",
+    "190:6842",
+    "366:990"
+  ],
+  "geometry": {
+    "measuredFields": 112,
+    "maximumLogicalError": 0.4613087972005161,
+    "worst": "phone-updates-selector selector-chip.width",
+    "limitLogicalPixels": 1
+  },
+  "referenceSha256": {
+    "phone-account-navigation": "0f93d2f1b9d4a65cca208cb5858b51209b74bf6b485f59ed0012dfa588c32ecd",
+    "phone-updates-selector": "580b1a70a89c95a2a439b13a3df2348d095d9a98d2116177a589781a8cedd164"
+  },
+  "goldenSha256": {
+    "phone-account-navigation": "be309a44fbf35b7600eddded08aa94eba8d2ea8cb101160c306347dff949c2d0",
+    "phone-updates-selector": "d307829885fcdaaf80e211232181af58f56e49c5fd7f306a1ffadebed2ee991b"
+  },
+  "raster": "Reviewed both overlays/diffs; residual font raster and arrow fallback retain the earlier approved treatment. Metrics are diagnostic only.",
+  "historicalPhoneAccount": "Original phone-account reference/capture/golden retained; the amended Account capture is phone-account-navigation."
+}

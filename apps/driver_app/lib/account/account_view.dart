@@ -238,28 +238,66 @@ class DriverAccountView extends StatelessWidget {
           SizedBox(height: gap),
           _NoAccess(noAccessMessage!),
         ],
-        if (showJourneys) ...[
+        if (showJourneys || showReports) ...[
           SizedBox(height: gap),
           card(const Key('account-briefings'), [
             DriverText(
-              'Briefings',
+              showJourneys
+                  ? showReports
+                        ? 'Briefings and reports'
+                        : 'Briefings'
+                  : 'Reports',
               key: const Key('account-briefings-title'),
               style: driverText(context, 22, 28, weight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             DriverText(
-              'Open briefings to choose a journey.',
+              !showJourneys
+                  ? 'Choose a journey to open its reports.'
+                  : showReports
+                  ? 'Choose a journey to open its briefing, updates or reports.'
+                  : 'Choose a journey to open its briefing or updates.',
               key: const Key('account-briefings-copy'),
               style: driverText(context, 16, 22, secondary: true),
             ),
-            const SizedBox(height: 8),
-            DriverAction(
-              key: const Key('account-open-briefings'),
-              label: 'Open briefings',
-              phone: true,
-              outlined: true,
-              onPressed: () => onSelect('journeys'),
-            ),
+            if (showJourneys) ...[
+              const SizedBox(height: 8),
+              DriverAction(
+                key: const Key('account-open-briefings'),
+                label: 'Open briefings',
+                phone: true,
+                outlined: true,
+                bordered: true,
+                onPressed: busy ? null : () => onSelect('journeys'),
+              ),
+              const SizedBox(height: 8),
+              DriverAction(
+                key: const Key('account-open-updates'),
+                label: 'Open updates',
+                phone: true,
+                outlined: true,
+                bordered: true,
+                onPressed: busy ? null : () => onSelect('updates'),
+              ),
+            ],
+            if (showReports) ...[
+              const SizedBox(height: 8),
+              DriverAction(
+                key: const Key('account-open-reports'),
+                label: 'Open reports',
+                phone: true,
+                outlined: true,
+                bordered: true,
+                onPressed: offline || busy ? null : () => onSelect('reports'),
+              ),
+              if (offline) ...[
+                const SizedBox(height: 8),
+                DriverText(
+                  'Connect to open reports',
+                  style: driverText(context, 16, 22, secondary: true),
+                ),
+              ],
+            ],
           ]),
         ],
         SizedBox(height: gap),
