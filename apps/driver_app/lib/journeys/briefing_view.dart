@@ -28,6 +28,7 @@ class DriverDutyView extends StatefulWidget {
     this.onReport,
     this.onReports,
     this.onRefresh,
+    this.onReconnect,
   });
   final DriverJourney journey;
   final DriverBriefing briefing;
@@ -36,7 +37,7 @@ class DriverDutyView extends StatefulWidget {
   final bool saved, updatesOnly;
   final DateTime? downloadedAt, checkedAt;
   final String? notice;
-  final VoidCallback? onBack, onAccount, onReport, onReports;
+  final VoidCallback? onBack, onAccount, onReport, onReports, onReconnect;
   final Future<void> Function()? onRefresh;
 
   @override
@@ -113,7 +114,11 @@ class _DriverDutyViewState extends State<DriverDutyView> {
     final wide =
         MediaQuery.sizeOf(context).width >= 1000 &&
         MediaQuery.textScalerOf(context).scale(20) <= 28;
-    final title = wide
+    final title = widget.saved
+        ? wide
+              ? 'Today’s duty · saved copy'
+              : 'Saved briefing'
+        : wide
         ? 'Today’s duty · ${driverDay(widget.journey.serviceDate)}'
         : 'Briefing';
     final connection = _Connection(
@@ -131,10 +136,6 @@ class _DriverDutyViewState extends State<DriverDutyView> {
             phone: !wide,
           );
     final notices = <Widget>[
-      if (widget.saved)
-        _Notice(
-          'Saved copy · read only · downloaded ${driverTime(widget.downloadedAt)} · last checked ${driverTime(widget.checkedAt)}',
-        ),
       if (widget.notice != null)
         _Notice(widget.notice!, onRetry: widget.onRefresh),
       if (b.availability == 'CANCELLED')
@@ -316,7 +317,39 @@ class _DriverDutyViewState extends State<DriverDutyView> {
           )
         : _updates || _selectedId != null
         ? _list(context, running)
+        : widget.saved
+        ? _SavedBriefing(
+            briefing: b,
+            destination: widget.journey.destination,
+            downloadedAt: widget.downloadedAt,
+            checkedAt: widget.checkedAt,
+            wide: wide,
+            notices: notices,
+            onChange: _openChange,
+            focusFor: _focusFor,
+            action: _savedAction(wide),
+          )
         : duty;
+    final displayed =
+        widget.saved && (selected != null || _updates || _selectedId != null)
+        ? Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  wide ? 32 : 55 / 3,
+                  16,
+                  wide ? 32 : 55 / 3,
+                  0,
+                ),
+                child: DriverText(
+                  'Saved copy · read only · ${driverDay(widget.journey.serviceDate)} · downloaded ${driverTime(widget.downloadedAt)} · last checked ${driverTime(widget.checkedAt)}',
+                  style: driverText(context, 16, 22, secondary: true),
+                ),
+              ),
+              Expanded(child: content),
+            ],
+          )
+        : content;
     return DriverFrame(
       title: selected != null
           ? wide
@@ -329,7 +362,9 @@ class _DriverDutyViewState extends State<DriverDutyView> {
       showReports: widget.onReports != null && !widget.saved,
       selected: _updates || selected != null ? 'updates' : 'journeys',
       now: widget.now,
-      connection: connection,
+      connection: widget.saved
+          ? _SavedConnection(at: widget.downloadedAt)
+          : connection,
       onPhoneBack: selected == null
           ? null
           : () => _closeDetail(updates: _detailFromUpdates),
@@ -363,7 +398,9 @@ class _DriverDutyViewState extends State<DriverDutyView> {
               onPressed: () => _closeDetail(updates: false),
             )
           : !_updates
-          ? report
+          ? widget.saved
+                ? _savedAction(false)
+                : report
           : null,
       child: PopScope(
         canPop: _selectedId == null && !_updates,
@@ -373,7 +410,7 @@ class _DriverDutyViewState extends State<DriverDutyView> {
           }
         },
         child: widget.onRefresh == null
-            ? content
+            ? displayed
             : CallbackShortcuts(
                 bindings: {
                   const SingleActivator(LogicalKeyboardKey.f5): () =>
@@ -386,13 +423,26 @@ class _DriverDutyViewState extends State<DriverDutyView> {
                   },
                   child: RefreshIndicator(
                     onRefresh: widget.onRefresh!,
-                    child: content,
+                    child: displayed,
                   ),
                 ),
               ),
       ),
     );
   }
+
+  Widget _savedAction(bool wide) => DriverAction(
+    key: const Key('saved-reconnect'),
+    label: widget.onReconnect == null
+        ? 'Retry connection'
+        : 'Reconnect and sign in',
+    phone: !wide,
+    onPressed:
+        widget.onReconnect ??
+        (widget.onRefresh == null
+            ? null
+            : () => unawaited(widget.onRefresh!())),
+  );
 
   Widget _list(BuildContext context, bool running) => ListView(
     physics: const AlwaysScrollableScrollPhysics(),
@@ -426,6 +476,8 @@ class _DriverDutyViewState extends State<DriverDutyView> {
             change: c,
             briefing: widget.briefing,
             running: running,
+            saved: widget.saved,
+            savedAt: widget.downloadedAt,
             focusNode: c.id == null ? null : _focusFor(c),
             onTap: c.id == null ? null : () => _openChange(c),
           ),
@@ -446,6 +498,270 @@ class _DriverDutyViewState extends State<DriverDutyView> {
         ),
       ),
     ],
+  );
+}
+
+class _SavedBriefing extends StatelessWidget {
+  const _SavedBriefing({
+    required this.briefing,
+    required this.destination,
+    required this.downloadedAt,
+    required this.checkedAt,
+    required this.wide,
+    required this.notices,
+    required this.onChange,
+    required this.focusFor,
+    required this.action,
+  });
+  final DriverBriefing briefing;
+  final String destination;
+  final DateTime? downloadedAt, checkedAt;
+  final bool wide;
+  final List<Widget> notices;
+  final ValueChanged<BriefingChange> onChange;
+  final FocusNode Function(BriefingChange) focusFor;
+  final Widget action;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = SrTheme.of(context).palette;
+    final ordered = [...briefing.stops]
+      ..sort((a, b) => a.sequence.compareTo(b.sequence));
+    final from = ordered
+        .where((s) => s.id == briefing.positionFromStopId)
+        .firstOrNull;
+    final to = ordered
+        .where((s) => s.id == briefing.positionToStopId)
+        .firstOrNull;
+    // This is the stored segment, never a current next-stop claim. If the saved
+    // segment is invalid, retain the whole snapshot instead of guessing by time.
+    final stops =
+        from != null &&
+            to != null &&
+            from.sequence < to.sequence &&
+            to.served &&
+            (briefing.positionProgressPermille ?? -1) >= 0 &&
+            (briefing.positionProgressPermille ?? 1001) <= 1000
+        ? ordered.where((s) => s.sequence >= to.sequence).toList()
+        : ordered;
+    final heading = Column(
+      key: const Key('saved-service'),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        DriverText(
+          '${briefing.trainNumber} → $destination',
+          style: driverText(
+            context,
+            wide ? 36 : 28,
+            wide ? 44 : 36,
+            weight: FontWeight.w600,
+          ),
+        ),
+        SizedBox(height: wide ? 4 : 8 / 3),
+        DriverText(
+          'Saved copy · downloaded ${downloadedAt == null ? '—' : _confirmationTime(downloadedAt!)} · last checked ${checkedAt == null ? '—' : _confirmationTime(checkedAt!)}',
+          key: const Key('saved-timestamps'),
+          semanticsLabel:
+              'Saved copy, read only. Downloaded ${downloadedAt == null ? 'unavailable' : _confirmationTime(downloadedAt!)}. Last successfully checked ${checkedAt == null ? 'unavailable' : _confirmationTime(checkedAt!)}.',
+          style: driverText(context, 16, 22, secondary: true),
+        ),
+      ],
+    );
+    Widget change(BriefingChange c) => _ChangeCard(
+      key: Key('saved-change-${c.id}'),
+      change: c,
+      briefing: briefing,
+      running: false,
+      compact: !wide,
+      saved: true,
+      savedAt: downloadedAt,
+      focusNode: c.id == null ? null : focusFor(c),
+      onTap: c.id == null ? null : () => onChange(c),
+    );
+    final gap = wide ? 24.0 : 32 / 3;
+    final guidance = Container(
+      key: const Key('saved-guidance'),
+      padding: EdgeInsets.all(wide ? 16 : 32 / 3),
+      decoration: BoxDecoration(
+        color: p.statusWarningSoft,
+        borderRadius: BorderRadius.circular(wide ? 28 : 44 / 3),
+      ),
+      child: Row(
+        children: [
+          DriverAsset(
+            wide ? 'report-warning' : 'phone-report-warning',
+            size: wide ? 28 : 24,
+          ),
+          SizedBox(width: wide ? 16 : 8),
+          Expanded(
+            child: DriverText(
+              'Offline · saved ${driverTime(downloadedAt)}. Live times unavailable.${wide ? ' Urgent? Use the radio.' : ''}',
+              style: driverText(
+                context,
+                20,
+                28,
+                weight: FontWeight.w500,
+                color: p.statusWarningInk,
+              ),
+            ),
+          ),
+          SizedBox(width: wide ? 16 : 40 / 3),
+        ],
+      ),
+    );
+    return SingleChildScrollView(
+      key: const Key('driver-briefing'),
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: EdgeInsets.fromLTRB(
+        wide ? 32 : 55 / 3,
+        wide ? 24 : 16,
+        wide ? 32 : 55 / 3,
+        32,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ...notices,
+          guidance,
+          SizedBox(height: gap),
+          if (wide) ...[
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 1232,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      heading,
+                      const SizedBox(height: 16),
+                      _Timetable(
+                        stops: stops,
+                        next: null,
+                        briefing: briefing,
+                        running: false,
+                        saved: true,
+                        savedAt: downloadedAt,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 24),
+                Expanded(
+                  flex: 880,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      DriverText(
+                        'Saved changes',
+                        style: driverText(
+                          context,
+                          28,
+                          36,
+                          weight: FontWeight.w600,
+                        ),
+                      ),
+                      for (final c in briefing.changes) ...[
+                        const SizedBox(height: 16),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: change(c),
+                        ),
+                      ],
+                      if (briefing.changes.isEmpty)
+                        DriverText(
+                          'No changes in this saved briefing.',
+                          style: driverText(context, 20, 28),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: gap),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: SizedBox(width: 480, child: action),
+            ),
+          ] else ...[
+            heading,
+            SizedBox(height: gap),
+            DriverText(
+              'Saved estimates · not live',
+              style: driverText(context, 22, 28, weight: FontWeight.w600),
+            ),
+            const SizedBox(height: 16 / 3),
+            for (final s in stops) ...[
+              Container(
+                key: Key('stop-${s.id}'),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: p.bgSurface,
+                  borderRadius: BorderRadius.circular(44 / 3),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: DriverText(
+                            s.station,
+                            style: driverText(
+                              context,
+                              20,
+                              28,
+                              weight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16 / 3),
+                        DriverText(
+                          s.served
+                              ? driverTime(
+                                  s.estimatedArrival ?? s.estimatedDeparture,
+                                )
+                              : '—',
+                          semanticsLabel:
+                              'Saved estimate ${s.served ? driverTime(s.estimatedArrival ?? s.estimatedDeparture) : 'unavailable'}, captured ${driverTime(downloadedAt)}, not live',
+                          style: driverText(context, 28, 36),
+                        ),
+                      ],
+                    ),
+                    DriverText(
+                      s.served
+                          ? 'Sched. ${driverTime(s.scheduledArrival ?? s.scheduledDeparture)} · ${s.confirmedPlatform == null ? 'Planned platform' : 'Platform'} ${s.confirmedPlatform ?? s.plannedPlatform ?? '—'} · saved ${driverTime(downloadedAt)}'
+                          : 'Not served in this saved briefing',
+                      style: driverText(context, 16, 22, secondary: true),
+                    ),
+                  ],
+                ),
+              ),
+              if (s != stops.last) const SizedBox(height: 16 / 3),
+            ],
+            if (briefing.changes.isNotEmpty) ...[
+              SizedBox(height: gap),
+              change(briefing.changes.first),
+            ],
+            SizedBox(height: gap),
+            DriverText(
+              'Urgent? Use the radio.',
+              style: driverText(context, 20, 28, color: p.statusWarningInk),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _SavedConnection extends StatelessWidget {
+  const _SavedConnection({required this.at});
+  final DateTime? at;
+  @override
+  Widget build(BuildContext context) => DriverConnection(
+    label: 'Offline · saved ${driverTime(at)}',
+    warning: true,
   );
 }
 
@@ -655,11 +971,15 @@ class _Timetable extends StatelessWidget {
     required this.next,
     required this.briefing,
     required this.running,
+    this.saved = false,
+    this.savedAt,
   });
   final List<BriefingStop> stops;
   final BriefingStop? next;
   final DriverBriefing briefing;
   final bool running;
+  final bool saved;
+  final DateTime? savedAt;
   @override
   Widget build(BuildContext context) {
     final p = SrTheme.of(context).palette;
@@ -687,7 +1007,9 @@ class _Timetable extends StatelessWidget {
               style: driverText(context, 28, 36, weight: FontWeight.w600),
             ),
             DriverText(
-              'Scheduled / expected',
+              saved
+                  ? 'Saved ${driverTime(savedAt)} · not live'
+                  : 'Scheduled / expected',
               style: driverText(context, 16, 22, secondary: true),
             ),
           ],
@@ -696,7 +1018,12 @@ class _Timetable extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(12),
           child: cells([
-            for (final s in ['STATION', 'SCHED.', 'EXPECTED', 'PLAT.'])
+            for (final s in [
+              'STATION',
+              'SCHED.',
+              saved ? 'SAVED EST.' : 'EXPECTED',
+              'PLAT.',
+            ])
               DriverText(
                 s,
                 style: driverText(
@@ -732,6 +1059,13 @@ class _Timetable extends StatelessWidget {
                 DriverText(
                   'Not served on this journey',
                   style: driverText(context, 16, 22, color: p.statusDangerInk),
+                )
+              else if (saved)
+                DriverText(
+                  '${driverTime(s.estimatedArrival ?? s.estimatedDeparture)} at ${driverTime(savedAt)}',
+                  semanticsLabel:
+                      'Saved estimate ${driverTime(s.estimatedArrival ?? s.estimatedDeparture)}, captured ${driverTime(savedAt)}, not live',
+                  style: driverText(context, 16, 22, secondary: true),
                 )
               else if (s.stationId != null &&
                   s.stationId == briefing.lastKnownStationId)
@@ -866,12 +1200,16 @@ class _ChangeCard extends StatelessWidget {
     this.onTap,
     this.compact = false,
     this.focusNode,
+    this.saved = false,
+    this.savedAt,
   });
   final BriefingChange change;
   final DriverBriefing briefing;
   final bool running, compact;
   final VoidCallback? onTap;
   final FocusNode? focusNode;
+  final bool saved;
+  final DateTime? savedAt;
   @override
   Widget build(BuildContext context) {
     final c = change, p = SrTheme.of(context).palette;
@@ -881,7 +1219,7 @@ class _ChangeCard extends StatelessWidget {
     final name = target?.station ?? 'Station unavailable';
     final kind = switch (c.kind) {
       'PLATFORM' => 'PLATFORM CHANGE',
-      'DELAY' => 'DELAY · ${c.delayMinutes ?? '—'} MIN',
+      'DELAY' => saved ? 'DELAY' : 'DELAY · ${c.delayMinutes ?? '—'} MIN',
       'CANCEL' => 'CANCELLATION',
       'EARLY_END' => 'ENDS EARLY',
       _ => 'CONFIRMED CHANGE',
@@ -892,7 +1230,9 @@ class _ChangeCard extends StatelessWidget {
             ? '$name: ${target?.plannedPlatform ?? '—'} → ${c.newPlatform ?? '—'}'
             : '$name: Platform ${c.newPlatform ?? '—'}',
       'DELAY' =>
-        running
+        saved
+            ? 'Saved delay: ${c.delayMinutes ?? '—'} min'
+            : running
             ? 'Running ${c.delayMinutes ?? '—'} min late'
             : 'Confirmed ${c.delayMinutes ?? '—'} min delay',
       'CANCEL' => 'This journey is cancelled',
@@ -900,7 +1240,11 @@ class _ChangeCard extends StatelessWidget {
       _ => 'Service change',
     };
     final by = c.confirmedBy ?? 'Name unavailable';
-    final desc = c.kind == 'PLATFORM'
+    final desc = saved && c.kind == 'PLATFORM'
+        ? 'Was ${target?.plannedPlatform ?? '—'} · $name ${driverTime(target?.estimatedArrival ?? target?.estimatedDeparture)} at ${driverTime(savedAt)}'
+        : saved && c.kind == 'DELAY'
+        ? '${c.delayMinutes ?? '—'} min late at ${driverTime(c.confirmedAt)} · saved'
+        : c.kind == 'PLATFORM'
         ? 'Was ${target?.plannedPlatform ?? '—'} · ${briefing.trainNumber}${running && target != null ? ' · expected ${driverTime(target.estimatedArrival ?? target.estimatedDeparture)}' : ''}'
         : c.kind == 'DELAY' && target != null && running
         ? '$name ${driverTime(target.scheduledArrival ?? target.scheduledDeparture)} → ${driverTime(target.estimatedArrival ?? target.estimatedDeparture)}'
@@ -924,7 +1268,11 @@ class _ChangeCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: DriverText(
-                      compact
+                      saved
+                          ? compact
+                                ? 'SAVED $kind'
+                                : '$kind · SAVED'
+                          : compact
                           ? '$kind · ${by.toUpperCase()} ${driverTime(c.confirmedAt)}'
                           : kind,
                       style: driverText(
@@ -955,7 +1303,7 @@ class _ChangeCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  if (compact) ...[
+                  if (compact && !saved) ...[
                     const SizedBox(width: 16 / 3),
                     const DriverAsset(
                       'phone-chevron',
@@ -974,7 +1322,16 @@ class _ChangeCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 DriverText(
-                  '$by · ${_confirmationTime(c.confirmedAt)}',
+                  saved
+                      ? '$by · ${driverTime(c.confirmedAt)} · saved'
+                      : '$by · ${_confirmationTime(c.confirmedAt)}',
+                  style: driverText(context, 16, 22, secondary: true),
+                ),
+              ],
+              if (compact && saved) ...[
+                const SizedBox(height: 8 / 3),
+                DriverText(
+                  '$by · ${driverTime(c.confirmedAt)} · saved ${driverTime(savedAt)}',
                   style: driverText(context, 16, 22, secondary: true),
                 ),
               ],

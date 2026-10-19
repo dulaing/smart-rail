@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-19",
+  "task": "figma-implementation T2, in progress",
+  "captures": [
+    "tablet-saved",
+    "phone-saved"
+  ],
+  "figmaNodes": [
+    "184:294",
+    "189:409"
+  ],
+  "geometry": {
+    "measuredFields": 68,
+    "maximumLogicalError": 3.333333337707245e-05,
+    "worst": "phone-saved saved-service.height",
+    "limitLogicalPixels": 1
+  },
+  "referenceSha256": {
+    "tablet-saved": "295cd7f9639bb3f61f12d93f5288321b7ed1bf948a25152ea73cef8c9e835f5b",
+    "phone-saved": "9bc5b53ace2e70fda3434f0c658f4fdca48cea65ab12b5c37a31b2405836756b"
+  },
+  "goldenSha256": {
+    "tablet-saved": "36631592121d9052c0b6102c87fef2445dba8f7882f6845187d1b504ae018815",
+    "phone-saved": "afe97dc5e6b3326bffd52b329c4364a93b6eb9bbd7db93f5f0a38e69da5c1092"
+  },
+  "raster": "Reviewed reference/actual overlays and diffs. Residual text raster and Noto Sans Math arrows use the earlier approved treatment. Metrics are diagnostic, never whole-image pass percentages.",
+  "approval": "User approved both stored timestamps, Saved delay: 17 min, planned platforms, signed-in Retry connection versus cold-offline Reconnect and sign in. See saved-briefing-reference-reconciliation.json."
+}

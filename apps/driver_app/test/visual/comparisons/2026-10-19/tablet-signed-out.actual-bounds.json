@@ -1,0 +1,44 @@
+{
+  "gate-header": {
+    "x": 48.0,
+    "y": 32.0,
+    "width": 1184.0,
+    "height": 48.0
+  },
+  "gate-chip": {
+    "x": 1090.5,
+    "y": 38.0,
+    "width": 141.5,
+    "height": 36.0
+  },
+  "gate-brand": {
+    "x": 108.0,
+    "y": 38.0,
+    "width": 982.5,
+    "height": 36.0
+  },
+  "gate-intro": {
+    "x": 100.0,
+    "y": 160.0,
+    "width": 540.0,
+    "height": 398.0
+  },
+  "gate-route": {
+    "x": 100.0,
+    "y": 412.0,
+    "width": 540.0,
+    "height": 146.0
+  },
+  "gate-card": {
+    "x": 680.0,
+    "y": 160.0,
+    "width": 500.0,
+    "height": 318.0
+  },
+  "gate-primary": {
+    "x": 712.0,
+    "y": 304.0,
+    "width": 436.0,
+    "height": 96.0
+  }
+}

@@ -154,6 +154,7 @@ class _DriverShellState extends State<DriverShell> {
                 onSelect: _selectFromFrame,
               )
             : DriverJourneysScreen(
+                key: ValueKey('journeys-${widget.offlineOwnerId ?? 'online'}'),
                 api: widget.journeyApi!,
                 offlineOwnerId: widget.offlineOwnerId,
                 displayName: widget.account.displayName,
@@ -161,6 +162,10 @@ class _DriverShellState extends State<DriverShell> {
                 showReports: reportsOpen,
                 onSelect: _selectFromFrame,
                 onReconnect: widget.controller.retry,
+                onSavedReconnect: () {
+                  _selectTab(DriverTab.journeys);
+                  widget.controller.signIn();
+                },
                 onReports: !reportsOpen
                     ? null
                     : () => _selectTab(DriverTab.reports),

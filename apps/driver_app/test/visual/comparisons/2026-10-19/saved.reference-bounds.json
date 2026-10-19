@@ -1,0 +1,23 @@
+{
+  "tablet-saved": {
+    "saved-guidance": {"x":168,"y":112,"width":1080,"height":60},
+    "saved-service": {"x":168,"y":196,"width":616,"height":70},
+    "saved-timestamps": {"x":168,"y":244,"width":616,"height":22},
+    "stop-gampaha": {"x":168,"y":378,"width":616,"height":72},
+    "stop-ragama": {"x":168,"y":458,"width":616,"height":72},
+    "stop-fort": {"x":168,"y":538,"width":616,"height":72},
+    "saved-change-platform": {"x":808,"y":248,"width":432,"height":162},
+    "saved-change-delay": {"x":808,"y":426,"width":432,"height":162},
+    "saved-reconnect": {"x":168,"y":634,"width":480,"height":96}
+  },
+  "phone-saved": {
+    "saved-guidance": {"x":18.3333,"y":120,"width":323.3333,"height":77.3333},
+    "saved-service": {"x":18.3333,"y":208,"width":323.3333,"height":82.6667},
+    "saved-timestamps": {"x":18.3333,"y":246.6667,"width":323.3333,"height":44},
+    "stop-gampaha": {"x":18.3333,"y":334.6667,"width":323.3333,"height":74},
+    "stop-ragama": {"x":18.3333,"y":414,"width":323.3333,"height":96},
+    "stop-fort": {"x":18.3333,"y":515.3333,"width":323.3333,"height":96},
+    "saved-change-platform": {"x":18.3333,"y":622,"width":323.3333,"height":96.6667},
+    "saved-reconnect": {"x":18.3333,"y":709.3333,"width":323.3333,"height":64}
+  }
+}

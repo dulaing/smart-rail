@@ -33,6 +33,7 @@ class DriverJourneysScreen extends StatefulWidget {
     this.onReports,
     this.onSelect,
     this.onReconnect,
+    this.onSavedReconnect,
     this.showReports = true,
   });
 
@@ -45,6 +46,7 @@ class DriverJourneysScreen extends StatefulWidget {
   final bool updatesOnly;
   final void Function(DriverJourney)? onReport;
   final VoidCallback? onAccount, onReports, onReconnect;
+  final VoidCallback? onSavedReconnect;
 
   /// Switches destination (`journeys`, `updates`, `reports`, `account`) in the shell.
   final ValueChanged<String>? onSelect;
@@ -67,7 +69,6 @@ class _DriverJourneysScreenState extends State<DriverJourneysScreen>
   late final BriefingCache _cache = widget.cache ?? BriefingCache();
   List<Map<String, dynamic>> _savedRows = [];
   bool _usingSaved = false;
-  String? _ownerId;
   DateTime? _checkedAt;
 
   @override
@@ -147,7 +148,6 @@ class _DriverJourneysScreenState extends State<DriverJourneysScreen>
                 .toList();
             if (available.isNotEmpty && mounted) {
               setState(() {
-                _ownerId = owner;
                 _usingSaved = true;
                 _savedRows = saved;
                 _journeys = available;
@@ -182,7 +182,6 @@ class _DriverJourneysScreenState extends State<DriverJourneysScreen>
         )
         .toList();
     setState(() {
-      _ownerId = owner;
       _usingSaved = true;
       _savedRows = rows;
       _journeys = journeys;
@@ -214,11 +213,12 @@ class _DriverJourneysScreenState extends State<DriverJourneysScreen>
             : () => widget.onReport!(journey),
         onAccount: widget.onAccount,
         onReports: widget.onReports,
-        offlineOwnerId:
-            widget.offlineOwnerId ?? (_usingSaved ? _ownerId : null),
+        offlineOwnerId: widget.offlineOwnerId,
+        onReconnect: widget.onSavedReconnect,
         savedRow: widget.offlineOwnerId == null && !_usingSaved
             ? null
             : _savedRows.firstWhere((row) => row['journeyId'] == journey.id),
+        cache: _cache,
       ),
     ),
   );
@@ -303,6 +303,8 @@ class DriverBriefingScreen extends StatefulWidget {
     this.onAccount,
     this.onReports,
     this.now,
+    this.onReconnect,
+    this.cache,
   });
 
   final DriverBriefingApi api;
@@ -312,6 +314,8 @@ class DriverBriefingScreen extends StatefulWidget {
   final String displayName;
   final bool updatesOnly;
   final VoidCallback? onReport, onAccount, onReports;
+  final VoidCallback? onReconnect;
+  final BriefingCache? cache;
   final DateTime Function()? now;
 
   @override
@@ -330,15 +334,16 @@ class _DriverBriefingScreenState extends State<DriverBriefingScreen>
   late DateTime _deviceNow = widget.now?.call() ?? DateTime.now();
   Timer? _poll;
   Timer? _clock;
-  final BriefingCache _cache = BriefingCache();
+  late final BriefingCache _cache = widget.cache ?? BriefingCache();
   DateTime? _downloadedAt;
   DateTime? _checkedAt;
+  bool _usingSaved = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    if (widget.offlineOwnerId != null && widget.savedRow != null) {
+    if (widget.savedRow != null) {
       _loadSaved(widget.savedRow!);
     } else {
       unawaited(_load());
@@ -400,6 +405,7 @@ class _DriverBriefingScreenState extends State<DriverBriefingScreen>
         }
         setState(() {
           _briefing = value;
+          _usingSaved = false;
           _downloadedAt = null;
           _checkedAt = null;
           _etag = etag;
@@ -413,9 +419,11 @@ class _DriverBriefingScreenState extends State<DriverBriefingScreen>
         if (!mounted) return;
         _checkedAt = DateTime.now();
         setState(() {
+          _usingSaved = false;
           _error = null;
           _status = null;
           _loading = false;
+          _downloadedAt = null;
         });
       case DriverReadFailure<DriverBriefing>(:final statusCode, :final message):
         if (statusCode == 401 || statusCode == 403) {
@@ -451,6 +459,7 @@ class _DriverBriefingScreenState extends State<DriverBriefingScreen>
     final briefing = DriverBriefing.fromJson(raw);
     setState(() {
       _briefing = briefing;
+      _usingSaved = true;
       _downloadedAt = DateTime.tryParse(row['downloadedAt'] as String? ?? '');
       _checkedAt = DateTime.tryParse(row['checkedAt'] as String? ?? '');
       _loading = false;
@@ -468,7 +477,7 @@ class _DriverBriefingScreenState extends State<DriverBriefingScreen>
         now: _deviceNow.add(_clockOffset),
         displayName: widget.displayName,
         updatesOnly: widget.updatesOnly,
-        saved: _downloadedAt != null || widget.offlineOwnerId != null,
+        saved: _usingSaved || widget.offlineOwnerId != null,
         downloadedAt: _downloadedAt,
         checkedAt: _checkedAt,
         notice: _error,
@@ -477,6 +486,7 @@ class _DriverBriefingScreenState extends State<DriverBriefingScreen>
         onReport: widget.onReport,
         onReports: widget.onReports,
         onRefresh: widget.offlineOwnerId == null ? _load : null,
+        onReconnect: widget.offlineOwnerId == null ? null : widget.onReconnect,
       );
     }
     return Scaffold(

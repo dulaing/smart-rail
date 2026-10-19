@@ -1,0 +1,56 @@
+{
+  "saved-guidance": {
+    "x": 168.0,
+    "y": 112.0,
+    "width": 1080.0,
+    "height": 60.0
+  },
+  "saved-service": {
+    "x": 168.0,
+    "y": 196.0,
+    "width": 616.0,
+    "height": 70.0
+  },
+  "saved-timestamps": {
+    "x": 168.0,
+    "y": 244.0,
+    "width": 616.0,
+    "height": 22.0
+  },
+  "stop-gampaha": {
+    "x": 168.0,
+    "y": 378.0,
+    "width": 616.0,
+    "height": 72.0
+  },
+  "stop-ragama": {
+    "x": 168.0,
+    "y": 458.0,
+    "width": 616.0,
+    "height": 72.0
+  },
+  "stop-fort": {
+    "x": 168.0,
+    "y": 538.0,
+    "width": 616.0,
+    "height": 72.0
+  },
+  "saved-change-platform": {
+    "x": 808.0,
+    "y": 248.0,
+    "width": 432.0,
+    "height": 162.0
+  },
+  "saved-change-delay": {
+    "x": 808.0,
+    "y": 426.0,
+    "width": 432.0,
+    "height": 162.0
+  },
+  "saved-reconnect": {
+    "x": 168.0,
+    "y": 634.0,
+    "width": 480.0,
+    "height": 96.0
+  }
+}

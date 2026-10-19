@@ -1,0 +1,138 @@
+{
+  "tablet-signed-out": {
+    "gate-header": {
+      "x": 48,
+      "y": 32,
+      "width": 1184,
+      "height": 48
+    },
+    "gate-chip": {
+      "x": 1090.5,
+      "y": 38,
+      "width": 141.5,
+      "height": 36
+    },
+    "gate-brand": {
+      "x": 108,
+      "y": 38,
+      "height": 36
+    },
+    "gate-intro": {
+      "x": 100,
+      "y": 160,
+      "width": 540,
+      "height": 398
+    },
+    "gate-route": {
+      "x": 100,
+      "y": 412,
+      "width": 540,
+      "height": 146
+    },
+    "gate-card": {
+      "x": 680,
+      "y": 160,
+      "width": 500,
+      "height": 318
+    },
+    "gate-primary": {
+      "x": 712,
+      "y": 304,
+      "width": 436,
+      "height": 96
+    }
+  },
+  "tablet-expired": {
+    "gate-header": {
+      "x": 48,
+      "y": 32,
+      "width": 1184,
+      "height": 48
+    },
+    "gate-chip": {
+      "x": 1090.5,
+      "y": 38,
+      "width": 141.5,
+      "height": 36
+    },
+    "gate-panel": {
+      "x": 100,
+      "y": 160,
+      "width": 1080,
+      "height": 448
+    },
+    "gate-icon": {
+      "x": 600,
+      "y": 240,
+      "width": 80,
+      "height": 80
+    },
+    "gate-title": {
+      "x": 190,
+      "y": 336,
+      "width": 900,
+      "height": 36
+    },
+    "gate-copy": {
+      "x": 190,
+      "y": 388,
+      "width": 900,
+      "height": 28
+    },
+    "gate-action": {
+      "x": 400,
+      "y": 432,
+      "width": 480,
+      "height": 96
+    }
+  },
+  "phone-signed-out": {
+    "gate-header": {
+      "x": 18.33,
+      "y": 48,
+      "width": 323.33,
+      "height": 56
+    },
+    "gate-brand": {
+      "x": 58.33,
+      "y": 62,
+      "height": 28
+    },
+    "gate-chip": {
+      "x": 18.33,
+      "y": 120,
+      "width": 128,
+      "height": 30.67
+    },
+    "gate-icon": {
+      "x": 18.33,
+      "y": 166.67,
+      "width": 72,
+      "height": 72
+    },
+    "gate-title": {
+      "x": 18.33,
+      "y": 254.67,
+      "width": 323.33,
+      "height": 36
+    },
+    "gate-card": {
+      "x": 18.33,
+      "y": 378.67,
+      "width": 323.33,
+      "height": 158.67
+    },
+    "gate-note": {
+      "x": 18.33,
+      "y": 553.33,
+      "width": 323.33,
+      "height": 22
+    },
+    "gate-primary": {
+      "x": 18.33,
+      "y": 709.33,
+      "width": 323.33,
+      "height": 64
+    }
+  }
+}

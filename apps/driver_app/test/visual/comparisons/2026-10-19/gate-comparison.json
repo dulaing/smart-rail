@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-19",
+  "task": "figma-implementation T2, in progress",
+  "captures": [
+    "tablet-signed-out",
+    "tablet-expired",
+    "phone-signed-out"
+  ],
+  "figmaNodes": [
+    "178:36",
+    "184:434",
+    "188:391"
+  ],
+  "geometry": {
+    "measuredFields": 86,
+    "maximumLogicalError": 0.4613087972005161,
+    "worst": "phone-signed-out gate-chip.width",
+    "limitLogicalPixels": 1
+  },
+  "referenceSha256": {
+    "tablet-signed-out": "915223d262a4f291ff0d1aae75b83ee78cc22337fa1dcd8e15fbc28218cdbfe1",
+    "tablet-expired": "e92101c053f588b43274d388d8353786e4c502e5d4b4458922417767b7112725",
+    "phone-signed-out": "115433bbe436e5ba2f474878132a1adbf078d74c8e50630586056e14e4fc35a9"
+  },
+  "goldenSha256": {
+    "tablet-signed-out": "ab0b2949b30b180c6ddec1f611238c5137d6a79d93d79fc205de7878a5c561a8",
+    "tablet-expired": "082fd27ff57a6f8f20342a92c291e7eedfb588e85d8cef6a3ba6d784a19aef99",
+    "phone-signed-out": "8fc31189902d40c0fc8160758835353bca44fe838a577ab0df5624560a6ec17b"
+  },
+  "raster": "Reviewed reference/actual overlays and diffs. Residual text raster and Noto Sans Math arrows use the earlier approved treatment. Metrics are diagnostic, never whole-image pass percentages."
+}

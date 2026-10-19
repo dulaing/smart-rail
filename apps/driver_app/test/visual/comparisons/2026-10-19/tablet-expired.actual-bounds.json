@@ -1,0 +1,44 @@
+{
+  "gate-header": {
+    "x": 48.0,
+    "y": 32.0,
+    "width": 1184.0,
+    "height": 48.0
+  },
+  "gate-chip": {
+    "x": 1090.5,
+    "y": 38.0,
+    "width": 141.5,
+    "height": 36.0
+  },
+  "gate-panel": {
+    "x": 100.0,
+    "y": 160.0,
+    "width": 1080.0,
+    "height": 448.0
+  },
+  "gate-icon": {
+    "x": 600.0,
+    "y": 240.0,
+    "width": 80.0,
+    "height": 80.0
+  },
+  "gate-title": {
+    "x": 190.0,
+    "y": 336.0,
+    "width": 900.0,
+    "height": 36.0
+  },
+  "gate-copy": {
+    "x": 190.0,
+    "y": 388.0,
+    "width": 900.0,
+    "height": 28.0
+  },
+  "gate-action": {
+    "x": 400.0,
+    "y": 432.0,
+    "width": 480.0,
+    "height": 96.0
+  }
+}

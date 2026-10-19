@@ -304,10 +304,13 @@ void main() {
       expect(find.text('19'), findsNothing);
       expect(find.text('7:27'), findsNothing);
       expect(find.text('Running 17 min late'), findsNothing);
-      expect(find.text('Confirmed 17 min delay'), findsOneWidget);
+      expect(
+        find.text(saved ? 'Saved delay: 17 min' : 'Confirmed 17 min delay'),
+        findsOneWidget,
+      );
       expect(
         find.text('Next stop unavailable. Scheduled stops are shown below.'),
-        findsOneWidget,
+        saved ? findsNothing : findsOneWidget,
       );
       expect(find.text('3'), findsOneWidget);
       expect(tester.takeException(), isNull);

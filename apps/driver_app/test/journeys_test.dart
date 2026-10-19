@@ -131,6 +131,19 @@ class _FakeCache extends BriefingCache {
 
   final List<Map<String, dynamic>> rows;
   final List<Set<String>> prunedWith = [];
+  int touches = 0;
+
+  @override
+  Future<void> save(
+    String ownerId,
+    DriverJourney journey,
+    DriverBriefing briefing,
+  ) async {}
+
+  @override
+  Future<void> touch(String ownerId, String journeyId) async {
+    touches++;
+  }
 
   @override
   Future<List<Map<String, dynamic>>> readAll(String ownerId) async => rows;
@@ -253,12 +266,117 @@ void main() {
       await tester.tap(find.byKey(const Key('journey-$_journeyId')));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('driver-briefing')), findsOneWidget);
-      expect(
-        find.textContaining('Saved copy · read only · downloaded'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('Saved copy · downloaded'), findsOneWidget);
       expect(find.byType(CircularProgressIndicator), findsNothing);
       expect(find.text('Report a problem'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'a signed-in cached fallback retries and successful 304 restores online mode',
+    (tester) async {
+      final now = DateTime.now().toUtc();
+      final row = Map<String, dynamic>.from(
+        (jsonDecode(_journeys())['journeys'] as List).first as Map,
+      );
+      row['briefing'] = jsonDecode(_briefing(observedAt: now));
+      row['downloadedAt'] = now.toIso8601String();
+      row['checkedAt'] = row['downloadedAt'];
+      final cache = _FakeCache([row]);
+      var mode = 0;
+      final api = DriverBriefingApi(
+        'https://api.test',
+        _OwnedAuth(),
+        client: MockClient((request) async {
+          if (mode == 1) throw http.ClientException('offline');
+          if (mode == 2) {
+            expect(request.headers['If-None-Match'], '"v1"');
+            return http.Response('', 304);
+          }
+          return http.Response(
+            _briefing(observedAt: now),
+            200,
+            headers: {'etag': '"v1"'},
+          );
+        }),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: srTheme(SrProfile.driver, Brightness.light),
+          home: DriverBriefingScreen(
+            api: api,
+            journey: DriverJourney.fromJson(row),
+            cache: cache,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Report a problem'), findsNothing);
+      mode = 1;
+      final refresh = tester
+          .widget<RefreshIndicator>(find.byType(RefreshIndicator))
+          .onRefresh;
+      await refresh();
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Saved copy · downloaded'), findsOneWidget);
+      expect(find.text('Retry connection'), findsOneWidget);
+      mode = 2;
+      await tester.ensureVisible(find.byKey(const Key('saved-reconnect')));
+      await tester.tap(find.byKey(const Key('saved-reconnect')));
+      await tester.pumpAndSettle();
+      expect(cache.touches, 1);
+      expect(find.textContaining('Saved copy · downloaded'), findsNothing);
+      expect(find.text('Retry connection'), findsNothing);
+      expect(find.text('Position unknown'), findsNothing);
+      await tester.pumpWidget(const SizedBox());
+    },
+  );
+
+  testWidgets(
+    'cold offline reconnect invokes sign-in without making a briefing read',
+    (tester) async {
+      final now = DateTime.now().toUtc();
+      final row = Map<String, dynamic>.from(
+        (jsonDecode(_journeys())['journeys'] as List).first as Map,
+      );
+      row['briefing'] = jsonDecode(_briefing(observedAt: now));
+      // Missing metadata remains read only and displays unavailable timestamps.
+      var reads = 0, signIns = 0;
+      final api = DriverBriefingApi(
+        'https://api.test',
+        _OwnedAuth(),
+        client: MockClient((request) async {
+          reads++;
+          return http.Response('unavailable', 503);
+        }),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: srTheme(SrProfile.driver, Brightness.light),
+          home: DriverBriefingScreen(
+            api: api,
+            journey: DriverJourney.fromJson(row),
+            offlineOwnerId: 'owner-1',
+            savedRow: row,
+            onReconnect: () {
+              signIns++;
+            },
+            onReport: () {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Report a problem'), findsNothing);
+      expect(
+        find.textContaining('downloaded — · last checked —'),
+        findsOneWidget,
+      );
+      await tester.ensureVisible(find.byKey(const Key('saved-reconnect')));
+      await tester.tap(find.byKey(const Key('saved-reconnect')));
+      await tester.pumpAndSettle();
+      expect(reads, 0);
+      expect(signIns, 1);
+      await tester.pumpWidget(const SizedBox());
     },
   );
 

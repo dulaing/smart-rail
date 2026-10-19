@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:smartrail_core/smartrail_core.dart';
 
 import 'account/account_controller.dart';
 import 'auth/account_api.dart';
+import 'gate_view.dart';
 import 'journeys/briefing_api.dart';
 import 'journeys/report_api.dart';
 import 'l10n/app_localizations.dart';
@@ -29,31 +29,16 @@ class DriverGate extends StatelessWidget {
       builder: (context, _) {
         final t = AppLocalizations.of(context);
         if (controller.checking) {
-          return _Frame(
-            title: t.appTitle,
-            children: [
-              Semantics(liveRegion: true, child: Text(t.checkingSession)),
-            ],
-          );
+          return const DriverGateView(kind: GateKind.checking);
         }
         final busy = controller.busy;
         return switch (controller.result) {
-          null => _Frame(
-            title: t.appTitle,
-            children: [
-              Text(t.signInPrompt),
-              if (controller.signInFailed)
-                Text(
-                  t.signInFailed,
-                  key: const Key('notice'),
-                  semanticsLabel: t.signInFailed,
-                ),
-              _Action(
-                label: t.signIn,
-                primary: true,
-                onPressed: busy ? null : controller.signIn,
-              ),
-            ],
+          null => DriverGateView(
+            kind: GateKind.signedOut,
+            busy: busy,
+            signInFailed: controller.signInFailed,
+            signInFailedMessage: t.signInFailed,
+            onSignIn: controller.signIn,
           ),
           AccountFound(:final account) => DriverShell(
             account: account,
@@ -72,107 +57,29 @@ class DriverGate extends StatelessWidget {
             reportApi: reportApi,
             offlineOwnerId: ownerId,
           ),
-          AccountMissing() => _Frame(
-            title: t.appTitle,
-            children: [
-              Text(t.noAccount, key: const Key('account-message')),
-              _Action(
-                label: t.signOut,
-                onPressed: busy ? null : controller.signOut,
-              ),
-            ],
+          AccountMissing() => DriverGateView(
+            kind: GateKind.missing,
+            message: t.noAccount,
+            busy: busy,
+            onSignOut: controller.signOut,
           ),
-          AccountExpired() => _Frame(
-            title: t.appTitle,
-            children: [
-              Text(t.sessionExpired, key: const Key('account-message')),
-              _Action(
-                label: t.signIn,
-                primary: true,
-                onPressed: busy ? null : controller.signIn,
-              ),
-            ],
+          AccountExpired() => DriverGateView(
+            kind: GateKind.expired,
+            busy: busy,
+            signInFailed: controller.signInFailed,
+            signInFailedMessage: t.signInFailed,
+            onSignIn: controller.signIn,
           ),
-          AccountFailed(:final message) => _Frame(
-            title: t.appTitle,
-            children: [
-              // A connection or server problem: retry is offered, and it is never called a denial.
-              Text(message, key: const Key('account-message')),
-              _Action(
-                label: t.retry,
-                primary: true,
-                onPressed: busy ? null : controller.retry,
-              ),
-              _Action(
-                label: t.signOut,
-                onPressed: busy ? null : controller.signOut,
-              ),
-            ],
+          // A connection or server problem: retry is offered, and it is never called a denial.
+          AccountFailed(:final message) => DriverGateView(
+            kind: GateKind.failed,
+            message: message,
+            busy: busy,
+            onRetry: controller.retry,
+            onSignOut: controller.signOut,
           ),
         };
       },
-    );
-  }
-}
-
-class _Frame extends StatelessWidget {
-  const _Frame({required this.title, required this.children});
-
-  final String title;
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = SrTheme.of(context);
-    final gap = theme.metrics.space[24]!;
-    return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.all(gap),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 560),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Semantics(
-                    header: true,
-                    child: Text(title, style: theme.text('title')),
-                  ),
-                  for (final child in children) ...[
-                    SizedBox(height: gap / 2),
-                    child,
-                  ],
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _Action extends StatelessWidget {
-  const _Action({
-    required this.label,
-    required this.onPressed,
-    this.primary = false,
-  });
-
-  final String label;
-  final VoidCallback? onPressed;
-  final bool primary;
-
-  @override
-  Widget build(BuildContext context) {
-    final child = Text(label);
-    return Align(
-      alignment: AlignmentDirectional.centerStart,
-      child: primary
-          ? FilledButton(onPressed: onPressed, child: child)
-          : OutlinedButton(onPressed: onPressed, child: child),
     );
   }
 }

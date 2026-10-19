@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-19",
+  "device": "emulator-5554, Android API35, 1080x2400, 420dpi, font scale 1.0",
+  "build": "Current Driver debug APK; installed with adb install -r",
+  "checks": {
+    "systemBrowserDemoDriverSignIn": "passed",
+    "assignedBriefingRead": "passed: SIM-1001, 19 October 2026, real API, position unknown without projections",
+    "coldOfflineSavedReopen": "passed: blocked emulator identity/API reverse ports and restarted process; owner-bound selector and saved briefing remained read only",
+    "independentStoredTimestamps": "passed: downloaded 11:34 PM, last successfully checked 11:35 PM",
+    "savedSafetyAndRecovery": "passed: no report action, planned platforms, unavailable historical estimates, urgent radio guidance, Reconnect and sign in",
+    "authenticatedRecovery": "passed: restored reverse ports and invoked Reconnect and sign in; system-browser sign-in returned to freshly read online selector",
+    "reportComposerReopen": "passed: real dated train/route context, reason controls and send button; no new report was submitted",
+    "signedInTransientNetworkFallback": "not established natively: reverse-port replacement left the existing HTTP connection alive; widget/API-client recovery tests pass",
+    "nativeAccessAndAudibleReader": "pending",
+    "phoneGlobalNavigation": "open regression: Reports history/chooser and Updates selector lack reliable phone entry points; reference correction under consultation"
+  },
+  "screenshots": ["native-online-briefing.png", "native-cold-saved-briefing.png"],
+  "cleanup": "API tcp:7074 and identity tcp:8080 reverse mappings restored; no server writes or device clock changes",
+  "interpretation": "Native smoke evidence only; not synthetic viewport goldens or an audible-reader pass."
+}

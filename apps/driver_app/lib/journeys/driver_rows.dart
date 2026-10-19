@@ -289,11 +289,13 @@ class DriverStatePanel extends StatelessWidget {
     this.detail,
     this.actionLabel,
     this.onAction,
+    this.secondaryLabel,
+    this.onSecondary,
   });
   final String panelKey, prefix, icon, title, copy;
-  final String? detail, actionLabel;
+  final String? detail, actionLabel, secondaryLabel;
   final bool wide;
-  final VoidCallback? onAction;
+  final VoidCallback? onAction, onSecondary;
 
   @override
   Widget build(BuildContext context) {
@@ -397,6 +399,18 @@ class DriverStatePanel extends StatelessWidget {
                 key: Key('$prefix-action'),
                 label: actionLabel!,
                 onPressed: onAction,
+              ),
+            ),
+          ],
+          if (secondaryLabel != null) ...[
+            const SizedBox(height: 16),
+            SizedBox(
+              width: 480,
+              child: DriverAction(
+                key: Key('$prefix-secondary'),
+                label: secondaryLabel!,
+                outlined: true,
+                onPressed: onSecondary,
               ),
             ),
           ],
