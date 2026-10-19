@@ -15,6 +15,7 @@ class DriverFrame extends StatelessWidget {
     this.connection,
     this.phoneAction,
     this.showReports = true,
+    this.showJourneys = true,
     this.onPhoneBack,
   });
 
@@ -23,7 +24,7 @@ class DriverFrame extends StatelessWidget {
   final ValueChanged<String>? onSelect;
   final DateTime? now;
   final Widget? connection, phoneAction;
-  final bool showReports;
+  final bool showReports, showJourneys;
   final VoidCallback? onPhoneBack;
 
   @override
@@ -98,6 +99,7 @@ class DriverFrame extends StatelessWidget {
                           button: true,
                           label: 'Account',
                           child: SizedBox(
+                            key: const Key('tab-account'),
                             width: 56,
                             height: 56,
                             child: Material(
@@ -152,6 +154,7 @@ class DriverFrame extends StatelessWidget {
                           selected: selected,
                           onSelect: onSelect,
                           showReports: showReports,
+                          showJourneys: showJourneys,
                         ),
                       ),
                       Expanded(child: body),
@@ -256,10 +259,11 @@ class _Rail extends StatelessWidget {
     required this.selected,
     this.onSelect,
     required this.showReports,
+    required this.showJourneys,
   });
   final String displayName, selected;
   final ValueChanged<String>? onSelect;
-  final bool showReports;
+  final bool showReports, showJourneys;
   @override
   Widget build(BuildContext context) {
     final p = SrTheme.of(context).palette;
@@ -283,8 +287,8 @@ class _Rail extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             for (final item in [
-              ('journeys', 'Briefing', 'briefing'),
-              ('updates', 'Updates', 'updates'),
+              if (showJourneys) ('journeys', 'Briefing', 'briefing'),
+              if (showJourneys) ('updates', 'Updates', 'updates'),
               if (showReports) ('reports', 'Reports', 'reports'),
             ]) ...[
               Semantics(
@@ -292,6 +296,7 @@ class _Rail extends StatelessWidget {
                 selected: selected == item.$1,
                 label: item.$2,
                 child: SizedBox(
+                  key: Key('tab-${item.$1}'),
                   width: 112,
                   height: 112,
                   child: Material(
@@ -333,6 +338,7 @@ class _Rail extends StatelessWidget {
             ],
             const Spacer(),
             SizedBox(
+              key: const Key('tab-account'),
               width: 112,
               height: 96,
               child: Semantics(
@@ -373,6 +379,79 @@ class _Rail extends StatelessWidget {
   }
 }
 
+/// The top-bar status: simulated-data chip and the server-check state beside the clock.
+class DriverConnection extends StatelessWidget {
+  const DriverConnection({
+    super.key,
+    required this.label,
+    this.semanticsLabel,
+    this.showDot = true,
+    this.warning = false,
+  });
+  final String label;
+  final String? semanticsLabel;
+  final bool showDot, warning;
+  @override
+  Widget build(BuildContext context) {
+    final p = SrTheme.of(context).palette;
+    return Row(
+      children: [
+        Container(
+          constraints: const BoxConstraints(minWidth: 141.5),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: p.bgSurface2,
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: DriverText(
+            'SIMULATED DATA',
+            style: driverText(
+              context,
+              14,
+              20,
+              weight: FontWeight.w600,
+              secondary: true,
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        SizedBox(
+          width: 180,
+          child: Semantics(
+            label: semanticsLabel ?? label,
+            child: Row(
+              children: [
+                if (showDot) ...[
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: warning ? p.statusWarning : p.statusSuccess,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                Expanded(
+                  child: DriverText(
+                    label,
+                    style: driverText(
+                      context,
+                      16,
+                      22,
+                      color: warning ? p.statusWarningInk : p.textSecondary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class DriverAction extends StatelessWidget {
   const DriverAction({
     super.key,
@@ -407,10 +486,15 @@ class DriverAction extends StatelessWidget {
 
 /// Keep Figma's explicit line boxes when a symbol uses a fallback font with taller metrics.
 class DriverText extends Text {
-  DriverText(super.data, {super.key, super.style, super.semanticsLabel})
-    : super(
-        strutStyle: style == null
-            ? null
-            : StrutStyle.fromTextStyle(style, forceStrutHeight: true),
-      );
+  DriverText(
+    super.data, {
+    super.key,
+    super.style,
+    super.semanticsLabel,
+    super.textAlign,
+  }) : super(
+         strutStyle: style == null
+             ? null
+             : StrutStyle.fromTextStyle(style, forceStrutHeight: true),
+       );
 }

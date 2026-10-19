@@ -23,6 +23,7 @@ class AccountController extends ChangeNotifier {
   bool _signInFailed = false;
   bool _busy = false;
   bool _disposed = false;
+  DateTime? _checkedAt;
 
   /// Null while signed out.
   AccountResult? get result => _result;
@@ -31,6 +32,9 @@ class AccountController extends ChangeNotifier {
   bool get checking => _checking;
   bool get signInFailed => _signInFailed;
   bool get busy => _busy;
+
+  /// When the server last returned this account; null until it has, and after sign-out.
+  DateTime? get accountCheckedAt => _checkedAt;
 
   Future<void> restore() async {
     String? ownerBeforeRestore;
@@ -92,6 +96,7 @@ class AccountController extends ChangeNotifier {
     }
     await clearSavedData?.call();
     _result = null;
+    _checkedAt = null;
     _signInFailed = false;
     _busy = false;
     _notify();
@@ -122,6 +127,7 @@ class AccountController extends ChangeNotifier {
       await clearSavedData?.call();
     }
     _result = result;
+    _checkedAt = result is AccountFound ? DateTime.now() : null;
     _notify();
   }
 

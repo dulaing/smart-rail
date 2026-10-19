@@ -1,0 +1,56 @@
+{
+  "account-card": {
+    "x": 168.0,
+    "y": 112.0,
+    "width": 1080.0,
+    "height": 270.0
+  },
+  "account-badge": {
+    "x": 200.0,
+    "y": 144.0,
+    "width": 122.4620361328125,
+    "height": 36.0
+  },
+  "account-name": {
+    "x": 200.0,
+    "y": 196.0,
+    "width": 1016.0,
+    "height": 44.0
+  },
+  "account-role": {
+    "x": 200.0,
+    "y": 256.0,
+    "width": 496.0,
+    "height": 56.0
+  },
+  "account-briefings": {
+    "x": 720.0,
+    "y": 256.0,
+    "width": 496.0,
+    "height": 56.0
+  },
+  "account-note": {
+    "x": 200.0,
+    "y": 328.0,
+    "width": 299.1360168457031,
+    "height": 22.0
+  },
+  "account-actions": {
+    "x": 168.0,
+    "y": 406.0,
+    "width": 1080.0,
+    "height": 96.0
+  },
+  "account-signout": {
+    "x": 168.0,
+    "y": 406.0,
+    "width": 528.0,
+    "height": 96.0
+  },
+  "account-open-briefings": {
+    "x": 720.0,
+    "y": 406.0,
+    "width": 528.0,
+    "height": 96.0
+  }
+}

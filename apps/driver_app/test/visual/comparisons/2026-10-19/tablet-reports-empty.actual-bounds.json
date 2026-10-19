@@ -1,0 +1,38 @@
+{
+  "reports-empty": {
+    "x": 168.0,
+    "y": 112.0,
+    "width": 1080.0,
+    "height": 448.0
+  },
+  "reports-empty-icon": {
+    "x": 668.0,
+    "y": 178.0,
+    "width": 80.0,
+    "height": 80.0
+  },
+  "reports-empty-title": {
+    "x": 258.0,
+    "y": 274.0,
+    "width": 900.0,
+    "height": 36.0
+  },
+  "reports-empty-copy": {
+    "x": 258.0,
+    "y": 326.0,
+    "width": 900.0,
+    "height": 56.0
+  },
+  "reports-empty-action": {
+    "x": 468.0,
+    "y": 398.0,
+    "width": 480.0,
+    "height": 96.0
+  },
+  "report-guidance": {
+    "x": 168.0,
+    "y": 584.0,
+    "width": 1080.0,
+    "height": 60.0
+  }
+}

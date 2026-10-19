@@ -157,7 +157,7 @@ void main() {
     await _openAccount(tester);
 
     expect(find.text('Demo Driver'), findsOneWidget);
-    expect(find.text('DRIVER'), findsOneWidget);
+    expect(find.text('Driver'), findsOneWidget);
     expect(accounts.tokenSeen, 'access-token');
   });
 

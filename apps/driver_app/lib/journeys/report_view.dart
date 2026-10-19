@@ -150,7 +150,7 @@ class DriverReportView extends StatelessWidget {
   List<Widget> _composer(BuildContext context, bool wide) {
     final gap = wide ? 24.0 : 32 / 3;
     return [
-      _ReportGuidance('Stop first. Urgent? Use the radio.', wide: wide),
+      ReportGuidance('Stop first. Urgent? Use the radio.', wide: wide),
       SizedBox(height: gap),
       _ReportSurface(
         surfaceKey: const Key('report-context'),
@@ -448,7 +448,7 @@ class DriverReportView extends StatelessWidget {
           ),
           SizedBox(height: gap),
         ],
-        _ReportGuidance(
+        ReportGuidance(
           wide
               ? 'Urgent? Use the radio. Nothing sends automatically.'
               : 'Urgent? Use the radio. Retry when connected.',
@@ -560,8 +560,8 @@ class _ReportSurface extends StatelessWidget {
   );
 }
 
-class _ReportGuidance extends StatelessWidget {
-  const _ReportGuidance(this.text, {required this.wide});
+class ReportGuidance extends StatelessWidget {
+  const ReportGuidance(this.text, {super.key, required this.wide});
   final String text;
   final bool wide;
   @override

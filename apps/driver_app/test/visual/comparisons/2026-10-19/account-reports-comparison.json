@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-19",
+  "task": "figma-implementation T2 (still in progress)",
+  "approval": "User approved account-reports-reference-proposal.html on 2026-10-19: remove invented email/assignment, Signed-in staff badge, Briefings area with Open briefings, remove paged count tiles and invented report id/station, add Receipt not confirmed draft row. Chooser and phone list: reuse existing rows, subject to a further reference proposal.",
+  "ledger": "account-reports-reference-reconciliation.json",
+  "geometry": {
+    "measuredFields": 172,
+    "maximumLogicalError": 0.864,
+    "worst": "tablet-account account-note.width",
+    "limitLogicalPixels": 1
+  },
+  "captures": [
+    "tablet-account",
+    "phone-account",
+    "tablet-reports-list",
+    "tablet-reports-empty"
+  ],
+  "referenceSha256": {
+    "tablet-account": "a1d5c749c1f40321591385b61fd134b16f61250502a02a4d4fff6e0815c4cf1a",
+    "phone-account": "571208ff911e9aa83ded10793d34793450d44992b3c4e5530f6bb21fe6d958d6",
+    "tablet-reports-list": "e2ec9e555fe420d5b3ad20a1f87bac681b1410eabdfd2333649de0fe074a9bf9",
+    "tablet-reports-empty": "a0639eb3c4111c2d7448022e3362dd005b56deb849670789f434017c4f84c2d9"
+  },
+  "raster": "Reviewed four overlays/diffs separately from geometry. Diagnostic metrics only; no whole-image pass percentage."
+}

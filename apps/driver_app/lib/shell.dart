@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:smartrail_core/smartrail_core.dart';
 
 import 'account/account_controller.dart';
+import 'account/account_view.dart';
 import 'auth/account_api.dart';
 import 'l10n/app_localizations.dart';
 import 'journeys/briefing_api.dart';
@@ -64,6 +65,14 @@ class _DriverShellState extends State<DriverShell> {
     setState(() => _tab = tab);
   }
 
+  /// The measured frame names its destinations; the shell owns which one is open.
+  void _selectFromFrame(String destination) => _selectTab(switch (destination) {
+    'journeys' => DriverTab.journeys,
+    'updates' => DriverTab.updates,
+    'reports' => DriverTab.reports,
+    _ => DriverTab.account,
+  });
+
   void _openReport(DriverJourney journey) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -123,18 +132,34 @@ class _DriverShellState extends State<DriverShell> {
       DriverTab.account => t.tabAccount,
     };
 
+    if (_tab == DriverTab.account) {
+      return DriverAccountView(
+        displayName: widget.account.displayName,
+        roles: widget.account.roles,
+        noAccessMessage: tabs.length > 1 ? null : t.noDriverAccess,
+        offline: widget.offlineOwnerId != null,
+        busy: widget.controller.busy,
+        now: DateTime.now(),
+        checkedAt: widget.controller.accountCheckedAt,
+        showJourneys: tabs.contains(DriverTab.journeys),
+        showReports: tabs.contains(DriverTab.reports),
+        onSignOut: widget.offlineOwnerId != null
+            ? widget.controller.signIn
+            : widget.controller.signOut,
+        onSelect: _selectFromFrame,
+        statusSample: kDebugMode
+            ? () => Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const StatusSample()),
+              )
+            : null,
+      );
+    }
+
     final nav = [for (final tab in tabs) (tab, label(tab))];
     final content = _Content(
       title: label(_tab),
       child: switch (_tab) {
-        DriverTab.account => SingleChildScrollView(
-          child: _AccountBody(
-            account: widget.account,
-            controller: widget.controller,
-            hasDriverAccess: tabs.length > 1,
-            offline: widget.offlineOwnerId != null,
-          ),
-        ),
+        DriverTab.account => const SizedBox.shrink(),
         _ when !canOpen(_tab, widget.account) => Text(t.accessDenied),
         DriverTab.journeys || DriverTab.updates =>
           widget.journeyApi == null
@@ -251,66 +276,6 @@ class _Content extends StatelessWidget {
         // The child owns its own scrolling (a list or a column), so it must get a bounded
         // height: an unbounded one collapses a nested scrollable to nothing.
         Expanded(child: child),
-      ],
-    );
-  }
-}
-
-class _AccountBody extends StatelessWidget {
-  const _AccountBody({
-    required this.account,
-    required this.controller,
-    required this.hasDriverAccess,
-    this.offline = false,
-  });
-
-  final Account account;
-  final AccountController controller;
-  final bool hasDriverAccess;
-  final bool offline;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context);
-    final theme = SrTheme.of(context);
-    final gap = theme.metrics.space[16]!;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(account.displayName, style: theme.text('heading')),
-        SizedBox(height: gap / 2),
-        Text(
-          account.roles.join(', '),
-          style: theme.text('body', color: theme.palette.textSecondary),
-        ),
-        if (!hasDriverAccess) ...[
-          SizedBox(height: gap),
-          Text(
-            t.noDriverAccess,
-            key: const Key('no-driver-access'),
-            style: theme.text('body', color: theme.palette.statusDangerInk),
-          ),
-        ],
-        SizedBox(height: gap),
-        if (offline)
-          OutlinedButton(
-            onPressed: controller.busy ? null : controller.signIn,
-            child: const Text('Reconnect and sign in'),
-          )
-        else
-          OutlinedButton(
-            onPressed: controller.busy ? null : controller.signOut,
-            child: Text(t.signOut),
-          ),
-        if (kDebugMode) ...[
-          SizedBox(height: gap / 2),
-          TextButton(
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(builder: (_) => const StatusSample()),
-            ),
-            child: Text(t.statusSample),
-          ),
-        ],
       ],
     );
   }

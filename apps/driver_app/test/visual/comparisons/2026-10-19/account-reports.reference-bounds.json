@@ -1,0 +1,270 @@
+{
+  "tablet-account": {
+    "account-card": {
+      "x": 168,
+      "y": 112,
+      "width": 1080,
+      "height": 270
+    },
+    "account-badge": {
+      "x": 200,
+      "y": 144,
+      "width": 123,
+      "height": 36
+    },
+    "account-name": {
+      "x": 200,
+      "y": 196,
+      "width": 1016,
+      "height": 44
+    },
+    "account-role": {
+      "x": 200,
+      "y": 256,
+      "width": 496,
+      "height": 56
+    },
+    "account-briefings": {
+      "x": 720,
+      "y": 256,
+      "width": 496,
+      "height": 56
+    },
+    "account-note": {
+      "x": 200,
+      "y": 328,
+      "width": 300,
+      "height": 22
+    },
+    "account-actions": {
+      "x": 168,
+      "y": 406,
+      "width": 1080,
+      "height": 96
+    },
+    "account-signout": {
+      "x": 168,
+      "y": 406,
+      "width": 528,
+      "height": 96
+    },
+    "account-open-briefings": {
+      "x": 720,
+      "y": 406,
+      "width": 528,
+      "height": 96
+    }
+  },
+  "phone-account": {
+    "account-profile": {
+      "x": 18.333,
+      "y": 120,
+      "width": 323.333,
+      "height": 160
+    },
+    "account-icon": {
+      "x": 34.333,
+      "y": 136,
+      "width": 48,
+      "height": 48
+    },
+    "account-name": {
+      "x": 34.333,
+      "y": 192,
+      "width": 291.333,
+      "height": 36
+    },
+    "account-role": {
+      "x": 34.333,
+      "y": 236,
+      "width": 291.333,
+      "height": 28
+    },
+    "account-briefings": {
+      "x": 18.333,
+      "y": 290.667,
+      "width": 323.333,
+      "height": 156.667
+    },
+    "account-briefings-title": {
+      "x": 31.667,
+      "y": 304,
+      "width": 296.667,
+      "height": 28
+    },
+    "account-briefings-copy": {
+      "x": 31.667,
+      "y": 340,
+      "width": 296.667,
+      "height": 22
+    },
+    "account-open-briefings": {
+      "x": 31.667,
+      "y": 370,
+      "width": 296.667,
+      "height": 64
+    },
+    "account-signin": {
+      "x": 18.333,
+      "y": 458,
+      "width": 323.333,
+      "height": 158.667
+    },
+    "account-shield": {
+      "x": 31.667,
+      "y": 471.333,
+      "width": 32,
+      "height": 32
+    },
+    "account-signout": {
+      "x": 18.333,
+      "y": 709.333,
+      "width": 323.333,
+      "height": 64
+    }
+  },
+  "tablet-reports-list": {
+    "reports-content": {
+      "x": 168,
+      "y": 112,
+      "width": 1080,
+      "height": 414
+    },
+    "reports-heading": {
+      "x": 168,
+      "y": 112,
+      "width": 1080,
+      "height": 96
+    },
+    "reports-context": {
+      "x": 168,
+      "y": 124,
+      "width": 560,
+      "height": 72
+    },
+    "reports-primary": {
+      "x": 768,
+      "y": 112,
+      "width": 480,
+      "height": 96
+    },
+    "report-row-draft": {
+      "x": 168,
+      "y": 232,
+      "width": 1080,
+      "height": 112
+    },
+    "report-row-RPT-118": {
+      "x": 168,
+      "y": 368,
+      "width": 1080,
+      "height": 112
+    },
+    "reports-note": {
+      "x": 168,
+      "y": 504,
+      "width": 1080,
+      "height": 22
+    },
+    "row-icon-draft": {
+      "x": 192,
+      "y": 256,
+      "width": 64,
+      "height": 64
+    },
+    "row-title-draft": {
+      "x": 264,
+      "y": 261,
+      "height": 28
+    },
+    "row-copy-draft": {
+      "x": 264,
+      "y": 293,
+      "height": 22
+    },
+    "row-delivery-draft": {
+      "x": 944,
+      "y": 270,
+      "width": 280,
+      "height": 36
+    },
+    "row-chip-draft": {
+      "x": 1023.5,
+      "y": 270,
+      "width": 200.5,
+      "height": 36
+    },
+    "row-icon-RPT-118": {
+      "x": 192,
+      "y": 392,
+      "width": 64,
+      "height": 64
+    },
+    "row-title-RPT-118": {
+      "x": 264,
+      "y": 397,
+      "height": 28
+    },
+    "row-copy-RPT-118": {
+      "x": 264,
+      "y": 429,
+      "height": 22
+    },
+    "row-delivery-RPT-118": {
+      "x": 944,
+      "y": 391,
+      "width": 280,
+      "height": 66
+    },
+    "row-chip-RPT-118": {
+      "x": 1083,
+      "y": 391,
+      "width": 141,
+      "height": 36
+    },
+    "row-ack-RPT-118": {
+      "x": 1136.5,
+      "y": 435,
+      "width": 87.5,
+      "height": 22
+    }
+  },
+  "tablet-reports-empty": {
+    "reports-empty": {
+      "x": 168,
+      "y": 112,
+      "width": 1080,
+      "height": 448
+    },
+    "reports-empty-icon": {
+      "x": 668,
+      "y": 178,
+      "width": 80,
+      "height": 80
+    },
+    "reports-empty-title": {
+      "x": 258,
+      "y": 274,
+      "width": 900,
+      "height": 36
+    },
+    "reports-empty-copy": {
+      "x": 258,
+      "y": 326,
+      "width": 900,
+      "height": 56
+    },
+    "reports-empty-action": {
+      "x": 468,
+      "y": 398,
+      "width": 480,
+      "height": 96
+    },
+    "report-guidance": {
+      "x": 168,
+      "y": 584,
+      "width": 1080,
+      "height": 60
+    }
+  }
+}

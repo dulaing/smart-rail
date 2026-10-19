@@ -1,0 +1,54 @@
+{
+  "approvedOn": "2026-10-19",
+  "frames": [
+    "184:453",
+    "190:6419",
+    "189:483",
+    "190:6842",
+    "183:459",
+    "190:6159"
+  ],
+  "unchangedFrames": [
+    "183:527",
+    "190:6222"
+  ],
+  "mutations": [
+    {
+      "frames": "184:453, 190:6419",
+      "changes": [
+        "badge \"DEMO STAFF ACCOUNT\" -> \"Signed-in staff\"",
+        "removed email text",
+        "label \"ASSIGNED JOURNEY\" -> \"BRIEFINGS\"",
+        "value \"DS-B1 → Colombo Fort\" -> \"Open briefings to choose a journey.\" (wrapping, fill width)",
+        "secondary action \"Back to briefing\" -> \"Open briefings\""
+      ]
+    },
+    {
+      "frames": "189:483, 190:6842",
+      "changes": [
+        "removed email text",
+        "removed \"CURRENT ASSIGNMENT\" label",
+        "\"DS-B1 → Colombo Fort\" -> \"Briefings\"",
+        "\"Mon 12 Oct · simulated duty\" -> \"Open briefings to choose a journey.\"",
+        "added Open briefings secondary action instance (341:786, 341:788)"
+      ]
+    },
+    {
+      "frames": "183:459, 190:6159",
+      "changes": [
+        "removed Report counts tiles (183:502, 190:6186)",
+        "subline \"DS-B1 · today · 1 report\" -> \"DS-B1 · 12 October 2026\"",
+        "row context \"RPT-118 · DS-B1 · Veyangoda · 6:51\" -> \"Server received 6:51\"",
+        "added Receipt not confirmed draft row (341:794, 341:816)"
+      ]
+    },
+    {
+      "component": "176:681 Driver / Report row",
+      "changes": [
+        "Not sent chip \"NOT SENT\" -> \"RECEIPT NOT CONFIRMED\"",
+        "removed invented 6:52 AM from Not sent and Sent variants",
+        "Context default -> \"Server received 6:51\""
+      ]
+    }
+  ]
+}

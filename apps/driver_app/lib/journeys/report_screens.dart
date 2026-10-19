@@ -7,6 +7,7 @@ import 'briefing_api.dart';
 import 'report_api.dart';
 import 'report_drafts.dart';
 import 'report_view.dart';
+import 'reports_view.dart';
 
 export 'report_view.dart' show reportReasons;
 
@@ -476,6 +477,39 @@ class _DriverReportJourneyScreenState extends State<DriverReportJourneyScreen>
     final selected = _reports
         .where((r) => r.id == _selectedReportId)
         .firstOrNull;
+    final wide =
+        MediaQuery.sizeOf(context).width >= 1000 &&
+        MediaQuery.textScalerOf(context).scale(20) <= 28;
+    if (_history && wide) {
+      void open({String? reportId}) => setState(() {
+        _selectedReportId = reportId;
+        _history = false;
+      });
+      return DriverReportsListView(
+        journey: widget.journey,
+        reports: _reports,
+        draftReason: _draft?.reasonCode,
+        busy: _busy,
+        accessLost: _accessLost,
+        canCreate: widget.canCreate,
+        contextAvailable: widget.journey.label != 'details not saved',
+        notice: _message,
+        displayName: widget.displayName,
+        now: DateTime.now(),
+        checkedAt: _checkedAt,
+        // A report that is not yet confirmed must be checked or retried, never duplicated.
+        onReport: _draft != null ? null : open,
+        onOpenReport: (report) => open(reportId: report.id),
+        onOpenDraft: open,
+        onSelect: (value) {
+          if (value == 'account') widget.onAccount?.call();
+          if (value == 'journeys') (widget.onBriefing ?? () {})();
+          if (value == 'updates') {
+            (widget.onUpdates ?? widget.onBriefing ?? () {})();
+          }
+        },
+      );
+    }
     if (_history && _draft == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Your reports')),
