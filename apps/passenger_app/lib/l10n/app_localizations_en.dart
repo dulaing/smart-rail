@@ -227,4 +227,363 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get simulatedRunning =>
       'Running information, when available, is a SmartRail simulation.';
+
+  @override
+  String get foodTitle => 'Food';
+
+  @override
+  String get foodIntro =>
+      'Order food to collect at a station stop on your train. You pay at the kiosk when you collect.';
+
+  @override
+  String get foodChooseTrain => 'Choose a train';
+
+  @override
+  String get foodChangeTrain => 'Change train';
+
+  @override
+  String get foodNoTrainChosen =>
+      'Pick a dated train to see where you can collect food.';
+
+  @override
+  String foodTrainLine(Object train, Object from, Object to) {
+    return '$train · $from → $to';
+  }
+
+  @override
+  String get foodToday => 'Today';
+
+  @override
+  String get foodOnRoute => 'On your Trains route';
+
+  @override
+  String get foodNoTrains =>
+      'No upcoming trains are saved yet. Open Trains while connected to load the timetable.';
+
+  @override
+  String get foodPickupHeading => 'Where to collect';
+
+  @override
+  String foodArrives(Object time) {
+    return 'Train due $time';
+  }
+
+  @override
+  String foodScheduledAt(Object time) {
+    return 'Scheduled $time';
+  }
+
+  @override
+  String get foodNoEstimate => 'No arrival estimate';
+
+  @override
+  String foodOrderBy(Object time) {
+    return 'Order by $time';
+  }
+
+  @override
+  String get foodSeeMenu => 'See menu';
+
+  @override
+  String get foodNoPickups => 'This train has no food collection points.';
+
+  @override
+  String get foodUnavailableHeading => 'Not available to order';
+
+  @override
+  String get foodReasonJourneyNotToday =>
+      'This train does not run today, so food cannot be ordered yet.';
+
+  @override
+  String get foodReasonStopNotServed => 'This train does not serve this stop.';
+
+  @override
+  String get foodReasonStopPassed => 'The train has already passed this stop.';
+
+  @override
+  String get foodReasonTrainUnknown =>
+      'SmartRail has no recent position for this train, so a pickup time cannot be promised.';
+
+  @override
+  String get foodReasonGeneric => 'Food cannot be ordered here right now.';
+
+  @override
+  String get foodProviderUnavailable =>
+      'Food ordering is unavailable right now. Train information is not affected.';
+
+  @override
+  String get foodLoadFailed =>
+      'Could not load food information. Check your connection and try again.';
+
+  @override
+  String get foodJourneyNotFound =>
+      'SmartRail no longer knows this train. Choose another one.';
+
+  @override
+  String get foodRetry => 'Try again';
+
+  @override
+  String get foodStaleOptions =>
+      'Could not refresh. These options may be out of date.';
+
+  @override
+  String foodMenuHeading(Object point) {
+    return 'Menu · $point';
+  }
+
+  @override
+  String get foodMenuEmpty =>
+      'This collection point has no items available right now.';
+
+  @override
+  String get foodSoldOut => 'Sold out';
+
+  @override
+  String foodAddItem(Object item) {
+    return 'Add one $item';
+  }
+
+  @override
+  String foodRemoveItem(Object item) {
+    return 'Remove one $item';
+  }
+
+  @override
+  String foodQuantityOf(Object item, int count) {
+    return '$item: $count in basket';
+  }
+
+  @override
+  String foodBasketSummary(int count, Object total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items',
+      one: '1 item',
+    );
+    return '$_temp0 · $total';
+  }
+
+  @override
+  String get foodReview => 'Review order';
+
+  @override
+  String get foodBasketAdjusted =>
+      'The menu changed, so your basket was updated.';
+
+  @override
+  String get foodPickupUnavailableNow =>
+      'This pickup is no longer available to order.';
+
+  @override
+  String get foodBack => 'Back to pickup points';
+
+  @override
+  String get foodReviewHeading => 'Review your order';
+
+  @override
+  String foodCollectAt(Object point) {
+    return 'Collect at $point';
+  }
+
+  @override
+  String foodTrainExpected(Object time) {
+    return 'Train expected $time. This is a SmartRail estimate and can change.';
+  }
+
+  @override
+  String get foodPayAtKiosk =>
+      'Pay at the kiosk when you collect. There is no online payment.';
+
+  @override
+  String get foodNoShowPolicy =>
+      'No-show: if you do not collect your order, the provider marks it No-show after the train leaves.';
+
+  @override
+  String get foodCancelPolicy =>
+      'You can cancel only while the provider still accepts cancellations. SmartRail checks this when you cancel.';
+
+  @override
+  String get foodTotal => 'Total';
+
+  @override
+  String get foodSignInToOrder => 'Sign in to order';
+
+  @override
+  String get foodSignInNote =>
+      'You can keep browsing without an account. Your basket stays here while you sign in.';
+
+  @override
+  String get foodSignInCancelled =>
+      'Sign-in was cancelled. Your basket is still here.';
+
+  @override
+  String get foodNoPermission => 'Your account cannot place food orders.';
+
+  @override
+  String get foodPlaceOrder => 'Place order';
+
+  @override
+  String get foodBackToMenu => 'Back to menu';
+
+  @override
+  String get foodSubmitting => 'Placing your order…';
+
+  @override
+  String get foodUncertainTitle => 'Order outcome not yet confirmed';
+
+  @override
+  String get foodUncertainBody =>
+      'We have not heard back from the food provider yet. Your order is saved under one reference, so checking again never places a second order. You can leave this screen and come back.';
+
+  @override
+  String get foodCheckAgain => 'Check again';
+
+  @override
+  String get foodChecking => 'Checking…';
+
+  @override
+  String get foodConflictBody =>
+      'SmartRail says this request reference was already used for a different order. Nothing was changed. Check your orders before trying again.';
+
+  @override
+  String get foodDiscardRequest => 'Discard this request';
+
+  @override
+  String get foodRefusedTitle => 'Order not placed';
+
+  @override
+  String get foodRefusedBack => 'Back to basket';
+
+  @override
+  String get foodReasonCutoffPassed =>
+      'The order cutoff for this pickup has passed.';
+
+  @override
+  String get foodReasonStockInsufficient =>
+      'There is not enough stock for something in your basket.';
+
+  @override
+  String get foodReasonItemUnavailable =>
+      'An item in your basket is no longer available.';
+
+  @override
+  String get foodReasonPickupMismatch =>
+      'This pickup no longer matches the train. Choose it again.';
+
+  @override
+  String get foodReasonOrderNotFound => 'SmartRail could not find this order.';
+
+  @override
+  String get foodReasonPassengerCancelled => 'You cancelled this order.';
+
+  @override
+  String get foodReasonTrainCancelled =>
+      'The train was cancelled, so this order was cancelled.';
+
+  @override
+  String get foodReasonTrainEndedEarly =>
+      'The train ends before this stop, so this order was cancelled.';
+
+  @override
+  String get foodSessionEnded =>
+      'Your sign-in ended. Sign in again to see your order. Nothing is shown until you do.';
+
+  @override
+  String get foodStorageFailed =>
+      'Could not save your order on this phone, so it was not sent. Try again.';
+
+  @override
+  String get foodOrderConfirmed => 'Order confirmed';
+
+  @override
+  String get foodPickupCode => 'Pickup code';
+
+  @override
+  String get foodPickupCodeHint =>
+      'Show this code at the kiosk. It is only shown here, to you.';
+
+  @override
+  String foodEvidenceAt(Object time) {
+    return 'Estimate from train evidence at $time';
+  }
+
+  @override
+  String get foodStatusPlacing => 'Placing';
+
+  @override
+  String get foodStatusRejected => 'Not placed';
+
+  @override
+  String get foodStatusAccepted => 'Accepted';
+
+  @override
+  String get foodStatusReady => 'Ready to collect';
+
+  @override
+  String get foodStatusCollected => 'Collected';
+
+  @override
+  String get foodStatusNoShow => 'No-show';
+
+  @override
+  String get foodStatusCancelled => 'Cancelled';
+
+  @override
+  String get foodYourOrder => 'Your order';
+
+  @override
+  String get foodOrderDone => 'Done';
+
+  @override
+  String get foodOpenOrder => 'See your order';
+
+  @override
+  String get foodCancelOrder => 'Cancel order';
+
+  @override
+  String get foodCancelConfirmTitle => 'Cancel this order?';
+
+  @override
+  String get foodCancelConfirmBody =>
+      'SmartRail will ask the food provider. It can refuse, for example after its cutoff.';
+
+  @override
+  String get foodKeepOrder => 'Keep order';
+
+  @override
+  String get foodCancelling => 'Cancelling…';
+
+  @override
+  String get foodCancelUnavailable =>
+      'The food provider could not be reached. Nothing was changed; try again.';
+
+  @override
+  String get foodCancelUnconfirmed =>
+      'We could not confirm whether the cancellation went through. The order shown is what SmartRail last reported. Check again before trying a second time.';
+
+  @override
+  String get foodReasonInvalidState => 'This order can no longer be cancelled.';
+
+  @override
+  String get foodReasonPlacementPending =>
+      'The order is still being placed. Try again shortly.';
+
+  @override
+  String get foodRecentOrders => 'Your orders';
+
+  @override
+  String foodOrderPlacedAt(Object time) {
+    return 'Placed $time';
+  }
+
+  @override
+  String get foodPendingOrderWaiting =>
+      'You have an order waiting for confirmation, so a new order cannot be placed yet.';
+
+  @override
+  String get foodBackToFood => 'Back to Food';
+
+  @override
+  String get foodOrderHistory => 'Order history';
 }

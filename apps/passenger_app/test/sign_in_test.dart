@@ -52,6 +52,7 @@ class FakeAccounts implements AccountApi {
 }
 
 const _passenger = Account(
+  accountId: 'acc-1',
   displayName: 'Demo Passenger',
   roles: ['PASSENGER'],
   permissions: ['orders.manage'],
@@ -106,7 +107,7 @@ void main() {
               ? 'Your next trains'
               : title == 'Trains'
               ? 'Trains'
-              : 'Coming soon',
+              : 'Choose a train',
         ),
         title == 'Trains' ? findsWidgets : findsOneWidget,
         reason: '$title is reachable while restoring',
