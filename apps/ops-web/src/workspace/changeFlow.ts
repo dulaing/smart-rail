@@ -90,6 +90,8 @@ export type FlowAction =
   | { type: 'reconcileFailed' }
   | { type: 'reconcileStarted' }
   | { type: 'denied'; status: 401 | 403 }
+  /** The incident named on the draft is no longer open: any review of it is dropped. */
+  | { type: 'incidentClosed'; incidentId: string }
   /** Leave a result or a refusal and start another change. */
   | { type: 'reset' }
 
@@ -174,6 +176,22 @@ export function flowReducer(state: FlowState, action: FlowAction): FlowState {
 
     case 'denied':
       return { ...state, step: { name: 'denied', status: action.status } }
+
+    case 'incidentClosed': {
+      // A confirmation already sent, or one that has finished, is decided by the server, not here.
+      if (step.name === 'confirming' || step.name === 'confirmed' || step.name === 'uncertain' || step.name === 'denied') return state
+      if (state.target.type !== 'publish' || state.target.draft.incidentId !== action.incidentId) return state
+      return {
+        ...state,
+        step: { name: 'editing' },
+        notice: {
+          tone: 'warning',
+          text:
+            'The incident you linked has been resolved, so the review was cleared and nothing was published. ' +
+            'Remove the link or choose another open incident, then preview again.',
+        },
+      }
+    }
 
     case 'reset':
       return { ...initialFlow(state.defaultKind), lastRequestId: state.lastRequestId }

@@ -30,3 +30,9 @@ test('moving between reports keeps focus where it is, while moving between works
   assert.notEqual(focusScope('/reports/abc'), focusScope('/corridor'))
   assert.notEqual(focusScope('/corridor'), focusScope('/corridor/journeys/abc'))
 })
+
+test('incidents open for anyone who reads them, and the audit history stays with audit.read', () => {
+  assert.equal(canOpenPath(controller, '/incidents'), true)
+  assert.equal(canOpenPath(auditor, '/incidents/6f1c0f4e-0000-0000-0000-000000000001'), true)
+  assert.equal(canOpenPath(sysAdmin, '/incidents'), false)
+})

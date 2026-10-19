@@ -1,6 +1,8 @@
-import { useEffect, useReducer, useRef, useState, type FormEvent, type RefObject } from 'react'
+import { useEffect, useReducer, useRef, type FormEvent, type RefObject } from 'react'
 import { messages } from '../../../../shared/design/generated/status.ts'
 import { ChangeReview } from './ChangeReview.tsx'
+import { incidentStillOpen } from '../reports/incidentActions.ts'
+import { reasonName } from '../reports/reasons.ts'
 import { confirmReview, previewTarget, readCurrentState } from './changeActions.ts'
 import { openIncidents } from './changesApi.ts'
 import {
@@ -11,6 +13,7 @@ import {
   type Target,
 } from './changeFlow.ts'
 import { describeActiveChange, stationName } from './facts.ts'
+import { usePolled } from './hooks.ts'
 import { publicReader, staffCall } from './live.ts'
 import { canChangePlatformAt, canWithdraw, startableKinds, type ChangeRights } from './rights.ts'
 import { clockText } from './time.ts'
@@ -22,13 +25,6 @@ const kindNames: Record<ChangeKind, string> = {
   CANCEL: 'Cancellation',
   PLATFORM: 'Platform change',
   EARLY_END: 'Early ending',
-}
-
-const incidentNames: Record<string, string> = {
-  TRAIN_FAULT: 'Train fault',
-  SIGNAL_DELAY: 'Signal delay',
-  OBSTRUCTION: 'Obstruction',
-  CANNOT_CONTINUE: 'Cannot continue',
 }
 
 const whyText = {
@@ -64,24 +60,37 @@ export function ChangePanel({
   const [flow, dispatch] = useReducer(flowReducer, startableKinds(rights)[0] ?? 'DELAY', initialFlow)
   const sending = useRef(false)
   const headingRef = useRef<HTMLHeadingElement>(null)
-  const [incidents, setIncidents] = useState<{ list: Incident[]; failed: boolean } | null>(null)
 
   const stopLabel = (stopId: string | null) => {
     const stop = running.stops.find((s) => s.stopId === stopId)
     return stop ? `${stop.sequence}. ${stationName(stations, stop.stationId)}` : 'an unknown stop'
   }
 
-  // Open incidents, only for someone allowed to name one.
+  // Open incidents, only for someone allowed to name one. They are re-read with the journey so a
+  // list that has gone stale is not what a person picks from.
+  const { data: incidents } = usePolled<{ list: Incident[]; failed: boolean }>(
+    `open-incidents:${rights.linkIncident}`,
+    async () => {
+      if (!rights.linkIncident) return { list: [], failed: false }
+      const result = await openIncidents(staffCall)
+      return result.kind === 'ok' ? { list: result.body, failed: false } : { list: [], failed: true }
+    },
+  )
+
+  // If the incident named on the draft is resolved while the draft is open, drop any review of it.
+  // A list that merely no longer shows it is checked with a read first; an unreadable answer is not "resolved".
+  const linkedIncidentId = flow.target.type === 'publish' ? flow.target.draft.incidentId : ''
   useEffect(() => {
-    if (!rights.linkIncident) return
+    if (!rights.linkIncident || linkedIncidentId === '' || incidents === null || incidents.failed) return
+    if (incidents.list.some((i) => i.incidentId === linkedIncidentId)) return
     let cancelled = false
-    void openIncidents(staffCall).then((result) => {
-      if (!cancelled) setIncidents(result.kind === 'ok' ? { list: result.body, failed: false } : { list: [], failed: true })
+    void incidentStillOpen(staffCall, linkedIncidentId).then((open) => {
+      if (!cancelled && open === false) dispatch({ type: 'incidentClosed', incidentId: linkedIncidentId })
     })
     return () => {
       cancelled = true
     }
-  }, [rights.linkIncident])
+  }, [incidents, linkedIncidentId, rights.linkIncident])
 
   // When a review, result or refusal appears, put keyboard and screen-reader focus on it.
   const stepName = flow.step.name
@@ -112,7 +121,7 @@ export function ChangePanel({
   const draft = flow.target.type === 'publish' ? flow.target.draft : null
   const incidentLabel = (id: string | null) => {
     const incident = incidents?.list.find((i) => i.incidentId === id)
-    return id ? (incident ? `${incidentNames[incident.reasonCode] ?? incident.reasonCode}, opened ${clockText(incident.openedAt)}` : 'an open incident') : null
+    return id ? (incident ? `${reasonName(incident.reasonCode)}, opened ${clockText(incident.openedAt)}` : 'a linked incident') : null
   }
 
   return (
@@ -485,9 +494,13 @@ function DraftForm({
             Incident (optional)
             <select value={draft.incidentId} onChange={(e) => set({ incidentId: e.target.value })}>
               <option value="">No incident linked</option>
+              {/* A link kept after its incident left the open list stays visible so it can be removed or changed. */}
+              {draft.incidentId !== '' && !(incidents?.list ?? []).some((i) => i.incidentId === draft.incidentId) && (
+                <option value={draft.incidentId}>The linked incident (no longer shown as open)</option>
+              )}
               {(incidents?.list ?? []).map((incident) => (
                 <option key={incident.incidentId} value={incident.incidentId}>
-                  {incidentNames[incident.reasonCode] ?? incident.reasonCode}, opened {clockText(incident.openedAt)}
+                  {reasonName(incident.reasonCode)}, opened {clockText(incident.openedAt)}
                 </option>
               ))}
             </select>

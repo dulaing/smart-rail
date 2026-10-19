@@ -4,6 +4,7 @@ import { canOpen, findDestination, focusScope, homeFor, visibleDestinations } fr
 import type { Me } from './auth'
 import { messages } from '../../../shared/design/generated/status.ts'
 import { navigate } from './router'
+import { IncidentWorkspace } from './reports/IncidentWorkspace'
 import { ReportsWorkspace } from './reports/ReportsWorkspace'
 import { OperationsWorkspace } from './workspace/OperationsWorkspace'
 
@@ -109,7 +110,10 @@ export function Shell({
         {destination && allowed && destination.path === '/reports' && (
           <ReportsWorkspace me={me} path={path} onRefreshMe={onRefresh} />
         )}
-        {destination && allowed && !['/account', '/corridor', '/changes', '/reports'].includes(destination.path) && (
+        {destination && allowed && destination.path === '/incidents' && (
+          <IncidentWorkspace me={me} path={path} onRefreshMe={onRefresh} />
+        )}
+        {destination && allowed && !['/account', '/corridor', '/changes', '/reports', '/incidents'].includes(destination.path) && (
           <section className="notice neutral">
             <h2>Not available yet</h2>
             <p>{destination.summary}</p>

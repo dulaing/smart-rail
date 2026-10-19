@@ -5,6 +5,7 @@ import { AppLink } from '../workspace/parts.tsx'
 import { usePolled } from '../workspace/hooks.ts'
 import { staffCall } from '../workspace/live.ts'
 import { acknowledge, isAcknowledged, recheck, settledReport, toRead, type AckOutcome } from './acknowledge.ts'
+import { openFromReport, type OpenOutcome } from './incidentActions.ts'
 import { dateTimeText, isGuid, personName } from './format.ts'
 import { journeyLabel, type JourneyChoice } from './journeyChoices.ts'
 import { reasonName } from './reasons.ts'
@@ -261,6 +262,8 @@ export function ReportDetail({
         )}
         <p className="sub">Acknowledging does not open an incident or publish a change.</p>
       </section>
+
+      <ReportIncident reportId={reportId} onRefreshMe={onRefreshMe} />
     </article>
   )
 }
@@ -270,3 +273,82 @@ const whyText = {
   timeout: 'the wait ran out',
   'server-error': 'the server gave an error',
 } as const
+
+type IncidentStep = { name: 'idle' } | { name: 'sending' } | { name: 'done'; outcome: OpenOutcome }
+
+/**
+ * Starts an incident from this report. It is its own action: it does not acknowledge the report
+ * (before or after) and publishes nothing. Opening twice from one report gives the same
+ * incident, so after a lost answer trying again is safe and the page says so.
+ */
+function ReportIncident({ reportId, onRefreshMe }: { reportId: string; onRefreshMe: () => void }) {
+  const [step, setStep] = useState<IncidentStep>({ name: 'idle' })
+  const sending = useRef(false)
+
+  const open = async () => {
+    if (sending.current) return
+    sending.current = true
+    setStep({ name: 'sending' })
+    try {
+      setStep({ name: 'done', outcome: await openFromReport(staffCall, reportId) })
+    } finally {
+      sending.current = false
+    }
+  }
+
+  const outcome = step.name === 'done' ? step.outcome : null
+  return (
+    <section aria-labelledby="incident-heading" className="stack tight">
+      <h3 id="incident-heading">Incident</h3>
+      {outcome?.kind === 'opened' ? (
+        <div className="notice success" role="status">
+          <p>
+            An incident is open for this report: <AppLink to={`/incidents/${outcome.incident.incidentId}`}>view the incident</AppLink>.
+            Opening it again from this report returns the same incident, never a second one.
+          </p>
+        </div>
+      ) : (
+        <p className="muted">Open an incident for this report to track it to a resolution. This is separate from acknowledging it.</p>
+      )}
+      {outcome?.kind === 'refused' && (
+        <div className="notice" role="alert">
+          <p>No incident was opened: {outcome.detail}</p>
+        </div>
+      )}
+      {outcome?.kind === 'missing' && (
+        <div className="notice" role="alert">
+          <p>This report no longer exists, so no incident was opened.</p>
+        </div>
+      )}
+      {outcome?.kind === 'uncertain' && (
+        <div className="notice warning" role="alert">
+          <p>
+            <strong>Not confirmed.</strong> No answer came back. Opening an incident from a report is safe to repeat: if one
+            was created, you will get that same incident.
+          </p>
+        </div>
+      )}
+      {outcome?.kind === 'denied' && (
+        <div className="notice" role="alert">
+          <p>
+            {outcome.code === 401
+              ? 'Your session has ended. No incident was opened.'
+              : 'Your account is not allowed to open incidents, or no longer is. No incident was opened.'}
+          </p>
+          <div className="actions">
+            <button type="button" onClick={onRefreshMe}>
+              Check my access again
+            </button>
+          </div>
+        </div>
+      )}
+      {outcome?.kind !== 'opened' && (
+        <div className="actions">
+          <button type="button" disabled={step.name === 'sending'} onClick={() => void open()}>
+            {step.name === 'sending' ? 'Opening…' : 'Open incident from this report'}
+          </button>
+        </div>
+      )}
+    </section>
+  )
+}
