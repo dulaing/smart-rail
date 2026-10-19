@@ -1,0 +1,222 @@
+/* Corridor, journey and change screens. Colours, spacing and type come from the shared tokens. */
+
+.muted {
+  color: var(--sr-color-text-secondary);
+}
+
+.sub {
+  display: block;
+  color: var(--sr-color-text-secondary);
+  font-size: var(--sr-type-small-size);
+}
+
+.problem {
+  color: var(--sr-color-status-danger-ink);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sr-space-8);
+}
+
+/* Notices come in three tones; the base (danger) is defined with the shell. */
+.notice.warning {
+  border-color: var(--sr-color-status-warning);
+  background: var(--sr-color-status-warning-soft);
+  color: var(--sr-color-status-warning-ink);
+}
+.notice.success {
+  border-color: var(--sr-color-status-success);
+  background: var(--sr-color-status-success-soft);
+  color: var(--sr-color-status-success-ink);
+}
+.notice h3,
+.notice h4 {
+  color: inherit;
+}
+.notice .sub,
+.notice .muted {
+  color: inherit;
+}
+
+/* Tables scroll sideways inside their own box instead of widening the page. */
+.table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--sr-color-line-hairline);
+  border-radius: var(--sr-radius-xs);
+  background: var(--sr-color-bg-surface);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--sr-type-cell-size);
+  line-height: var(--sr-type-cell-line);
+}
+th,
+td {
+  padding: var(--sr-space-12) var(--sr-space-16);
+  border-bottom: 1px solid var(--sr-color-line-hairline);
+  text-align: left;
+  vertical-align: top;
+}
+thead th {
+  color: var(--sr-color-text-secondary);
+  font-size: var(--sr-type-small-size);
+  font-weight: 600;
+  white-space: nowrap;
+}
+tbody tr:last-child > * {
+  border-bottom: 0;
+}
+tbody th {
+  font-weight: 600;
+}
+
+h3,
+h4 {
+  margin: 0;
+  color: var(--sr-color-text-primary);
+}
+h3 {
+  font-size: var(--sr-type-heading-size);
+  font-weight: var(--sr-type-heading-weight);
+}
+h4 {
+  font-size: var(--sr-type-body-size);
+  font-weight: 600;
+}
+
+.stack.tight {
+  gap: var(--sr-space-16);
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sr-space-16) var(--sr-space-32);
+  margin: 0;
+}
+.facts dt {
+  color: var(--sr-color-text-secondary);
+  font-size: var(--sr-type-small-size);
+}
+.facts dd {
+  margin: var(--sr-space-4) 0 0;
+}
+
+.panel {
+  display: grid;
+  gap: var(--sr-space-20);
+  max-width: 880px;
+  padding: var(--sr-space-24);
+  border: 1px solid var(--sr-color-line-hairline);
+  border-radius: var(--sr-radius-xs);
+  background: var(--sr-color-bg-surface);
+}
+
+.review {
+  display: grid;
+  gap: var(--sr-space-16);
+  padding: var(--sr-space-20);
+  border: 1.5px solid var(--sr-color-accent-primary);
+  border-radius: var(--sr-radius-xs);
+  background: var(--sr-color-bg-surface-2);
+}
+.review h3:focus,
+.notice h3:focus {
+  outline: none;
+}
+.review h3:focus-visible,
+.notice h3:focus-visible {
+  outline: 3px solid var(--sr-color-accent-primary);
+  outline-offset: 2px;
+}
+
+.compare {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--sr-space-16);
+}
+
+.form {
+  display: grid;
+  gap: var(--sr-space-16);
+}
+.form fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.form legend {
+  padding: 0;
+  margin-bottom: var(--sr-space-8);
+  font-weight: 600;
+}
+.form .fields {
+  display: grid;
+  gap: var(--sr-space-12);
+}
+.form label {
+  display: grid;
+  gap: var(--sr-space-4);
+  max-width: 420px;
+}
+.form input[type='text'],
+.form input[type='number'],
+.form select {
+  min-height: var(--sr-min-target);
+  padding: 0 var(--sr-space-12);
+  border: 1.5px solid var(--sr-color-text-tertiary);
+  border-radius: var(--sr-radius-xs);
+  background: var(--sr-color-bg-surface);
+  color: var(--sr-color-text-primary);
+  font: inherit;
+}
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sr-space-8) var(--sr-space-16);
+}
+.form .choice {
+  display: flex;
+  align-items: center;
+  gap: var(--sr-space-8);
+  min-height: var(--sr-min-target);
+  max-width: none;
+}
+.choice input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+}
+
+ul.plain {
+  display: grid;
+  gap: var(--sr-space-8);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sr-space-12);
+  padding: var(--sr-space-12);
+  border: 1px solid var(--sr-color-line-hairline);
+  border-radius: var(--sr-radius-xs);
+}

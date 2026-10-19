@@ -271,6 +271,42 @@ no secret, exact redirect `http://localhost:5173/`), an audience mapper that add
 
 ### Operations web app
 
+#### Seed journeys for the Operations T1 check
+
+With the local Aspire database running and migrated (one-time setup above), set
+`ConnectionStrings__smartrail` to its connection string, then run from the repository root:
+
+```powershell
+dotnet run --project services/api -- --seed-operations-demo
+```
+
+This command runs only in Development and exits after adding four fictional Fort–Ragama–Gampaha
+journeys. It prints their service dates, workspace paths and the UTC seed anchor:
+
+| Train | Evidence when seeded |
+| --- | --- |
+| `SIM-OPS-FRESH` | Current observation, two-minute reported delay |
+| `SIM-OPS-AGEING` | Observation 185 seconds old; becomes unknown 55 seconds later |
+| `SIM-OPS-UNKNOWN` | Observation five minutes old; schedule/history remain, position/ETA unknown |
+| `SIM-OPS-OVERNIGHT` | Previous service date, 23:45 departure and 00:45 arrival; no observation |
+
+Open the Operations corridor as `demo-controller` immediately after seeding. The fresh sample
+returns unchanged ETags between polls, becomes ageing after three minutes and unknown after four.
+The samples are excluded from the continuous simulator, so reading or restarting the API never
+refreshes their evidence. Near midnight, their service date remains the date of departure.
+
+Each run with a new anchor adds a new set; previous journeys, observations, changes and audit
+history remain intact. To repeat the same set without duplicates or refreshing evidence, pass
+the printed anchor, for example `--Seed:OperationsAnchor=2026-10-18T12:00:00Z` after the command.
+Anchors must include a time-zone offset and cannot be in the future. To get fresh evidence for
+a new check, omit the anchor and use the newly printed journey IDs.
+
+For the remaining T1 browser checks, block one running request in browser developer tools
+(partial failure), switch the browser offline (connection lost), then restore it (reconnect).
+Seeding alone does not verify those screen states.
+
+#### Run the app
+
     npm --prefix apps/ops-web install
     npm --prefix apps/ops-web run dev        # http://localhost:5173 (the port is fixed)
 
