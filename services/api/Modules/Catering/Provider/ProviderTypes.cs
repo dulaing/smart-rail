@@ -14,6 +14,9 @@ public sealed record ProviderMenuItem(string Id, string Name, int PriceMinorLkr,
 
 public sealed record ProviderMenu(string CollectionPointId, string Currency, IReadOnlyList<ProviderMenuItem> Items);
 
+// RailBites' Development-only outage switch, as the provider itself answers it: {"outage": bool}.
+public sealed record ProviderOutage(bool Outage);
+
 public sealed record ProviderPickupTime(
     DateTimeOffset ScheduledArrival, DateTimeOffset? EstimatedArrival, DateTimeOffset? EtaEvidenceAt);
 

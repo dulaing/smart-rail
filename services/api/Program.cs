@@ -4,6 +4,7 @@ using SmartRail.Api.Infrastructure;
 using SmartRail.Api.Modules.Access;
 using SmartRail.Api.Modules.Catering;
 using SmartRail.Api.Modules.Catering.Callbacks;
+using SmartRail.Api.Modules.Demo;
 using SmartRail.Api.Modules.Operations;
 using SmartRail.Api.Modules.Rail;
 using SmartRail.Api.Modules.Rail.Running;
@@ -60,6 +61,7 @@ builder.AddSmartRailRail(hasDatabase);
 builder.AddSmartRailCatering(hasDatabase);
 builder.AddSmartRailOperations(hasDatabase);
 builder.AddSmartRailSimulator(hasDatabase);
+builder.AddSmartRailDemo(hasDatabase);
 
 // Browsers may call the API only from the origins listed in Cors:AllowedOrigins.
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
@@ -143,6 +145,7 @@ if (hasDatabase)
     if (app.Environment.IsDevelopment())
     {
         app.MapSimulatorEndpoints();
+        app.MapDemoEndpoints();
     }
 }
 
