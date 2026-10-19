@@ -1,0 +1,29 @@
+{
+  "approvedOn": "2026-10-19",
+  "newFrames": {
+    "DT12": "348:810 Journey selector (Briefing)",
+    "DT12U": "348:912 Updates selector",
+    "DT13": "348:11794 Reports chooser",
+    "D10": "349:911",
+    "D11": "349:972",
+    "D12": "349:1036 phone Reports list",
+    "D13": "353:982 phone empty Reports list (reuses the D07 state card; composition extension, no new content)"
+  },
+  "components": {
+    "Driver / Report row": "added State=Journey and State=Journey cancelled variants (176:681); removed invented times earlier",
+    "Driver / Phone report row": "new set 347:690 (Tone Neutral/Accent/Success/Danger) with Title, Copy, Chip, Detail, Show chip, Show detail and Icon properties"
+  },
+  "updated": {
+    "DT0": "178:36 and dark 190:5503: removed pre-login DEMO STAFF ACCOUNT / Sunil · Driver / email",
+    "DT6": "178:178 service-date heading added",
+    "DT9": "184:384 service-date heading added and title carries the date",
+    "D07": "189:454 service-date control added"
+  },
+  "notes": [
+    "New frames are Light only; Dark Driver frames remain inventory, not an app theme",
+    "ENDS EARLY uses the warning token tone with the same row geometry; no Figma specimen",
+    "The phone no-saved-briefing state reuses the D07 card with the DT9 wording and radio icon; it has no dedicated frame",
+    "Reports chooser date control lets a driver view another service date; creating a report remains subject to server assignment checks"
+  ],
+  "exports": "Light reference PNGs (2560x1600 tablet, 1080x2400 phone) saved as *.reference.png with SHA-256 in selector-reports-comparison.json"
+}

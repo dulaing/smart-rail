@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-19",
+  "task": "figma-implementation T2 (still in progress)",
+  "approval": "User approved journey-selector-reference-proposal.html (selector, Reports chooser, phone Reports list, sign-in without pre-login identity) and the service-date control on the no-duty/offline-no-saved references.",
+  "ledger": "selector-reports-reference-reconciliation.json",
+  "geometry": {
+    "measuredFields": 504,
+    "maximumLogicalError": 0.688,
+    "worst": "tablet-reports-chooser row-chip-DS-B1.x",
+    "limitLogicalPixels": 1
+  },
+  "captures": [
+    "tablet-selector",
+    "tablet-updates-selector",
+    "tablet-reports-chooser",
+    "tablet-no-duty",
+    "tablet-no-saved",
+    "phone-selector",
+    "phone-reports-chooser",
+    "phone-reports-list",
+    "phone-reports-empty",
+    "phone-no-duty"
+  ],
+  "referenceSha256": {
+    "tablet-selector": "30301ac24f5de55082ff9601e889633c6067a75b42ba148d207e9307cd7cf954",
+    "tablet-updates-selector": "91294f87234c4414ce3b1e7150bb4be796a0542d2d9d92ccf6eec8495a6c3d5a",
+    "tablet-reports-chooser": "b3093bd821d60ec3d31b5d66e553e00aa036030c312b10d333b523e5f3994051",
+    "tablet-no-duty": "853d733c0fb2ffacd3cdf8fff44408b4629ac30fb518df40ca29c39f6f39d294",
+    "tablet-no-saved": "08c05655274ff7f1847d71e197ca63b30b461015aee4f912ec63b8e199ae996c",
+    "phone-selector": "3d8fd62514a43783de1025e566875eab3d13095ff3ed0a154cdf88e7b50e1a28",
+    "phone-reports-chooser": "58f39825daa9d07a9d920f6dae5ce96c46b0d22fe8d8f5011afa78caa432db4f",
+    "phone-reports-list": "a6a924b29eda1e94f80f34a25b47b926e7a7f2d2d525a944c9945de65adcb9e2",
+    "phone-reports-empty": "e6efac47caee38f655e3981bce645c9a94654d472ef8cf19cdb5138fce88149f",
+    "phone-no-duty": "207629ce902ae47892e77367f8f82ec18f86d9a5cd45881d6bef194d86e8e362"
+  },
+  "raster": "Reviewed overlays/diffs separately from geometry; diagnostic metrics only."
+}

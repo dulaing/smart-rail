@@ -1,13 +1,15 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:smartrail_core/smartrail_core.dart';
 
 import 'briefing_api.dart';
+import 'driver_rows.dart';
+import 'journey_screens.dart';
 import 'report_api.dart';
 import 'report_drafts.dart';
 import 'report_view.dart';
 import 'reports_view.dart';
+import 'selector_view.dart';
 
 export 'report_view.dart' show reportReasons;
 
@@ -22,6 +24,8 @@ class DriverReportsScreen extends StatefulWidget {
     this.onAccount,
     this.onBriefing,
     this.onUpdates,
+    this.onSelect,
+    this.showJourneys = true,
     this.canCreate = true,
   }) : drafts = drafts ?? ReportDraftStore();
   final DriverBriefingApi journeyApi;
@@ -33,7 +37,10 @@ class DriverReportsScreen extends StatefulWidget {
   final String displayName;
   final VoidCallback? onAccount;
   final ValueChanged<DriverJourney>? onBriefing, onUpdates;
-  final bool canCreate;
+
+  /// Switches destination in the shell (`journeys`, `updates`, `account`).
+  final ValueChanged<String>? onSelect;
+  final bool canCreate, showJourneys;
 
   @override
   State<DriverReportsScreen> createState() => _DriverReportsScreenState();
@@ -49,17 +56,24 @@ class _ReportsHome {
 }
 
 class _DriverReportsScreenState extends State<DriverReportsScreen> {
+  late DateTime _date = reportToday(widget.now?.call());
   late Future<_ReportsHome> _home = _loadHome();
+  DateTime? _checkedAt;
 
   Future<_ReportsHome> _loadHome() async {
     final owner = await widget.journeyApi.ownerId();
     final pending = owner == null
         ? <ReportDraft>[]
         : await widget.drafts.pendingFor(owner);
-    final today = await widget.journeyApi.journeys(
-      reportToday(widget.now?.call()),
-    );
+    final today = await widget.journeyApi.journeys(_date);
+    if (today is DriverReadOk<List<DriverJourney>>) _checkedAt = DateTime.now();
     return _ReportsHome(today, pending);
+  }
+
+  void _changeDate(int days) {
+    _date = _date.add(Duration(days: days));
+    _checkedAt = null;
+    _reload();
   }
 
   /// A report may have been sent, reconciled or started while the other screen was open.
@@ -96,76 +110,78 @@ class _DriverReportsScreenState extends State<DriverReportsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = SrTheme.of(context);
     return FutureBuilder(
       future: _home,
       builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return const Center(child: CircularProgressIndicator());
-        }
+        final loading = snapshot.connectionState != ConnectionState.done;
         final home = snapshot.data;
-        if (home == null) {
-          return const Text('Could not load your reports. Try again.');
-        }
-        final today = home.today;
-        final pendingIds = {for (final draft in home.pending) draft.journeyId};
+        final today = home?.today;
+        final loaded = today is DriverReadOk<List<DriverJourney>>;
+        final pendingIds = {
+          for (final draft in home?.pending ?? const <ReportDraft>[])
+            draft.journeyId,
+        };
         // A journey with an unconfirmed report is listed once, in the section that says so.
-        final choices = today is DriverReadOk<List<DriverJourney>>
+        final choices = loaded
             ? [
                 for (final journey in today.value)
                   if (!pendingIds.contains(journey.id)) journey,
               ]
             : <DriverJourney>[];
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (home.pending.isNotEmpty) ...[
-              Text('Reports not confirmed', style: theme.text('heading')),
-              Text(
-                'Control may not have received these. Open one to check receipt or retry the same report. Nothing is sent automatically.',
-                style: theme.text('body'),
-              ),
-              for (final draft in home.pending)
-                Card(
-                  child: ListTile(
-                    key: Key('pending-${draft.journeyId}'),
-                    minTileHeight: theme.metrics.minTarget,
-                    title: Text(_pendingTitle(draft)),
-                    subtitle: Text(
-                      '${reportReasons[draft.reasonCode] ?? draft.reasonCode} · Receipt not confirmed',
-                    ),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () => _open(draft.journey ?? _unknownJourney(draft)),
-                  ),
-                ),
-            ],
-            if (today is! DriverReadOk<List<DriverJourney>>)
-              const Text(
-                'Could not load your assigned journeys. Reconnect and try again.',
-              )
-            else if (choices.isEmpty && home.pending.isEmpty)
-              const Text('No assigned journeys for this service date.')
-            else if (choices.isNotEmpty) ...[
-              Text(
-                'Choose a journey for your report.',
-                style: theme.text('body'),
-              ),
-              for (final journey in choices)
-                Card(
-                  child: ListTile(
-                    minTileHeight: theme.metrics.minTarget,
-                    title: Text('${journey.trainNumber} · ${journey.label}'),
-                    subtitle: Text(
-                      '${journey.origin} → ${journey.destination}',
-                    ),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () => _open(journey),
-                  ),
-                ),
-            ],
+        final pending = home?.pending ?? const <ReportDraft>[];
+        final failed = !loading && !loaded;
+        return DriverSelectorView(
+          destination: 'reports',
+          displayName: widget.displayName,
+          date: _date,
+          now: DateTime.now(),
+          checkedAt: _checkedAt,
+          showJourneys: widget.showJourneys,
+          loading: loading,
+          error: failed
+              ? 'Could not load your assigned journeys. Reconnect and try again.'
+              : null,
+          onRetry: failed ? _reload : null,
+          empty: loaded && today.value.isEmpty && pending.isEmpty
+              ? SelectorEmpty.noAssignment
+              : SelectorEmpty.none,
+          pending: [for (final draft in pending) _pendingItem(draft)],
+          items: [
+            for (final journey in choices)
+              journeyItem(journey, saved: false, onTap: () => _open(journey)),
           ],
+          onPreviousDate: () => _changeDate(-1),
+          onNextDate: () => _changeDate(1),
+          onSelect: (value) {
+            if (value == 'account') widget.onAccount?.call();
+            if (value == 'journeys' || value == 'updates') {
+              widget.onSelect?.call(value);
+            }
+          },
+          onCheckAgain: _reload,
+          onRefresh: () async {
+            _reload();
+            await _home;
+          },
         );
       },
+    );
+  }
+
+  SelectorItem _pendingItem(ReportDraft draft) {
+    final reason = reportReasons[draft.reasonCode] ?? draft.reasonCode;
+    final title = _pendingTitle(draft);
+    final copy = '$reason · Saved on this device';
+    return SelectorItem(
+      id: draft.journeyId,
+      rowKey: Key('pending-${draft.journeyId}'),
+      title: title,
+      copy: copy,
+      chip: 'RECEIPT NOT CONFIRMED',
+      tone: RowTone.danger,
+      icon: 'reports',
+      semantics: '$title. $copy. Receipt not confirmed.',
+      onTap: () => _open(draft.journey ?? _unknownJourney(draft)),
     );
   }
 }
@@ -173,11 +189,8 @@ class _DriverReportsScreenState extends State<DriverReportsScreen> {
 String _pendingTitle(ReportDraft draft) {
   final journey = draft.journey;
   if (journey == null) return 'Earlier journey';
-  return '${journey.trainNumber} · ${_date(journey.serviceDate)}';
+  return '${journey.trainNumber} · ${reportDate(journey.serviceDate)}';
 }
-
-String _date(DateTime value) =>
-    '${value.year.toString().padLeft(4, '0')}-${value.month.toString().padLeft(2, '0')}-${value.day.toString().padLeft(2, '0')}';
 
 /// Stands in for a journey whose details an older version of the app did not save with its draft.
 /// The report itself needs only the journey ID, which every draft has.

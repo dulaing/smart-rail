@@ -6,6 +6,7 @@ import 'package:driver_app/auth/auth_service.dart';
 import 'package:driver_app/journeys/briefing_api.dart';
 import 'package:driver_app/main.dart';
 import 'package:flutter/material.dart';
+import 'dart:ui' show Tristate;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -142,6 +143,7 @@ void main() {
   });
 
   testWidgets('a restored session opens the shell without asking again', (tester) async {
+    _tablet(tester);
     final accounts = FakeAccounts(const AccountFound(_driver));
     await _pump(tester, FakeAuth(restores: true), accounts);
 
@@ -205,6 +207,7 @@ void main() {
     });
 
     testWidgets('a connection failure offers retry and is not called a permission denial', (tester) async {
+      _tablet(tester);
       final accounts = FakeAccounts(const AccountFailed('Could not reach SmartRail.'));
       await _pump(tester, FakeAuth(), accounts);
       await _signIn(tester);
@@ -223,7 +226,7 @@ void main() {
 
   group('driver shell', () {
     testWidgets('shows only the destinations this account may use, with honest empty content', (tester) async {
-      _phone(tester);
+      _tablet(tester);
       await _pump(tester, FakeAuth(), FakeAccounts(const AccountFound(_driver)));
       await _signIn(tester);
 
@@ -252,7 +255,7 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(find.byKey(const Key('driver-journeys-list')), findsOneWidget);
       expect(find.byKey(const Key('journey-$_journeyId')), findsOneWidget);
-      expect(find.text('SIM-1001'), findsOneWidget);
+      expect(find.text('SIM-1001 · Morning express'), findsOneWidget);
     });
 
     testWidgets('a staff account without driver permissions gets Account only and an explanation', (tester) async {
@@ -273,7 +276,8 @@ void main() {
         await _signIn(tester);
 
         expect(tester.takeException(), isNull);
-        for (final key in ['journeys', 'updates', 'reports', 'account']) {
+        // The tablet rail holds every destination; the phone frame keeps the Account button.
+        for (final key in name == 'phone' ? ['account'] : ['journeys', 'updates', 'reports', 'account']) {
           final rect = tester.getRect(find.byKey(Key('tab-$key')));
           expect(rect.height, greaterThanOrEqualTo(56), reason: '$key height');
           expect(rect.width, greaterThanOrEqualTo(56), reason: '$key width');
@@ -332,14 +336,15 @@ void main() {
     });
 
     testWidgets('each tab is a labelled button and the open tab is selected', (tester) async {
-      _phone(tester);
+      _tablet(tester);
       final handle = tester.ensureSemantics();
       await _pump(tester, FakeAuth(), FakeAccounts(const AccountFound(_driver)));
       await _signIn(tester);
 
       final data = tester.getSemantics(find.byKey(const Key('tab-journeys'))).getSemanticsData();
-      expect(data.label, 'Journeys');
+      expect(data.label, 'Briefing');
       expect(data.flagsCollection.isButton, isTrue);
+      expect(data.flagsCollection.isSelected, Tristate.isTrue);
       handle.dispose();
     });
   });

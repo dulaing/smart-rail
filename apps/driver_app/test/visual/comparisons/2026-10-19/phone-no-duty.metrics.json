@@ -1,0 +1,12 @@
+﻿{
+    "reference":  "comparisons/2026-10-19/phone-no-duty.reference.png",
+    "actual":  "comparisons/2026-10-19/phone-no-duty.actual.png",
+    "cropTop":  120,
+    "cropBottom":  60,
+    "width":  1080,
+    "height":  2220,
+    "meanAbsoluteChannelError":  1.218899594038483,
+    "pixelsWithChannelDeltaAbove16":  0.014647981314647982,
+    "maximumChannelDelta":  244,
+    "interpretation":  "Diagnostic only. Review geometry and text separately; this is not a whole-image pass threshold."
+}

@@ -1,0 +1,790 @@
+{
+  "tablet-selector": {
+    "selector-heading": {
+      "x": 168,
+      "y": 112,
+      "width": 1080,
+      "height": 56
+    },
+    "selector-lead": {
+      "x": 168,
+      "y": 126,
+      "width": 760,
+      "height": 28
+    },
+    "selector-date": {
+      "x": 952,
+      "y": 112,
+      "width": 296,
+      "height": 56
+    },
+    "date-previous": {
+      "x": 952,
+      "y": 112,
+      "width": 56,
+      "height": 56
+    },
+    "date-label": {
+      "x": 1016,
+      "y": 126,
+      "width": 168,
+      "height": 28
+    },
+    "date-next": {
+      "x": 1192,
+      "y": 112,
+      "width": 56,
+      "height": 56
+    },
+    "journey-DS-B1": {
+      "x": 168,
+      "y": 192,
+      "width": 1080,
+      "height": 112
+    },
+    "row-icon-DS-B1": {
+      "x": 192,
+      "y": 216,
+      "width": 64,
+      "height": 64
+    },
+    "row-title-DS-B1": {
+      "x": 264,
+      "y": 221,
+      "height": 28
+    },
+    "row-copy-DS-B1": {
+      "x": 264,
+      "y": 253,
+      "height": 22
+    },
+    "row-chip-DS-B1": {
+      "x": 1097.5,
+      "y": 230,
+      "width": 126.5,
+      "height": 36
+    },
+    "journey-DS-B2": {
+      "x": 168,
+      "y": 328,
+      "width": 1080,
+      "height": 112
+    },
+    "row-icon-DS-B2": {
+      "x": 192,
+      "y": 352,
+      "width": 64,
+      "height": 64
+    },
+    "row-title-DS-B2": {
+      "x": 264,
+      "y": 357,
+      "height": 28
+    },
+    "row-copy-DS-B2": {
+      "x": 264,
+      "y": 389,
+      "height": 22
+    },
+    "row-chip-DS-B2": {
+      "x": 1120,
+      "y": 366,
+      "width": 104,
+      "height": 36
+    }
+  },
+  "tablet-updates-selector": {
+    "selector-heading": {
+      "x": 168,
+      "y": 112,
+      "width": 1080,
+      "height": 56
+    },
+    "selector-lead": {
+      "x": 168,
+      "y": 126,
+      "width": 760,
+      "height": 28
+    },
+    "selector-date": {
+      "x": 952,
+      "y": 112,
+      "width": 296,
+      "height": 56
+    },
+    "date-previous": {
+      "x": 952,
+      "y": 112,
+      "width": 56,
+      "height": 56
+    },
+    "date-label": {
+      "x": 1016,
+      "y": 126,
+      "width": 168,
+      "height": 28
+    },
+    "date-next": {
+      "x": 1192,
+      "y": 112,
+      "width": 56,
+      "height": 56
+    },
+    "journey-DS-B1": {
+      "x": 168,
+      "y": 192,
+      "width": 1080,
+      "height": 112
+    },
+    "row-icon-DS-B1": {
+      "x": 192,
+      "y": 216,
+      "width": 64,
+      "height": 64
+    },
+    "row-title-DS-B1": {
+      "x": 264,
+      "y": 221,
+      "height": 28
+    },
+    "row-copy-DS-B1": {
+      "x": 264,
+      "y": 253,
+      "height": 22
+    },
+    "row-chip-DS-B1": {
+      "x": 1097.5,
+      "y": 230,
+      "width": 126.5,
+      "height": 36
+    },
+    "journey-DS-B2": {
+      "x": 168,
+      "y": 328,
+      "width": 1080,
+      "height": 112
+    },
+    "row-icon-DS-B2": {
+      "x": 192,
+      "y": 352,
+      "width": 64,
+      "height": 64
+    },
+    "row-title-DS-B2": {
+      "x": 264,
+      "y": 357,
+      "height": 28
+    },
+    "row-copy-DS-B2": {
+      "x": 264,
+      "y": 389,
+      "height": 22
+    },
+    "row-chip-DS-B2": {
+      "x": 1120,
+      "y": 366,
+      "width": 104,
+      "height": 36
+    }
+  },
+  "tablet-reports-chooser": {
+    "selector-heading": {
+      "x": 168,
+      "y": 112,
+      "width": 1080,
+      "height": 56
+    },
+    "selector-lead": {
+      "x": 168,
+      "y": 126,
+      "width": 760,
+      "height": 28
+    },
+    "selector-date": {
+      "x": 952,
+      "y": 112,
+      "width": 296,
+      "height": 56
+    },
+    "date-previous": {
+      "x": 952,
+      "y": 112,
+      "width": 56,
+      "height": 56
+    },
+    "date-label": {
+      "x": 1016,
+      "y": 126,
+      "width": 168,
+      "height": 28
+    },
+    "date-next": {
+      "x": 1192,
+      "y": 112,
+      "width": 56,
+      "height": 56
+    },
+    "section-unconfirmed": {
+      "x": 168,
+      "y": 192,
+      "width": 1080,
+      "height": 54
+    },
+    "section-journeys": {
+      "x": 168,
+      "y": 406,
+      "width": 1080,
+      "height": 28
+    },
+    "reports-note": {
+      "x": 168,
+      "y": 594,
+      "width": 1080,
+      "height": 22
+    },
+    "pending-DS-B1": {
+      "x": 168,
+      "y": 270,
+      "width": 1080,
+      "height": 112
+    },
+    "row-icon-DS-B1": {
+      "x": 192,
+      "y": 294,
+      "width": 64,
+      "height": 64
+    },
+    "row-title-DS-B1": {
+      "x": 264,
+      "y": 299,
+      "height": 28
+    },
+    "row-copy-DS-B1": {
+      "x": 264,
+      "y": 331,
+      "height": 22
+    },
+    "row-chip-DS-B1": {
+      "x": 1023.5,
+      "y": 308,
+      "width": 200.5,
+      "height": 36
+    },
+    "journey-DS-B2": {
+      "x": 168,
+      "y": 458,
+      "width": 1080,
+      "height": 112
+    },
+    "row-icon-DS-B2": {
+      "x": 192,
+      "y": 482,
+      "width": 64,
+      "height": 64
+    },
+    "row-title-DS-B2": {
+      "x": 264,
+      "y": 487,
+      "height": 28
+    },
+    "row-copy-DS-B2": {
+      "x": 264,
+      "y": 519,
+      "height": 22
+    },
+    "row-chip-DS-B2": {
+      "x": 1097.5,
+      "y": 496,
+      "width": 126.5,
+      "height": 36
+    }
+  },
+  "tablet-no-duty": {
+    "selector-heading": {
+      "x": 168,
+      "y": 112,
+      "width": 1080,
+      "height": 56
+    },
+    "selector-date": {
+      "x": 952,
+      "y": 112,
+      "width": 296,
+      "height": 56
+    },
+    "state-panel": {
+      "x": 168,
+      "y": 192,
+      "width": 1080,
+      "height": 448
+    },
+    "state-icon": {
+      "x": 668,
+      "y": 258,
+      "width": 80,
+      "height": 80
+    },
+    "state-title": {
+      "x": 258,
+      "y": 354,
+      "width": 900,
+      "height": 36
+    },
+    "state-copy": {
+      "x": 258,
+      "y": 406,
+      "width": 900,
+      "height": 56
+    },
+    "state-action": {
+      "x": 468,
+      "y": 478,
+      "width": 480,
+      "height": 96
+    },
+    "state-contact": {
+      "x": 168,
+      "y": 664,
+      "width": 1080,
+      "height": 112
+    }
+  },
+  "tablet-no-saved": {
+    "selector-heading": {
+      "x": 168,
+      "y": 112,
+      "width": 1080,
+      "height": 56
+    },
+    "selector-date": {
+      "x": 952,
+      "y": 112,
+      "width": 296,
+      "height": 56
+    },
+    "state-panel": {
+      "x": 168,
+      "y": 192,
+      "width": 1080,
+      "height": 448
+    },
+    "state-icon": {
+      "x": 668,
+      "y": 258,
+      "width": 80,
+      "height": 80
+    },
+    "state-title": {
+      "x": 258,
+      "y": 354,
+      "width": 900,
+      "height": 36
+    },
+    "state-copy": {
+      "x": 258,
+      "y": 406,
+      "width": 900,
+      "height": 56
+    },
+    "state-action": {
+      "x": 468,
+      "y": 478,
+      "width": 480,
+      "height": 96
+    },
+    "report-guidance": {
+      "x": 168,
+      "y": 664,
+      "width": 1080,
+      "height": 60
+    }
+  },
+  "phone-selector": {
+    "selector-chip": {
+      "x": 18.33,
+      "y": 120,
+      "width": 128,
+      "height": 30.67
+    },
+    "selector-lead": {
+      "x": 18.33,
+      "y": 161.33,
+      "width": 323.33,
+      "height": 22
+    },
+    "selector-date": {
+      "x": 18.33,
+      "y": 194,
+      "width": 323.33,
+      "height": 56
+    },
+    "date-previous": {
+      "x": 18.33,
+      "y": 194,
+      "width": 56,
+      "height": 56
+    },
+    "date-label": {
+      "x": 82.33,
+      "y": 208,
+      "width": 195.33,
+      "height": 28
+    },
+    "date-next": {
+      "x": 285.67,
+      "y": 194,
+      "width": 56,
+      "height": 56
+    },
+    "journey-DS-B1": {
+      "x": 18.33,
+      "y": 260.67,
+      "width": 323.33,
+      "height": 134.67
+    },
+    "row-icon-DS-B1": {
+      "x": 31.67,
+      "y": 304,
+      "width": 48,
+      "height": 48
+    },
+    "row-title-DS-B1": {
+      "x": 87.67,
+      "y": 274,
+      "height": 28
+    },
+    "row-copy-DS-B1": {
+      "x": 87.67,
+      "y": 306,
+      "height": 44
+    },
+    "row-chip-DS-B1": {
+      "x": 87.67,
+      "y": 354,
+      "width": 118.33,
+      "height": 28
+    },
+    "journey-DS-B2": {
+      "x": 18.33,
+      "y": 406,
+      "width": 323.33,
+      "height": 134.67
+    },
+    "row-icon-DS-B2": {
+      "x": 31.67,
+      "y": 449.33,
+      "width": 48,
+      "height": 48
+    },
+    "row-title-DS-B2": {
+      "x": 87.67,
+      "y": 419.33,
+      "height": 28
+    },
+    "row-copy-DS-B2": {
+      "x": 87.67,
+      "y": 451.33,
+      "height": 44
+    },
+    "row-chip-DS-B2": {
+      "x": 87.67,
+      "y": 499.33,
+      "width": 95.67,
+      "height": 28
+    }
+  },
+  "phone-reports-chooser": {
+    "selector-chip": {
+      "x": 18.33,
+      "y": 120,
+      "width": 128,
+      "height": 30.67
+    },
+    "selector-lead": {
+      "x": 18.33,
+      "y": 161.33,
+      "width": 323.33,
+      "height": 22
+    },
+    "selector-date": {
+      "x": 18.33,
+      "y": 194,
+      "width": 323.33,
+      "height": 56
+    },
+    "section-unconfirmed": {
+      "x": 18.33,
+      "y": 260.67,
+      "width": 323.33,
+      "height": 98
+    },
+    "section-journeys": {
+      "x": 18.33,
+      "y": 492.67,
+      "width": 323.33,
+      "height": 28
+    },
+    "reports-note": {
+      "x": 18.33,
+      "y": 676.67,
+      "width": 323.33,
+      "height": 22
+    },
+    "pending-DS-B1": {
+      "x": 18.33,
+      "y": 369.33,
+      "width": 323.33,
+      "height": 112.67
+    },
+    "row-icon-DS-B1": {
+      "x": 31.67,
+      "y": 401.67,
+      "width": 48,
+      "height": 48
+    },
+    "row-title-DS-B1": {
+      "x": 87.67,
+      "y": 382.67,
+      "height": 28
+    },
+    "row-copy-DS-B1": {
+      "x": 87.67,
+      "y": 414.67,
+      "height": 22
+    },
+    "row-chip-DS-B1": {
+      "x": 87.67,
+      "y": 440.67,
+      "width": 192.33,
+      "height": 28
+    },
+    "journey-DS-B2": {
+      "x": 18.33,
+      "y": 531.33,
+      "width": 323.33,
+      "height": 134.67
+    },
+    "row-icon-DS-B2": {
+      "x": 31.67,
+      "y": 574.67,
+      "width": 48,
+      "height": 48
+    },
+    "row-title-DS-B2": {
+      "x": 87.67,
+      "y": 544.67,
+      "height": 28
+    },
+    "row-copy-DS-B2": {
+      "x": 87.67,
+      "y": 576.67,
+      "height": 44
+    },
+    "row-chip-DS-B2": {
+      "x": 87.67,
+      "y": 624.67,
+      "width": 118.33,
+      "height": 28
+    }
+  },
+  "phone-reports-list": {
+    "reports-context": {
+      "x": 18.33,
+      "y": 120,
+      "width": 323.33,
+      "height": 28
+    },
+    "reports-note": {
+      "x": 18.33,
+      "y": 431.33,
+      "width": 323.33,
+      "height": 44
+    },
+    "reports-primary": {
+      "x": 18.33,
+      "y": 709.33,
+      "width": 323.33,
+      "height": 64
+    },
+    "report-row-draft": {
+      "x": 18.33,
+      "y": 158.67,
+      "width": 323.33,
+      "height": 112.67
+    },
+    "row-icon-draft": {
+      "x": 31.67,
+      "y": 191,
+      "width": 48,
+      "height": 48
+    },
+    "row-title-draft": {
+      "x": 87.67,
+      "y": 172,
+      "height": 28
+    },
+    "row-copy-draft": {
+      "x": 87.67,
+      "y": 204,
+      "height": 22
+    },
+    "row-chip-draft": {
+      "x": 87.67,
+      "y": 230,
+      "width": 192.33,
+      "height": 28
+    },
+    "report-row-RPT-118": {
+      "x": 18.33,
+      "y": 282,
+      "width": 323.33,
+      "height": 138.67
+    },
+    "row-icon-RPT-118": {
+      "x": 31.67,
+      "y": 327.33,
+      "width": 48,
+      "height": 48
+    },
+    "row-title-RPT-118": {
+      "x": 87.67,
+      "y": 295.33,
+      "height": 28
+    },
+    "row-copy-RPT-118": {
+      "x": 87.67,
+      "y": 327.33,
+      "height": 22
+    },
+    "row-chip-RPT-118": {
+      "x": 87.67,
+      "y": 353.33,
+      "width": 132.67,
+      "height": 28
+    },
+    "row-ack-RPT-118": {
+      "x": 87.67,
+      "y": 385.33,
+      "width": 240.67,
+      "height": 22
+    }
+  },
+  "phone-reports-empty": {
+    "reports-context": {
+      "x": 18.33,
+      "y": 120,
+      "width": 323.33,
+      "height": 28
+    },
+    "reports-empty": {
+      "x": 18.33,
+      "y": 158.67,
+      "width": 323.33,
+      "height": 254.67
+    },
+    "reports-empty-icon": {
+      "x": 34.33,
+      "y": 174.67,
+      "width": 48,
+      "height": 48
+    },
+    "reports-empty-title": {
+      "x": 34.33,
+      "y": 236,
+      "width": 291.33,
+      "height": 36
+    },
+    "reports-empty-copy": {
+      "x": 34.33,
+      "y": 285.33,
+      "width": 291.33,
+      "height": 112
+    },
+    "report-guidance": {
+      "x": 18.33,
+      "y": 424,
+      "width": 323.33,
+      "height": 49.33
+    },
+    "reports-primary": {
+      "x": 18.33,
+      "y": 709.33,
+      "width": 323.33,
+      "height": 64
+    }
+  },
+  "phone-no-duty": {
+    "selector-chip": {
+      "x": 18.33,
+      "y": 120,
+      "width": 128,
+      "height": 30.67
+    },
+    "selector-date": {
+      "x": 18.33,
+      "y": 161.33,
+      "width": 323.33,
+      "height": 56
+    },
+    "date-previous": {
+      "x": 18.33,
+      "y": 161.33,
+      "width": 56,
+      "height": 56
+    },
+    "date-label": {
+      "x": 82.33,
+      "y": 175.33,
+      "width": 195.33,
+      "height": 28
+    },
+    "date-next": {
+      "x": 285.67,
+      "y": 161.33,
+      "width": 56,
+      "height": 56
+    },
+    "state-panel": {
+      "x": 18.33,
+      "y": 228,
+      "width": 323.33,
+      "height": 234
+    },
+    "state-icon": {
+      "x": 34.33,
+      "y": 244,
+      "width": 48,
+      "height": 48
+    },
+    "state-title": {
+      "x": 34.33,
+      "y": 305.33,
+      "width": 291.33,
+      "height": 36
+    },
+    "state-copy": {
+      "x": 34.33,
+      "y": 354.67,
+      "width": 291.33,
+      "height": 56
+    },
+    "state-detail": {
+      "x": 34.33,
+      "y": 424,
+      "width": 291.33,
+      "height": 22
+    },
+    "state-contact": {
+      "x": 18.33,
+      "y": 472.67,
+      "width": 323.33,
+      "height": 186.67
+    },
+    "state-action": {
+      "x": 18.33,
+      "y": 709.33,
+      "width": 323.33,
+      "height": 64
+    }
+  }
+}

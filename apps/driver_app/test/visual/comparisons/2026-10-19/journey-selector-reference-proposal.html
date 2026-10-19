@@ -1,0 +1,39 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+body{margin:0;font:14px/1.5 var(--font-sans,system-ui);color:var(--foreground)}p{margin:8px 0 14px}
+label{display:inline-block;margin:0 12px 12px 0}select{font:inherit;padding:8px;background:var(--secondary);border:1px solid var(--border);border-radius:8px;color:var(--foreground)}
+.sample{background:#f3f4f7;color:#0b0f17;padding:24px;border-radius:12px;max-width:1080px}.phone{max-width:323px;padding:16px}
+h2{font-size:28px;line-height:36px;margin:0 0 4px;font-weight:600}.body{font-size:20px;line-height:28px;color:#4b5363}.small{font-size:16px;line-height:22px;color:#4b5363}
+.date{display:flex;align-items:center;gap:12px;margin:16px 0}.date b{font-size:20px;line-height:28px;flex:1;text-align:center}.btn{width:56px;height:56px;border-radius:28px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:24px}
+.row{display:flex;align-items:center;gap:8px;background:#fff;border-radius:28px;padding:12px 24px;min-height:112px;margin-bottom:16px;box-sizing:border-box}
+.phone .row{border-radius:15px;padding:13px;min-height:72px;flex-wrap:wrap}
+.icon{width:64px;height:64px;border-radius:28px;background:#e6f4f8;display:flex;align-items:center;justify-content:center;flex:none;color:#0b7899;font-size:28px}.phone .icon{width:48px;height:48px;border-radius:15px;font-size:22px}
+.main{flex:1;min-width:0}.t{font-size:20px;line-height:28px;font-weight:500}.chip{display:inline-block;font-size:14px;line-height:20px;font-weight:600;padding:8px 12px;border-radius:99px;background:#e6f4f8}.phone .chip{padding:4px 8px}
+.bad{background:#fdecea;color:#7d2118}.ok{background:#e6f6ef;color:#03543a}.chev{font-size:28px;color:#4b5363;padding-left:8px}
+.card{background:#fff;border-radius:28px;padding:24px;margin-bottom:16px}.hint{color:#4b5363}
+table{border-collapse:collapse;width:100%;margin-top:16px}td,th{text-align:left;vertical-align:top;border-bottom:1px solid var(--border);padding:10px 6px}th{font-weight:600}.muted{color:var(--muted-foreground)}
+</style></head><body>
+<p><strong>Proposed Driver references: journey selector, Reports chooser, phone Reports list and sign-in</strong> · reuses the approved Reports-list row; no new API fields</p>
+<label>Example <select id="s"><option value="sel">Briefing / Updates selector (tablet)</option><option value="choose">Reports chooser (tablet)</option><option value="selp">Selector (phone)</option><option value="chp">Reports chooser (phone)</option><option value="listp">Reports list for a journey (phone)</option><option value="signin">Sign-in (tablet)</option></select></label>
+<div class="sample" id="v"></div>
+<table><thead><tr><th>Gap in the references</th><th>Proposed reference</th></tr></thead><tbody id="rows"></tbody></table>
+<p class="muted">Rows reuse the approved Reports-list card: 112 logical px tall on tablet, 72 on phone, 28 / 15 px radius, 64 / 48 px icon box, 14sp chips. Phones scroll vertically; nothing shrinks. Light theme only, as for every Driver app screen. Fixture names and times are test data.</p>
+<script>
+const row=(icon,t,c,chip,cls)=>`<div class="row"><div class="icon">${icon}</div><div class="main"><div class="t">${t}</div><div class="small">${c}</div></div>${chip?`<span class="chip ${cls||''}">${chip}</span>`:''}<span class="chev">›</span></div>`;
+const date=`<div class="date"><span class="btn">‹</span><b>Mon 12 Oct</b><span class="btn">›</span></div>`;
+const jr=(chip,cls)=>row('☰','DS-B1 · Morning service','Veyangoda 6:52 → Colombo Fort 8:01',chip,cls);
+const V={
+sel:`<h2>Today’s duty · Mon 12 Oct</h2><div class="body">Choose a journey to open its briefing.</div>${date}${jr('As scheduled','ok')}${row('☰','DS-B2 · Evening service','Colombo Fort 17:40 → Veyangoda 18:50','Cancelled','bad')}<p class="small">Offline: rows say “Saved copy · read only”. A saved date with nothing says “No saved briefing”; only an online empty read says “No duty assignment” (existing DT6/D07/DT9).</p>`,
+choose:`<h2>Reports · Mon 12 Oct</h2><div class="body">Choose a journey for your report.</div>${date}<div class="small" style="margin:8px 0">Reports not confirmed</div>${row('⚑','Train fault · DS-B1 · 12 October 2026','Saved on this device','RECEIPT NOT CONFIRMED','bad')}<div class="small" style="margin:8px 0">Today’s journeys</div>${jr('')}`,
+selp:`<h2 style="font-size:22px;line-height:28px">Today’s duty</h2>${date}${jr('As scheduled','ok')}`,
+chp:`<h2 style="font-size:22px;line-height:28px">Reports</h2><div class="small">Choose a journey for your report.</div>${row('⚑','Train fault · DS-B1','Saved on this device','RECEIPT NOT CONFIRMED','bad')}${jr('')}`,
+listp:`<h2 style="font-size:22px;line-height:28px">Your reports</h2><div class="small">DS-B1 · 12 October 2026</div><div class="card" style="padding:13px;border-radius:15px;margin:12px 0"><span class="body" style="font-size:20px;font-weight:500">Report a problem</span></div>${row('⚑','Train fault','Saved on this device','RECEIPT NOT CONFIRMED','bad')}${row('⚑','Signal delay','Server received 6:51','ACKNOWLEDGED','ok')}<div class="small">Dilani · 6:55</div>`,
+signin:`<div class="card"><h2>Staff sign-in</h2><div class="body">Continue with your assigned staff account.</div><p><span class="action" style="display:block;background:#0b0f17;color:#fff;padding:20px;border-radius:28px;text-align:center;font-size:22px">Sign in with staff account</span></p><div class="small">Sign-in opens your organisation’s secure sign-in page.</div></div>`};
+const R={
+sel:[['No selector, date control or journey rows in any reference','Page title “Today’s duty · date”; a service-date control (previous / next day, 56 px targets) above one row per assigned dated journey: train and timetable label, origin time → destination time, availability chip (As scheduled / Ends early / Cancelled), “Saved copy · read only” offline. Updates uses the same rows and opens that journey’s Updates; the title becomes “Updates · date”.']],
+choose:[['No Reports chooser reference (today a plain list)','Same date control and rows. An unconfirmed draft is listed first under “Reports not confirmed” as a danger row that opens its receipt; a row opens that journey’s Reports list (DT8). Existing wording “Nothing is sent automatically.” stays as a note.']],
+selp:[['Phone selector','Same rows at phone size; header is logo / title / Account avatar as on D02. Reports and Updates stay reachable from the briefing as today.']],
+chp:[['Phone Reports chooser','Same as tablet at phone size.']],
+listp:[['No phone Reports list (DT8 is tablet only)','Phone header “Your reports”, subline “DS-B1 · 12 October 2026”, the Report a problem action, then the same rows with the chip under the text. Fields identical to the approved tablet list: reason, server receipt time, acknowledging name and time, unconfirmed draft first.']],
+signin:[['Sign-in shows a “DEMO STAFF ACCOUNT / Sunil · Driver / email” block before anyone has signed in','Remove it. The app knows no identity until sign-in, and the account read supplies no email. Keep the headline, the sign-in card and the “secure sign-in page” note; “Station progress · not exact GPS” stays as a labelled illustration.']]};
+const s=document.getElementById('s');function d(){v.className='sample'+(/p$/.test(s.value)?' phone':'');v.innerHTML=V[s.value];rows.innerHTML=R[s.value].map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>').join('')}s.onchange=d;d();
+</script></body></html>

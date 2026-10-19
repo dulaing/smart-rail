@@ -1,0 +1,50 @@
+{
+  "selector-heading": {
+    "x": 168.0,
+    "y": 112.0,
+    "width": 1080.0,
+    "height": 56.0
+  },
+  "selector-date": {
+    "x": 952.0,
+    "y": 112.0,
+    "width": 296.0,
+    "height": 56.0
+  },
+  "state-panel": {
+    "x": 168.0,
+    "y": 192.0,
+    "width": 1080.0,
+    "height": 448.0
+  },
+  "state-icon": {
+    "x": 668.0,
+    "y": 258.0,
+    "width": 80.0,
+    "height": 80.0
+  },
+  "state-title": {
+    "x": 258.0,
+    "y": 354.0,
+    "width": 900.0,
+    "height": 36.0
+  },
+  "state-copy": {
+    "x": 258.0,
+    "y": 406.0,
+    "width": 900.0,
+    "height": 56.0
+  },
+  "state-action": {
+    "x": 468.0,
+    "y": 478.0,
+    "width": 480.0,
+    "height": 96.0
+  },
+  "state-contact": {
+    "x": 168.0,
+    "y": 664.0,
+    "width": 1080.0,
+    "height": 112.0
+  }
+}

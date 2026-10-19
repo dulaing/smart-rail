@@ -194,15 +194,11 @@ class _Rig {
 
   Widget app() => MaterialApp(
     theme: srTheme(SrProfile.driver, Brightness.light),
-    home: Scaffold(
-      body: SingleChildScrollView(
-        child: DriverReportsScreen(
-          journeyApi: journeyApi,
-          reportApi: reportApi,
-          drafts: drafts,
-          now: _afterMidnight,
-        ),
-      ),
+    home: DriverReportsScreen(
+      journeyApi: journeyApi,
+      reportApi: reportApi,
+      drafts: drafts,
+      now: _afterMidnight,
     ),
   );
 
@@ -268,8 +264,9 @@ void main() {
         '2026-10-19',
       );
       expect(find.text('Reports not confirmed'), findsOneWidget);
-      expect(find.text('SIM-1001 · 2026-10-18'), findsOneWidget);
-      expect(find.text('Signal delay · Receipt not confirmed'), findsOneWidget);
+      expect(find.text('SIM-1001 · 18 October 2026'), findsOneWidget);
+      expect(find.text('Signal delay · Saved on this device'), findsOneWidget);
+      expect(find.text('RECEIPT NOT CONFIRMED'), findsOneWidget);
       // Today's journey is still offered for a new report.
       expect(find.text('SIM-2002 · Morning express'), findsOneWidget);
       expect(rig.posts, isEmpty, reason: 'listing a draft never sends it');
@@ -333,7 +330,7 @@ void main() {
       expect(find.text('Retry same report'), findsOneWidget);
       await tester.pageBack();
       await tester.pumpAndSettle();
-      expect(find.text('SIM-1001 · 2026-10-18'), findsOneWidget);
+      expect(find.text('SIM-1001 · 18 October 2026'), findsOneWidget);
     },
   );
 
@@ -420,7 +417,7 @@ void main() {
       );
       await tester.pumpWidget(rig.app());
       await tester.pumpAndSettle();
-      expect(find.text('SIM-1001 · 2026-10-18'), findsOneWidget);
+      expect(find.text('SIM-1001 · 18 October 2026'), findsOneWidget);
       expect(
         find.text(
           'Could not load your assigned journeys. Reconnect and try again.',
@@ -439,7 +436,7 @@ void main() {
     await tester.pumpWidget(rig.app());
     await tester.pumpAndSettle();
     expect(find.text('Reports not confirmed'), findsNothing);
-    expect(find.text('SIM-1001 · 2026-10-18'), findsNothing);
+    expect(find.text('SIM-1001 · 18 October 2026'), findsNothing);
   });
 
   testWidgets(
@@ -459,7 +456,7 @@ void main() {
       final rig = _Rig(drafts: _MemoryDrafts(todayDraft));
       await tester.pumpWidget(rig.app());
       await tester.pumpAndSettle();
-      expect(find.text('SIM-2002 · 2026-10-19'), findsOneWidget);
+      expect(find.text('SIM-2002 · 19 October 2026'), findsOneWidget);
       expect(find.text('SIM-2002 · Morning express'), findsNothing);
     },
   );

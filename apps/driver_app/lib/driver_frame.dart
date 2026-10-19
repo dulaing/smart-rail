@@ -98,6 +98,7 @@ class DriverFrame extends StatelessWidget {
                         Semantics(
                           button: true,
                           label: 'Account',
+                          excludeSemantics: true,
                           child: SizedBox(
                             key: const Key('tab-account'),
                             width: 56,
@@ -295,6 +296,7 @@ class _Rail extends StatelessWidget {
                 button: true,
                 selected: selected == item.$1,
                 label: item.$2,
+                excludeSemantics: true,
                 child: SizedBox(
                   key: Key('tab-${item.$1}'),
                   width: 112,
@@ -344,6 +346,7 @@ class _Rail extends StatelessWidget {
               child: Semantics(
                 button: true,
                 label: 'Account',
+                excludeSemantics: true,
                 child: InkWell(
                   onTap: () => onSelect?.call('account'),
                   child: Column(

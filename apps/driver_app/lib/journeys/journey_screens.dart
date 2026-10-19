@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:smartrail_core/smartrail_core.dart';
 
 import 'briefing_api.dart';
+import '../driver_frame.dart';
 import 'briefing_cache.dart';
 import 'briefing_view.dart';
+import 'driver_rows.dart';
+import 'selector_view.dart';
 
 const _colomboOffset = Duration(hours: 5, minutes: 30);
 
@@ -16,12 +19,6 @@ DateTime colomboToday([DateTime? now]) {
 
 String _dateLabel(DateTime date) =>
     '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-
-String _time(DateTime? value) {
-  if (value == null) return '—';
-  final local = value.toLocal();
-  return '${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
-}
 
 class DriverJourneysScreen extends StatefulWidget {
   const DriverJourneysScreen({
@@ -34,6 +31,9 @@ class DriverJourneysScreen extends StatefulWidget {
     this.onReport,
     this.onAccount,
     this.onReports,
+    this.onSelect,
+    this.onReconnect,
+    this.showReports = true,
   });
 
   final DriverBriefingApi api;
@@ -44,7 +44,11 @@ class DriverJourneysScreen extends StatefulWidget {
   final String displayName;
   final bool updatesOnly;
   final void Function(DriverJourney)? onReport;
-  final VoidCallback? onAccount, onReports;
+  final VoidCallback? onAccount, onReports, onReconnect;
+
+  /// Switches destination (`journeys`, `updates`, `reports`, `account`) in the shell.
+  final ValueChanged<String>? onSelect;
+  final bool showReports;
 
   @override
   State<DriverJourneysScreen> createState() => _DriverJourneysScreenState();
@@ -64,6 +68,7 @@ class _DriverJourneysScreenState extends State<DriverJourneysScreen>
   List<Map<String, dynamic>> _savedRows = [];
   bool _usingSaved = false;
   String? _ownerId;
+  DateTime? _checkedAt;
 
   @override
   void initState() {
@@ -116,6 +121,7 @@ class _DriverJourneysScreenState extends State<DriverJourneysScreen>
           _error = null;
           _status = null;
           _loading = false;
+          _checkedAt = DateTime.now();
         });
       case DriverReadNotModified<List<DriverJourney>>():
         setState(() {
@@ -123,6 +129,7 @@ class _DriverJourneysScreenState extends State<DriverJourneysScreen>
           _error = null;
           _status = null;
           _loading = false;
+          _checkedAt = DateTime.now();
         });
       case DriverReadFailure<List<DriverJourney>>(
         :final statusCode,
@@ -195,155 +202,92 @@ class _DriverJourneysScreenState extends State<DriverJourneysScreen>
     unawaited(_load());
   }
 
+  void _open(DriverJourney journey) => Navigator.of(context).push(
+    MaterialPageRoute<void>(
+      builder: (_) => DriverBriefingScreen(
+        api: widget.api,
+        journey: journey,
+        displayName: widget.displayName,
+        updatesOnly: widget.updatesOnly,
+        onReport: widget.onReport == null
+            ? null
+            : () => widget.onReport!(journey),
+        onAccount: widget.onAccount,
+        onReports: widget.onReports,
+        offlineOwnerId:
+            widget.offlineOwnerId ?? (_usingSaved ? _ownerId : null),
+        savedRow: widget.offlineOwnerId == null && !_usingSaved
+            ? null
+            : _savedRows.firstWhere((row) => row['journeyId'] == journey.id),
+      ),
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
-    final theme = SrTheme.of(context);
-    final gap = theme.metrics.space[16]!;
-    return RefreshIndicator(
+    final saved = widget.offlineOwnerId != null || _usingSaved;
+    final journeys = _journeys;
+    final empty = journeys != null && journeys.isEmpty && _error == null
+        ? (saved ? SelectorEmpty.noSaved : SelectorEmpty.noAssignment)
+        : SelectorEmpty.none;
+    return DriverSelectorView(
+      destination: widget.updatesOnly ? 'updates' : 'journeys',
+      displayName: widget.displayName,
+      date: _date,
+      saved: saved,
+      now: DateTime.now(),
+      checkedAt: _checkedAt,
+      showReports: widget.showReports,
+      loading: _loading,
+      error: _error,
+      onRetry: _status == 401 || _status == 403
+          ? null
+          : () => unawaited(_load()),
+      unavailable: journeys == null && !_loading && _error == null,
+      empty: empty,
+      items: [
+        for (final journey in journeys ?? const <DriverJourney>[])
+          journeyItem(journey, saved: saved, onTap: () => _open(journey)),
+      ],
+      onPreviousDate: () => _changeDate(-1),
+      onNextDate: () => _changeDate(1),
+      onSelect: (value) => widget.onSelect?.call(value),
+      onCheckAgain: widget.offlineOwnerId != null
+          ? widget.onReconnect
+          : () => unawaited(_load()),
       onRefresh: _load,
-      child: ListView(
-        key: const Key('driver-journeys-list'),
-        padding: EdgeInsets.all(gap),
-        children: [
-          Row(
-            children: [
-              IconButton(
-                tooltip: 'Previous day',
-                onPressed: () => _changeDate(-1),
-                icon: const Icon(Icons.chevron_left),
-              ),
-              Expanded(
-                child: Center(
-                  child: Text(_dateLabel(_date), style: theme.text('heading')),
-                ),
-              ),
-              IconButton(
-                tooltip: 'Next day',
-                onPressed: () => _changeDate(1),
-                icon: const Icon(Icons.chevron_right),
-              ),
-            ],
-          ),
-          if (_loading) const LinearProgressIndicator(),
-          if (_error != null)
-            _Notice(
-              key: const Key('journey-list-error'),
-              message: _error!,
-              action: _status == 401 || _status == 403
-                  ? null
-                  : () => unawaited(_load()),
-            ),
-          if (_journeys != null && _journeys!.isEmpty)
-            // Offline the app cannot know whether anything is assigned, so it must not say
-            // "none assigned"; only a successful online read can say that.
-            if (widget.offlineOwnerId != null || _usingSaved)
-              const _Notice(
-                key: Key('no-saved-journeys'),
-                message: 'No saved briefing for this date. Reconnect to check your assignments.',
-              )
-            else
-              const _Notice(
-                key: Key('no-assigned-journeys'),
-                message: 'No assigned journeys for this service date.',
-              ),
-          for (final journey in _journeys ?? const <DriverJourney>[]) ...[
-            SizedBox(height: gap),
-            _JourneyCard(
-              journey: journey,
-              saved: widget.offlineOwnerId != null || _usingSaved,
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => DriverBriefingScreen(
-                    api: widget.api,
-                    journey: journey,
-                    displayName: widget.displayName,
-                    updatesOnly: widget.updatesOnly,
-                    onReport: widget.onReport == null
-                        ? null
-                        : () => widget.onReport!(journey),
-                    onAccount: widget.onAccount,
-                    onReports: widget.onReports,
-                    offlineOwnerId:
-                        widget.offlineOwnerId ??
-                        (_usingSaved ? _ownerId : null),
-                    savedRow: widget.offlineOwnerId == null && !_usingSaved
-                        ? null
-                        : _savedRows.firstWhere(
-                            (row) => row['journeyId'] == journey.id,
-                          ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-          if (_journeys == null && !_loading && _error == null)
-            const _Notice(message: 'The journey list is unavailable.'),
-        ],
-      ),
     );
   }
 }
 
-class _JourneyCard extends StatelessWidget {
-  const _JourneyCard({
-    required this.journey,
-    required this.onTap,
-    this.saved = false,
-  });
-  final DriverJourney journey;
-  final VoidCallback onTap;
-  final bool saved;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = SrTheme.of(context);
-    final gap = theme.metrics.space[8]!;
-    return Card(
-      child: InkWell(
-        key: Key('journey-${journey.id}'),
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(theme.metrics.radius['md']!),
-        child: Padding(
-          padding: EdgeInsets.all(theme.metrics.space[16]!),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(journey.trainNumber, style: theme.text('heading')),
-                  SizedBox(width: gap),
-                  Expanded(
-                    child: Text(
-                      journey.label,
-                      style: theme.text('body'),
-                      textAlign: TextAlign.end,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: gap),
-              if (saved) const Text('Saved copy · read only'),
-              if (saved) SizedBox(height: gap / 2),
-              Text(
-                '${journey.origin}  ${_time(journey.departure)}  →  ${journey.destination}  ${_time(journey.arrival)}',
-                style: theme.text('body'),
-              ),
-              SizedBox(height: gap),
-              Text(
-                journey.availability == 'CANCELLED'
-                    ? 'Cancelled'
-                    : journey.availability == 'ENDS_EARLY'
-                    ? 'Ends early'
-                    : 'As scheduled',
-                style: theme.text('body'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+/// A journey as one selector row. Availability is the only status the list knows; offline rows
+/// also say they are a saved, read-only copy.
+SelectorItem journeyItem(
+  DriverJourney journey, {
+  required bool saved,
+  VoidCallback? onTap,
+  String keyPrefix = 'journey',
+}) {
+  final (chip, tone) = switch (journey.availability) {
+    'CANCELLED' => ('CANCELLED', RowTone.danger),
+    'ENDS_EARLY' => ('ENDS EARLY', RowTone.warning),
+    _ => ('AS SCHEDULED', RowTone.neutral),
+  };
+  final copy =
+      '${journey.origin} ${driverTime(journey.departure)} → ${journey.destination} ${driverTime(journey.arrival)}';
+  final title = '${journey.trainNumber} · ${journey.label}';
+  return SelectorItem(
+    id: journey.id,
+    rowKey: Key('$keyPrefix-${journey.id}'),
+    title: title,
+    copy: copy,
+    chip: chip,
+    tone: tone,
+    detail: saved ? 'Saved copy · read only' : null,
+    semantics:
+        '$title. $copy. ${chip.toLowerCase()}.${saved ? ' Saved copy, read only.' : ''}',
+    onTap: onTap,
+  );
 }
 
 class DriverBriefingScreen extends StatefulWidget {

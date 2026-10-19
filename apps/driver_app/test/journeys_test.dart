@@ -220,7 +220,8 @@ void main() {
 
       expect(find.byKey(const Key('no-saved-journeys')), findsOneWidget);
       expect(find.byKey(const Key('no-assigned-journeys')), findsNothing);
-      expect(find.textContaining('Reconnect'), findsOneWidget);
+      expect(find.text('No saved briefing available'), findsOneWidget);
+      expect(find.textContaining('has no saved copy'), findsOneWidget);
     },
   );
 

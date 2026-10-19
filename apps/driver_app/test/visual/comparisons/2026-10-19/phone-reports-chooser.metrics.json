@@ -1,0 +1,12 @@
+﻿{
+    "reference":  "comparisons/2026-10-19/phone-reports-chooser.reference.png",
+    "actual":  "comparisons/2026-10-19/phone-reports-chooser.actual.png",
+    "cropTop":  120,
+    "cropBottom":  60,
+    "width":  1080,
+    "height":  2220,
+    "meanAbsoluteChannelError":  2.1076673896118341,
+    "pixelsWithChannelDeltaAbove16":  0.026232065398732067,
+    "maximumChannelDelta":  244,
+    "interpretation":  "Diagnostic only. Review geometry and text separately; this is not a whole-image pass threshold."
+}

@@ -60,14 +60,17 @@ class ReportDraft {
 /// Rows of another owner or in a damaged state are left out.
 List<ReportDraft> pendingDrafts(Map<String, dynamic> saved, String ownerId) {
   final drafts = [
-    for (final raw in saved.values) ?ReportDraft.fromJson(raw, ownerId: ownerId),
+    for (final raw in saved.values)
+      ?ReportDraft.fromJson(raw, ownerId: ownerId),
   ];
   // A draft with no saved journey has no date to sort by, so it comes first.
   int order(ReportDraft a, ReportDraft b) {
     final left = a.journey?.serviceDate;
     final right = b.journey?.serviceDate;
     if (left == null || right == null) {
-      return left == right ? a.journeyId.compareTo(b.journeyId) : (left == null ? -1 : 1);
+      return left == right
+          ? a.journeyId.compareTo(b.journeyId)
+          : (left == null ? -1 : 1);
     }
     final byDate = left.compareTo(right);
     return byDate != 0 ? byDate : a.journeyId.compareTo(b.journeyId);
