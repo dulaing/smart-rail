@@ -158,8 +158,8 @@ void main() {
       expect(metrics.textContrast, 7);
     });
 
-    test('station is dark only and driver is light only', () {
-      expect(srProfileThemes[SrProfile.station], [Brightness.dark]);
+    test('station and driver are light only', () {
+      expect(srProfileThemes[SrProfile.station], [Brightness.light]);
       expect(srProfileThemes[SrProfile.driver], [Brightness.light]);
       expect(srProfileThemes[SrProfile.ops], [Brightness.light]);
       expect(srProfileThemes[SrProfile.passenger], [Brightness.light, Brightness.dark]);

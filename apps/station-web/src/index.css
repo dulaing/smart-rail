@@ -12,7 +12,7 @@ html {
   font-family: var(--sr-font-stack);
   background: var(--sr-color-bg-canvas);
   color: var(--sr-color-text-primary);
-  color-scheme: dark;
+  color-scheme: light;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
