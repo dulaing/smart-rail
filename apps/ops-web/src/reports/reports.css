@@ -1,0 +1,82 @@
+/* Control inbox, incident workspace and audit history. Colours, spacing and type come from the shared tokens. */
+
+.reports-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(320px, 1.2fr);
+  gap: var(--sr-space-32);
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .reports-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sr-space-16);
+}
+.filters label {
+  display: grid;
+  gap: var(--sr-space-4);
+  min-width: 200px;
+}
+.filters select {
+  min-height: var(--sr-min-target);
+  padding: 0 var(--sr-space-12);
+  border: 1.5px solid var(--sr-color-text-tertiary);
+  border-radius: var(--sr-radius-xs);
+  background: var(--sr-color-bg-surface);
+  color: var(--sr-color-text-primary);
+  font: inherit;
+}
+
+.report-list {
+  max-width: 640px;
+}
+.report-row {
+  display: grid;
+  gap: var(--sr-space-4);
+  min-height: var(--sr-min-target);
+  padding: var(--sr-space-12) var(--sr-space-16);
+  border: 1px solid var(--sr-color-line-hairline);
+  border-left: 4px solid var(--sr-color-line-hairline);
+  border-radius: var(--sr-radius-xs);
+  background: var(--sr-color-bg-surface);
+  color: inherit;
+  text-decoration: none;
+}
+.report-row:hover {
+  background: var(--sr-color-bg-surface-2);
+}
+.report-row.selected {
+  border-color: var(--sr-color-accent-primary);
+  border-left-color: var(--sr-color-accent-primary);
+  background: var(--sr-color-bg-surface-2);
+}
+.row-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sr-space-8);
+}
+
+.panel h2:focus {
+  outline: none;
+}
+.panel h2:focus-visible {
+  outline: 3px solid var(--sr-color-accent-primary);
+  outline-offset: 2px;
+}
+
+/* Audit table: keep an outcome badge on one line and let long IDs wrap instead of widening the table. */
+td .sr-badge {
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+td code {
+  overflow-wrap: anywhere;
+  font-size: var(--sr-type-small-size);
+}

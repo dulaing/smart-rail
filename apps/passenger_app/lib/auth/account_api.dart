@@ -8,12 +8,14 @@ import '../platform_client.dart';
 /// The signed-in person's SmartRail account, from `GET /api/me`.
 class Account {
   const Account({
+    required this.accountId,
     required this.displayName,
     required this.roles,
     required this.permissions,
   });
 
   factory Account.fromJson(Map<String, dynamic> json) => Account(
+    accountId: json['accountId'] as String,
     displayName: json['displayName'] as String,
     roles: [
       for (final g in json['grants'] as List) (g as Map)['role'] as String,
@@ -23,6 +25,8 @@ class Account {
     ],
   );
 
+  /// SmartRail's own ID for this account; per-account local data is keyed by it.
+  final String accountId;
   final String displayName;
   final List<String> roles;
   final List<String> permissions;

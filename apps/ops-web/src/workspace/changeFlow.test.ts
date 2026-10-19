@@ -179,3 +179,30 @@ test('a lost confirmation reads current state and never sends a second write', a
   }
   assert.equal(refreshes, 1)
 })
+
+test('an incident resolving after preview drops the review, keeps the draft and asks for a fresh preview', () => {
+  let state = initialFlow()
+  state = flowReducer(state, { type: 'edit', draft: { ...emptyDraft('DELAY'), delayMinutes: '5', incidentId: 'i1' } })
+  state = flowReducer(state, { type: 'previewStarted' })
+  state = flowReducer(state, {
+    type: 'previewed', requestId: 1,
+    request: { draft: { kind: 'DELAY', delayMinutes: 5 }, incidentId: 'i1' },
+    preview: { ...preview, incidentId: 'i1' },
+  })
+  assert.equal(state.step.name, 'reviewing')
+
+  const closed = flowReducer(state, { type: 'incidentClosed', incidentId: 'i1' })
+  assert.equal(closed.step.name, 'editing')
+  assert.equal(closed.notice?.tone, 'warning')
+  assert.match(closed.notice?.text ?? '', /resolved/)
+  assert.equal(closed.target.type === 'publish' && closed.target.draft.incidentId, 'i1')
+  // Confirming without a review is impossible, so the stale review cannot be sent.
+  assert.equal(flowReducer(closed, { type: 'confirmStarted' }), closed)
+})
+
+test('an incident closing is ignored when it is not the one on the draft or a confirmation is already in flight', () => {
+  const withLink = flowReducer(initialFlow(), { type: 'edit', draft: { ...emptyDraft('DELAY'), delayMinutes: '5', incidentId: 'i1' } })
+  assert.equal(flowReducer(withLink, { type: 'incidentClosed', incidentId: 'other' }), withLink)
+  const confirming = { ...reviewingState(), step: { name: 'confirming' as const, review } }
+  assert.equal(flowReducer(confirming, { type: 'incidentClosed', incidentId: 'i1' }), confirming)
+})

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { FreshnessLine } from '../design/FreshnessLine.tsx'
 import { StatusBadge } from '../design/StatusBadge.tsx'
+import { canOpenPath } from '../access'
 import type { Me } from '../auth'
 import { ChangePanel } from './ChangePanel.tsx'
 import { confirmedFacts, delayOf, evidenceOf, failureText, stationName } from './facts.ts'
@@ -81,6 +82,11 @@ export function JourneyWorkspace({ me, journeyId, onRefreshMe }: { me: Me; journ
         <p className="muted">
           Timetable: {running.timetable.label}. Running information: {running.runningLabel}. Times are Sri Lanka time.
         </p>
+        {canOpenPath(me, `/audit/journeys/${running.journeyId}`) && (
+          <p>
+            <AppLink to={`/audit/journeys/${running.journeyId}`}>View this journey’s history</AppLink>
+          </p>
+        )}
       </div>
 
       {lost ? (
