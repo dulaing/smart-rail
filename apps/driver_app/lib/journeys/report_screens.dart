@@ -7,67 +7,145 @@ import 'briefing_api.dart';
 import 'report_api.dart';
 import 'report_drafts.dart';
 
+/// The reasons a driver can pick, and the words for them.
+const reportReasons = {
+  'TRAIN_FAULT': 'Train fault',
+  'SIGNAL_DELAY': 'Signal delay',
+  'OBSTRUCTION': 'Obstruction',
+  'CANNOT_CONTINUE': 'Cannot continue',
+};
+
 class DriverReportsScreen extends StatefulWidget {
-  const DriverReportsScreen({
+  DriverReportsScreen({
     super.key,
     required this.journeyApi,
     required this.reportApi,
-  });
+    ReportDraftStore? drafts,
+    this.now,
+  }) : drafts = drafts ?? ReportDraftStore();
   final DriverBriefingApi journeyApi;
   final DriverReportApi reportApi;
+  final ReportDraftStore drafts;
+
+  /// The clock, so a test can put it either side of midnight.
+  final DateTime Function()? now;
 
   @override
   State<DriverReportsScreen> createState() => _DriverReportsScreenState();
 }
 
+/// What the Reports list shows: today's assigned journeys, and every report whose delivery is
+/// not confirmed. The second part comes from this device, so it does not depend on the date or
+/// on the network: a report written before midnight stays reachable after it.
+class _ReportsHome {
+  const _ReportsHome(this.today, this.pending);
+  final DriverRead<List<DriverJourney>> today;
+  final List<ReportDraft> pending;
+}
+
 class _DriverReportsScreenState extends State<DriverReportsScreen> {
-  late final Future<DriverRead<List<DriverJourney>>> _journeys = widget
-      .journeyApi
-      .journeys(reportToday());
+  late Future<_ReportsHome> _home = _loadHome();
+
+  Future<_ReportsHome> _loadHome() async {
+    final owner = await widget.journeyApi.ownerId();
+    final pending = owner == null
+        ? <ReportDraft>[]
+        : await widget.drafts.pendingFor(owner);
+    final today = await widget.journeyApi.journeys(
+      reportToday(widget.now?.call()),
+    );
+    return _ReportsHome(today, pending);
+  }
+
+  /// A report may have been sent, reconciled or started while the other screen was open.
+  void _reload() {
+    if (!mounted) return;
+    final next = _loadHome();
+    setState(() {
+      _home = next;
+    });
+  }
+
+  void _open(DriverJourney journey) => Navigator.of(context)
+      .push(
+        MaterialPageRoute<void>(
+          builder: (_) => DriverReportJourneyScreen(
+            journey: journey,
+            api: widget.reportApi,
+            journeyApi: widget.journeyApi,
+            drafts: widget.drafts,
+          ),
+        ),
+      )
+      .then((_) => _reload());
 
   @override
   Widget build(BuildContext context) {
     final theme = SrTheme.of(context);
     return FutureBuilder(
-      future: _journeys,
+      future: _home,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const Center(child: CircularProgressIndicator());
         }
-        final result = snapshot.data;
-        if (result is! DriverReadOk<List<DriverJourney>>) {
-          return const Text(
-            'Could not load your assigned journeys. Reconnect and try again.',
-          );
+        final home = snapshot.data;
+        if (home == null) {
+          return const Text('Could not load your reports. Try again.');
         }
-        if (result.value.isEmpty) {
-          return const Text('No assigned journeys for this service date.');
-        }
+        final today = home.today;
+        final pendingIds = {for (final draft in home.pending) draft.journeyId};
+        // A journey with an unconfirmed report is listed once, in the section that says so.
+        final choices = today is DriverReadOk<List<DriverJourney>>
+            ? [
+                for (final journey in today.value)
+                  if (!pendingIds.contains(journey.id)) journey,
+              ]
+            : <DriverJourney>[];
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Choose a journey for your report.',
-              style: theme.text('body'),
-            ),
-            for (final journey in result.value)
-              Card(
-                child: ListTile(
-                  minTileHeight: theme.metrics.minTarget,
-                  title: Text('${journey.trainNumber} · ${journey.label}'),
-                  subtitle: Text('${journey.origin} → ${journey.destination}'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => DriverReportJourneyScreen(
-                        journey: journey,
-                        api: widget.reportApi,
-                        journeyApi: widget.journeyApi,
-                      ),
+            if (home.pending.isNotEmpty) ...[
+              Text('Reports not confirmed', style: theme.text('heading')),
+              Text(
+                'Control may not have received these. Open one to check receipt or retry the same report. Nothing is sent automatically.',
+                style: theme.text('body'),
+              ),
+              for (final draft in home.pending)
+                Card(
+                  child: ListTile(
+                    key: Key('pending-${draft.journeyId}'),
+                    minTileHeight: theme.metrics.minTarget,
+                    title: Text(_pendingTitle(draft)),
+                    subtitle: Text(
+                      '${reportReasons[draft.reasonCode] ?? draft.reasonCode} · Receipt not confirmed',
                     ),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => _open(draft.journey ?? _unknownJourney(draft)),
                   ),
                 ),
+            ],
+            if (today is! DriverReadOk<List<DriverJourney>>)
+              const Text(
+                'Could not load your assigned journeys. Reconnect and try again.',
+              )
+            else if (choices.isEmpty && home.pending.isEmpty)
+              const Text('No assigned journeys for this service date.')
+            else if (choices.isNotEmpty) ...[
+              Text(
+                'Choose a journey for your report.',
+                style: theme.text('body'),
               ),
+              for (final journey in choices)
+                Card(
+                  child: ListTile(
+                    minTileHeight: theme.metrics.minTarget,
+                    title: Text('${journey.trainNumber} · ${journey.label}'),
+                    subtitle: Text('${journey.origin} → ${journey.destination}'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => _open(journey),
+                  ),
+                ),
+            ],
           ],
         );
       },
@@ -75,16 +153,41 @@ class _DriverReportsScreenState extends State<DriverReportsScreen> {
   }
 }
 
+String _pendingTitle(ReportDraft draft) {
+  final journey = draft.journey;
+  if (journey == null) return 'Earlier journey';
+  return '${journey.trainNumber} · ${_date(journey.serviceDate)}';
+}
+
+String _date(DateTime value) =>
+    '${value.year.toString().padLeft(4, '0')}-${value.month.toString().padLeft(2, '0')}-${value.day.toString().padLeft(2, '0')}';
+
+/// Stands in for a journey whose details an older version of the app did not save with its draft.
+/// The report itself needs only the journey ID, which every draft has.
+DriverJourney _unknownJourney(ReportDraft draft) => DriverJourney(
+  id: draft.journeyId,
+  serviceDate: DateTime.utc(1970),
+  trainNumber: 'earlier journey',
+  label: 'details not saved',
+  origin: '',
+  departure: null,
+  destination: '',
+  arrival: null,
+  availability: 'AS_SCHEDULED',
+);
+
 class DriverReportJourneyScreen extends StatefulWidget {
-  const DriverReportJourneyScreen({
+  DriverReportJourneyScreen({
     super.key,
     required this.journey,
     required this.api,
     required this.journeyApi,
-  });
+    ReportDraftStore? drafts,
+  }) : drafts = drafts ?? ReportDraftStore();
   final DriverJourney journey;
   final DriverReportApi api;
   final DriverBriefingApi journeyApi;
+  final ReportDraftStore drafts;
 
   @override
   State<DriverReportJourneyScreen> createState() =>
@@ -93,13 +196,8 @@ class DriverReportJourneyScreen extends StatefulWidget {
 
 class _DriverReportJourneyScreenState extends State<DriverReportJourneyScreen>
     with WidgetsBindingObserver {
-  static const _reasons = {
-    'TRAIN_FAULT': 'Train fault',
-    'SIGNAL_DELAY': 'Signal delay',
-    'OBSTRUCTION': 'Obstruction',
-    'CANNOT_CONTINUE': 'Cannot continue',
-  };
-  final ReportDraftStore _drafts = ReportDraftStore();
+  static const _reasons = reportReasons;
+  ReportDraftStore get _drafts => widget.drafts;
   List<DriverReport> _reports = [];
   ReportDraft? _draft;
   String? _reason = 'TRAIN_FAULT';
@@ -219,7 +317,7 @@ class _DriverReportJourneyScreenState extends State<DriverReportJourneyScreen>
     }
     final draft = retry && _draft != null
         ? _draft!
-        : await _drafts.create(owner, widget.journey.id, _reason!);
+        : await _drafts.create(owner, widget.journey, _reason!);
     setState(() {
       _draft = draft;
       _draftState = 'Not sent — Control has not been told.';

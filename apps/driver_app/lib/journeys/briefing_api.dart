@@ -30,6 +30,20 @@ class DriverJourney {
     availability: json['availability'] as String,
   );
 
+  /// The same keys the server sends, so a saved copy reads back through [DriverJourney.fromJson].
+  Map<String, dynamic> toJson() => {
+    'journeyId': id,
+    'serviceDate':
+        '${serviceDate.year.toString().padLeft(4, '0')}-${serviceDate.month.toString().padLeft(2, '0')}-${serviceDate.day.toString().padLeft(2, '0')}',
+    'trainNumber': trainNumber,
+    'timetableLabel': label,
+    'originName': origin,
+    'scheduledDeparture': departure?.toUtc().toIso8601String(),
+    'destinationName': destination,
+    'scheduledArrival': arrival?.toUtc().toIso8601String(),
+    'availability': availability,
+  };
+
   final String id;
   final DateTime serviceDate;
   final String trainNumber;

@@ -3,17 +3,77 @@ import 'dart:math';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import 'briefing_api.dart';
+
+/// A report whose delivery is not confirmed: the one key, reason and journey it was written for.
+///
+/// It keeps a copy of the journey's details so the Reports list can still reach it after the
+/// service date changes, when today's assigned journeys no longer include that journey.
 class ReportDraft {
   const ReportDraft({
     required this.ownerId,
     required this.journeyId,
     required this.clientReportId,
     required this.reasonCode,
+    this.journey,
   });
+
   final String ownerId;
   final String journeyId;
   final String clientReportId;
   final String reasonCode;
+
+  /// The journey as it was when the report was written. Null for a draft saved by an older
+  /// version of the app, which did not keep it.
+  final DriverJourney? journey;
+
+  Map<String, dynamic> toJson() => {
+    'ownerId': ownerId,
+    'journeyId': journeyId,
+    'clientReportId': clientReportId,
+    'reasonCode': reasonCode,
+    'journey': journey?.toJson(),
+  };
+
+  /// Null when the saved row is damaged or is not this owner's.
+  static ReportDraft? fromJson(Object? raw, {String? ownerId}) {
+    try {
+      final json = Map<String, dynamic>.from(raw as Map);
+      if (ownerId != null && json['ownerId'] != ownerId) return null;
+      final saved = json['journey'];
+      return ReportDraft(
+        ownerId: json['ownerId'] as String,
+        journeyId: json['journeyId'] as String,
+        clientReportId: json['clientReportId'] as String,
+        reasonCode: json['reasonCode'] as String,
+        journey: saved == null
+            ? null
+            : DriverJourney.fromJson(Map<String, dynamic>.from(saved as Map)),
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+}
+
+/// Every unconfirmed report this owner has, oldest service date first, from the saved rows.
+/// Rows of another owner or in a damaged state are left out.
+List<ReportDraft> pendingDrafts(Map<String, dynamic> saved, String ownerId) {
+  final drafts = [
+    for (final raw in saved.values) ?ReportDraft.fromJson(raw, ownerId: ownerId),
+  ];
+  // A draft with no saved journey has no date to sort by, so it comes first.
+  int order(ReportDraft a, ReportDraft b) {
+    final left = a.journey?.serviceDate;
+    final right = b.journey?.serviceDate;
+    if (left == null || right == null) {
+      return left == right ? a.journeyId.compareTo(b.journeyId) : (left == null ? -1 : 1);
+    }
+    final byDate = left.compareTo(right);
+    return byDate != 0 ? byDate : a.journeyId.compareTo(b.journeyId);
+  }
+
+  return drafts..sort(order);
 }
 
 class ReportDraftStore {
@@ -34,42 +94,31 @@ class ReportDraftStore {
   }
 
   Future<ReportDraft?> read(String ownerId, String journeyId) async {
-    final raw = (await _all())[journeyId];
-    if (raw == null) return null;
-    try {
-      final json = Map<String, dynamic>.from(raw as Map);
-      if (json['ownerId'] != ownerId || json['journeyId'] != journeyId) {
-        return null;
-      }
-      return ReportDraft(
-        ownerId: ownerId,
-        journeyId: journeyId,
-        clientReportId: json['clientReportId'] as String,
-        reasonCode: json['reasonCode'] as String,
-      );
-    } catch (_) {
-      return null;
-    }
+    final draft = ReportDraft.fromJson(
+      (await _all())[journeyId],
+      ownerId: ownerId,
+    );
+    return draft?.journeyId == journeyId ? draft : null;
   }
+
+  /// All of this owner's unconfirmed reports, whatever service date they were written for.
+  Future<List<ReportDraft>> pendingFor(String ownerId) async =>
+      pendingDrafts(await _all(), ownerId);
 
   Future<ReportDraft> create(
     String ownerId,
-    String journeyId,
+    DriverJourney journey,
     String reasonCode,
   ) async {
     final draft = ReportDraft(
       ownerId: ownerId,
-      journeyId: journeyId,
+      journeyId: journey.id,
       clientReportId: _uuidV4(),
       reasonCode: reasonCode,
+      journey: journey,
     );
     final all = await _all();
-    all[journeyId] = {
-      'ownerId': ownerId,
-      'journeyId': journeyId,
-      'clientReportId': draft.clientReportId,
-      'reasonCode': reasonCode,
-    };
+    all[journey.id] = draft.toJson();
     await _storage.write(key: _key, value: jsonEncode(all));
     return draft;
   }
