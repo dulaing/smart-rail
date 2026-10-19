@@ -86,7 +86,21 @@ public sealed class FlakyProxy : IAsyncDisposable
             }
 
             proxy.Traceparents.Add(context.Request.Headers["traceparent"].FirstOrDefault());
-            using var response = await upstream.SendAsync(request);
+            HttpResponseMessage response;
+            try
+            {
+                response = await upstream.SendAsync(request);
+            }
+            catch (HttpRequestException)
+            {
+                // RailBites is stopped. A real stopped service refuses or drops the connection,
+                // never answers 500, and how fast the refusal arrives differs between operating
+                // systems. Dropping the connection looks the same to the caller everywhere.
+                context.Abort();
+                return;
+            }
+
+            using var _ = response;
             proxy.Forwarded++;
             if (proxy.BeforeResponse is not null) await proxy.BeforeResponse(request);
             if (proxy.Mode == ProxyMode.DropResponse)
