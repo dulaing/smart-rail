@@ -1,0 +1,322 @@
+{
+  "date": "2026-10-19",
+  "task": "figma-implementation T2 (still in progress)",
+  "approval": "User approved report-reference-proposal.html corrections before layout implementation. Figma Light/Dark composer and receipt references reconciled. No API fields or storage schema added.",
+  "ledger": "report-reference-reconciliation.json",
+  "geometry": {
+    "regions": 37,
+    "maximumLogicalError": 0.5213216145833428,
+    "limitLogicalPixels": 1
+  },
+  "viewports": {
+    "tablet": {
+      "logical": [
+        1280,
+        800
+      ],
+      "dpr": 2
+    },
+    "phone": {
+      "logical": [
+        360,
+        800
+      ],
+      "dpr": 3,
+      "safeInsetsLogical": {
+        "top": 40,
+        "bottom": 20
+      },
+      "comparisonCropPhysical": {
+        "top": 120,
+        "bottom": 60
+      }
+    }
+  },
+  "raster": "Reviewed eight final overlays separately from geometry. Existing approved Figma/Flutter glyph raster differences and Noto Sans Math arrow fallback remain. Metrics are diagnostic, with no whole-image pass percentage.",
+  "checks": [
+    "83 Driver tests passed including fourteen exact real-font goldens",
+    "Report target/label guidelines and 7:1 resolved text-paint contrast at both sizes",
+    "200% text and long Sinhala/Tamil context scroll without overflow",
+    "Lost-response draft retention, manual receipt check without POST, same-key retry, named acknowledgement polling, recovered draft removal, denied lookup disables retry",
+    "Driver analysis clean; debug APK builds; token check 165 pairs, four outputs current"
+  ],
+  "native": {
+    "device": "API35 emulator-5554, 1080x2400, 420dpi; real device-size evidence, not synthetic golden",
+    "reportId": "e89e71a2-1c1e-45b2-b54c-53d9d6ae43d4",
+    "train": "SIM-1001",
+    "serviceDate": "2026-10-19",
+    "reason": "SIGNAL_DELAY",
+    "receiptAtUtc": "2026-10-19T16:07:40.977165+00:00",
+    "acknowledgedBy": "Demo Controller",
+    "acknowledgedAtUtc": "2026-10-19T16:09:07.518024+00:00",
+    "result": "Real Driver submit -> awaiting Control; explicit Operations API acknowledgement -> reopened named receipt. Separate receipt/ack times; no historical local-save cell. Nested Account navigation returned to root Account. Rebuilt afterward for a semantics-only duplicate-label fix. Audible reader and offline device acceptance still pending."
+  },
+  "remaining": "Reports history/chooser fidelity, account reference correction approval and implementation, selection/recovery and remaining Driver states, full Android offline/access/native-reader checks. T2 unchecked.",
+  "sourcesSha256NormalizedLf": {
+    "lib/journeys/report_view.dart": "4e54783feb143bc46308271f80c92e8889ca716652f5ca38998d6bac0be9b058",
+    "lib/journeys/report_screens.dart": "cb73c1804b2d2304be9a7531ee900f82513bee2509fe1c2976d6202fddf4c886",
+    "lib/shell.dart": "2876b013236c8dbce57f1b0fd0051a8d1a63bb5c291a9eb817effccb9ee787ed",
+    "test/report_drafts_test.dart": "fe4cc033d85b0edbe66b2b4b18ea558f12bb80996302eedde55f99c7a0e6841b",
+    "test/visual/driver_report_test.dart": "ce543a623840c414443d0665d52431fef4f2682e54574ad2d60089701c700bd7"
+  },
+  "assetsSha256": {
+    "phone-report-check.svg": "17b54dfca83663193de5cc74a8db20c3b523b87f1dd5130b06f6727b5ad26454",
+    "phone-report-clock.svg": "5d199c8946251f1eb1aa1fa50e2398a5ed14ffe97b9810190a0b83564d40e300",
+    "phone-report-obstruction.svg": "608a2ad33293d6d5da7e38692ea7ffaffb9d96c9636c5c2e618a267ace4816ed",
+    "phone-report-selected.svg": "6ac745ab99dd465cb18fe14e3c59244d5da44b19fa63838af177730886466ba9",
+    "phone-report-signal.svg": "4cb0737f5383bd43c3e0cdc3aa7f709d9a0eb514e8c2a478cd7d515740b552f9",
+    "phone-report-stop.svg": "77f0a824c2631557759637efd09c51e0dc39db1cfd1dbdd3a052754b23b8c7ac",
+    "phone-report-train.svg": "7052450b8a292e0a12ac3ba666b9d9a021ac319fe4cd6dd9d8708599d203bd44",
+    "phone-report-warning.svg": "2ec5ec1298aa6a9cf368e06905b31c1143038743fa5a11c4beb080272b2ee38b",
+    "report-check.svg": "c7e0677eaa7ab8c0d012f4774b7030d493e1ac5a520153402064f1b5e4a7d1df",
+    "report-clock.svg": "83fc26de2ed8c1bd13a964ec3a3a9b3fb2d3ded7f138d0b3cb3223351a21421d",
+    "report-obstruction.svg": "8805f21982c4ac7a140c61355795a309764c020fd43ba71eef8c02cb95a6d2a2",
+    "report-selected.svg": "ed8395be7227787d406b01a49e372ab4a28a28621e3573f7562f9b8772777b07",
+    "report-signal.svg": "9a91bf088de893dc81363a0b08635b62ad2cf28bdb33f69ce6d7a4b4e816a8c7",
+    "report-stop.svg": "57ce3e16f230430c4606e36b75977766076bc54590514ee177d7d4b4518025bf",
+    "report-train.svg": "4e2ee606e9549fd879b7ce57dbb9e4a23b8e7b68c5f6cbf566fe9400684b2945",
+    "report-warning.svg": "4354e3bd8696829376c812d46cdfe3c22453baddf8bc866cbb2a5369d3f6f899"
+  },
+  "frames": {
+    "tablet-report-compose": {
+      "reference.png": {
+        "file": "tablet-report-compose.reference.png",
+        "sha256": "c6ff3f7006456b808390c0b5f93b6fa57cfd3923b21cff5225397621ae7c7601"
+      },
+      "actual.png": {
+        "file": "tablet-report-compose.actual.png",
+        "sha256": "df037ff2c6e334afeb8cfd45accf9dabf958158ac1faf51b6bc387b20b5fea58"
+      },
+      "overlay.png": {
+        "file": "tablet-report-compose.overlay.png",
+        "sha256": "3b7556d1b34c33e1d0e47f450917f491443d45b0c9d2d4246169e1be136fc604"
+      },
+      "diff.png": {
+        "file": "tablet-report-compose.diff.png",
+        "sha256": "9fe340c0dedd80d0ad1ee0c91b978e3ed0b5811b1e924bd148fec5af4caef1e8"
+      },
+      "metrics.json": {
+        "file": "tablet-report-compose.metrics.json",
+        "sha256": "8553acdb7d6564cc277f978907e965e4ee9ea596c204f84975004879aa69ddef"
+      },
+      "actual-bounds.json": {
+        "file": "tablet-report-compose.actual-bounds.json",
+        "sha256": "870d9d9a90fc04a044f7fae9a72711522b90d85a709352f4d9321cf355ac200d"
+      },
+      "golden": {
+        "file": "apps/driver_app/test/visual/goldens/tablet-report-compose.png",
+        "sha256": "df037ff2c6e334afeb8cfd45accf9dabf958158ac1faf51b6bc387b20b5fea58"
+      }
+    },
+    "tablet-report-uncertain": {
+      "reference.png": {
+        "file": "tablet-report-uncertain.reference.png",
+        "sha256": "544f2cd1963233c007d2febd41967e04b8b4475814f6f94f2dc7f2693cc0456b"
+      },
+      "actual.png": {
+        "file": "tablet-report-uncertain.actual.png",
+        "sha256": "f8ec5441e88d81a8790d5c50b700255f9bf97f22a931e0bdd47bda9004ad4a32"
+      },
+      "overlay.png": {
+        "file": "tablet-report-uncertain.overlay.png",
+        "sha256": "80bec053c3e5e1ed04e60fd495270d6ee94d9147edd9bb60b5610425e9e846ef"
+      },
+      "diff.png": {
+        "file": "tablet-report-uncertain.diff.png",
+        "sha256": "e5cfe6c7a0b20f81a8fe3aaf1e7492ef7d632173a9f8252fcf9437fe7c21eff3"
+      },
+      "metrics.json": {
+        "file": "tablet-report-uncertain.metrics.json",
+        "sha256": "287f702372ce2889147353a887b2c41ad9db2d8674843c1d7c492b671e490d10"
+      },
+      "actual-bounds.json": {
+        "file": "tablet-report-uncertain.actual-bounds.json",
+        "sha256": "6272420e7e64675c9a8716db78a62ed53fb951f1179317948eaa1f4b6564ccd6"
+      },
+      "golden": {
+        "file": "apps/driver_app/test/visual/goldens/tablet-report-uncertain.png",
+        "sha256": "f8ec5441e88d81a8790d5c50b700255f9bf97f22a931e0bdd47bda9004ad4a32"
+      }
+    },
+    "tablet-report-await": {
+      "reference.png": {
+        "file": "tablet-report-await.reference.png",
+        "sha256": "7ca0c99ce6fe28c184884bdd514b4ef3eb04e6bffd808dce5b5609475f5e387d"
+      },
+      "actual.png": {
+        "file": "tablet-report-await.actual.png",
+        "sha256": "a19c9e775f751ef727a88fb0ce4755bf8e3d2f3ca5d295c986ea95e8aaee1a6a"
+      },
+      "overlay.png": {
+        "file": "tablet-report-await.overlay.png",
+        "sha256": "d78cc9ed1b1667d941faea335c0b2e76f41dce271b24d36d00d5d0f857c5fb16"
+      },
+      "diff.png": {
+        "file": "tablet-report-await.diff.png",
+        "sha256": "ac57fa7a104304e6d7806f677b3e1af5bb7b51206d9543c84ce00844e300e394"
+      },
+      "metrics.json": {
+        "file": "tablet-report-await.metrics.json",
+        "sha256": "112314612bb0e41a182fb9df4c08bd4599c0edb9b55c3c3027bce526052ebeed"
+      },
+      "actual-bounds.json": {
+        "file": "tablet-report-await.actual-bounds.json",
+        "sha256": "695b6dce44a576b4075316aba66f908266e47cc0b00593244da7b92eac4bdf9b"
+      },
+      "golden": {
+        "file": "apps/driver_app/test/visual/goldens/tablet-report-await.png",
+        "sha256": "a19c9e775f751ef727a88fb0ce4755bf8e3d2f3ca5d295c986ea95e8aaee1a6a"
+      }
+    },
+    "tablet-report-ack": {
+      "reference.png": {
+        "file": "tablet-report-ack.reference.png",
+        "sha256": "62886ee70ac9f85dee4d525102787b3cb576a15bc2ca53966e9dea9ad911d202"
+      },
+      "actual.png": {
+        "file": "tablet-report-ack.actual.png",
+        "sha256": "2d5a179a579b97252bcccf3851875690785e801966a009a2cb9a94a842b02674"
+      },
+      "overlay.png": {
+        "file": "tablet-report-ack.overlay.png",
+        "sha256": "0f18905e9553ad37013fc7573927d5b8ba64d242b84f70f273531f96a6d926a1"
+      },
+      "diff.png": {
+        "file": "tablet-report-ack.diff.png",
+        "sha256": "a9ba52e8afd4f654787cceb6b5d989fd704f6bed2db8812bd55ef2a14a18de8d"
+      },
+      "metrics.json": {
+        "file": "tablet-report-ack.metrics.json",
+        "sha256": "affe163afea6ae7427556b54bd87a5207f5b84cd12c28220ff7473b78650af13"
+      },
+      "actual-bounds.json": {
+        "file": "tablet-report-ack.actual-bounds.json",
+        "sha256": "695b6dce44a576b4075316aba66f908266e47cc0b00593244da7b92eac4bdf9b"
+      },
+      "golden": {
+        "file": "apps/driver_app/test/visual/goldens/tablet-report-ack.png",
+        "sha256": "2d5a179a579b97252bcccf3851875690785e801966a009a2cb9a94a842b02674"
+      }
+    },
+    "phone-report-compose": {
+      "reference.png": {
+        "file": "phone-report-compose.reference.png",
+        "sha256": "76dd3780f6d4497d0252a97876fc3c7879bbf92f14a3a9a9022e474539213d61"
+      },
+      "actual.png": {
+        "file": "phone-report-compose.actual.png",
+        "sha256": "afb67c16f2cf72ae1d1819521066dab010bf3be5b352fd7f4ca52db8cf67b455"
+      },
+      "overlay.png": {
+        "file": "phone-report-compose.overlay.png",
+        "sha256": "63beba4d1146184067af952fcc0f70852560272c4b8067ace500511b7eea68ba"
+      },
+      "diff.png": {
+        "file": "phone-report-compose.diff.png",
+        "sha256": "29f48c867351d5ef298df842665977579ed873ca69fa555786560d76fc4eab6c"
+      },
+      "metrics.json": {
+        "file": "phone-report-compose.metrics.json",
+        "sha256": "9143eb771b22d568057b0115cfe0b557aeda6c085bc4daa4e118f3546ae813e6"
+      },
+      "actual-bounds.json": {
+        "file": "phone-report-compose.actual-bounds.json",
+        "sha256": "83a21e3faf20f9fd9d7999882b7b27e5110d16d276c4cbad853918a6ca90021e"
+      },
+      "golden": {
+        "file": "apps/driver_app/test/visual/goldens/phone-report-compose.png",
+        "sha256": "afb67c16f2cf72ae1d1819521066dab010bf3be5b352fd7f4ca52db8cf67b455"
+      }
+    },
+    "phone-report-uncertain": {
+      "reference.png": {
+        "file": "phone-report-uncertain.reference.png",
+        "sha256": "bc33e1ea686afb7d47e9b0a326fa49cdbc8b0be598c5104b77cb6f4b1a87b7ef"
+      },
+      "actual.png": {
+        "file": "phone-report-uncertain.actual.png",
+        "sha256": "a120702a8d2bb53da7af10f67ae595af1535d8b0ca460ba022c4384dab5b8118"
+      },
+      "overlay.png": {
+        "file": "phone-report-uncertain.overlay.png",
+        "sha256": "f6ed5a2f46d3ef61e10e03627d3c45f2fc1a08602e8839c9cc6c3d2e2191e7d7"
+      },
+      "diff.png": {
+        "file": "phone-report-uncertain.diff.png",
+        "sha256": "0625d62887a27bb73764a340687f6902a97433379cf576e3f812ab8786498b7f"
+      },
+      "metrics.json": {
+        "file": "phone-report-uncertain.metrics.json",
+        "sha256": "e80bd96eff115af0a7cac7f20f55ca3f87c495c1691a1fad04907d6070f03874"
+      },
+      "actual-bounds.json": {
+        "file": "phone-report-uncertain.actual-bounds.json",
+        "sha256": "f3d3d5f7332ac295b2c5aaed25bf54aafb1bace0ea4b319879fb7b15d2756373"
+      },
+      "golden": {
+        "file": "apps/driver_app/test/visual/goldens/phone-report-uncertain.png",
+        "sha256": "a120702a8d2bb53da7af10f67ae595af1535d8b0ca460ba022c4384dab5b8118"
+      }
+    },
+    "phone-report-await": {
+      "reference.png": {
+        "file": "phone-report-await.reference.png",
+        "sha256": "2c8be18f883849ef1bb3144e28547545232f6689e97704a5772963dbe2ce3808"
+      },
+      "actual.png": {
+        "file": "phone-report-await.actual.png",
+        "sha256": "df9d2f9f17ad8368b3b96ddcf805a2a9f17460aee1ba309de675df4cf400184f"
+      },
+      "overlay.png": {
+        "file": "phone-report-await.overlay.png",
+        "sha256": "8a28fbe35192244698bb9cedb7c25848a0af148b7735bfbeadb8bbe573115a5f"
+      },
+      "diff.png": {
+        "file": "phone-report-await.diff.png",
+        "sha256": "f722af95d9ebe03611b3bfa7dc2bb1cbdf62fc6754ef44cef1c51764fe6f9e31"
+      },
+      "metrics.json": {
+        "file": "phone-report-await.metrics.json",
+        "sha256": "e56a94843a7c02b258545cf3864fe71d066c1d08af20ff9123182e3c5049cd54"
+      },
+      "actual-bounds.json": {
+        "file": "phone-report-await.actual-bounds.json",
+        "sha256": "988ec058f2a5c3a4dcdb56b8c2067d1f21a967595d94fab2c932bc2086f9faeb"
+      },
+      "golden": {
+        "file": "apps/driver_app/test/visual/goldens/phone-report-await.png",
+        "sha256": "df9d2f9f17ad8368b3b96ddcf805a2a9f17460aee1ba309de675df4cf400184f"
+      }
+    },
+    "phone-report-ack": {
+      "reference.png": {
+        "file": "phone-report-ack.reference.png",
+        "sha256": "9fda8d16d36ce81a818c79fd700b1ebbd1e4ae72b0e74221ab93879bc0415d0d"
+      },
+      "actual.png": {
+        "file": "phone-report-ack.actual.png",
+        "sha256": "c511a40a9f671bb1031d7ae7129d958a04200cdb30e71534178c0742f952ea5a"
+      },
+      "overlay.png": {
+        "file": "phone-report-ack.overlay.png",
+        "sha256": "7e4ba9c45ee1bc49b5041d2f05c95b37f36996984d2be2ec7f0b659d865b9080"
+      },
+      "diff.png": {
+        "file": "phone-report-ack.diff.png",
+        "sha256": "b56dbb990deb4815a7b519cc62250da8357963a5ac9d7eaa777f8ca9906715ba"
+      },
+      "metrics.json": {
+        "file": "phone-report-ack.metrics.json",
+        "sha256": "954d060fe85608e84a7cff9ab1ba50a3da4ed1dc3ec1f09cf976bbcdf22e6da4"
+      },
+      "actual-bounds.json": {
+        "file": "phone-report-ack.actual-bounds.json",
+        "sha256": "2513b4e23a31a0220a2b136d11b09fab8e00f18e31ed53e24ff9895387615c51"
+      },
+      "golden": {
+        "file": "apps/driver_app/test/visual/goldens/phone-report-ack.png",
+        "sha256": "c511a40a9f671bb1031d7ae7129d958a04200cdb30e71534178c0742f952ea5a"
+      }
+    }
+  }
+}

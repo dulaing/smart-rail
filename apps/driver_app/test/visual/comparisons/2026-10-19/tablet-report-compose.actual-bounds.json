@@ -1,0 +1,44 @@
+{
+  "report-content": {
+    "x": 168.0,
+    "y": 112.0,
+    "width": 1080.0,
+    "height": 552.0
+  },
+  "report-guidance": {
+    "x": 168.0,
+    "y": 112.0,
+    "width": 1080.0,
+    "height": 60.0
+  },
+  "report-context": {
+    "x": 168.0,
+    "y": 196.0,
+    "width": 1080.0,
+    "height": 84.0
+  },
+  "report-reasons": {
+    "x": 168.0,
+    "y": 304.0,
+    "width": 1080.0,
+    "height": 240.0
+  },
+  "reason-icon-TRAIN_FAULT": {
+    "x": 193.0,
+    "y": 340.0,
+    "width": 40.0,
+    "height": 40.0
+  },
+  "reason-icon-SIGNAL_DELAY": {
+    "x": 746.0,
+    "y": 340.0,
+    "width": 40.0,
+    "height": 40.0
+  },
+  "reason-selected-icon": {
+    "x": 1194.0,
+    "y": 346.0,
+    "width": 28.0,
+    "height": 28.0
+  }
+}

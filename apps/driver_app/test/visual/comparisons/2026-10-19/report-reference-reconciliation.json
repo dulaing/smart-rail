@@ -1,0 +1,68 @@
+{
+  "approvedOn": "2026-10-19",
+  "approval": "User approved train/service-date/route context; draft-only local saved state without timestamp; separate receipt and named acknowledgement; uncertain receipt with manual check/retry.",
+  "frames": [
+    "183:165",
+    "183:256",
+    "183:327",
+    "183:394",
+    "188:507",
+    "188:556",
+    "188:603",
+    "188:647"
+  ],
+  "mutations": [
+    {
+      "key": "ReportReconcileResult",
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"mutatedNodeIds\":[\"183:211\",\"183:212\",\"183:214\",\"183:215\",\"183:165\",\"183:296\",\"183:297\",\"183:302\",\"183:308\",\"183:313\",\"183:317\",\"183:294\",\"183:303\",\"183:318\",\"183:319\",\"183:321\",\"334:790\",\"183:314\",\"183:256\",\"183:368\",\"183:373\",\"183:388\",\"183:369\",\"183:375\",\"183:378\",\"183:379\",\"183:380\",\"183:383\",\"183:384\",\"183:327\",\"183:435\",\"183:440\",\"183:455\",\"183:436\",\"183:442\",\"183:445\",\"183:446\",\"183:447\",\"183:450\",\"183:451\",\"183:394\",\"190:5918\",\"190:5919\",\"190:5921\",\"190:5922\",\"190:5888\",\"190:5989\",\"190:5990\",\"190:5994\",\"190:5999\",\"190:6003\",\"190:6007\",\"190:5988\",\"190:5995\",\"190:6008\",\"190:6009\",\"190:6010\",\"334:794\",\"190:6004\",\"190:5965\",\"190:6058\",\"190:6062\",\"190:6075\",\"190:6059\",\"190:6064\",\"190:6066\",\"190:6067\",\"190:6068\",\"190:6070\",\"190:6071\",\"190:6033\",\"190:6122\",\"190:6126\",\"190:6139\",\"190:6123\",\"190:6128\",\"190:6130\",\"190:6131\",\"190:6132\",\"190:6134\",\"190:6135\",\"190:6097\",\"188:526\",\"188:527\",\"188:507\",\"188:571\",\"188:572\",\"188:573\",\"188:579\",\"188:586\",\"188:592\",\"188:595\",\"188:601\",\"334:798\",\"188:568\",\"188:556\",\"188:620\",\"188:626\",\"188:642\",\"188:603\",\"188:664\",\"188:670\",\"188:686\",\"188:647\",\"190:6603\",\"190:6604\",\"190:6588\",\"190:6645\",\"190:6646\",\"190:6647\",\"190:6652\",\"190:6658\",\"190:6663\",\"190:6666\",\"190:6672\",\"334:800\",\"190:6643\",\"190:6633\",\"190:6694\",\"190:6699\",\"190:6713\",\"190:6680\",\"190:6738\",\"190:6743\",\"190:6757\",\"190:6724\"],\"createdNodeIds\":[\"334:790\",\"I334:790;176:591\",\"334:792\",\"334:794\",\"I334:794;176:591\",\"334:796\",\"334:798\",\"I334:798;187:603\",\"334:800\",\"I334:800;187:603\"],\"removedNodeIds\":[\"183:370\",\"183:437\",\"190:6060\",\"190:6124\"],\"frames\":[{\"id\":\"183:165\",\"name\":\"DT3 · Report a problem\",\"contentHeight\":1328,\"contentBottom\":1552},{\"id\":\"183:256\",\"name\":\"DT4 · Report — Not sent\",\"contentHeight\":1356,\"contentBottom\":1580},{\"id\":\"183:327\",\"name\":\"DT4 · Report — Awaiting Control\",\"contentHeight\":1012,\"contentBottom\":1236},{\"id\":\"183:394\",\"name\":\"DT4 · Report — Acknowledged\",\"contentHeight\":1012,\"contentBottom\":1236},{\"id\":\"190:5888\",\"name\":\"DT3 · Report a problem · Dark\",\"contentHeight\":1328,\"contentBottom\":1552},{\"id\":\"190:5965\",\"name\":\"DT4 · Report — Not sent · Dark\",\"contentHeight\":1356,\"contentBottom\":1580},{\"id\":\"190:6033\",\"name\":\"DT4 · Report — Awaiting Control · Dark\",\"contentHeight\":1012,\"contentBottom\":1236},{\"id\":\"190:6097\",\"name\":\"DT4 · Report — Acknowledged · Dark\",\"contentHeight\":1012,\"contentBottom\":1236},{\"id\":\"188:507\",\"name\":\"D04 · Report a problem\",\"contentHeight\":1604,\"contentBottom\":1964},{\"id\":\"188:556\",\"name\":\"D05 · Not sent\",\"contentHeight\":1866,\"contentBottom\":2226},{\"id\":\"188:603\",\"name\":\"D05 · Awaiting Control\",\"contentHeight\":1476,\"contentBottom\":1836},{\"id\":\"188:647\",\"name\":\"D05 · Control acknowledged\",\"contentHeight\":1584,\"contentBottom\":1944},{\"id\":\"190:6588\",\"name\":\"D04 · Report a problem · Dark\",\"contentHeight\":1604,\"contentBottom\":1964},{\"id\":\"190:6633\",\"name\":\"D05 · Not sent · Dark\",\"contentHeight\":1866,\"contentBottom\":2226},{\"id\":\"190:6680\",\"name\":\"D05 · Awaiting Control · Dark\",\"contentHeight\":1476,\"contentBottom\":1836},{\"id\":\"190:6724\",\"name\":\"D05 · Control acknowledged · Dark\",\"contentHeight\":1584,\"contentBottom\":1944}]}"
+          }
+        ],
+        "structuredContent": null,
+        "isError": false
+      }
+    },
+    {
+      "key": "ReportReconcileFix",
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"mutatedNodeIds\":[\"183:208\",\"183:209\",\"183:211\",\"183:212\",\"183:214\",\"183:215\",\"183:165\",\"190:5915\",\"190:5916\",\"190:5918\",\"190:5919\",\"190:5921\",\"190:5922\",\"190:5888\",\"188:580\",\"188:556\",\"188:621\",\"188:603\",\"188:665\",\"188:647\",\"190:6653\",\"190:6633\",\"190:6695\",\"190:6680\",\"190:6739\",\"190:6724\",\"183:256\",\"190:5965\",\"188:556\",\"190:6633\"],\"removedNodeIds\":[\"188:622\",\"188:666\",\"190:6696\",\"190:6740\"],\"frames\":[{\"id\":\"183:165\",\"name\":\"DT3 · Report a problem\",\"bottom\":1328},{\"id\":\"183:256\",\"name\":\"DT4 · Report — Receipt not confirmed\",\"bottom\":1580},{\"id\":\"188:556\",\"name\":\"D05 · Receipt not confirmed\",\"bottom\":2226},{\"id\":\"188:603\",\"name\":\"D05 · Awaiting Control\",\"bottom\":1662},{\"id\":\"188:647\",\"name\":\"D05 · Control acknowledged\",\"bottom\":1770}]}"
+          }
+        ],
+        "structuredContent": null,
+        "isError": false
+      }
+    },
+    {
+      "key": "ReportHeaderFix",
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"mutatedNodeIds\":[\"334:792\",\"334:796\"],\"headers\":[{\"id\":\"183:165\",\"texts\":[\"Report a problem\",\"SIMULATED DATA\",\"Live · 6:51\",\"6:51\"]},{\"id\":\"183:256\",\"texts\":[\"Your report · not sent\",\"SIMULATED DATA\",\"Offline · not sent\",\"6:52\"]},{\"id\":\"183:327\",\"texts\":[\"Your report · RPT-118\",\"SIMULATED DATA\",\"Live · 6:53\",\"6:53\"]},{\"id\":\"183:394\",\"texts\":[\"Your report · RPT-118\",\"SIMULATED DATA\",\"Live · 6:55\",\"6:55\"]}]}"
+          }
+        ],
+        "structuredContent": null,
+        "isError": false
+      }
+    },
+    {
+      "key": "ReportFinalHeaderFix",
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"mutatedNodeIds\":[\"183:284\",\"183:290\",\"190:5979\",\"190:5984\"],\"changed\":[{\"id\":\"183:284\",\"before\":\"Your report · not sent\",\"after\":\"Your report · receipt not confirmed\"},{\"id\":\"183:290\",\"before\":\"Offline · not sent\",\"after\":\"Receipt unknown\"},{\"id\":\"190:5979\",\"before\":\"Your report · not sent\",\"after\":\"Your report · receipt not confirmed\"},{\"id\":\"190:5984\",\"before\":\"Offline · not sent\",\"after\":\"Receipt unknown\"}]}"
+          }
+        ],
+        "structuredContent": null,
+        "isError": false
+      }
+    }
+  ]
+}

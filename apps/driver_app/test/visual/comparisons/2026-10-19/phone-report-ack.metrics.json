@@ -1,0 +1,12 @@
+﻿{
+    "reference":  "test/visual/comparisons/2026-10-19/phone-report-ack.reference.png",
+    "actual":  "test/visual/comparisons/2026-10-19/phone-report-ack.actual.png",
+    "cropTop":  120,
+    "cropBottom":  60,
+    "width":  1080,
+    "height":  2220,
+    "meanAbsoluteChannelError":  1.5911675564453343,
+    "pixelsWithChannelDeltaAbove16":  0.018030947614280948,
+    "maximumChannelDelta":  244,
+    "interpretation":  "Diagnostic only. Review geometry and text separately; this is not a whole-image pass threshold."
+}

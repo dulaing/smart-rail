@@ -1,0 +1,42 @@
+{
+  "tablet-report-compose": {
+    "reason-icon-TRAIN_FAULT": {
+      "x": 193,
+      "y": 340,
+      "width": 40,
+      "height": 40
+    },
+    "reason-icon-SIGNAL_DELAY": {
+      "x": 746,
+      "y": 340,
+      "width": 40,
+      "height": 40
+    },
+    "reason-selected-icon": {
+      "x": 1194,
+      "y": 346,
+      "width": 28,
+      "height": 28
+    }
+  },
+  "phone-report-compose": {
+    "reason-icon-TRAIN_FAULT": {
+      "x": 35.33333333333333,
+      "y": 360,
+      "width": 28,
+      "height": 28
+    },
+    "reason-icon-SIGNAL_DELAY": {
+      "x": 35.33333333333333,
+      "y": 432,
+      "width": 28,
+      "height": 28
+    },
+    "reason-selected-icon": {
+      "x": 304.66666666666663,
+      "y": 436,
+      "width": 20,
+      "height": 20
+    }
+  }
+}

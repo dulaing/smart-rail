@@ -1,0 +1,240 @@
+{
+  "tablet-report-compose": {
+    "report-content": {
+      "x": 168,
+      "y": 112,
+      "width": 1080,
+      "height": 552
+    },
+    "report-guidance": {
+      "x": 168,
+      "y": 112,
+      "width": 1080,
+      "height": 60
+    },
+    "report-context": {
+      "x": 168,
+      "y": 196,
+      "width": 1080,
+      "height": 84
+    },
+    "report-reasons": {
+      "x": 168,
+      "y": 304,
+      "width": 1080,
+      "height": 240
+    },
+    "reason-icon-TRAIN_FAULT": {
+      "x": 193,
+      "y": 340,
+      "width": 40,
+      "height": 40
+    },
+    "reason-icon-SIGNAL_DELAY": {
+      "x": 746,
+      "y": 340,
+      "width": 40,
+      "height": 40
+    },
+    "reason-selected-icon": {
+      "x": 1194,
+      "y": 346,
+      "width": 28,
+      "height": 28
+    }
+  },
+  "tablet-report-uncertain": {
+    "report-content": {
+      "x": 168,
+      "y": 112,
+      "width": 1080,
+      "height": 678
+    },
+    "delivery-receipt": {
+      "x": 168,
+      "y": 112,
+      "width": 1080,
+      "height": 362
+    },
+    "report-context": {
+      "x": 168,
+      "y": 498,
+      "width": 528,
+      "height": 120
+    }
+  },
+  "tablet-report-await": {
+    "report-content": {
+      "x": 168,
+      "y": 112,
+      "width": 1080,
+      "height": 506
+    },
+    "delivery-receipt": {
+      "x": 168,
+      "y": 112,
+      "width": 1080,
+      "height": 362
+    },
+    "report-context": {
+      "x": 168,
+      "y": 498,
+      "width": 528,
+      "height": 120
+    }
+  },
+  "tablet-report-ack": {
+    "report-content": {
+      "x": 168,
+      "y": 112,
+      "width": 1080,
+      "height": 506
+    },
+    "delivery-receipt": {
+      "x": 168,
+      "y": 112,
+      "width": 1080,
+      "height": 362
+    },
+    "report-context": {
+      "x": 168,
+      "y": 498,
+      "width": 528,
+      "height": 120
+    }
+  },
+  "phone-report-compose": {
+    "report-content": {
+      "x": 18.333333333333332,
+      "y": 120,
+      "width": 323.3333333333333,
+      "height": 534.6666666666666
+    },
+    "report-guidance": {
+      "x": 18.333333333333332,
+      "y": 120,
+      "width": 323.3333333333333,
+      "height": 77.33333333333333
+    },
+    "report-context": {
+      "x": 18.333333333333332,
+      "y": 208,
+      "width": 323.3333333333333,
+      "height": 84.66666666666666
+    },
+    "report-reasons": {
+      "x": 18.333333333333332,
+      "y": 342,
+      "width": 323.3333333333333,
+      "height": 280
+    },
+    "reason-icon-TRAIN_FAULT": {
+      "x": 35.33333333333333,
+      "y": 360,
+      "width": 28,
+      "height": 28
+    },
+    "reason-icon-SIGNAL_DELAY": {
+      "x": 35.33333333333333,
+      "y": 432,
+      "width": 28,
+      "height": 28
+    },
+    "reason-selected-icon": {
+      "x": 304.66666666666663,
+      "y": 436,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "phone-report-uncertain": {
+    "receipt-badge": {
+      "x": 18.333333333333332,
+      "y": 120,
+      "width": 187,
+      "height": 30.666666666666664
+    },
+    "receipt-title": {
+      "x": 18.333333333333332,
+      "y": 161.33333333333331,
+      "width": 323.3333333333333,
+      "height": 36
+    },
+    "receipt-timeline": {
+      "x": 18.333333333333332,
+      "y": 274.66666666666663,
+      "width": 323.3333333333333,
+      "height": 187.33333333333331
+    },
+    "report-context": {
+      "x": 18.333333333333332,
+      "y": 472.66666666666663,
+      "width": 323.3333333333333,
+      "height": 106.66666666666666
+    }
+  },
+  "phone-report-await": {
+    "report-content": {
+      "x": 18.333333333333332,
+      "y": 120,
+      "width": 323.3333333333333,
+      "height": 434
+    },
+    "receipt-badge": {
+      "x": 18.333333333333332,
+      "y": 120,
+      "width": 197.33333333333331,
+      "height": 30.666666666666664
+    },
+    "receipt-title": {
+      "x": 18.333333333333332,
+      "y": 161.33333333333331,
+      "width": 323.3333333333333,
+      "height": 36
+    },
+    "receipt-timeline": {
+      "x": 18.333333333333332,
+      "y": 274.66666666666663,
+      "width": 323.3333333333333,
+      "height": 129.33333333333331
+    },
+    "report-context": {
+      "x": 18.333333333333332,
+      "y": 414.66666666666663,
+      "width": 323.3333333333333,
+      "height": 106.66666666666666
+    }
+  },
+  "phone-report-ack": {
+    "report-content": {
+      "x": 18.333333333333332,
+      "y": 120,
+      "width": 323.3333333333333,
+      "height": 470
+    },
+    "receipt-badge": {
+      "x": 18.333333333333332,
+      "y": 120,
+      "width": 127.33333333333333,
+      "height": 30.666666666666664
+    },
+    "receipt-title": {
+      "x": 18.333333333333332,
+      "y": 161.33333333333331,
+      "width": 323.3333333333333,
+      "height": 72
+    },
+    "receipt-timeline": {
+      "x": 18.333333333333332,
+      "y": 310.66666666666663,
+      "width": 323.3333333333333,
+      "height": 129.33333333333331
+    },
+    "report-context": {
+      "x": 18.333333333333332,
+      "y": 450.66666666666663,
+      "width": 323.3333333333333,
+      "height": 106.66666666666666
+    }
+  }
+}

@@ -6,14 +6,9 @@ import 'package:smartrail_core/smartrail_core.dart';
 import 'briefing_api.dart';
 import 'report_api.dart';
 import 'report_drafts.dart';
+import 'report_view.dart';
 
-/// The reasons a driver can pick, and the words for them.
-const reportReasons = {
-  'TRAIN_FAULT': 'Train fault',
-  'SIGNAL_DELAY': 'Signal delay',
-  'OBSTRUCTION': 'Obstruction',
-  'CANNOT_CONTINUE': 'Cannot continue',
-};
+export 'report_view.dart' show reportReasons;
 
 class DriverReportsScreen extends StatefulWidget {
   DriverReportsScreen({
@@ -22,6 +17,11 @@ class DriverReportsScreen extends StatefulWidget {
     required this.reportApi,
     ReportDraftStore? drafts,
     this.now,
+    this.displayName = 'Driver',
+    this.onAccount,
+    this.onBriefing,
+    this.onUpdates,
+    this.canCreate = true,
   }) : drafts = drafts ?? ReportDraftStore();
   final DriverBriefingApi journeyApi;
   final DriverReportApi reportApi;
@@ -29,6 +29,10 @@ class DriverReportsScreen extends StatefulWidget {
 
   /// The clock, so a test can put it either side of midnight.
   final DateTime Function()? now;
+  final String displayName;
+  final VoidCallback? onAccount;
+  final ValueChanged<DriverJourney>? onBriefing, onUpdates;
+  final bool canCreate;
 
   @override
   State<DriverReportsScreen> createState() => _DriverReportsScreenState();
@@ -74,6 +78,16 @@ class _DriverReportsScreenState extends State<DriverReportsScreen> {
             api: widget.reportApi,
             journeyApi: widget.journeyApi,
             drafts: widget.drafts,
+            displayName: widget.displayName,
+            onAccount: widget.onAccount,
+            history: true,
+            canCreate: widget.canCreate,
+            onBriefing: widget.onBriefing == null
+                ? null
+                : () => widget.onBriefing!(journey),
+            onUpdates: widget.onUpdates == null
+                ? null
+                : () => widget.onUpdates!(journey),
           ),
         ),
       )
@@ -140,7 +154,9 @@ class _DriverReportsScreenState extends State<DriverReportsScreen> {
                   child: ListTile(
                     minTileHeight: theme.metrics.minTarget,
                     title: Text('${journey.trainNumber} · ${journey.label}'),
-                    subtitle: Text('${journey.origin} → ${journey.destination}'),
+                    subtitle: Text(
+                      '${journey.origin} → ${journey.destination}',
+                    ),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () => _open(journey),
                   ),
@@ -183,11 +199,22 @@ class DriverReportJourneyScreen extends StatefulWidget {
     required this.api,
     required this.journeyApi,
     ReportDraftStore? drafts,
+    this.displayName = 'Driver',
+    this.onAccount,
+    this.history = false,
+    this.onBriefing,
+    this.onUpdates,
+    this.canCreate = true,
   }) : drafts = drafts ?? ReportDraftStore();
   final DriverJourney journey;
   final DriverReportApi api;
   final DriverBriefingApi journeyApi;
   final ReportDraftStore drafts;
+  final String displayName;
+  final VoidCallback? onAccount;
+  final bool history;
+  final VoidCallback? onBriefing, onUpdates;
+  final bool canCreate;
 
   @override
   State<DriverReportJourneyScreen> createState() =>
@@ -196,7 +223,6 @@ class DriverReportJourneyScreen extends StatefulWidget {
 
 class _DriverReportJourneyScreenState extends State<DriverReportJourneyScreen>
     with WidgetsBindingObserver {
-  static const _reasons = reportReasons;
   ReportDraftStore get _drafts => widget.drafts;
   List<DriverReport> _reports = [];
   ReportDraft? _draft;
@@ -206,6 +232,10 @@ class _DriverReportJourneyScreenState extends State<DriverReportJourneyScreen>
   bool _accessLost = false;
   bool _busy = true;
   Timer? _poll;
+  String? _selectedReportId;
+  late bool _history = widget.history;
+  DateTime? _checkedAt;
+  int _revision = 0;
 
   @override
   void initState() {
@@ -232,12 +262,18 @@ class _DriverReportJourneyScreenState extends State<DriverReportJourneyScreen>
 
   Future<void> _refreshReports() async {
     if (_busy || _accessLost) return;
+    final revision = _revision;
     final result = await widget.api.list(widget.journey.id);
-    if (!mounted) return;
+    if (!mounted || _busy || _accessLost || revision != _revision) return;
     if (result case ReportListOk(:final reports)) {
-      setState(() => _reports = reports);
+      setState(() {
+        _reports = reports;
+        _checkedAt = DateTime.now();
+      });
     } else if (result case ReportFailure(status: 401 || 403)) {
       setState(() => _accessLost = true);
+    } else if (result is ReportFailure) {
+      setState(() => _checkedAt = null);
     }
   }
 
@@ -247,13 +283,14 @@ class _DriverReportJourneyScreenState extends State<DriverReportJourneyScreen>
       if (mounted) {
         setState(() {
           _busy = false;
+          _accessLost = true;
           _message = 'Sign in again to use reports.';
         });
       }
       return;
     }
     final saved = await _drafts.read(owner, widget.journey.id);
-    final result = await widget.api.list(widget.journey.id);
+    var result = await widget.api.list(widget.journey.id);
     DriverReport? recovered;
     final savedDraft = saved;
     if (savedDraft != null) {
@@ -271,13 +308,18 @@ class _DriverReportJourneyScreenState extends State<DriverReportJourneyScreen>
           if (lookup case ReportListOk(:final reports)
               when reports.isNotEmpty) {
             recovered = reports.first;
+          } else if (lookup case ReportFailure(status: 401 || 403)) {
+            result = lookup;
           }
         }
       }
     }
+    if (recovered != null) await _drafts.clear(widget.journey.id);
     if (!mounted) return;
     setState(() {
       _draft = recovered == null ? saved : null;
+      if (saved != null) _history = false;
+      _selectedReportId = recovered?.id;
       if (savedDraft != null && recovered == null) {
         _reason = savedDraft.reasonCode;
         _draftState = 'Receipt not confirmed. Check receipt before retrying.';
@@ -292,6 +334,7 @@ class _DriverReportJourneyScreenState extends State<DriverReportJourneyScreen>
         ];
         _message = null;
         _accessLost = false;
+        _checkedAt = DateTime.now();
       } else if (result case ReportFailure(:final message, :final status)) {
         _message = message;
         _accessLost = status == 401 || status == 403;
@@ -301,26 +344,31 @@ class _DriverReportJourneyScreenState extends State<DriverReportJourneyScreen>
   }
 
   Future<void> _send({bool retry = false}) async {
-    if (_busy || _reason == null) return;
+    if (_busy || _accessLost || !widget.canCreate || _reason == null) return;
+    _revision++;
     setState(() {
       _busy = true;
       _message = null;
       _draftState = 'Sending report…';
     });
     final owner = await widget.journeyApi.ownerId();
+    if (!mounted) return;
     if (owner == null) {
       setState(() {
         _busy = false;
         _draftState = 'Not sent — sign in again.';
+        _accessLost = true;
       });
       return;
     }
     final draft = retry && _draft != null
         ? _draft!
         : await _drafts.create(owner, widget.journey, _reason!);
+    if (!mounted) return;
     setState(() {
       _draft = draft;
-      _draftState = 'Not sent — Control has not been told.';
+      _history = false;
+      _draftState = 'Sending report…';
     });
     final result = await widget.api.submit(
       widget.journey.id,
@@ -331,6 +379,7 @@ class _DriverReportJourneyScreenState extends State<DriverReportJourneyScreen>
     switch (result) {
       case ReportOk(:final report):
         await _drafts.clear(widget.journey.id);
+        if (!mounted) return;
         setState(() {
           _draft = null;
           _accessLost = false;
@@ -340,9 +389,12 @@ class _DriverReportJourneyScreenState extends State<DriverReportJourneyScreen>
             ..._reports.where((item) => item.id != report.id),
           ];
           _busy = false;
+          _selectedReportId = report.id;
+          _checkedAt = DateTime.now();
         });
       case ReportFailure(status: null):
         setState(() {
+          _checkedAt = null;
           _draftState = 'Receipt not confirmed. Reconcile or retry with the same report key.';
           _busy = false;
         });
@@ -366,7 +418,8 @@ class _DriverReportJourneyScreenState extends State<DriverReportJourneyScreen>
 
   Future<void> _reconcile() async {
     final draft = _draft;
-    if (_busy || draft == null) return;
+    if (_busy || _accessLost || draft == null) return;
+    _revision++;
     setState(() {
       _busy = true;
       _draftState = 'Checking for server receipt…';
@@ -379,6 +432,7 @@ class _DriverReportJourneyScreenState extends State<DriverReportJourneyScreen>
     switch (result) {
       case ReportListOk(:final reports) when reports.isNotEmpty:
         await _drafts.clear(widget.journey.id);
+        if (!mounted) return;
         setState(() {
           _reports = [
             reports.first,
@@ -387,6 +441,8 @@ class _DriverReportJourneyScreenState extends State<DriverReportJourneyScreen>
           _draft = null;
           _draftState = null;
           _busy = false;
+          _selectedReportId = reports.first.id;
+          _checkedAt = DateTime.now();
         });
       case ReportListOk():
         setState(() {
@@ -396,6 +452,7 @@ class _DriverReportJourneyScreenState extends State<DriverReportJourneyScreen>
         });
       case ReportFailure(status: null):
         setState(() {
+          _checkedAt = null;
           _draftState = 'Receipt not confirmed. Reconnect and reconcile again.';
           _busy = false;
         });
@@ -416,103 +473,122 @@ class _DriverReportJourneyScreenState extends State<DriverReportJourneyScreen>
 
   @override
   Widget build(BuildContext context) {
-    final theme = SrTheme.of(context);
-    final gap = theme.metrics.space[16]!;
-    return Scaffold(
-      appBar: AppBar(title: Text('Report · ${widget.journey.trainNumber}')),
-      body: ListView(
-        padding: EdgeInsets.all(gap),
-        children: [
-          const Text(
-            'Send reports only while stopped. For urgent danger, use the established radio or emergency procedure; do not wait for this app.',
-          ),
-          SizedBox(height: gap),
-          Text('Choose a reason', style: theme.text('heading')),
-          AbsorbPointer(
-            absorbing: _busy || _draft != null || _accessLost,
-            child: RadioGroup<String>(
-              groupValue: _reason,
-              onChanged: (value) {
-                if (value != null && !_busy && _draft == null) {
-                  setState(() => _reason = value);
-                }
-              },
-              child: Column(
-                children: [
-                  for (final entry in _reasons.entries)
-                    RadioListTile<String>(
-                      value: entry.key,
-                      title: Text(entry.value, style: theme.text('body')),
-                      minTileHeight: theme.metrics.minTarget,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                ],
-              ),
-            ),
-          ),
-          FilledButton(
-            onPressed: _busy || _accessLost
-                ? null
-                : () => unawaited(_send(retry: _draft != null)),
-            child: Text(
-              _draft == null ? 'Review and send' : 'Retry same report',
-            ),
-          ),
-          if (_draftState != null) ...[
-            SizedBox(height: gap),
-            Semantics(
-              liveRegion: true,
-              child: Text(_draftState!, key: const Key('report-draft-state')),
-            ),
-            if (_draft != null)
-              TextButton(
-                onPressed: _busy || _accessLost ? null : _reconcile,
-                child: const Text('Check receipt'),
-              ),
-          ],
-          if (_message != null) ...[SizedBox(height: gap), Text(_message!)],
-          if (_busy) const LinearProgressIndicator(),
-          SizedBox(height: gap),
-          Text('Your reports', style: theme.text('heading')),
-          for (final report in _reports)
-            Card(
-              child: Padding(
-                padding: EdgeInsets.all(gap),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _reasons[report.reasonCode] ?? report.reasonCode,
-                      style: theme.text('body'),
-                    ),
-                    SizedBox(height: gap / 2),
-                    Text(
-                      'Received by server · ${_time(report.receivedAt)}',
-                      style: theme.text('body'),
-                    ),
-                    SizedBox(height: gap / 2),
-                    Text(
-                      report.state == 'ACKNOWLEDGED' &&
-                              report.acknowledgedByName != null &&
-                              report.acknowledgedAt != null
-                          ? 'Acknowledged by ${report.acknowledgedByName} · ${_time(report.acknowledgedAt)}'
-                          : 'Sent · awaiting Control acknowledgement',
-                      style: theme.text('body'),
-                    ),
-                  ],
+    final selected = _reports
+        .where((r) => r.id == _selectedReportId)
+        .firstOrNull;
+    if (_history && _draft == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Your reports')),
+        body: ListView(
+          padding: const EdgeInsets.all(24),
+          children: [
+            Text('${widget.journey.trainNumber} reports'),
+            if (_busy) const LinearProgressIndicator(),
+            if (_message != null) Text(_message!),
+            if (_accessLost)
+              const Text('Access ended. Sign in again or contact Control.'),
+            if (_reports.isEmpty && !_busy && _message == null && !_accessLost)
+              const Text('No reports for this journey.'),
+            for (final report in _reports)
+              Card(
+                child: ListTile(
+                  minTileHeight: 64,
+                  title: Text(
+                    reportReasons[report.reasonCode] ?? report.reasonCode,
+                  ),
+                  subtitle: Text(
+                    'Server received ${reportTime(report.receivedAt)}',
+                  ),
+                  onTap: () => setState(() {
+                    _selectedReportId = report.id;
+                    _history = false;
+                  }),
                 ),
               ),
+            FilledButton(
+              onPressed: _accessLost || _busy || !widget.canCreate
+                  ? null
+                  : () => setState(() {
+                      _selectedReportId = null;
+                      _history = false;
+                    }),
+              child: const Text('Report a problem'),
             ),
-        ],
-      ),
+          ],
+        ),
+      );
+    }
+    // A removed report cannot silently become another receipt. Return to the list.
+    if (_selectedReportId != null && selected == null && _draft == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Your reports')),
+        body: Center(
+          child: TextButton(
+            onPressed: () => setState(() {
+              _selectedReportId = null;
+              _history = true;
+            }),
+            child: const Text(
+              'This report is no longer in the current list. Back to reports',
+            ),
+          ),
+        ),
+      );
+    }
+    return DriverReportView(
+      journey: widget.journey,
+      reason: _reason ?? 'TRAIN_FAULT',
+      report: selected,
+      hasDraft: _draft != null,
+      contextAvailable: widget.journey.label != 'details not saved',
+      displayName: widget.displayName,
+      now: DateTime.now(),
+      checkedAt: _checkedAt,
+      busy: _busy,
+      notice: _accessLost
+          ? 'Access ended. Sign in again or contact Control.'
+          : _draftState ?? _message,
+      onReason: _accessLost || _busy || _draft != null
+          ? null
+          : (value) => setState(() => _reason = value),
+      onSend: _accessLost || _busy || !widget.canCreate
+          ? null
+          : () => unawaited(_send(retry: _draft != null)),
+      onCheck: _accessLost || _busy
+          ? null
+          : _draft != null
+          ? _reconcile
+          : _checkStatus,
+      onBack: () => Navigator.of(context).pop(),
+      onReports: () => setState(() {
+        _history = true;
+        _selectedReportId = null;
+      }),
+      onAccount: widget.onAccount,
+      onBriefing: widget.onBriefing,
+      onUpdates: widget.onUpdates,
     );
   }
-}
 
-String _time(DateTime? value) {
-  if (value == null) return 'time unavailable';
-  final local = value.toLocal();
-  return '${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
+  Future<void> _checkStatus() async {
+    if (_busy || _accessLost) return;
+    _revision++;
+    setState(() => _busy = true);
+    final result = await widget.api.list(widget.journey.id);
+    if (!mounted) return;
+    setState(() {
+      _busy = false;
+      if (result case ReportListOk(:final reports)) {
+        _reports = reports;
+        _checkedAt = DateTime.now();
+        _message = null;
+      } else if (result case ReportFailure(:final status, :final message)) {
+        _accessLost = status == 401 || status == 403;
+        _message = message;
+        _checkedAt = null;
+      }
+    });
+  }
 }
 
 const _colomboOffset = Duration(hours: 5, minutes: 30);

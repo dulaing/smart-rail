@@ -59,6 +59,51 @@ class DriverShell extends StatefulWidget {
 class _DriverShellState extends State<DriverShell> {
   late DriverTab _tab = _tabs.first;
 
+  void _selectTab(DriverTab tab) {
+    Navigator.of(context).popUntil((route) => route.isFirst);
+    setState(() => _tab = tab);
+  }
+
+  void _openReport(DriverJourney journey) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => DriverReportJourneyScreen(
+          journey: journey,
+          api: widget.reportApi!,
+          journeyApi: widget.journeyApi!,
+          displayName: widget.account.displayName,
+          canCreate: widget.account.permissions.contains(
+            'driver.reports.create',
+          ),
+          onAccount: () => _selectTab(DriverTab.account),
+          onUpdates: () => _openBriefing(journey, updates: true),
+        ),
+      ),
+    );
+  }
+
+  void _openBriefing(DriverJourney journey, {bool updates = false}) {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute<void>(
+        builder: (_) => DriverBriefingScreen(
+          api: widget.journeyApi!,
+          journey: journey,
+          displayName: widget.account.displayName,
+          updatesOnly: updates,
+          onAccount: () => _selectTab(DriverTab.account),
+          onReports: canOpen(DriverTab.reports, widget.account)
+              ? () => _selectTab(DriverTab.reports)
+              : null,
+          onReport:
+              widget.reportApi != null &&
+                  widget.account.permissions.contains('driver.reports.create')
+              ? () => _openReport(journey)
+              : null,
+        ),
+      ),
+    );
+  }
+
   List<DriverTab> get _tabs => [
     for (final tab in DriverTab.values)
       if (canOpen(tab, widget.account)) tab,
@@ -106,29 +151,15 @@ class _DriverShellState extends State<DriverShell> {
                       !canOpen(DriverTab.reports, widget.account) ||
                           widget.offlineOwnerId != null
                       ? null
-                      : () {
-                          Navigator.of(context).pop();
-                          setState(() => _tab = DriverTab.reports);
-                        },
-                  onAccount: () {
-                    Navigator.of(context).pop();
-                    setState(() => _tab = DriverTab.account);
-                  },
+                      : () => _selectTab(DriverTab.reports),
+                  onAccount: () => _selectTab(DriverTab.account),
                   onReport:
                       widget.reportApi == null ||
                           !widget.account.permissions.contains(
                             'driver.reports.create',
                           )
                       ? null
-                      : (journey) => Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (_) => DriverReportJourneyScreen(
-                              journey: journey,
-                              api: widget.reportApi!,
-                              journeyApi: widget.journeyApi!,
-                            ),
-                          ),
-                        ),
+                      : _openReport,
                 ),
         DriverTab.reports =>
           widget.journeyApi == null || widget.reportApi == null
@@ -139,6 +170,13 @@ class _DriverShellState extends State<DriverShell> {
               : DriverReportsScreen(
                   journeyApi: widget.journeyApi!,
                   reportApi: widget.reportApi!,
+                  displayName: widget.account.displayName,
+                  onAccount: () => _selectTab(DriverTab.account),
+                  canCreate: widget.account.permissions.contains(
+                    'driver.reports.create',
+                  ),
+                  onBriefing: _openBriefing,
+                  onUpdates: (journey) => _openBriefing(journey, updates: true),
                 ),
       },
     );

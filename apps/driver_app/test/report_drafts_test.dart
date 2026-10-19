@@ -79,8 +79,9 @@ Map<String, dynamic> _journeyJson(String id, String date, String train) => {
   'availability': 'AS_SCHEDULED',
 };
 
-DriverJourney _yesterday() =>
-    DriverJourney.fromJson(_journeyJson(_yesterdayJourney, '2026-10-18', 'SIM-1001'));
+DriverJourney _yesterday() => DriverJourney.fromJson(
+  _journeyJson(_yesterdayJourney, '2026-10-18', 'SIM-1001'),
+);
 
 /// A report written at 23:58 on 18 October that was never confirmed.
 Map<String, dynamic> _lateDraftRows({String owner = 'owner-1'}) => {
@@ -113,6 +114,9 @@ class _Rig {
     String? owner = 'owner-1',
     int todayStatus = 200,
     this.submitStatus = 201,
+    this.loseSubmitResponse = false,
+    this.receiptFound = false,
+    this.lookupStatus = 200,
   }) {
     final journeyApi = DriverBriefingApi(
       'https://api.test',
@@ -123,7 +127,9 @@ class _Rig {
             ? http.Response(
                 jsonEncode({
                   'serviceDate': '2026-10-19',
-                  'journeys': [_journeyJson(_todayJourney, '2026-10-19', 'SIM-2002')],
+                  'journeys': [
+                    _journeyJson(_todayJourney, '2026-10-19', 'SIM-2002'),
+                  ],
                 }),
                 200,
               )
@@ -136,9 +142,39 @@ class _Rig {
       client: MockClient((request) async {
         reportRequests.add(request);
         if (request.method == 'POST') {
+          if (loseSubmitResponse) throw http.ClientException('Response lost');
           return http.Response(jsonEncode(_report()), submitStatus);
         }
-        return http.Response(jsonEncode({'items': <Object>[], 'nextCursor': null}), 200);
+        if (request.url.queryParameters.containsKey('clientReportId')) {
+          if (lookupStatus != 200) {
+            return http.Response('{"detail":"Access ended"}', lookupStatus);
+          }
+          return http.Response(
+            jsonEncode({
+              'items': receiptFound ? [_report()] : [],
+            }),
+            200,
+          );
+        }
+        if (acknowledged) {
+          return http.Response(
+            jsonEncode({
+              'items': [
+                {
+                  ..._report(),
+                  'state': 'ACKNOWLEDGED',
+                  'acknowledgedByName': 'Dilani',
+                  'acknowledgedAt': '2026-10-18T18:55:00Z',
+                },
+              ],
+            }),
+            200,
+          );
+        }
+        return http.Response(
+          jsonEncode({'items': <Object>[], 'nextCursor': null}),
+          200,
+        );
       }),
     );
     this.journeyApi = journeyApi;
@@ -147,6 +183,10 @@ class _Rig {
 
   final _MemoryDrafts drafts;
   final int submitStatus;
+  final bool loseSubmitResponse;
+  bool receiptFound;
+  final int lookupStatus;
+  bool acknowledged = false;
   final journeyRequests = <http.Request>[];
   final reportRequests = <http.Request>[];
   late final DriverBriefingApi journeyApi;
@@ -193,7 +233,9 @@ void main() {
       journeyId: 'a',
       clientReportId: 'k1',
       reasonCode: 'TRAIN_FAULT',
-      journey: DriverJourney.fromJson(_journeyJson('a', '2026-10-17', 'SIM-0001')),
+      journey: DriverJourney.fromJson(
+        _journeyJson('a', '2026-10-17', 'SIM-0001'),
+      ),
     ).toJson();
     final rows = {
       'b': _lateDraftRows()[_yesterdayJourney],
@@ -213,121 +255,236 @@ void main() {
     expect(pending.first.journey, isNull);
   });
 
-  testWidgets('a report left unconfirmed before midnight is still listed after it', (tester) async {
-    final rig = _Rig(drafts: _MemoryDrafts(_lateDraftRows()));
-    await tester.pumpWidget(rig.app());
-    await tester.pumpAndSettle();
+  testWidgets(
+    'a report left unconfirmed before midnight is still listed after it',
+    (tester) async {
+      final rig = _Rig(drafts: _MemoryDrafts(_lateDraftRows()));
+      await tester.pumpWidget(rig.app());
+      await tester.pumpAndSettle();
 
-    // The list is read for the new service date, which does not contain yesterday's journey.
-    expect(rig.journeyRequests.single.url.queryParameters['serviceDate'], '2026-10-19');
-    expect(find.text('Reports not confirmed'), findsOneWidget);
-    expect(find.text('SIM-1001 · 2026-10-18'), findsOneWidget);
-    expect(find.text('Signal delay · Receipt not confirmed'), findsOneWidget);
-    // Today's journey is still offered for a new report.
-    expect(find.text('SIM-2002 · Morning express'), findsOneWidget);
-    expect(rig.posts, isEmpty, reason: 'listing a draft never sends it');
-  });
+      // The list is read for the new service date, which does not contain yesterday's journey.
+      expect(
+        rig.journeyRequests.single.url.queryParameters['serviceDate'],
+        '2026-10-19',
+      );
+      expect(find.text('Reports not confirmed'), findsOneWidget);
+      expect(find.text('SIM-1001 · 2026-10-18'), findsOneWidget);
+      expect(find.text('Signal delay · Receipt not confirmed'), findsOneWidget);
+      // Today's journey is still offered for a new report.
+      expect(find.text('SIM-2002 · Morning express'), findsOneWidget);
+      expect(rig.posts, isEmpty, reason: 'listing a draft never sends it');
+    },
+  );
 
-  testWidgets('retrying after midnight sends the same report key once, and the draft is cleared', (tester) async {
+  testWidgets(
+    'retrying after midnight sends the same report key once, and the draft is cleared',
+    (tester) async {
+      final drafts = _MemoryDrafts(_lateDraftRows());
+      final rig = _Rig(drafts: drafts);
+      await tester.pumpWidget(rig.app());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('pending-$_yesterdayJourney')));
+      await tester.pumpAndSettle();
+      expect(find.text('Your report'), findsOneWidget);
+      expect(find.text('Retry same report'), findsOneWidget);
+      expect(rig.posts, isEmpty, reason: 'opening a draft never sends it');
+
+      await tester.tap(find.text('Retry same report'));
+      await tester.pumpAndSettle();
+
+      expect(rig.posts, hasLength(1));
+      expect(
+        rig.posts.single.url.path,
+        '/api/driver/journeys/$_yesterdayJourney/reports',
+      );
+      expect(jsonDecode(rig.posts.single.body), {
+        'clientReportId': _clientId,
+        'reasonCode': 'SIGNAL_DELAY',
+      });
+      expect(drafts.rows, isEmpty);
+      expect(
+        find.textContaining('Server received this report'),
+        findsOneWidget,
+      );
+      expect(find.text('Waiting for Control'), findsOneWidget);
+
+      // Back on the list the confirmed report is no longer pending.
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      expect(find.text('Reports not confirmed'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'a failed retry keeps the draft and its key for another manual try',
+    (tester) async {
+      final drafts = _MemoryDrafts(_lateDraftRows());
+      final rig = _Rig(drafts: drafts, submitStatus: 503);
+      await tester.pumpWidget(rig.app());
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('pending-$_yesterdayJourney')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Retry same report'));
+      await tester.pumpAndSettle();
+
+      expect(rig.posts, hasLength(1));
+      expect(drafts.rows[_yesterdayJourney]['clientReportId'], _clientId);
+      expect(find.text('Retry same report'), findsOneWidget);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      expect(find.text('SIM-1001 · 2026-10-18'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'lost response keeps a draft until manual receipt check, then polls named acknowledgement',
+    (tester) async {
+      final drafts = _MemoryDrafts(_lateDraftRows());
+      final rig = _Rig(drafts: drafts, loseSubmitResponse: true);
+      await tester.pumpWidget(rig.app());
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('pending-$_yesterdayJourney')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Retry same report'));
+      await tester.pumpAndSettle();
+      expect(rig.posts, hasLength(1));
+      expect(find.text('Receipt not confirmed'), findsOneWidget);
+      expect(find.text('Saved on this device'), findsOneWidget);
+      expect(find.textContaining('Control has not been told'), findsNothing);
+      expect(drafts.rows[_yesterdayJourney]['clientReportId'], _clientId);
+      rig.receiptFound = true;
+      await tester.ensureVisible(find.text('Check receipt'));
+      await tester.tap(find.text('Check receipt'));
+      await tester.pumpAndSettle();
+      expect(
+        rig.posts,
+        hasLength(1),
+        reason: 'receipt checking must never resend',
+      );
+      expect(drafts.rows, isEmpty);
+      expect(find.text('Saved on this device'), findsNothing);
+      expect(find.text('Waiting for Control'), findsOneWidget);
+      expect(find.text('Not acknowledged'), findsOneWidget);
+      expect(find.textContaining('Acknowledged by'), findsNothing);
+      rig.acknowledged = true;
+      await tester.pump(const Duration(seconds: 31));
+      await tester.pumpAndSettle();
+      expect(find.text('Acknowledged by Dilani'), findsOneWidget);
+      expect(find.text('Dilani · 12:25 AM'), findsOneWidget);
+      expect(rig.posts, hasLength(1));
+    },
+  );
+
+  testWidgets(
+    'opening a recovered receipt removes the persisted draft without sending',
+    (tester) async {
+      final drafts = _MemoryDrafts(_lateDraftRows());
+      final rig = _Rig(drafts: drafts, receiptFound: true);
+      await tester.pumpWidget(rig.app());
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('pending-$_yesterdayJourney')));
+      await tester.pumpAndSettle();
+      expect(drafts.rows, isEmpty);
+      expect(rig.posts, isEmpty);
+      expect(find.text('Waiting for Control'), findsOneWidget);
+      expect(find.text('Saved on this device'), findsNothing);
+    },
+  );
+
+  testWidgets('denied receipt lookup retains draft and disables retry', (
+    tester,
+  ) async {
     final drafts = _MemoryDrafts(_lateDraftRows());
-    final rig = _Rig(drafts: drafts);
+    final rig = _Rig(drafts: drafts, lookupStatus: 403);
     await tester.pumpWidget(rig.app());
     await tester.pumpAndSettle();
-
     await tester.tap(find.byKey(const Key('pending-$_yesterdayJourney')));
     await tester.pumpAndSettle();
-    expect(find.text('Report · SIM-1001'), findsOneWidget);
-    expect(find.text('Retry same report'), findsOneWidget);
-    expect(rig.posts, isEmpty, reason: 'opening a draft never sends it');
-
+    expect(
+      find.text('Access ended. Sign in again or contact Control.'),
+      findsOneWidget,
+    );
     await tester.tap(find.text('Retry same report'));
     await tester.pumpAndSettle();
-
-    expect(rig.posts, hasLength(1));
-    expect(rig.posts.single.url.path, '/api/driver/journeys/$_yesterdayJourney/reports');
-    expect(jsonDecode(rig.posts.single.body), {
-      'clientReportId': _clientId,
-      'reasonCode': 'SIGNAL_DELAY',
-    });
-    expect(drafts.rows, isEmpty);
-    expect(find.textContaining('Received by server'), findsOneWidget);
-    expect(find.text('Sent · awaiting Control acknowledgement'), findsOneWidget);
-
-    // Back on the list the confirmed report is no longer pending.
-    await tester.pageBack();
-    await tester.pumpAndSettle();
-    expect(find.text('Reports not confirmed'), findsNothing);
-  });
-
-  testWidgets('a failed retry keeps the draft and its key for another manual try', (tester) async {
-    final drafts = _MemoryDrafts(_lateDraftRows());
-    final rig = _Rig(drafts: drafts, submitStatus: 503);
-    await tester.pumpWidget(rig.app());
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('pending-$_yesterdayJourney')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Retry same report'));
-    await tester.pumpAndSettle();
-
-    expect(rig.posts, hasLength(1));
+    expect(rig.posts, isEmpty);
     expect(drafts.rows[_yesterdayJourney]['clientReportId'], _clientId);
-    expect(find.text('Retry same report'), findsOneWidget);
-    await tester.pageBack();
-    await tester.pumpAndSettle();
-    expect(find.text('SIM-1001 · 2026-10-18'), findsOneWidget);
   });
 
-  testWidgets('the pending report is listed even when today\'s journeys cannot be read', (tester) async {
-    final rig = _Rig(drafts: _MemoryDrafts(_lateDraftRows()), todayStatus: 500);
-    await tester.pumpWidget(rig.app());
-    await tester.pumpAndSettle();
-    expect(find.text('SIM-1001 · 2026-10-18'), findsOneWidget);
-    expect(find.text('Could not load your assigned journeys. Reconnect and try again.'), findsOneWidget);
-  });
+  testWidgets(
+    'the pending report is listed even when today\'s journeys cannot be read',
+    (tester) async {
+      final rig = _Rig(
+        drafts: _MemoryDrafts(_lateDraftRows()),
+        todayStatus: 500,
+      );
+      await tester.pumpWidget(rig.app());
+      await tester.pumpAndSettle();
+      expect(find.text('SIM-1001 · 2026-10-18'), findsOneWidget);
+      expect(
+        find.text(
+          'Could not load your assigned journeys. Reconnect and try again.',
+        ),
+        findsOneWidget,
+      );
+    },
+  );
 
-  testWidgets('another driver\'s unconfirmed report is not listed', (tester) async {
-    final rig = _Rig(drafts: _MemoryDrafts(_lateDraftRows(owner: 'someone-else')));
+  testWidgets('another driver\'s unconfirmed report is not listed', (
+    tester,
+  ) async {
+    final rig = _Rig(
+      drafts: _MemoryDrafts(_lateDraftRows(owner: 'someone-else')),
+    );
     await tester.pumpWidget(rig.app());
     await tester.pumpAndSettle();
     expect(find.text('Reports not confirmed'), findsNothing);
     expect(find.text('SIM-1001 · 2026-10-18'), findsNothing);
   });
 
-  testWidgets('a journey with an unconfirmed report is listed once, not also as a new choice', (tester) async {
-    final todayDraft = {
-      _todayJourney: ReportDraft(
-        ownerId: 'owner-1',
-        journeyId: _todayJourney,
-        clientReportId: _clientId,
-        reasonCode: 'TRAIN_FAULT',
-        journey: DriverJourney.fromJson(_journeyJson(_todayJourney, '2026-10-19', 'SIM-2002')),
-      ).toJson(),
-    };
-    final rig = _Rig(drafts: _MemoryDrafts(todayDraft));
-    await tester.pumpWidget(rig.app());
-    await tester.pumpAndSettle();
-    expect(find.text('SIM-2002 · 2026-10-19'), findsOneWidget);
-    expect(find.text('SIM-2002 · Morning express'), findsNothing);
-  });
+  testWidgets(
+    'a journey with an unconfirmed report is listed once, not also as a new choice',
+    (tester) async {
+      final todayDraft = {
+        _todayJourney: ReportDraft(
+          ownerId: 'owner-1',
+          journeyId: _todayJourney,
+          clientReportId: _clientId,
+          reasonCode: 'TRAIN_FAULT',
+          journey: DriverJourney.fromJson(
+            _journeyJson(_todayJourney, '2026-10-19', 'SIM-2002'),
+          ),
+        ).toJson(),
+      };
+      final rig = _Rig(drafts: _MemoryDrafts(todayDraft));
+      await tester.pumpWidget(rig.app());
+      await tester.pumpAndSettle();
+      expect(find.text('SIM-2002 · 2026-10-19'), findsOneWidget);
+      expect(find.text('SIM-2002 · Morning express'), findsNothing);
+    },
+  );
 
-  testWidgets('a draft saved before journeys were kept with it is still reachable', (tester) async {
-    final legacy = {
-      _yesterdayJourney: {
-        'ownerId': 'owner-1',
-        'journeyId': _yesterdayJourney,
-        'clientReportId': _clientId,
-        'reasonCode': 'OBSTRUCTION',
-      },
-    };
-    final drafts = _MemoryDrafts(legacy);
-    final rig = _Rig(drafts: drafts);
-    await tester.pumpWidget(rig.app());
-    await tester.pumpAndSettle();
-    expect(find.text('Earlier journey'), findsOneWidget);
-    await tester.tap(find.byKey(const Key('pending-$_yesterdayJourney')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Retry same report'));
-    await tester.pumpAndSettle();
-    expect(jsonDecode(rig.posts.single.body)['clientReportId'], _clientId);
-  });
+  testWidgets(
+    'a draft saved before journeys were kept with it is still reachable',
+    (tester) async {
+      final legacy = {
+        _yesterdayJourney: {
+          'ownerId': 'owner-1',
+          'journeyId': _yesterdayJourney,
+          'clientReportId': _clientId,
+          'reasonCode': 'OBSTRUCTION',
+        },
+      };
+      final drafts = _MemoryDrafts(legacy);
+      final rig = _Rig(drafts: drafts);
+      await tester.pumpWidget(rig.app());
+      await tester.pumpAndSettle();
+      expect(find.text('Earlier journey'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('pending-$_yesterdayJourney')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Retry same report'));
+      await tester.pumpAndSettle();
+      expect(jsonDecode(rig.posts.single.body)['clientReportId'], _clientId);
+    },
+  );
 }

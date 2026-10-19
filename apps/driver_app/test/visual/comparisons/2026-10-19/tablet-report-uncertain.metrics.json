@@ -1,0 +1,12 @@
+﻿{
+    "reference":  "test/visual/comparisons/2026-10-19/tablet-report-uncertain.reference.png",
+    "actual":  "test/visual/comparisons/2026-10-19/tablet-report-uncertain.actual.png",
+    "cropTop":  0,
+    "cropBottom":  0,
+    "width":  2560,
+    "height":  1600,
+    "meanAbsoluteChannelError":  0.87141756184895836,
+    "pixelsWithChannelDeltaAbove16":  0.01017626953125,
+    "maximumChannelDelta":  244,
+    "interpretation":  "Diagnostic only. Review geometry and text separately; this is not a whole-image pass threshold."
+}

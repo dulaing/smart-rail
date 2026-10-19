@@ -1,0 +1,12 @@
+﻿{
+    "reference":  "test/visual/comparisons/2026-10-19/tablet-report-compose.reference.png",
+    "actual":  "test/visual/comparisons/2026-10-19/tablet-report-compose.actual.png",
+    "cropTop":  0,
+    "cropBottom":  0,
+    "width":  2560,
+    "height":  1600,
+    "meanAbsoluteChannelError":  0.56493424479166665,
+    "pixelsWithChannelDeltaAbove16":  0.006535888671875,
+    "maximumChannelDelta":  244,
+    "interpretation":  "Diagnostic only. Review geometry and text separately; this is not a whole-image pass threshold."
+}

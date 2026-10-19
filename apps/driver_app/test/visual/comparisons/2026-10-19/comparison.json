@@ -249,5 +249,6 @@
         "sha256": "f5b068d77de7537b848850dc94eb04061484a95fee593f604cda4c62fb73b4c0"
       }
     }
-  }
+  },
+  "reportContinuation": "report-comparison.json"
 }
