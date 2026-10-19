@@ -65,3 +65,28 @@ class FoodNotice extends StatelessWidget {
     );
   }
 }
+
+
+/// A label with an amount on the right. At large text sizes the amount wraps under the label
+/// instead of overflowing, so neither is ever clipped.
+class FoodPriceRow extends StatelessWidget {
+  const FoodPriceRow({super.key, required this.label, required this.amount, this.style, this.amountKey});
+
+  final String label, amount;
+  final TextStyle? style;
+  final Key? amountKey;
+
+  @override
+  Widget build(BuildContext context) {
+    final textStyle = style ?? SrTheme.of(context).text('body');
+    return Wrap(
+      alignment: WrapAlignment.spaceBetween,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 12,
+      children: [
+        Text(label, style: textStyle),
+        Text(amount, key: amountKey, style: textStyle),
+      ],
+    );
+  }
+}

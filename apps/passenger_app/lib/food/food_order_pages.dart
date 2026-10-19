@@ -113,25 +113,17 @@ class ReviewView extends StatelessWidget {
               for (final (item, quantity) in controller.cartLines)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(child: Text('$quantity × ${item.name}', style: theme.text('body'))),
-                      const SizedBox(width: 12),
-                      Text(formatLkr(item.priceMinorLkr * quantity), style: theme.text('body')),
-                    ],
+                  child: FoodPriceRow(
+                    label: '$quantity × ${item.name}',
+                    amount: formatLkr(item.priceMinorLkr * quantity),
                   ),
                 ),
               const Divider(),
-              Row(
-                children: [
-                  Expanded(child: Text(t.foodTotal, style: theme.text('heading'))),
-                  Text(
-                    formatLkr(controller.totalMinorLkr ?? 0),
-                    key: const Key('food-review-total'),
-                    style: theme.text('heading'),
-                  ),
-                ],
+              FoodPriceRow(
+                label: t.foodTotal,
+                amount: formatLkr(controller.totalMinorLkr ?? 0),
+                amountKey: const Key('food-review-total'),
+                style: theme.text('heading'),
               ),
             ],
           ),
@@ -362,21 +354,14 @@ class OrderView extends StatelessWidget {
               for (final item in order.items!)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
-                  child: Row(
-                    children: [
-                      Expanded(child: Text('${item.quantity} × ${item.name}', style: theme.text('body'))),
-                      Text(formatLkr(item.quantity * item.unitPriceMinorLkr), style: theme.text('body')),
-                    ],
+                  child: FoodPriceRow(
+                    label: '${item.quantity} × ${item.name}',
+                    amount: formatLkr(item.quantity * item.unitPriceMinorLkr),
                   ),
                 ),
               if (order.totalMinorLkr != null) ...[
                 const Divider(),
-                Row(
-                  children: [
-                    Expanded(child: Text(t.foodTotal, style: theme.text('heading'))),
-                    Text(formatLkr(order.totalMinorLkr!), style: theme.text('heading')),
-                  ],
-                ),
+                FoodPriceRow(label: t.foodTotal, amount: formatLkr(order.totalMinorLkr!), style: theme.text('heading')),
               ],
             ],
           ),
@@ -421,20 +406,13 @@ class _SummaryCard extends StatelessWidget {
           for (final line in display.lines)
             Padding(
               padding: const EdgeInsets.only(bottom: 4),
-              child: Row(
-                children: [
-                  Expanded(child: Text('${line.quantity} × ${line.name}', style: theme.text('body'))),
-                  Text(formatLkr(line.quantity * line.unitPriceMinorLkr), style: theme.text('body')),
-                ],
+              child: FoodPriceRow(
+                label: '${line.quantity} × ${line.name}',
+                amount: formatLkr(line.quantity * line.unitPriceMinorLkr),
               ),
             ),
           const Divider(),
-          Row(
-            children: [
-              Expanded(child: Text(t.foodTotal, style: theme.text('heading'))),
-              Text(formatLkr(display.totalMinorLkr), style: theme.text('heading')),
-            ],
-          ),
+          FoodPriceRow(label: t.foodTotal, amount: formatLkr(display.totalMinorLkr), style: theme.text('heading')),
         ],
       ),
     );

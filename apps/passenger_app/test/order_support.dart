@@ -183,7 +183,7 @@ String testKey() => 'key-${++_keyCounter}';
 FoodOrdersController ordersFor(
   TestAccount account,
   FoodOrderSource api, {
-  MemoryFoodRequestStore? store,
+  FoodRequestStore? store,
   String Function()? newKey,
 }) => FoodOrdersController(
   account: account.controller,
