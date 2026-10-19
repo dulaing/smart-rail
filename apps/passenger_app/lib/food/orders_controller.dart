@@ -51,6 +51,7 @@ class FoodOrdersController extends ChangeNotifier {
     required this.api,
     required this.store,
     String Function()? newKey,
+    this.pollEvery = const Duration(seconds: 30),
   }) : _newKey = newKey ?? _randomUuid {
     account.addListener(_onAccountChanged);
     _onAccountChanged();
@@ -60,6 +61,11 @@ class FoodOrdersController extends ChangeNotifier {
   final FoodOrderSource api;
   final FoodRequestStore store;
   final String Function() _newKey;
+
+  /// How often an unresolved request is checked while the Food tab is visible.
+  final Duration pollEvery;
+  Timer? _timer;
+  bool _visible = false;
 
   String? _accountId;
   int _epoch = 0;
@@ -322,6 +328,25 @@ class FoodOrdersController extends ChangeNotifier {
     }
   }
 
+  /// Food is on screen and the app is in the foreground. Becoming visible (a tab switch or a resume)
+  /// checks at once; while visible an unresolved request is checked every [pollEvery]. Nothing runs
+  /// in the background.
+  void setVisible(bool visible) {
+    if (visible == _visible) return;
+    _visible = visible;
+    _timer?.cancel();
+    _timer = null;
+    if (!visible) return;
+    _timer = Timer.periodic(pollEvery, (_) => unawaited(tick()));
+    unawaited(tick());
+  }
+
+  /// One refresh round: re-ask about an unresolved request. A rejected session or a key conflict is
+  /// not retried on a timer.
+  Future<void> tick() async {
+    if (request != null && phase == OrderPhase.uncertain) await recover();
+  }
+
   /// The person explicitly gives up a request the server said belongs to a different order. This is
   /// the only way past a key conflict, and it is never automatic.
   Future<void> discardConflict() async {
@@ -364,6 +389,7 @@ class FoodOrdersController extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    _timer?.cancel();
     account.removeListener(_onAccountChanged);
     super.dispose();
   }

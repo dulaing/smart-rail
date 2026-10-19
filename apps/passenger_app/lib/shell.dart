@@ -39,6 +39,10 @@ class PassengerShell extends StatefulWidget {
 class _PassengerShellState extends State<PassengerShell>
     with WidgetsBindingObserver {
   PassengerTab _tab = PassengerTab.trains;
+  bool _foreground = true;
+
+  /// Food polls an unresolved order only while it is on screen in the foreground.
+  void _syncOrders() => widget.orders.setVisible(_foreground && _tab == PassengerTab.food);
 
   @override
   void initState() {
@@ -55,6 +59,8 @@ class _PassengerShellState extends State<PassengerShell>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     widget.trains.paused = state != AppLifecycleState.resumed;
+    _foreground = state == AppLifecycleState.resumed;
+    _syncOrders();
     if (state == AppLifecycleState.resumed) {
       widget.trains.refresh();
       if (widget.food.journey != null) {
@@ -141,7 +147,10 @@ class _PassengerShellState extends State<PassengerShell>
               label: t.navLabel,
               tabs: [for (final tab in PassengerTab.values) (tab, label(tab))],
               selected: _tab,
-              onSelect: (tab) => setState(() => _tab = tab),
+              onSelect: (tab) {
+                setState(() => _tab = tab);
+                _syncOrders();
+              },
             ),
           ],
         ),

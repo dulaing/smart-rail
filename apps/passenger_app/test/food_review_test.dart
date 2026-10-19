@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:passenger_app/food/food_controller.dart';
+import 'package:passenger_app/food/order_api.dart';
 import 'package:passenger_app/food/orders_controller.dart';
 
 import 'food_support.dart';
@@ -187,6 +188,69 @@ void main() {
     expect(find.text('Food cannot be ordered here right now.'), findsOneWidget);
     expect(find.textContaining('BRAND_NEW_CODE'), findsNothing);
     expect(find.text('Order confirmed'), findsNothing);
+    orders.dispose();
+    c.dispose();
+  });
+
+  testWidgets('Check again on an unconfirmed order replays the same key and shows the confirmed code', (tester) async {
+    tallScreen(tester);
+    final c = await basketReady();
+    final account = TestAccount();
+    final api = FakeOrderSource()
+      ..placeScript.add(() async => const OrderReply.lost())
+      ..placeScript.add(() async => reply(200, orderJson()));
+    final orders = ordersFor(account, api);
+    await tester.pumpWidget(foodApp(c, account: account, orders: orders));
+    await tester.runAsync(() => account.signInAs('acc-1'));
+    await openReview(tester);
+    await tester.tap(find.byKey(const Key('food-place-order')));
+    await tester.pumpAndSettle();
+    expect(find.text('Order outcome not yet confirmed'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('food-check-again')));
+    await tester.pumpAndSettle();
+    expect(api.placed, hasLength(2));
+    expect(api.placed.last, api.placed.first);
+    expect(find.text('Order confirmed'), findsOneWidget);
+    expect(find.text('482915'), findsOneWidget);
+    orders.dispose();
+    c.dispose();
+  });
+
+  testWidgets('a key conflict is explained and offers only an explicit discard', (tester) async {
+    tallScreen(tester);
+    final c = await basketReady();
+    final account = TestAccount();
+    final api = FakeOrderSource()..placeScript.add(() async => problem(409, 'CLIENT_REQUEST_KEY_IN_USE'));
+    final orders = ordersFor(account, api);
+    await tester.pumpWidget(foodApp(c, account: account, orders: orders));
+    await tester.runAsync(() => account.signInAs('acc-1'));
+    await openReview(tester);
+    await tester.tap(find.byKey(const Key('food-place-order')));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('already used for a different order'), findsOneWidget);
+    expect(find.byKey(const Key('food-check-again')), findsNothing);
+    await tester.tap(find.byKey(const Key('food-discard-request')));
+    await tester.pumpAndSettle();
+    expect(orders.phase, OrderPhase.none);
+    orders.dispose();
+    c.dispose();
+  });
+
+  testWidgets('a rejected session hides the order and asks for sign-in again', (tester) async {
+    tallScreen(tester);
+    final c = await basketReady();
+    final account = TestAccount();
+    final api = FakeOrderSource()..placeScript.add(() async => problem(401, 'UNAUTHORIZED'));
+    final orders = ordersFor(account, api);
+    await tester.pumpWidget(foodApp(c, account: account, orders: orders));
+    await tester.runAsync(() => account.signInAs('acc-1'));
+    await openReview(tester);
+    await tester.tap(find.byKey(const Key('food-place-order')));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Your sign-in ended'), findsOneWidget);
+    expect(find.byKey(const Key('food-pickup-code')), findsNothing);
+    expect(find.byKey(const Key('food-sign-in-again')), findsOneWidget);
     orders.dispose();
     c.dispose();
   });
