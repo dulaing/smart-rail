@@ -1,9 +1,10 @@
 ---
-description: Review changed code or a feature task for correctness and simplicity.
-argument-hint: "[feature file, task id, or review scope]"
+description: Review a spec, task, staged/working changes, files, or branch comparison.
+argument-hint: "[spec file, task, staged, working changes, or branch] [fix if requested]"
 ---
 
 # Review
 
-Follow the [Review section of AGENTS.md](../../AGENTS.md#review).
-Use `$ARGUMENTS` as the requested review target.
+Read and follow the [Review section of AGENTS.md](../../AGENTS.md#review).
+Use `$ARGUMENTS` as the target and review type. Report findings before minor
+suggestions; edits require a request for fixes.

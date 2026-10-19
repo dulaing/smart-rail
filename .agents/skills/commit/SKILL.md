@@ -1,6 +1,9 @@
 ---
 name: commit
-description: Draft a conventional commit message for staged changes when the user requests a message or invokes /commit or $commit. This skill does not create a Git commit.
+description: Draft a conventional commit message for staged changes, suggest a split for unrelated staged work, or provide message alternatives when requested or invoked as /commit or $commit. Drafting alone does not create a Git commit.
 ---
 
-Follow the [Commit section of AGENTS.md](../../../AGENTS.md#commit). Base the message on staged changes; use a named feature or task only as context.
+Read and follow the [Commit section of AGENTS.md](../../../AGENTS.md#commit).
+Base the message on staged changes; use a named feature, task, issue, or style
+request as context. Keep message drafting separate from an explicit request to
+stage files or create a Git commit.

@@ -1,6 +1,9 @@
 ---
 name: review
-description: Review changed code or a feature task for correctness and simplicity when the user asks for a review or invokes $review.
+description: Review a feature spec, task, staged or working changes, files, or branch comparison when the user asks for a review or invokes $review. Apply fixes only when requested.
 ---
 
-Follow the [Review section of AGENTS.md](../../../AGENTS.md#review). Use the user's feature file, task ID, files, or changed files as the target.
+Read and follow the [Review section of AGENTS.md](../../../AGENTS.md#review).
+Use the requested target and distinguish a plan review from a code review.
+Report actionable findings and verification limits; fix only within an explicit
+request for corrections.

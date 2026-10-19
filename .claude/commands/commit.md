@@ -1,8 +1,10 @@
 ---
-description: Draft a conventional commit message explaining the reason for staged changes.
+description: Draft a conventional message for staged changes, with alternatives or split suggestions when useful.
+argument-hint: "[feature/task/issue context or message preference]"
 ---
 
 # Commit
 
-Follow the [Commit section of AGENTS.md](../../AGENTS.md#commit).
-Use any feature file or task id supplied in `$ARGUMENTS` as context.
+Read and follow the [Commit section of AGENTS.md](../../AGENTS.md#commit).
+Use `$ARGUMENTS` as context or a message preference. Inspect the staged diff;
+the default output is a proposed message, not a staging or commit operation.
