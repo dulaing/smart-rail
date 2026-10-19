@@ -17,5 +17,13 @@ String foodReasonText(AppLocalizations t, String? code) => switch (code) {
   'STOP_NOT_SERVED' => t.foodReasonStopNotServed,
   'STOP_PASSED' => t.foodReasonStopPassed,
   'TRAIN_UNKNOWN' => t.foodReasonTrainUnknown,
+  'CUTOFF_PASSED' => t.foodReasonCutoffPassed,
+  'STOCK_INSUFFICIENT' => t.foodReasonStockInsufficient,
+  'ITEM_UNAVAILABLE' => t.foodReasonItemUnavailable,
+  'PICKUP_MISMATCH' => t.foodReasonPickupMismatch,
+  'ORDER_NOT_FOUND' => t.foodReasonOrderNotFound,
+  'PASSENGER_CANCELLED' => t.foodReasonPassengerCancelled,
+  'TRAIN_CANCELLED' => t.foodReasonTrainCancelled,
+  'TRAIN_ENDED_EARLY' => t.foodReasonTrainEndedEarly,
   _ => t.foodReasonGeneric,
 };

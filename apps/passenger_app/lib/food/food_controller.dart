@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../trains/train_controller.dart';
 import 'food_api.dart';
 import 'food_models.dart';
+import 'order_models.dart';
 
 enum FoodLoad { idle, loading, ready, providerUnavailable, notFound, failed }
 
@@ -54,6 +55,9 @@ class FoodController extends ChangeNotifier {
 
   /// True once a menu refresh removed or reduced something already in the cart.
   bool cartAdjusted = false;
+
+  /// True while the review screen (before submitting) is open.
+  bool reviewing = false;
 
   int _journeyVersion = 0;
   int _menuVersion = 0;
@@ -149,6 +153,7 @@ class FoodController extends ChangeNotifier {
   Future<void> selectJourney(FoodJourneyChoice choice) async {
     if (journey?.id == choice.id) return;
     journey = choice;
+    reviewing = false;
     _journeyVersion++;
     _menuVersion++;
     options = null;
@@ -212,6 +217,7 @@ class FoodController extends ChangeNotifier {
   }
 
   void _clearPickup() {
+    reviewing = false;
     _stopId = null;
     _menuVersion++;
     menu = null;
@@ -293,6 +299,55 @@ class FoodController extends ChangeNotifier {
 
   /// Whether the cart can go to review: a pickup the server still calls orderable and something in it.
   bool get canReview => (selectedOption?.orderable ?? false) && _cart.isNotEmpty && menu != null;
+
+  /// Opens review and re-reads the options and menu so the passenger sees current answers. The
+  /// server still decides at submission; this only avoids showing stale information.
+  Future<void> startReview() async {
+    if (!canReview) return;
+    reviewing = true;
+    _notify();
+    await Future.wait([refreshOptions(), refreshMenu()]);
+  }
+
+  void endReview() {
+    reviewing = false;
+    _notify();
+  }
+
+  /// Called once an order is in flight: the basket was frozen into the request, so it is emptied.
+  void finishOrder() {
+    _cart.clear();
+    cartAdjusted = false;
+    reviewing = false;
+    _notify();
+  }
+
+  /// The basket as an immutable submission, or null when it cannot be ordered now. It carries only
+  /// the passenger's choices: no ETA, cutoff or account.
+  OrderDraft? buildDraft() {
+    final option = selectedOption, chosen = journey, current = menu;
+    if (option == null || chosen == null || current == null || !canReview) return null;
+    final lines = cartLines;
+    String two(int n) => n.toString().padLeft(2, '0');
+    final date = chosen.serviceDate;
+    return OrderDraft(
+      order: CanonicalOrder(
+        collectionPointId: option.pointId,
+        journeyId: chosen.id,
+        pickupStopId: option.stopId,
+        items: [for (final (item, quantity) in lines) DraftItem(item.id, quantity)],
+      ),
+      display: OrderDisplay(
+        pointName: option.pointName,
+        trainNumber: chosen.trainNumber,
+        serviceDate: '${date.year}-${two(date.month)}-${two(date.day)}',
+        lines: [
+          for (final (item, quantity) in lines)
+            DisplayLine(name: item.name, quantity: quantity, unitPriceMinorLkr: item.priceMinorLkr),
+        ],
+      ),
+    );
+  }
 
   void _notify() {
     if (!_disposed) notifyListeners();

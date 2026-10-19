@@ -374,4 +374,167 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get foodBack => 'பெறும் இடங்களுக்குத் திரும்பு';
+
+  @override
+  String get foodReviewHeading => 'உங்கள் ஆர்டரை மதிப்பாய்வு செய்யுங்கள்';
+
+  @override
+  String foodCollectAt(Object point) {
+    return '$point இல் பெற்றுக்கொள்ளுங்கள்';
+  }
+
+  @override
+  String foodTrainExpected(Object time) {
+    return 'ரயில் எதிர்பார்க்கப்படும் நேரம் $time. இது SmartRail மதிப்பீடு; மாறக்கூடும்.';
+  }
+
+  @override
+  String get foodPayAtKiosk =>
+      'பெறும்போது கியோஸ்க்கில் பணம் செலுத்துங்கள். ஆன்லைன் கட்டணம் இல்லை.';
+
+  @override
+  String get foodNoShowPolicy =>
+      'வராதவர்: நீங்கள் ஆர்டரைப் பெறாவிட்டால் ரயில் புறப்பட்ட பின் வழங்குநர் அதை வராதவர் என குறிப்பார்.';
+
+  @override
+  String get foodCancelPolicy =>
+      'வழங்குநர் ரத்துகளை ஏற்கும் வரை மட்டுமே ரத்து செய்யலாம். நீங்கள் ரத்து செய்யும்போது SmartRail இதைச் சரிபார்க்கும்.';
+
+  @override
+  String get foodTotal => 'மொத்தம்';
+
+  @override
+  String get foodSignInToOrder => 'ஆர்டர் செய்ய உள்நுழையவும்';
+
+  @override
+  String get foodSignInNote =>
+      'கணக்கு இல்லாமலும் உலாவலாம். நீங்கள் உள்நுழையும்போது உங்கள் கூடை இங்கேயே இருக்கும்.';
+
+  @override
+  String get foodSignInCancelled =>
+      'உள்நுழைவு ரத்து செய்யப்பட்டது. உங்கள் கூடை இன்னும் இங்கே உள்ளது.';
+
+  @override
+  String get foodNoPermission => 'உங்கள் கணக்கால் உணவு ஆர்டர் செய்ய முடியாது.';
+
+  @override
+  String get foodPlaceOrder => 'ஆர்டர் செய்';
+
+  @override
+  String get foodBackToMenu => 'மெனுவுக்குத் திரும்பு';
+
+  @override
+  String get foodSubmitting => 'உங்கள் ஆர்டரை வைக்கிறது…';
+
+  @override
+  String get foodUncertainTitle =>
+      'ஆர்டர் முடிவு இன்னும் உறுதிப்படுத்தப்படவில்லை';
+
+  @override
+  String get foodUncertainBody =>
+      'உணவு வழங்குநரிடமிருந்து இன்னும் பதில் வரவில்லை. உங்கள் ஆர்டர் ஒரே குறிப்பின் கீழ் சேமிக்கப்பட்டுள்ளதால் மீண்டும் சரிபார்ப்பது இரண்டாவது ஆர்டரை வைக்காது. இந்த திரையை விட்டு பிறகு திரும்பலாம்.';
+
+  @override
+  String get foodCheckAgain => 'மீண்டும் சரிபார்க்கவும்';
+
+  @override
+  String get foodChecking => 'சரிபார்க்கிறது…';
+
+  @override
+  String get foodConflictBody =>
+      'இந்த கோரிக்கை குறிப்பு ஏற்கனவே வேறொரு ஆர்டருக்குப் பயன்படுத்தப்பட்டது என SmartRail கூறுகிறது. எதுவும் மாறவில்லை. மீண்டும் முயலும் முன் உங்கள் ஆர்டர்களைச் சரிபார்க்கவும்.';
+
+  @override
+  String get foodDiscardRequest => 'இந்த கோரிக்கையை நீக்கவும்';
+
+  @override
+  String get foodRefusedTitle => 'ஆர்டர் வைக்கப்படவில்லை';
+
+  @override
+  String get foodRefusedBack => 'கூடைக்குத் திரும்பு';
+
+  @override
+  String get foodReasonCutoffPassed =>
+      'இந்த பெறுதலுக்கான ஆர்டர் கடைசி நேரம் முடிந்துவிட்டது.';
+
+  @override
+  String get foodReasonStockInsufficient =>
+      'உங்கள் கூடையில் உள்ள ஒரு பொருளுக்கு போதிய இருப்பு இல்லை.';
+
+  @override
+  String get foodReasonItemUnavailable =>
+      'உங்கள் கூடையில் உள்ள ஒரு பொருள் இனி கிடைக்கவில்லை.';
+
+  @override
+  String get foodReasonPickupMismatch =>
+      'இந்த பெறுதல் இனி ரயிலுடன் பொருந்தவில்லை. மீண்டும் தேர்ந்தெடுக்கவும்.';
+
+  @override
+  String get foodReasonOrderNotFound =>
+      'இந்த ஆர்டரை SmartRail கண்டுபிடிக்க முடியவில்லை.';
+
+  @override
+  String get foodReasonPassengerCancelled =>
+      'நீங்கள் இந்த ஆர்டரை ரத்து செய்தீர்கள்.';
+
+  @override
+  String get foodReasonTrainCancelled =>
+      'ரயில் ரத்து செய்யப்பட்டதால் இந்த ஆர்டர் ரத்து செய்யப்பட்டது.';
+
+  @override
+  String get foodReasonTrainEndedEarly =>
+      'ரயில் இந்த நிறுத்தத்திற்கு முன் முடிவதால் இந்த ஆர்டர் ரத்து செய்யப்பட்டது.';
+
+  @override
+  String get foodSessionEnded =>
+      'உங்கள் உள்நுழைவு முடிந்தது. உங்கள் ஆர்டரைப் பார்க்க மீண்டும் உள்நுழையவும். அதுவரை எதுவும் காட்டப்படாது.';
+
+  @override
+  String get foodStorageFailed =>
+      'உங்கள் ஆர்டரை இந்த தொலைபேசியில் சேமிக்க முடியவில்லை, எனவே அனுப்பப்படவில்லை. மீண்டும் முயலவும்.';
+
+  @override
+  String get foodOrderConfirmed => 'ஆர்டர் உறுதிசெய்யப்பட்டது';
+
+  @override
+  String get foodPickupCode => 'பெறும் குறியீடு';
+
+  @override
+  String get foodPickupCodeHint =>
+      'இந்த குறியீட்டை கியோஸ்க்கில் காட்டுங்கள். இது இங்கே உங்களுக்கு மட்டுமே காட்டப்படும்.';
+
+  @override
+  String foodEvidenceAt(Object time) {
+    return '$time மணிக்கான ரயில் சான்றின் அடிப்படையில் மதிப்பீடு';
+  }
+
+  @override
+  String get foodStatusPlacing => 'வைக்கப்படுகிறது';
+
+  @override
+  String get foodStatusRejected => 'வைக்கப்படவில்லை';
+
+  @override
+  String get foodStatusAccepted => 'ஏற்கப்பட்டது';
+
+  @override
+  String get foodStatusReady => 'பெற தயார்';
+
+  @override
+  String get foodStatusCollected => 'பெறப்பட்டது';
+
+  @override
+  String get foodStatusNoShow => 'வரவில்லை';
+
+  @override
+  String get foodStatusCancelled => 'ரத்து செய்யப்பட்டது';
+
+  @override
+  String get foodYourOrder => 'உங்கள் ஆர்டர்';
+
+  @override
+  String get foodOrderDone => 'முடிந்தது';
+
+  @override
+  String get foodOpenOrder => 'உங்கள் ஆர்டரைப் பார்க்கவும்';
 }

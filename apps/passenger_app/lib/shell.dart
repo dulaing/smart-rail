@@ -5,6 +5,7 @@ import 'account/account_controller.dart';
 import 'account/account_page.dart';
 import 'food/food_controller.dart';
 import 'food/food_pages.dart';
+import 'food/orders_controller.dart';
 import 'l10n/app_localizations.dart';
 import 'preferences.dart';
 import 'trains/train_controller.dart';
@@ -22,12 +23,14 @@ class PassengerShell extends StatefulWidget {
     required this.preferences,
     required this.trains,
     required this.food,
+    required this.orders,
   });
 
   final AccountController account;
   final PreferencesController preferences;
   final TrainController trains;
   final FoodController food;
+  final FoodOrdersController orders;
 
   @override
   State<PassengerShell> createState() => _PassengerShellState();
@@ -126,6 +129,8 @@ class _PassengerShellState extends State<PassengerShell>
                           ? TrainsPage(controller: widget.trains)
                           : FoodPage(
                               controller: widget.food,
+                              orders: widget.orders,
+                              account: widget.account,
                               active: _tab == PassengerTab.food,
                             ),
                     ),

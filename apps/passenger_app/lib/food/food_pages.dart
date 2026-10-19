@@ -1,17 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:smartrail_core/smartrail_core.dart';
 
+import '../account/account_controller.dart';
 import '../l10n/app_localizations.dart';
 import 'food_controller.dart';
 import 'food_format.dart';
 import 'food_models.dart';
+import 'food_order_pages.dart';
+import 'food_widgets.dart';
+import 'orders_controller.dart';
 
 /// The Food tab: public browsing from the dated train to the menu and basket. It never waits for
 /// sign-in, and a food provider outage here leaves the rest of the app untouched.
 class FoodPage extends StatelessWidget {
-  const FoodPage({super.key, required this.controller, required this.active});
+  const FoodPage({
+    super.key,
+    required this.controller,
+    required this.orders,
+    required this.account,
+    required this.active,
+  });
 
   final FoodController controller;
+  final FoodOrdersController orders;
+  final AccountController account;
 
   /// True while Food is the visible tab, so Back steps through Food instead of leaving the app.
   final bool active;
@@ -19,13 +31,29 @@ class FoodPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: controller,
+      listenable: Listenable.merge([controller, orders, account]),
       builder: (context, _) {
-        final inMenu = controller.selectedOption != null;
+        final viewingOrder = orders.viewing && orders.signedIn;
+        final inReview = !viewingOrder && controller.reviewing && controller.selectedOption != null;
+        final inMenu = !viewingOrder && !inReview && controller.selectedOption != null;
+        final Widget body = viewingOrder
+            ? OrderView(orders: orders, account: account)
+            : inReview
+            ? ReviewView(controller: controller, orders: orders, account: account)
+            : inMenu
+            ? _MenuView(controller: controller)
+            : _BrowseView(controller: controller, orders: orders);
         return PopScope(
-          canPop: !(active && inMenu),
+          canPop: !(active && (viewingOrder || inReview || inMenu)),
           onPopInvokedWithResult: (didPop, _) {
-            if (!didPop) controller.deselectOption();
+            if (didPop) return;
+            if (viewingOrder) {
+              orders.closeOrder();
+            } else if (inReview) {
+              controller.endReview();
+            } else {
+              controller.deselectOption();
+            }
           },
           child: Column(
             children: [
@@ -35,7 +63,7 @@ class FoodPage extends StatelessWidget {
                     await controller.refreshOptions();
                     await controller.refreshMenu();
                   },
-                  child: inMenu ? _MenuView(controller: controller) : _BrowseView(controller: controller),
+                  child: body,
                 ),
               ),
               if (inMenu && controller.cartCount > 0) _BasketBar(controller: controller),
@@ -47,74 +75,10 @@ class FoodPage extends StatelessWidget {
   }
 }
 
-class _Heading extends StatelessWidget {
-  const _Heading(this.text);
-  final String text;
-
-  @override
-  Widget build(BuildContext context) =>
-      Semantics(header: true, child: Text(text, style: SrTheme.of(context).text('title')));
-}
-
-class _Card extends StatelessWidget {
-  const _Card({required this.child, this.tint});
-  final Widget child;
-  final Color? tint;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = SrTheme.of(context);
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: tint ?? theme.palette.bgSurface,
-          borderRadius: BorderRadius.circular(theme.metrics.radius['lg']!),
-          border: Border.all(color: theme.palette.lineHairline),
-        ),
-        child: Padding(padding: const EdgeInsets.all(16), child: child),
-      ),
-    );
-  }
-}
-
-/// A short notice with an icon; used for empty, error and provider states.
-class _Notice extends StatelessWidget {
-  const _Notice({required this.icon, required this.text, this.action, this.actionLabel});
-  final IconData icon;
-  final String text;
-  final VoidCallback? action;
-  final String? actionLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = SrTheme.of(context);
-    return _Card(
-      tint: theme.palette.bgSurface2,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(icon, color: theme.palette.textSecondary),
-              const SizedBox(width: 12),
-              Expanded(child: Text(text, style: theme.text('body'))),
-            ],
-          ),
-          if (action != null && actionLabel != null) ...[
-            const SizedBox(height: 8),
-            OutlinedButton(onPressed: action, child: Text(actionLabel!)),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
 class _BrowseView extends StatelessWidget {
-  const _BrowseView({required this.controller});
+  const _BrowseView({required this.controller, required this.orders});
   final FoodController controller;
+  final FoodOrdersController orders;
 
   @override
   Widget build(BuildContext context) {
@@ -128,10 +92,17 @@ class _BrowseView extends StatelessWidget {
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(20),
       children: [
-        _Heading(t.foodTitle),
+        FoodHeading(t.foodTitle),
         const SizedBox(height: 8),
         Text(t.foodIntro, style: theme.text('body', color: theme.palette.textSecondary)),
         const SizedBox(height: 16),
+        if (orders.signedIn && (orders.request != null || orders.order != null))
+          FoodNotice(
+            icon: Icons.receipt_long_outlined,
+            text: orders.request != null ? t.foodUncertainTitle : t.foodYourOrder,
+            action: orders.openOrder,
+            actionLabel: t.foodOpenOrder,
+          ),
         _JourneyCard(controller: controller),
         const SizedBox(height: 4),
         if (journey != null) ...[
@@ -142,22 +113,22 @@ class _BrowseView extends StatelessWidget {
               child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()),
             ),
           if (controller.optionsLoad == FoodLoad.providerUnavailable)
-            _Notice(
+            FoodNotice(
               icon: Icons.cloud_off_outlined,
               text: t.foodProviderUnavailable,
               action: controller.refreshOptions,
               actionLabel: t.foodRetry,
             ),
           if (controller.optionsLoad == FoodLoad.failed)
-            _Notice(
+            FoodNotice(
               icon: Icons.error_outline,
               text: options == null ? t.foodLoadFailed : t.foodStaleOptions,
               action: controller.refreshOptions,
               actionLabel: t.foodRetry,
             ),
           if (controller.optionsLoad == FoodLoad.notFound)
-            _Notice(icon: Icons.train_outlined, text: t.foodJourneyNotFound),
-          if (options != null && options.options.isEmpty) _Notice(icon: Icons.storefront_outlined, text: t.foodNoPickups),
+            FoodNotice(icon: Icons.train_outlined, text: t.foodJourneyNotFound),
+          if (options != null && options.options.isEmpty) FoodNotice(icon: Icons.storefront_outlined, text: t.foodNoPickups),
           if (options != null)
             for (final option in options.options)
               _OptionCard(
@@ -180,7 +151,7 @@ class _JourneyCard extends StatelessWidget {
     final t = AppLocalizations.of(context);
     final theme = SrTheme.of(context);
     final journey = controller.journey;
-    return _Card(
+    return FoodCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -277,7 +248,7 @@ class _OptionCard extends StatelessWidget {
     final scheduled = option.scheduledArrival;
     final estimate = option.estimatedArrival;
     final secondary = theme.text('body', color: theme.palette.textSecondary);
-    return _Card(
+    return FoodCard(
       tint: option.orderable ? null : theme.palette.bgSurface2,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -340,32 +311,32 @@ class _MenuView extends StatelessWidget {
             label: Text(t.foodBack),
           ),
         ),
-        _Heading(t.foodMenuHeading(option.pointName)),
+        FoodHeading(t.foodMenuHeading(option.pointName)),
         const SizedBox(height: 8),
         if (!option.orderable)
-          _Notice(icon: Icons.info_outline, text: t.foodPickupUnavailableNow),
-        if (controller.cartAdjusted) _Notice(icon: Icons.info_outline, text: t.foodBasketAdjusted),
+          FoodNotice(icon: Icons.info_outline, text: t.foodPickupUnavailableNow),
+        if (controller.cartAdjusted) FoodNotice(icon: Icons.info_outline, text: t.foodBasketAdjusted),
         if (controller.menuLoad == FoodLoad.loading && menu == null)
           const Center(
             child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()),
           ),
         if (controller.menuLoad == FoodLoad.providerUnavailable)
-          _Notice(
+          FoodNotice(
             icon: Icons.cloud_off_outlined,
             text: t.foodProviderUnavailable,
             action: controller.refreshMenu,
             actionLabel: t.foodRetry,
           ),
         if (controller.menuLoad == FoodLoad.failed)
-          _Notice(
+          FoodNotice(
             icon: Icons.error_outline,
             text: t.foodLoadFailed,
             action: controller.refreshMenu,
             actionLabel: t.foodRetry,
           ),
         if (controller.menuLoad == FoodLoad.notFound)
-          _Notice(icon: Icons.storefront_outlined, text: t.foodMenuEmpty),
-        if (menu != null && menu.items.isEmpty) _Notice(icon: Icons.storefront_outlined, text: t.foodMenuEmpty),
+          FoodNotice(icon: Icons.storefront_outlined, text: t.foodMenuEmpty),
+        if (menu != null && menu.items.isEmpty) FoodNotice(icon: Icons.storefront_outlined, text: t.foodMenuEmpty),
         if (menu != null)
           for (final item in menu.items) _ItemRow(controller: controller, item: item),
       ],
@@ -385,7 +356,7 @@ class _ItemRow extends StatelessWidget {
     final quantity = controller.quantityOf(item.id);
     final limit = controller.limitFor(item);
     final soldOut = limit == 0;
-    return _Card(
+    return FoodCard(
       tint: soldOut ? theme.palette.bgSurface2 : null,
       child: Row(
         children: [
@@ -444,17 +415,24 @@ class _BasketBar extends StatelessWidget {
       elevation: 4,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-        child: Row(
+        // Stacked, not side by side: at large text sizes the summary and button need the full width.
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Expanded(
-              child: Semantics(
-                liveRegion: true,
-                child: Text(
-                  t.foodBasketSummary(controller.cartCount, formatLkr(controller.totalMinorLkr ?? 0)),
-                  key: const Key('food-basket-summary'),
-                  style: theme.text('heading'),
-                ),
+            Semantics(
+              liveRegion: true,
+              child: Text(
+                t.foodBasketSummary(controller.cartCount, formatLkr(controller.totalMinorLkr ?? 0)),
+                key: const Key('food-basket-summary'),
+                style: theme.text('heading'),
               ),
+            ),
+            const SizedBox(height: 8),
+            FilledButton(
+              key: const Key('food-review'),
+              onPressed: controller.canReview ? controller.startReview : null,
+              child: Text(t.foodReview),
             ),
           ],
         ),

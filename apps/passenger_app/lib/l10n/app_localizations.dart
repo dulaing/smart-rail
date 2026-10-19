@@ -723,6 +723,282 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Back to pickup points'**
   String get foodBack;
+
+  /// No description provided for @foodReviewHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Review your order'**
+  String get foodReviewHeading;
+
+  /// No description provided for @foodCollectAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Collect at {point}'**
+  String foodCollectAt(Object point);
+
+  /// No description provided for @foodTrainExpected.
+  ///
+  /// In en, this message translates to:
+  /// **'Train expected {time}. This is a SmartRail estimate and can change.'**
+  String foodTrainExpected(Object time);
+
+  /// No description provided for @foodPayAtKiosk.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay at the kiosk when you collect. There is no online payment.'**
+  String get foodPayAtKiosk;
+
+  /// No description provided for @foodNoShowPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'No-show: if you do not collect your order, the provider marks it No-show after the train leaves.'**
+  String get foodNoShowPolicy;
+
+  /// No description provided for @foodCancelPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'You can cancel only while the provider still accepts cancellations. SmartRail checks this when you cancel.'**
+  String get foodCancelPolicy;
+
+  /// No description provided for @foodTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get foodTotal;
+
+  /// No description provided for @foodSignInToOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to order'**
+  String get foodSignInToOrder;
+
+  /// No description provided for @foodSignInNote.
+  ///
+  /// In en, this message translates to:
+  /// **'You can keep browsing without an account. Your basket stays here while you sign in.'**
+  String get foodSignInNote;
+
+  /// No description provided for @foodSignInCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign-in was cancelled. Your basket is still here.'**
+  String get foodSignInCancelled;
+
+  /// No description provided for @foodNoPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account cannot place food orders.'**
+  String get foodNoPermission;
+
+  /// No description provided for @foodPlaceOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Place order'**
+  String get foodPlaceOrder;
+
+  /// No description provided for @foodBackToMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to menu'**
+  String get foodBackToMenu;
+
+  /// No description provided for @foodSubmitting.
+  ///
+  /// In en, this message translates to:
+  /// **'Placing your order…'**
+  String get foodSubmitting;
+
+  /// No description provided for @foodUncertainTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Order outcome not yet confirmed'**
+  String get foodUncertainTitle;
+
+  /// No description provided for @foodUncertainBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We have not heard back from the food provider yet. Your order is saved under one reference, so checking again never places a second order. You can leave this screen and come back.'**
+  String get foodUncertainBody;
+
+  /// No description provided for @foodCheckAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Check again'**
+  String get foodCheckAgain;
+
+  /// No description provided for @foodChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking…'**
+  String get foodChecking;
+
+  /// No description provided for @foodConflictBody.
+  ///
+  /// In en, this message translates to:
+  /// **'SmartRail says this request reference was already used for a different order. Nothing was changed. Check your orders before trying again.'**
+  String get foodConflictBody;
+
+  /// No description provided for @foodDiscardRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard this request'**
+  String get foodDiscardRequest;
+
+  /// No description provided for @foodRefusedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Order not placed'**
+  String get foodRefusedTitle;
+
+  /// No description provided for @foodRefusedBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to basket'**
+  String get foodRefusedBack;
+
+  /// No description provided for @foodReasonCutoffPassed.
+  ///
+  /// In en, this message translates to:
+  /// **'The order cutoff for this pickup has passed.'**
+  String get foodReasonCutoffPassed;
+
+  /// No description provided for @foodReasonStockInsufficient.
+  ///
+  /// In en, this message translates to:
+  /// **'There is not enough stock for something in your basket.'**
+  String get foodReasonStockInsufficient;
+
+  /// No description provided for @foodReasonItemUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'An item in your basket is no longer available.'**
+  String get foodReasonItemUnavailable;
+
+  /// No description provided for @foodReasonPickupMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'This pickup no longer matches the train. Choose it again.'**
+  String get foodReasonPickupMismatch;
+
+  /// No description provided for @foodReasonOrderNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'SmartRail could not find this order.'**
+  String get foodReasonOrderNotFound;
+
+  /// No description provided for @foodReasonPassengerCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'You cancelled this order.'**
+  String get foodReasonPassengerCancelled;
+
+  /// No description provided for @foodReasonTrainCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'The train was cancelled, so this order was cancelled.'**
+  String get foodReasonTrainCancelled;
+
+  /// No description provided for @foodReasonTrainEndedEarly.
+  ///
+  /// In en, this message translates to:
+  /// **'The train ends before this stop, so this order was cancelled.'**
+  String get foodReasonTrainEndedEarly;
+
+  /// No description provided for @foodSessionEnded.
+  ///
+  /// In en, this message translates to:
+  /// **'Your sign-in ended. Sign in again to see your order. Nothing is shown until you do.'**
+  String get foodSessionEnded;
+
+  /// No description provided for @foodStorageFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save your order on this phone, so it was not sent. Try again.'**
+  String get foodStorageFailed;
+
+  /// No description provided for @foodOrderConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Order confirmed'**
+  String get foodOrderConfirmed;
+
+  /// No description provided for @foodPickupCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Pickup code'**
+  String get foodPickupCode;
+
+  /// No description provided for @foodPickupCodeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Show this code at the kiosk. It is only shown here, to you.'**
+  String get foodPickupCodeHint;
+
+  /// No description provided for @foodEvidenceAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimate from train evidence at {time}'**
+  String foodEvidenceAt(Object time);
+
+  /// No description provided for @foodStatusPlacing.
+  ///
+  /// In en, this message translates to:
+  /// **'Placing'**
+  String get foodStatusPlacing;
+
+  /// No description provided for @foodStatusRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Not placed'**
+  String get foodStatusRejected;
+
+  /// No description provided for @foodStatusAccepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Accepted'**
+  String get foodStatusAccepted;
+
+  /// No description provided for @foodStatusReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to collect'**
+  String get foodStatusReady;
+
+  /// No description provided for @foodStatusCollected.
+  ///
+  /// In en, this message translates to:
+  /// **'Collected'**
+  String get foodStatusCollected;
+
+  /// No description provided for @foodStatusNoShow.
+  ///
+  /// In en, this message translates to:
+  /// **'No-show'**
+  String get foodStatusNoShow;
+
+  /// No description provided for @foodStatusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get foodStatusCancelled;
+
+  /// No description provided for @foodYourOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Your order'**
+  String get foodYourOrder;
+
+  /// No description provided for @foodOrderDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get foodOrderDone;
+
+  /// No description provided for @foodOpenOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'See your order'**
+  String get foodOpenOrder;
 }
 
 class _AppLocalizationsDelegate

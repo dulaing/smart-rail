@@ -5,12 +5,15 @@ import 'package:passenger_app/food/food_api.dart';
 import 'package:passenger_app/food/food_controller.dart';
 import 'package:passenger_app/food/food_models.dart';
 import 'package:passenger_app/food/food_pages.dart';
+import 'package:passenger_app/food/orders_controller.dart';
 import 'package:passenger_app/l10n/app_localizations.dart';
 import 'package:passenger_app/trains/train_api.dart';
 import 'package:passenger_app/trains/train_cache.dart';
 import 'package:passenger_app/trains/train_controller.dart';
 import 'package:passenger_app/trains/train_models.dart';
 import 'package:smartrail_core/smartrail_core.dart';
+
+import 'order_support.dart';
 
 /// 2026-10-20 08:00 in Colombo, the presentation start used by the demo scenario.
 final colomboMorning = DateTime.utc(2026, 10, 20, 2, 30);
@@ -124,13 +127,24 @@ FakeFoodSource fakeSource({
   return source;
 }
 
-Widget foodApp(FoodController controller, {Brightness brightness = Brightness.light, Locale locale = const Locale('en')}) =>
-    MaterialApp(
-      theme: srTheme(SrProfile.passenger, brightness, locale: locale),
-      locale: locale,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: Scaffold(body: FoodPage(controller: controller, active: true)),
-    );
+Widget foodApp(
+  FoodController controller, {
+  FoodOrdersController? orders,
+  TestAccount? account,
+  Brightness brightness = Brightness.light,
+  Locale locale = const Locale('en'),
+}) {
+  final holder = account ?? TestAccount();
+  final ordersController = orders ?? ordersFor(holder, FakeOrderSource());
+  return MaterialApp(
+    theme: srTheme(SrProfile.passenger, brightness, locale: locale),
+    locale: locale,
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    home: Scaffold(
+      body: FoodPage(controller: controller, orders: ordersController, account: holder.controller, active: true),
+    ),
+  );
+}
 
 Matcher get providerDown => throwsA(isA<FoodReadException>());

@@ -19,6 +19,11 @@ class AccountController extends ChangeNotifier {
 
   /// Null while a guest.
   AccountResult? get result => _result;
+  /// The signed-in account's ID, or null as a guest or without an enabled account.
+  String? get accountId => switch (_result) {
+    AccountFound(:final account) => account.accountId,
+    _ => null,
+  };
   bool get signInFailed => _signInFailed;
   bool get busy => _busy;
 

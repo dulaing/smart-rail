@@ -52,6 +52,7 @@ class FakeAccounts implements AccountApi {
 }
 
 const _passenger = Account(
+  accountId: 'acc-1',
   displayName: 'Demo Passenger',
   roles: ['PASSENGER'],
   permissions: ['orders.manage'],
