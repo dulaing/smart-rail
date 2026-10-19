@@ -47,3 +47,7 @@ Created **106 editable desktop screens: 53 Light and 53 Dark**, in 12 paired flo
 - Four report reasons remain consistent with the pilot, with no note field. Incident resolution leaves acknowledgement and active service changes unchanged. Provider recovery retains failed work and does not declare an empty backlog on restore.
 
 The initial inventory grew from 46 to 53 per theme to include separate publication receipts, the full scoped station flow, provider recovery and the audit end page. These are static design fixtures with linked main actions, not a connected application or backend test. No app/backend implementation, build or automated browser test was run for this Figma-only task.
+
+## Operations icon update — 19 October 2026
+
+Replaced the brand mark on all 106 Operations web screens with the supplied `operations-icon` asset through a reusable `Operations / App icon` component. The icon is cropped to its dark rounded-square shape; the existing product name and header layout remain in place. Verified exactly one new icon and no old brand mark on each of the 53 Light and 53 Dark screens, and visually checked sign-in and corridor branding in both themes.

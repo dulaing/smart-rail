@@ -40,3 +40,7 @@ Figma-only design. Interactive station terminal, app/backend implementation, mai
 - Visually inspected entrance, changed/unknown platform, cancellation, saved timetable, final arrival, no-cache and configuration states. Repaired the narrow Tamil planned-platform heading and replaced recovery debug wording with a plain refreshed timestamp.
 
 Native Sinhala/Tamil review and physical four-metre/sunlight checks are **pending**. Shared-source translations are explicitly unreviewed, and supplemental wording is a design draft. The DS-F1/F2/F3 and DS-N1 origin/cleared/overnight fixtures are synthetic design examples, not claimed current seeded services. No app/backend code, build, browser test or physical display test ran for this Figma-only task.
+
+## Passenger square icon update — 19 October 2026
+
+Replaced the shared Station header brand mark with the supplied `passenger-icon-square` asset, using a reusable `Passenger / Square icon` component. The icon retains the 64 × 64 header slot and the station names and clock remain aligned. Checked that all 33 Light-only boards show one new icon and no old brand mark, and visually inspected the header and entrance board.

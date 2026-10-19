@@ -48,3 +48,7 @@ No app/backend code changed. These are design and prototype checks, not user tes
 - [x] **T4 — Scale all tablet designs to 2560 × 1600.** All 34 tablet screens (17 Light and 17 Dark) are uniformly scaled 2× from 1280 × 800. Original layout proportions, fonts, icons, spacing and controls use the same factor. The earlier tablet measurements above describe the original 1× compositions: body 20 becomes 40, time 28 becomes 56 and 96px actions become 192px. Phone dimensions remain unchanged.
 
 Rearranged the enlarged flow sections to avoid canvas overlap. Screen IDs, themes, component connections and prototype destinations remain intact. Checked all 34 persisted frame dimensions, 728 text layers and 410 component instances: no screen overflow or missing font/component. Restored source instance text sizing to prevent label wrapping introduced by fixed text-box overrides; visually checked Light duty and Dark reporting after correction.
+
+## Logo update — 19 October 2026
+
+Replaced the shared brand mark in all 42 driver screen placements that display it with the supplied transparent `driver-logo` PNG, using a reusable `Driver / App logo` component in `HiFi · Components`. The logo has no backing fill or card. The 12 phone states with title/back headers keep their existing header pattern. Checked that no old brand-mark instances remain on the Driver screens page, each logo and its image retain the same proportions, and tablet navigation and phone headers render clearly in Light and Dark.
