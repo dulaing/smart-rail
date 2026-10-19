@@ -29,6 +29,10 @@ public class IncidentApiTests(AccessApi api) : IClassFixture<AccessApi>
 
         public Task<IReadOnlyList<AuditRecord>> ReadForTargetsAsync(IReadOnlyList<AuditTargets> targets, int limit, CancellationToken cancellationToken) =>
             throw new InvalidOperationException("audit down");
+
+        public Task<AuditPage> ReadPageAsync(
+            IReadOnlyList<AuditTargets> targets, DateTimeOffset? afterTime, Guid? afterId, int limit, CancellationToken cancellationToken) =>
+            throw new InvalidOperationException("audit down");
     }
 
     private const string Incidents = "/api/operations/incidents";

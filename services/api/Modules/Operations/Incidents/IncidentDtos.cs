@@ -33,5 +33,7 @@ public sealed record IncidentDto(
 
 public sealed record IncidentPageDto(IReadOnlyList<IncidentDto> Items, string? NextCursor);
 
-// The audit trail of one incident, oldest first.
-public sealed record IncidentAuditDto(Guid IncidentId, IReadOnlyList<AuditRecord> Entries);
+// One oldest-first page of an incident's audit trail. nextCursor continues to the next page and
+// is null at the end of the history; complete says whether this page reached that end.
+public sealed record IncidentAuditDto(
+    Guid IncidentId, IReadOnlyList<AuditRecord> Entries, string? NextCursor, bool Complete);

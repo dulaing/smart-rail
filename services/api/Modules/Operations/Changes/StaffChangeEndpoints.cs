@@ -25,11 +25,12 @@ public static class StaffChangeEndpoints
         journey.MapGet("audit", ReadAudit).RequireAuthorization(AccessPolicies.For(Permissions.AuditRead));
     }
 
-    // Who did what to this journey and when, oldest first, at most limit entries. Denied
+    // Who did what to this journey and when, oldest first, one bounded page at a time. Denied
     // attempts are listed beside successful changes, and so are the journey's driver reports.
-    // Request bodies are never kept, so none show.
+    // Request bodies are never kept, so none show. The optional cursor continues from an earlier
+    // page; nextCursor is null at the end of the trail.
     private static async Task<IResult> ReadAudit(
-        Guid journeyId, int? limit, HttpContext context,
+        Guid journeyId, int? limit, string? cursor, HttpContext context,
         IJourneyStopReader journeys, IAuditTrail audit, JourneyAuditTargets targets)
     {
         if (await journeys.FindAsync(journeyId, context.RequestAborted) is null)
@@ -38,10 +39,26 @@ public static class StaffChangeEndpoints
                 title: "Unknown journey", detail: "No journey has this ID.", statusCode: StatusCodes.Status404NotFound);
         }
 
+        PageCursor? after = null;
+        if (cursor is not null)
+        {
+            if (!PageCursor.TryDecode(cursor, out var decoded))
+            {
+                return Results.Problem(
+                    title: "Invalid audit request",
+                    detail: "cursor is not a continuation token from this list.",
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            after = decoded;
+        }
+
         var take = Math.Clamp(limit ?? DefaultAuditLimit, 1, MaxAuditLimit);
-        var entries = await audit.ReadForTargetsAsync(
-            await targets.ForJourneyAsync(journeyId, context.RequestAborted), take, context.RequestAborted);
-        return Results.Ok(new JourneyAuditDto(journeyId, entries));
+        var page = await audit.ReadPageAsync(
+            await targets.ForJourneyAsync(journeyId, context.RequestAborted),
+            after?.Time, after?.Id, take, context.RequestAborted);
+        var next = page.HasMore ? new PageCursor(page.Entries[^1].OccurredAt, page.Entries[^1].Id).Encode() : null;
+        return Results.Ok(new JourneyAuditDto(journeyId, page.Entries, next, !page.HasMore));
     }
 
     // Shows what a publish or withdrawal would do, including the incident it would carry.
