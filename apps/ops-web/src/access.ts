@@ -42,6 +42,12 @@ export const destinations: readonly Destination[] = [
     anyOf: ['incidents.read', 'incidents.manage'],
   },
   {
+    path: '/audit',
+    label: 'Audit history',
+    summary: 'Who did what and when, for a journey or an incident.',
+    anyOf: ['audit.read'],
+  },
+  {
     path: '/demo-controls',
     label: 'Demo controls',
     summary: 'Pause and resume the simulation.',
@@ -69,7 +75,7 @@ export function visibleDestinations(me: Me): Destination[] {
 export const journeyPathPattern = /^\/corridor\/journeys\/([^/]+)$/
 
 /** Workspaces whose pages live under their own path: /reports/{reportId}, /incidents/{incidentId}, /audit/... */
-const nestedWorkspaces = ['/reports', '/incidents']
+const nestedWorkspaces = ['/reports', '/incidents', '/audit']
 
 export function findDestination(path: string): Destination | undefined {
   const own = destinations.find((d) => d.path === path)

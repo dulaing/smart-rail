@@ -82,4 +82,4 @@ const auditRoute = (subject: AuditSubject) =>
     : `/api/operations/incidents/${subject.id}/audit`
 
 export const readAudit = (call: Fetcher, subject: AuditSubject, cursor: string | null) =>
-  send<AuditPage & Record<string, unknown>>(call, `${auditRoute(subject)}${query({ limit: auditPageSize, cursor })}`, get)
+  send<AuditPage>(call, `${auditRoute(subject)}${query({ limit: auditPageSize, cursor })}`, get)

@@ -36,3 +36,20 @@ test('incidents open for anyone who reads them, and the audit history stays with
   assert.equal(canOpenPath(auditor, '/incidents/6f1c0f4e-0000-0000-0000-000000000001'), true)
   assert.equal(canOpenPath(sysAdmin, '/incidents'), false)
 })
+
+test('audit history needs audit.read: a controller, a station staff account and a SysAdmin are refused', () => {
+  const id = '6f1c0f4e-0000-0000-0000-000000000001'
+  assert.equal(canOpenPath(auditor, '/audit'), true)
+  assert.equal(canOpenPath(auditor, `/audit/journeys/${id}`), true)
+  assert.equal(canOpenPath(auditor, `/audit/incidents/${id}`), true)
+  assert.equal(canOpenPath(controller, '/audit'), false)
+  assert.equal(canOpenPath(controller, `/audit/incidents/${id}`), false)
+  assert.equal(canOpenPath(meWith('changes.publish_platform'), '/audit'), false)
+  assert.equal(canOpenPath(sysAdmin, `/audit/journeys/${id}`), false)
+})
+
+test('an auditor is offered incident and audit pages and never the raw report inbox', () => {
+  const paths = visibleDestinations(auditor).map((d) => d.path)
+  assert.ok(paths.includes('/incidents') && paths.includes('/audit'))
+  assert.ok(!paths.includes('/reports'))
+})

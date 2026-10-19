@@ -70,3 +70,13 @@
   outline: 3px solid var(--sr-color-accent-primary);
   outline-offset: 2px;
 }
+
+/* Audit table: keep an outcome badge on one line and let long IDs wrap instead of widening the table. */
+td .sr-badge {
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+td code {
+  overflow-wrap: anywhere;
+  font-size: var(--sr-type-small-size);
+}
