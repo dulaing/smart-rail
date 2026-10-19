@@ -112,7 +112,7 @@ class SrMetrics {
 /// Line-height multiple per language code, for scripts that stack taller than Latin.
 const srLineScale = <String, double>{'en': 1, 'si': 1.25, 'ta': 1.2};
 
-const srFontFamilies = <String, String>{'latin': 'NotoSans', 'sinhala': 'NotoSansSinhala', 'tamil': 'NotoSansTamil'};
+const srFontFamilies = <String, String>{'latin': 'NotoSans', 'sinhala': 'AbhayaLibre', 'tamil': 'NotoSansTamil'};
 
 const _passengerLight = SrPalette(
   bgCanvas: Color(0xFFF3F4F7),
@@ -333,7 +333,7 @@ const _driverMetrics = SrMetrics(
   textContrast: 7,
   minTarget: 56,
   space: {4: 4, 8: 8, 12: 12, 16: 16, 20: 20, 24: 24, 28: 28, 32: 32, 36: 36, 40: 40, 44: 44, 48: 48, 56: 56, 64: 64, 72: 72, 80: 80, 96: 96},
-  radius: {'xs': 6, 'sm': 10, 'md': 14, 'lg': 22, 'xl': 28, '2xl': 36, 'full': 999},
+  radius: {'xs': 12, 'sm': 20, 'md': 28, 'lg': 44, 'xl': 56, '2xl': 72, 'full': 999},
   type: {
     'display': SrTextRole(fontKey: 'latin', weight: 300, size: 64, height: 1.188, letterSpacing: 0),
     'title': SrTextRole(fontKey: 'latin', weight: 600, size: 36, height: 1.222, letterSpacing: 0),
@@ -354,11 +354,33 @@ const _stationMetrics = SrMetrics(
   space: {4: 4, 8: 8, 12: 12, 16: 16, 20: 20, 24: 24, 28: 28, 32: 32, 36: 36, 40: 40, 44: 44, 48: 48, 56: 56, 64: 64, 72: 72, 80: 80, 96: 96},
   radius: {'xs': 6, 'sm': 10, 'md': 14, 'lg': 22, 'xl': 28, '2xl': 36, 'full': 999},
   type: {
-    'clock': SrTextRole(fontKey: 'latin', weight: 300, size: 72, height: 1, letterSpacing: 0),
-    'heading': SrTextRole(fontKey: 'latin', weight: 600, size: 56, height: 1.15, letterSpacing: 0),
-    'board': SrTextRole(fontKey: 'latin', weight: 500, size: 48, height: 1.2, letterSpacing: 0),
-    'body': SrTextRole(fontKey: 'latin', weight: 400, size: 32, height: 1.3, letterSpacing: 0),
-    'caption': SrTextRole(fontKey: 'latin', weight: 400, size: 28, height: 1.3, letterSpacing: 0),
+    'clock': SrTextRole(fontKey: 'latin', weight: 400, size: 96, height: 1.167, letterSpacing: 0),
+    'heading': SrTextRole(fontKey: 'latin', weight: 600, size: 64, height: 1.188, letterSpacing: 0),
+    'board': SrTextRole(fontKey: 'latin', weight: 500, size: 40, height: 1.2, letterSpacing: 0),
+    'body': SrTextRole(fontKey: 'latin', weight: 400, size: 32, height: 1.25, letterSpacing: 0),
+    'caption': SrTextRole(fontKey: 'latin', weight: 400, size: 24, height: 1.333, letterSpacing: 0),
+    'time': SrTextRole(fontKey: 'latin', weight: 400, size: 64, height: 1.25, letterSpacing: 0),
+    'hero-time': SrTextRole(fontKey: 'latin', weight: 400, size: 104, height: 1.154, letterSpacing: 0),
+    'platform': SrTextRole(fontKey: 'latin', weight: 400, size: 216, height: 1.074, letterSpacing: 0),
+    'label': SrTextRole(fontKey: 'latin', weight: 500, size: 28, height: 1.286, letterSpacing: 0),
+    'small-time': SrTextRole(fontKey: 'latin', weight: 500, size: 38, height: 1.263, letterSpacing: 0),
+    'row-en': SrTextRole(fontKey: 'latin', weight: 500, size: 40, height: 1.2, letterSpacing: 0),
+    'row-si': SrTextRole(fontKey: 'sinhala', weight: 400, size: 42, height: 1.238, letterSpacing: 0),
+    'row-ta': SrTextRole(fontKey: 'tamil', weight: 400, size: 32, height: 1.375, letterSpacing: 0),
+    'status-en': SrTextRole(fontKey: 'latin', weight: 500, size: 32, height: 1.25, letterSpacing: 0),
+    'status-si': SrTextRole(fontKey: 'sinhala', weight: 400, size: 38, height: 1.263, letterSpacing: 0),
+    'status-ta': SrTextRole(fontKey: 'tamil', weight: 400, size: 30, height: 1.467, letterSpacing: 0),
+    'notice-en': SrTextRole(fontKey: 'latin', weight: 600, size: 40, height: 1.2, letterSpacing: 0),
+    'notice-si': SrTextRole(fontKey: 'sinhala', weight: 400, size: 44, height: 1.182, letterSpacing: 0),
+    'notice-ta': SrTextRole(fontKey: 'tamil', weight: 400, size: 32, height: 1.375, letterSpacing: 0),
+    'hero-en': SrTextRole(fontKey: 'latin', weight: 600, size: 56, height: 1.214, letterSpacing: 0),
+    'hero-si': SrTextRole(fontKey: 'sinhala', weight: 400, size: 52, height: 1.154, letterSpacing: 0),
+    'hero-ta': SrTextRole(fontKey: 'tamil', weight: 400, size: 40, height: 1.4, letterSpacing: 0),
+    'small-en': SrTextRole(fontKey: 'latin', weight: 400, size: 24, height: 1.5, letterSpacing: 0),
+    'small-si': SrTextRole(fontKey: 'sinhala', weight: 400, size: 28, height: 1.286, letterSpacing: 0),
+    'small-ta': SrTextRole(fontKey: 'tamil', weight: 400, size: 24, height: 1.5, letterSpacing: 0),
+    'meta-si': SrTextRole(fontKey: 'sinhala', weight: 400, size: 30, height: 1.2, letterSpacing: 0),
+    'meta-ta': SrTextRole(fontKey: 'tamil', weight: 400, size: 24, height: 1.5, letterSpacing: 0),
   },
 );
 

@@ -1,0 +1,25 @@
+{
+  "capturedOn": "2026-10-19",
+  "method": "Visible text segments against nearest opaque solid ancestor; resolved variable values. Text bounding boxes checked against screen bounds. Digital checks do not prove glyph clipping, runtime accessibility, physical readability or native-language correctness.",
+  "page": "229:36",
+  "minimumRequired": 7,
+  "texts": 1319,
+  "minRatio": 7.0118499786565485,
+  "fonts": {
+    "Noto Sans/SemiBold": 150,
+    "Abhaya Libre/Regular": 328,
+    "Noto Sans Tamil/Regular": 328,
+    "Noto Sans/Regular": 424,
+    "Noto Sans/Medium": 81
+  },
+  "failures": [],
+  "untested": 0,
+  "overflow": [],
+  "images": {
+    "97c2f48c0c11324cbd5aa2f70df4dd9599ebf215": {
+      "sample": "I231:38;292:2327;292:2326",
+      "name": "Supplied passenger-icon-square PNG",
+      "count": 33
+    }
+  }
+}

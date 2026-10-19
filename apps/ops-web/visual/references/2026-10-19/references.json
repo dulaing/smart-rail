@@ -1,0 +1,134 @@
+{
+  "capturedOn": "2026-10-19",
+  "status": "User-approved dated Figma reference set for existing features; not app-rendered regression baselines",
+  "references": [
+    {
+      "file": "corridor.png",
+      "nodeId": "202:66",
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=202-66",
+      "logical": [
+        1440,
+        900
+      ],
+      "artworkScale": 1,
+      "dpr": 1,
+      "referenceUserApproved": true,
+      "approvedSha256": "9d92104ce8dc779c16af24e90cde2720fbb927ef0fcb4957650cfb7ca3dbcb33",
+      "approvedOn": "2026-10-19"
+    },
+    {
+      "nodeId": "202:240",
+      "file": "journey.png",
+      "width": 1440,
+      "height": 900,
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=202-240",
+      "logical": [
+        1440,
+        900
+      ],
+      "artworkScale": 1,
+      "dpr": 1,
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "c8a2f16223289a8dac52102ff4e32a523bdfc2b66dbc1ed4d16215e40fd6fce3"
+    },
+    {
+      "nodeId": "203:168",
+      "file": "compose.png",
+      "width": 1440,
+      "height": 900,
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=203-168",
+      "logical": [
+        1440,
+        900
+      ],
+      "artworkScale": 1,
+      "dpr": 1,
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "ffc08d438848f7ea070aae445b856adf82fb6940853132f82d7618bead728667"
+    },
+    {
+      "nodeId": "203:264",
+      "file": "review.png",
+      "width": 1440,
+      "height": 900,
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=203-264",
+      "logical": [
+        1440,
+        900
+      ],
+      "artworkScale": 1,
+      "dpr": 1,
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "99a0d2d757a19fc88be960c16ce1336467f4c283f5b9e65497808a323fb4e6b8"
+    },
+    {
+      "nodeId": "206:926",
+      "file": "report-detail.png",
+      "width": 1440,
+      "height": 900,
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=206-926",
+      "logical": [
+        1440,
+        900
+      ],
+      "artworkScale": 1,
+      "dpr": 1,
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "e6348c331a620cab61951313201a5ba5f67c6e7717bc730fd481764b2a0f40b2"
+    },
+    {
+      "nodeId": "206:1267",
+      "file": "incidents.png",
+      "width": 1440,
+      "height": 900,
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=206-1267",
+      "logical": [
+        1440,
+        900
+      ],
+      "artworkScale": 1,
+      "dpr": 1,
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "a02db6aeccb0148283372cf8a6a1adc48694dd98484af32f5a5cd4610c4e02d0"
+    },
+    {
+      "nodeId": "207:1060",
+      "file": "history.png",
+      "width": 1440,
+      "height": 900,
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=207-1060",
+      "logical": [
+        1440,
+        900
+      ],
+      "artworkScale": 1,
+      "dpr": 1,
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "7e3846e9e1ab7a3743db96cc0946f1d95791dab7ff09ca61dbb35d3094d5ec97"
+    },
+    {
+      "nodeId": "207:1835",
+      "file": "account.png",
+      "width": 1440,
+      "height": 900,
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=207-1835",
+      "logical": [
+        1440,
+        900
+      ],
+      "artworkScale": 1,
+      "dpr": 1,
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "47f06413854526e4a91954b93700483da883fc3190fb1ecb3524679919391689"
+    }
+  ],
+  "approvedOn": "2026-10-19",
+  "approvalScope": "Representative dated references plus linked state-matrix and T1 supplements. Excludes unavailable feature UI, new themes and implementation/device acceptance."
+}

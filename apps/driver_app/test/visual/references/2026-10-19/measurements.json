@@ -1,0 +1,1054 @@
+{
+  "capturedOn": "2026-10-19",
+  "units": "Figma canvas pixels; apply the uniform surface conversion recorded in the feature spec",
+  "nodes": [
+    {
+      "screen": {
+        "id": "178:73",
+        "name": "DT1 · Today’s duty",
+        "type": "FRAME",
+        "x": 3040,
+        "y": 800,
+        "w": 2560,
+        "h": 1600,
+        "layout": "NONE",
+        "pad": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "gap": 0,
+        "radius": 0
+      },
+      "children": [
+        {
+          "id": "178:75",
+          "name": "Navigation rail",
+          "type": "FRAME",
+          "x": 0,
+          "y": 0,
+          "w": 272,
+          "h": 1600,
+          "layout": "VERTICAL",
+          "pad": [
+            48,
+            24,
+            32,
+            24
+          ],
+          "gap": 32,
+          "radius": 0,
+          "children": [
+            {
+              "id": "282:10382",
+              "name": "Driver app logo",
+              "type": "INSTANCE",
+              "x": 88,
+              "y": 48,
+              "w": 96.00000762939453,
+              "h": 96.00000762939453,
+              "layout": "NONE",
+              "pad": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "gap": 0,
+              "radius": 0
+            },
+            {
+              "id": "178:78",
+              "name": "DRIVER",
+              "type": "TEXT",
+              "x": 85.5,
+              "y": 176,
+              "w": 101,
+              "h": 40,
+              "pad": [
+                null,
+                null,
+                null,
+                null
+              ]
+            },
+            {
+              "id": "178:79",
+              "name": "Navigation tabs",
+              "type": "FRAME",
+              "x": 24,
+              "y": 248,
+              "w": 224,
+              "h": 704,
+              "layout": "VERTICAL",
+              "pad": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "gap": 16,
+              "radius": 0
+            },
+            {
+              "id": "178:97",
+              "name": "Flexible space",
+              "type": "FRAME",
+              "x": 24,
+              "y": 984,
+              "w": 224,
+              "h": 360,
+              "layout": "VERTICAL",
+              "pad": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "gap": 0,
+              "radius": 0
+            },
+            {
+              "id": "178:98",
+              "name": "Open staff account",
+              "type": "FRAME",
+              "x": 24,
+              "y": 1376,
+              "w": 224,
+              "h": 192,
+              "layout": "VERTICAL",
+              "pad": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "gap": 8,
+              "radius": 0
+            }
+          ]
+        },
+        {
+          "id": "178:102",
+          "name": "Top bar",
+          "type": "FRAME",
+          "x": 272,
+          "y": 0,
+          "w": 2288,
+          "h": 176,
+          "layout": "HORIZONTAL",
+          "pad": [
+            24,
+            64,
+            24,
+            64
+          ],
+          "gap": 32,
+          "radius": 0,
+          "children": [
+            {
+              "id": "178:103",
+              "name": "Today’s duty · Mon 12 Oct",
+              "type": "TEXT",
+              "x": 64,
+              "y": 60,
+              "w": 1160,
+              "h": 56,
+              "pad": [
+                null,
+                null,
+                null,
+                null
+              ]
+            },
+            {
+              "id": "178:104",
+              "name": "Connection and clock",
+              "type": "FRAME",
+              "x": 1344,
+              "y": 52,
+              "w": 880,
+              "h": 72,
+              "layout": "HORIZONTAL",
+              "pad": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "gap": 32,
+              "radius": 0
+            }
+          ]
+        },
+        {
+          "id": "178:111",
+          "name": "Content",
+          "type": "FRAME",
+          "x": 336,
+          "y": 224,
+          "w": 2160,
+          "h": 1316,
+          "layout": "HORIZONTAL",
+          "pad": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "gap": 48,
+          "radius": 0,
+          "children": [
+            {
+              "id": "178:112",
+              "name": "Duty and stops",
+              "type": "FRAME",
+              "x": 0,
+              "y": 0,
+              "w": 1232,
+              "h": 1316,
+              "layout": "VERTICAL",
+              "pad": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "gap": 32,
+              "radius": 0
+            },
+            {
+              "id": "178:153",
+              "name": "Changes and reporting",
+              "type": "FRAME",
+              "x": 1280,
+              "y": 0,
+              "w": 880,
+              "h": 1312,
+              "layout": "VERTICAL",
+              "pad": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "gap": 48,
+              "radius": 0
+            }
+          ]
+        }
+      ],
+      "textSamples": [
+        {
+          "id": "178:78",
+          "text": "DRIVER",
+          "font": {
+            "family": "Noto Sans",
+            "style": "SemiBold",
+            "variationSettings": {
+              "wght": 600,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 28,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 40
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "178:103",
+          "text": "Today’s duty · Mon 12 Oct",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Regular",
+            "variationSettings": {
+              "wght": 400,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 40,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 56
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "178:109",
+          "text": "Live · 7:08",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Regular",
+            "variationSettings": {
+              "wght": 400,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 32,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 44
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "178:110",
+          "text": "7:08",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Regular",
+            "variationSettings": {
+              "wght": 400,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 56,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 72
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "178:114",
+          "text": "DS-B1 → Colombo Fort",
+          "font": {
+            "family": "Noto Sans",
+            "style": "SemiBold",
+            "variationSettings": {
+              "wght": 600,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 72,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 88
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "178:119",
+          "text": "Gampaha · Platform 3",
+          "font": {
+            "family": "Noto Sans",
+            "style": "SemiBold",
+            "variationSettings": {
+              "wght": 600,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 56,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 72
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "178:122",
+          "text": "19",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Light",
+            "variationSettings": {
+              "wght": 300,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 128,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 152
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "178:139",
+          "text": "Gampaha",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Medium",
+            "variationSettings": {
+              "wght": 500,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 40,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 56
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "I178:156;176:633",
+          "text": "Gampaha: Platform 3",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Medium",
+            "variationSettings": {
+              "wght": 500,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 44,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 56
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "I178:156;176:634",
+          "text": "Was 2 · DS-B1 · expected 7:27",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Regular",
+            "variationSettings": {
+              "wght": 400,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 32,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 44
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "I178:165;176:642",
+          "text": "Gampaha 7:10 → 7:27",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Regular",
+            "variationSettings": {
+              "wght": 400,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 32,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 44
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "I178:175;176:589",
+          "text": "Report a problem",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Medium",
+            "variationSettings": {
+              "wght": 500,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 44,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 56
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        }
+      ]
+    },
+    {
+      "screen": {
+        "id": "188:417",
+        "name": "D02 · Assigned briefing",
+        "type": "FRAME",
+        "x": 1320,
+        "y": 400,
+        "w": 1080,
+        "h": 2400,
+        "layout": "NONE",
+        "pad": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "gap": 0,
+        "radius": 0
+      },
+      "children": [
+        {
+          "id": "188:419",
+          "name": "Device status",
+          "type": "FRAME",
+          "x": 55,
+          "y": 48,
+          "w": 970,
+          "h": 54,
+          "layout": "HORIZONTAL",
+          "pad": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "gap": 32,
+          "radius": 0,
+          "children": [
+            {
+              "id": "188:420",
+              "name": "7:08",
+              "type": "TEXT",
+              "x": 0,
+              "y": 0,
+              "w": 72,
+              "h": 54,
+              "pad": [
+                null,
+                null,
+                null,
+                null
+              ]
+            },
+            {
+              "id": "188:421",
+              "name": "●  ▰",
+              "type": "TEXT",
+              "x": 883,
+              "y": 0,
+              "w": 87,
+              "h": 54,
+              "pad": [
+                null,
+                null,
+                null,
+                null
+              ]
+            }
+          ]
+        },
+        {
+          "id": "188:422",
+          "name": "App header",
+          "type": "FRAME",
+          "x": 55,
+          "y": 144,
+          "w": 970,
+          "h": 168,
+          "layout": "HORIZONTAL",
+          "pad": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "gap": 24,
+          "radius": 0,
+          "children": [
+            {
+              "id": "282:10450",
+              "name": "Driver app logo",
+              "type": "INSTANCE",
+              "x": 0,
+              "y": 36,
+              "w": 96.00000762939453,
+              "h": 96.00000762939453,
+              "layout": "NONE",
+              "pad": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "gap": 0,
+              "radius": 0
+            },
+            {
+              "id": "188:425",
+              "name": "Briefing",
+              "type": "TEXT",
+              "x": 120,
+              "y": 42,
+              "w": 658,
+              "h": 84,
+              "pad": [
+                null,
+                null,
+                null,
+                null
+              ]
+            },
+            {
+              "id": "188:426",
+              "name": "Open staff account",
+              "type": "FRAME",
+              "x": 802,
+              "y": 0,
+              "w": 168,
+              "h": 168,
+              "layout": "VERTICAL",
+              "pad": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "gap": 0,
+              "radius": 999
+            }
+          ]
+        },
+        {
+          "id": "188:428",
+          "name": "Content",
+          "type": "FRAME",
+          "x": 55,
+          "y": 360,
+          "w": 970,
+          "h": 1736,
+          "layout": "VERTICAL",
+          "pad": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "gap": 24,
+          "radius": 0,
+          "children": [
+            {
+              "id": "188:430",
+              "name": "Live freshness",
+              "type": "FRAME",
+              "x": 0,
+              "y": 0,
+              "w": 970,
+              "h": 86,
+              "layout": "HORIZONTAL",
+              "pad": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "gap": 24,
+              "radius": 0
+            },
+            {
+              "id": "188:435",
+              "name": "Assigned train",
+              "type": "FRAME",
+              "x": 0,
+              "y": 110,
+              "w": 970,
+              "h": 182,
+              "layout": "VERTICAL",
+              "pad": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "gap": 8,
+              "radius": 0
+            },
+            {
+              "id": "188:438",
+              "name": "Next stop",
+              "type": "FRAME",
+              "x": 0,
+              "y": 316,
+              "w": 970,
+              "h": 358,
+              "layout": "VERTICAL",
+              "pad": [
+                40,
+                40,
+                40,
+                40
+              ],
+              "gap": 16,
+              "radius": 44
+            },
+            {
+              "id": "188:444",
+              "name": "Upcoming stops",
+              "type": "FRAME",
+              "x": 0,
+              "y": 698,
+              "w": 970,
+              "h": 726,
+              "layout": "VERTICAL",
+              "pad": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "gap": 8,
+              "radius": 0
+            },
+            {
+              "id": "188:461",
+              "name": "Latest confirmed change",
+              "type": "FRAME",
+              "x": 0,
+              "y": 1448,
+              "w": 970,
+              "h": 210,
+              "layout": "VERTICAL",
+              "pad": [
+                32,
+                32,
+                32,
+                32
+              ],
+              "gap": 8,
+              "radius": 44
+            },
+            {
+              "id": "189:515",
+              "name": "Info only — follow signals.",
+              "type": "TEXT",
+              "x": 0,
+              "y": 1682,
+              "w": 970,
+              "h": 54,
+              "pad": [
+                null,
+                null,
+                null,
+                null
+              ]
+            }
+          ]
+        },
+        {
+          "id": "188:429",
+          "name": "System gesture",
+          "type": "RECTANGLE",
+          "x": 380,
+          "y": 2360,
+          "w": 320,
+          "h": 12,
+          "pad": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "radius": 999
+        },
+        {
+          "id": "188:467",
+          "name": "Primary action",
+          "type": "FRAME",
+          "x": 0,
+          "y": 2112,
+          "w": 1080,
+          "h": 224,
+          "layout": "VERTICAL",
+          "pad": [
+            16,
+            55,
+            16,
+            55
+          ],
+          "gap": 0,
+          "radius": 0,
+          "children": [
+            {
+              "id": "188:468",
+              "name": "Report a problem",
+              "type": "INSTANCE",
+              "x": 55,
+              "y": 16,
+              "w": 970,
+              "h": 192,
+              "layout": "HORIZONTAL",
+              "pad": [
+                32,
+                48,
+                32,
+                48
+              ],
+              "gap": 32,
+              "radius": 44
+            }
+          ]
+        }
+      ],
+      "textSamples": [
+        {
+          "id": "188:420",
+          "text": "7:08",
+          "font": {
+            "family": "Noto Sans",
+            "style": "SemiBold",
+            "variationSettings": {
+              "wght": 600,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 36,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 54
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "188:432",
+          "text": "LIVE · 7:08",
+          "font": {
+            "family": "Noto Sans",
+            "style": "SemiBold",
+            "variationSettings": {
+              "wght": 600,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 36,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 54
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "188:436",
+          "text": "DS-B1 → Colombo Fort",
+          "font": {
+            "family": "Noto Sans",
+            "style": "SemiBold",
+            "variationSettings": {
+              "wght": 600,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 84,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 108
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "188:440",
+          "text": "Gampaha · Platform 3",
+          "font": {
+            "family": "Noto Sans",
+            "style": "SemiBold",
+            "variationSettings": {
+              "wght": 600,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 66,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 84
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "188:448",
+          "text": "Gampaha",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Medium",
+            "variationSettings": {
+              "wght": 500,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 60,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 84
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "188:450",
+          "text": "Sched. 7:10 · Platform 3",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Regular",
+            "variationSettings": {
+              "wght": 400,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 48,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 66
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "188:455",
+          "text": "Sched. 7:30 · Platform 2",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Regular",
+            "variationSettings": {
+              "wght": 400,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 48,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 66
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "188:460",
+          "text": "Sched. 8:01 · Platform 4",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Regular",
+            "variationSettings": {
+              "wght": 400,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 48,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 66
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "188:464",
+          "text": "Gampaha: 2 → 3",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Medium",
+            "variationSettings": {
+              "wght": 500,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 60,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 84
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "I188:468;187:601",
+          "text": "Report a problem",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Medium",
+            "variationSettings": {
+              "wght": 500,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 66,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 84
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        }
+      ]
+    }
+  ]
+}

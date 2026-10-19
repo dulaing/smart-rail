@@ -1,0 +1,57 @@
+{
+  "date": "2026-10-19",
+  "scope": "Existing routes/states only; dark staff frames retained in inventory but excluded from implementation",
+  "families": [
+    {
+      "frames": "P01, P03, P06, P11",
+      "route": "PassengerTab.home / trains; inline route picker",
+      "code": [
+        "apps/passenger_app/lib/shell.dart",
+        "apps/passenger_app/lib/trains/train_pages.dart"
+      ],
+      "status": "existing screen family; map illustration is presentation only; no GPS claim"
+    },
+    {
+      "frames": "P02, P07, P08, P09",
+      "route": "TrainDetailPage via Navigator",
+      "code": [
+        "apps/passenger_app/lib/trains/train_pages.dart"
+      ],
+      "status": "existing detail, freshness and disruption states"
+    },
+    {
+      "frames": "P04, P10",
+      "route": "no dedicated Updates / follow UI",
+      "code": [
+        "apps/passenger_app/lib/trains/train_pages.dart",
+        "apps/passenger_app/lib/account/account_page.dart"
+      ],
+      "status": "future personal-change and follow UI; prerequisite passenger-saved-journeys T3/T4; current public notices remain in train views"
+    },
+    {
+      "frames": "P05, P17",
+      "route": "PassengerTab.account / external Keycloak sign-in",
+      "code": [
+        "apps/passenger_app/lib/account/account_page.dart"
+      ],
+      "status": "account/auth exists; omit design-only follow/saved lists until prerequisite UI exists; no local credential form"
+    },
+    {
+      "frames": "P12-P16",
+      "route": "PassengerTab.food; FoodPage browse/menu/ReviewView/OrderView",
+      "code": [
+        "apps/passenger_app/lib/food/food_pages.dart",
+        "apps/passenger_app/lib/food/food_order_pages.dart"
+      ],
+      "status": "existing Food/order workflow; preserve API-only confirmation and entered-code secrecy"
+    },
+    {
+      "frames": "P18",
+      "route": "localized Home/detail/Updates counterparts",
+      "code": [
+        "apps/passenger_app/lib/shell.dart"
+      ],
+      "status": "Abhaya Libre Regular confirmed for bundled fonts and live Figma. Localized Home/detail references; Updates still excluded until passenger-saved-journeys T3/T4."
+    }
+  ]
+}

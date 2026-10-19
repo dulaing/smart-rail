@@ -1,0 +1,156 @@
+{
+  "capturedOn": "2026-10-19",
+  "status": "Selected-reference approvals and frozen hashes are in references.json; before images and assets are supporting evidence.",
+  "files": [
+    {
+      "file": "account.logical.png",
+      "bytes": 75145,
+      "sha256": "2df54da41296fad4649f4699432e21cadd7ff05519c2708c70cbb4282efadd35",
+      "sha1": "74679bd08dd79cc66c208ea96c606faca7e4e411",
+      "width": 1280,
+      "height": 800
+    },
+    {
+      "file": "account.png",
+      "bytes": 100388,
+      "sha256": "147134a1047d35440226bc650894fd392440040a5439d1d4a98c880e393d8f20",
+      "sha1": "03df948341965a84f5071e271536af9a455a6602",
+      "width": 2560,
+      "height": 1600
+    },
+    {
+      "file": "assets/336e3.svg",
+      "bytes": 1197,
+      "sha256": "c0e7c3d363a239141c11d85e0fdbb23f6cd09d37965ec4498fcdcffcb9c97500",
+      "sha1": "b5edface195b7d9b3dc578c9fb2363148fa85143"
+    },
+    {
+      "file": "assets/625be.png",
+      "bytes": 270084,
+      "sha256": "3192267b3e89808bfa03dc99ad604f4184d806d3277857d4b3d9597a88502cbd",
+      "sha1": "a14e09f4c5822813698399bfd5b2586749efe846",
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "file": "assets/7c009.svg",
+      "bytes": 231,
+      "sha256": "611840135e99943a1a2c19df4651f9c2234088c7549155114e3add9e7ca902fb",
+      "sha1": "1dd38e2b7fcbf88e153fcf1fb0aacf3189f12d77"
+    },
+    {
+      "file": "assets/8e538.svg",
+      "bytes": 1513,
+      "sha256": "53eec05497588d30545754a93b72e7767d514bf33e9a1ed7c20c22b30d289c76",
+      "sha1": "e8796c04c91074b50c1e3386ec73eabe4c1e811d"
+    },
+    {
+      "file": "assets/a2d74.svg",
+      "bytes": 2522,
+      "sha256": "4d3f5e8c8b1f0594ab0c8157dc8d6b96d885a393056bf7fb6a85029d922efbd2",
+      "sha1": "4e5ce95f85bbb204ea679d7f186ce630fee1c7c7"
+    },
+    {
+      "file": "assets/bc77c.svg",
+      "bytes": 1052,
+      "sha256": "e379a0f82396568782b8dc437020e26a93c81a97326164960115b2d4fc194740",
+      "sha1": "dc9daf4d5511057b11c4cae74a84f0b10b2e61d4"
+    },
+    {
+      "file": "before.png",
+      "bytes": 194623,
+      "sha256": "a24fa81e56694e2ed272493883b6f15d36738f17673b48b1b5d663036435f15b",
+      "sha1": "bb778748121ca4e1fc20d2e3e3784c7bea176748",
+      "width": 2560,
+      "height": 1600
+    },
+    {
+      "file": "change-detail.logical.png",
+      "bytes": 98062,
+      "sha256": "3843beaf9503e65d44f857e39c0a86f88786c6adae1433589994fee728cfd723",
+      "sha1": "e6df1d561149b61f2f05bdff17f5c882651ee497",
+      "width": 1280,
+      "height": 800
+    },
+    {
+      "file": "change-detail.png",
+      "bytes": 118311,
+      "sha256": "a559085d6af896db835d59f359a220b797b28c40ccb320b0cbd9b33d32fc6223",
+      "sha1": "25fb61cdb04c000b27c294f2a48cf983f1748b2b",
+      "width": 2560,
+      "height": 1600
+    },
+    {
+      "file": "phone-briefing.content.png",
+      "bytes": 35678,
+      "sha256": "11cdd8b90909a6122946c70a4b58974c7e4079d48ce37495df623c0792a11bc3",
+      "sha1": "ecf27aff343017d4075d6ad2424453ca2d32b5ce",
+      "width": 360,
+      "height": 740
+    },
+    {
+      "file": "phone-briefing.logical.png",
+      "bytes": 48375,
+      "sha256": "4561ebb180d018ab63571d9bcecdd733716c5f3aa238b67593212f24a6379165",
+      "sha1": "75099387486bcb7421d25ad3380c19db3855906d",
+      "width": 360,
+      "height": 800
+    },
+    {
+      "file": "phone-briefing.png",
+      "bytes": 150941,
+      "sha256": "dcd039e56f48a541d2341e0571f1e4aa663ecd0da123c1500437c83c6286fb27",
+      "sha1": "db3616a4e5115a6b5beeddf14b5393496da25c8d",
+      "width": 1080,
+      "height": 2400
+    },
+    {
+      "file": "tablet-duty.logical.png",
+      "bytes": 90303,
+      "sha256": "edd3c5d8a150ad993909b0e27206d6c17474d5873ac6f8d1a407731898ff7504",
+      "sha1": "6561cdc1456b1741508bda687d6b5e7b9bb14ed7",
+      "width": 1280,
+      "height": 800
+    },
+    {
+      "file": "tablet-duty.png",
+      "bytes": 193637,
+      "sha256": "a6cfc93f583e98b00f5097951dc2cb824d42f68b6c9784e56d65d3c1e05f4265",
+      "sha1": "39e69793800c400a5777967571d63e3cfd2cb0e6",
+      "width": 2560,
+      "height": 1600
+    },
+    {
+      "file": "tablet-report-sent.png",
+      "bytes": 135048,
+      "sha256": "0fe200953ab8c94eb2710016ad9f5fde7b771c4b65d0703e0c5a98ffc98014dc",
+      "sha1": "1b7a0542fb9bb3aeeea480d95eda005ceffbbcf3",
+      "width": 2560,
+      "height": 1600
+    },
+    {
+      "file": "tablet-sign-in.png",
+      "bytes": 127246,
+      "sha256": "7117115f39b18b2a99a598305147cbbfd3c0b7cf6d7dfa85b3fdc7d9dc9723e1",
+      "sha1": "d5325369bcf08d3dbba8a076d67bb00f0c305aad",
+      "width": 2560,
+      "height": 1600
+    },
+    {
+      "file": "updates.logical.png",
+      "bytes": 89977,
+      "sha256": "23a59fcffdd584873f50fef1b103941c62b762f37f31781772f4098af2aa9d54",
+      "sha1": "feeb19dbd3d1bfe548c9f7fba19992cfbdc1484f",
+      "width": 1280,
+      "height": 800
+    },
+    {
+      "file": "updates.png",
+      "bytes": 117925,
+      "sha256": "2cadedf2031848ebb063de9f8cddd47ba064ba91b33210788fee0f7a52d6f52b",
+      "sha1": "671b3090397bd72294c38f4e67a97f0fef2bb3ed",
+      "width": 2560,
+      "height": 1600
+    }
+  ]
+}

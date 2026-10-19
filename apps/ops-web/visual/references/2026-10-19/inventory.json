@@ -1,0 +1,1215 @@
+{
+  "capturedOn": "2026-10-19",
+  "fileKey": "38B21GKxgb3wxRar06gHXP",
+  "status": "discovery, not approved baseline",
+  "page": "HiFi · Operations web",
+  "frames": [
+    {
+      "id": "202:36",
+      "name": "O01 · Staff sign-in",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 01 · Access & corridor"
+    },
+    {
+      "id": "202:66",
+      "name": "O02 · Pilot corridor",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 01 · Access & corridor"
+    },
+    {
+      "id": "202:240",
+      "name": "O03 · Journey workspace",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 01 · Access & corridor"
+    },
+    {
+      "id": "204:6178",
+      "name": "O02 · Loading corridor",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 01 · Access & corridor"
+    },
+    {
+      "id": "204:6230",
+      "name": "O02 · No matching services",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 01 · Access & corridor"
+    },
+    {
+      "id": "204:6281",
+      "name": "O02 · Partial observation failure",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 01 · Access & corridor"
+    },
+    {
+      "id": "204:6394",
+      "name": "O02 · Connection lost",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 01 · Access & corridor"
+    },
+    {
+      "id": "211:7595",
+      "name": "O01 · Staff sign-in · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 01 · Access & corridor"
+    },
+    {
+      "id": "211:7625",
+      "name": "O02 · Pilot corridor · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 01 · Access & corridor"
+    },
+    {
+      "id": "211:7793",
+      "name": "O03 · Journey workspace · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 01 · Access & corridor"
+    },
+    {
+      "id": "211:8803",
+      "name": "O02 · Loading corridor · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 01 · Access & corridor"
+    },
+    {
+      "id": "211:8852",
+      "name": "O02 · No matching services · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 01 · Access & corridor"
+    },
+    {
+      "id": "211:8900",
+      "name": "O02 · Partial observation failure · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 01 · Access & corridor"
+    },
+    {
+      "id": "211:9010",
+      "name": "O02 · Connection lost · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 01 · Access & corridor"
+    },
+    {
+      "id": "203:168",
+      "name": "O04 · Compose · Delay",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 02 · Compose & review"
+    },
+    {
+      "id": "203:264",
+      "name": "O05 · Review · Delay",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 02 · Compose & review"
+    },
+    {
+      "id": "203:395",
+      "name": "O04 · Compose · Cancellation",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 02 · Compose & review"
+    },
+    {
+      "id": "203:486",
+      "name": "O05 · Review · Cancellation",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 02 · Compose & review"
+    },
+    {
+      "id": "203:618",
+      "name": "O04 · Compose · Platform",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 02 · Compose & review"
+    },
+    {
+      "id": "203:719",
+      "name": "O05 · Review · Platform",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 02 · Compose & review"
+    },
+    {
+      "id": "203:850",
+      "name": "O04 · Compose · Ends early",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 02 · Compose & review"
+    },
+    {
+      "id": "203:945",
+      "name": "O05 · Review · Ends early",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 02 · Compose & review"
+    },
+    {
+      "id": "211:7927",
+      "name": "O04 · Compose · Delay · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 02 · Compose & review"
+    },
+    {
+      "id": "211:8017",
+      "name": "O05 · Review · Delay · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 02 · Compose & review"
+    },
+    {
+      "id": "211:8145",
+      "name": "O04 · Compose · Cancellation · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 02 · Compose & review"
+    },
+    {
+      "id": "211:8232",
+      "name": "O05 · Review · Cancellation · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 02 · Compose & review"
+    },
+    {
+      "id": "211:8360",
+      "name": "O04 · Compose · Platform · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 02 · Compose & review"
+    },
+    {
+      "id": "211:8456",
+      "name": "O05 · Review · Platform · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 02 · Compose & review"
+    },
+    {
+      "id": "211:8584",
+      "name": "O04 · Compose · Ends early · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 02 · Compose & review"
+    },
+    {
+      "id": "211:8675",
+      "name": "O05 · Review · Ends early · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 02 · Compose & review"
+    },
+    {
+      "id": "205:563",
+      "name": "O06 · Delay confirmed",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 03 · Publish, withdraw & recover"
+    },
+    {
+      "id": "205:641",
+      "name": "O06 · Cancellation confirmed",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 03 · Publish, withdraw & recover"
+    },
+    {
+      "id": "205:722",
+      "name": "O06 · Platform change confirmed",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 03 · Publish, withdraw & recover"
+    },
+    {
+      "id": "205:797",
+      "name": "O06 · Early ending confirmed",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 03 · Publish, withdraw & recover"
+    },
+    {
+      "id": "205:878",
+      "name": "O06 · Provider delivery confirmed",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 03 · Publish, withdraw & recover"
+    },
+    {
+      "id": "205:967",
+      "name": "O07 · Stale review",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 03 · Publish, withdraw & recover"
+    },
+    {
+      "id": "205:1051",
+      "name": "O07 · Publication outcome uncertain",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 03 · Publish, withdraw & recover"
+    },
+    {
+      "id": "205:1110",
+      "name": "O05 · Review withdrawal",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 03 · Publish, withdraw & recover"
+    },
+    {
+      "id": "205:1220",
+      "name": "O06 · Withdrawal confirmed",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 03 · Publish, withdraw & recover"
+    },
+    {
+      "id": "205:1289",
+      "name": "O07 · Incident link invalid",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 03 · Publish, withdraw & recover"
+    },
+    {
+      "id": "211:9105",
+      "name": "O06 · Delay confirmed · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 03 · Publish, withdraw & recover"
+    },
+    {
+      "id": "211:9179",
+      "name": "O06 · Cancellation confirmed · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 03 · Publish, withdraw & recover"
+    },
+    {
+      "id": "211:9257",
+      "name": "O06 · Platform change confirmed · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 03 · Publish, withdraw & recover"
+    },
+    {
+      "id": "211:9329",
+      "name": "O06 · Early ending confirmed · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 03 · Publish, withdraw & recover"
+    },
+    {
+      "id": "211:9407",
+      "name": "O06 · Provider delivery confirmed · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 03 · Publish, withdraw & recover"
+    },
+    {
+      "id": "211:9493",
+      "name": "O07 · Stale review · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 03 · Publish, withdraw & recover"
+    },
+    {
+      "id": "211:9574",
+      "name": "O07 · Publication outcome uncertain · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 03 · Publish, withdraw & recover"
+    },
+    {
+      "id": "211:9630",
+      "name": "O05 · Review withdrawal · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 03 · Publish, withdraw & recover"
+    },
+    {
+      "id": "211:9737",
+      "name": "O06 · Withdrawal confirmed · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 03 · Publish, withdraw & recover"
+    },
+    {
+      "id": "211:9803",
+      "name": "O07 · Incident link invalid · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 03 · Publish, withdraw & recover"
+    },
+    {
+      "id": "206:811",
+      "name": "O08 · Driver report inbox",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 04 · Reports & incidents"
+    },
+    {
+      "id": "206:926",
+      "name": "O09 · Report awaiting acknowledgement",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 04 · Reports & incidents"
+    },
+    {
+      "id": "206:1004",
+      "name": "O09 · Report acknowledged",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 04 · Reports & incidents"
+    },
+    {
+      "id": "206:1090",
+      "name": "O09 · Acknowledgement uncertain",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 04 · Reports & incidents"
+    },
+    {
+      "id": "206:1149",
+      "name": "O08 · Empty report inbox",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 04 · Reports & incidents"
+    },
+    {
+      "id": "206:1200",
+      "name": "O08 · Report read failure",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 04 · Reports & incidents"
+    },
+    {
+      "id": "206:1267",
+      "name": "O10 · Incident workspace",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 04 · Reports & incidents"
+    },
+    {
+      "id": "206:1371",
+      "name": "O10 · Create incident",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 04 · Reports & incidents"
+    },
+    {
+      "id": "206:1442",
+      "name": "O10 · Open incident",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 04 · Reports & incidents"
+    },
+    {
+      "id": "206:1519",
+      "name": "O10 · Confirm incident resolution",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 04 · Reports & incidents"
+    },
+    {
+      "id": "206:1589",
+      "name": "O10 · Incident resolved",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 04 · Reports & incidents"
+    },
+    {
+      "id": "211:9867",
+      "name": "O08 · Driver report inbox · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 04 · Reports & incidents"
+    },
+    {
+      "id": "211:9979",
+      "name": "O09 · Report awaiting acknowledgement · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 04 · Reports & incidents"
+    },
+    {
+      "id": "211:10054",
+      "name": "O09 · Report acknowledged · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 04 · Reports & incidents"
+    },
+    {
+      "id": "211:10137",
+      "name": "O09 · Acknowledgement uncertain · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 04 · Reports & incidents"
+    },
+    {
+      "id": "211:10193",
+      "name": "O08 · Empty report inbox · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 04 · Reports & incidents"
+    },
+    {
+      "id": "211:10241",
+      "name": "O08 · Report read failure · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 04 · Reports & incidents"
+    },
+    {
+      "id": "211:10305",
+      "name": "O10 · Incident workspace · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 04 · Reports & incidents"
+    },
+    {
+      "id": "211:10406",
+      "name": "O10 · Create incident · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 04 · Reports & incidents"
+    },
+    {
+      "id": "211:10473",
+      "name": "O10 · Open incident · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 04 · Reports & incidents"
+    },
+    {
+      "id": "211:10547",
+      "name": "O10 · Confirm incident resolution · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 04 · Reports & incidents"
+    },
+    {
+      "id": "211:10614",
+      "name": "O10 · Incident resolved · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 04 · Reports & incidents"
+    },
+    {
+      "id": "207:1060",
+      "name": "O11 · Journey history",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 05 · Roles, audit & account"
+    },
+    {
+      "id": "207:1198",
+      "name": "O11 · Incident history",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 05 · Roles, audit & account"
+    },
+    {
+      "id": "207:1320",
+      "name": "O14 · Auditor incident view",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 05 · Roles, audit & account"
+    },
+    {
+      "id": "207:1398",
+      "name": "O14 · Gampaha staff workspace",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 05 · Roles, audit & account"
+    },
+    {
+      "id": "207:1529",
+      "name": "O14 · Scoped platform draft",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 05 · Roles, audit & account"
+    },
+    {
+      "id": "207:1610",
+      "name": "O14 · Scoped platform review",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 05 · Roles, audit & account"
+    },
+    {
+      "id": "207:1711",
+      "name": "O14 · Scoped platform confirmed",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 05 · Roles, audit & account"
+    },
+    {
+      "id": "207:1769",
+      "name": "O14 · Access denied",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 05 · Roles, audit & account"
+    },
+    {
+      "id": "207:1813",
+      "name": "O15 · Session expired",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 05 · Roles, audit & account"
+    },
+    {
+      "id": "207:1835",
+      "name": "O16 · Staff account",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 05 · Roles, audit & account"
+    },
+    {
+      "id": "210:1558",
+      "name": "O11 · Journey history · final page",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 05 · Roles, audit & account"
+    },
+    {
+      "id": "211:10680",
+      "name": "O11 · Journey history · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 05 · Roles, audit & account"
+    },
+    {
+      "id": "211:10815",
+      "name": "O11 · Incident history · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 05 · Roles, audit & account"
+    },
+    {
+      "id": "211:10934",
+      "name": "O14 · Auditor incident view · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 05 · Roles, audit & account"
+    },
+    {
+      "id": "211:11009",
+      "name": "O14 · Gampaha staff workspace · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 05 · Roles, audit & account"
+    },
+    {
+      "id": "211:11139",
+      "name": "O14 · Scoped platform draft · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 05 · Roles, audit & account"
+    },
+    {
+      "id": "211:11216",
+      "name": "O14 · Scoped platform review · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 05 · Roles, audit & account"
+    },
+    {
+      "id": "211:11316",
+      "name": "O14 · Scoped platform confirmed · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 05 · Roles, audit & account"
+    },
+    {
+      "id": "211:11373",
+      "name": "O14 · Access denied · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 05 · Roles, audit & account"
+    },
+    {
+      "id": "211:11416",
+      "name": "O15 · Session expired · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 05 · Roles, audit & account"
+    },
+    {
+      "id": "211:11438",
+      "name": "O16 · Staff account · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 05 · Roles, audit & account"
+    },
+    {
+      "id": "211:12079",
+      "name": "O11 · Journey history · final page · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 05 · Roles, audit & account"
+    },
+    {
+      "id": "208:1360",
+      "name": "O12 · Healthy diagnostics",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 06 · Demo controls & diagnostics"
+    },
+    {
+      "id": "208:1483",
+      "name": "O12 · Degraded provider diagnostics",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 06 · Demo controls & diagnostics"
+    },
+    {
+      "id": "208:1608",
+      "name": "O13 · Simulation running",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 06 · Demo controls & diagnostics"
+    },
+    {
+      "id": "208:1684",
+      "name": "O13 · Simulation paused and old",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 06 · Demo controls & diagnostics"
+    },
+    {
+      "id": "208:1762",
+      "name": "O13 · Control outcome uncertain",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 06 · Demo controls & diagnostics"
+    },
+    {
+      "id": "209:1511",
+      "name": "O12 · Provider recovery",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Ops web · 06 · Demo controls & diagnostics"
+    },
+    {
+      "id": "211:11500",
+      "name": "O12 · Healthy diagnostics · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 06 · Demo controls & diagnostics"
+    },
+    {
+      "id": "211:11621",
+      "name": "O12 · Degraded provider diagnostics · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 06 · Demo controls & diagnostics"
+    },
+    {
+      "id": "211:11744",
+      "name": "O13 · Simulation running · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 06 · Demo controls & diagnostics"
+    },
+    {
+      "id": "211:11818",
+      "name": "O13 · Simulation paused and old · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 06 · Demo controls & diagnostics"
+    },
+    {
+      "id": "211:11894",
+      "name": "O13 · Control outcome uncertain · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 06 · Demo controls & diagnostics"
+    },
+    {
+      "id": "211:11958",
+      "name": "O12 · Provider recovery · Dark",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Ops web · 06 · Demo controls & diagnostics"
+    }
+  ],
+  "initialAudit": {
+    "page": "199:36",
+    "counts": {
+      "light": 53,
+      "dark": 53
+    },
+    "texts": 3572,
+    "fonts": {
+      "Noto Sans/SemiBold": 950,
+      "Noto Sans/Display SemiBold": 108,
+      "Noto Sans/Regular": 1068,
+      "Noto Sans/Medium": 1414,
+      "Noto Sans/Display Light": 32
+    },
+    "colors": {
+      "light:VariableID:120:42": 845,
+      "light:VariableID:120:43": 760,
+      "light:VariableID:120:45": 39,
+      "light:VariableID:120:58": 50,
+      "light:VariableID:120:53": 34,
+      "light:VariableID:192:596": 8,
+      "light:VariableID:120:48": 31,
+      "dark:VariableID:120:42": 845,
+      "dark:VariableID:120:43": 760,
+      "dark:VariableID:120:45": 39,
+      "dark:VariableID:120:58": 50,
+      "dark:VariableID:120:53": 34,
+      "dark:VariableID:192:596": 8,
+      "dark:VariableID:120:48": 31,
+      "light:VariableID:192:595": 19,
+      "dark:VariableID:192:595": 19
+    },
+    "images": {
+      "f0aa009421cc2ab01251124d3af2bab0a11aee8e": {
+        "sample": "I289:3150;288:643",
+        "name": "Supplied operations-icon PNG",
+        "count": 106
+      }
+    },
+    "missing": []
+  }
+}

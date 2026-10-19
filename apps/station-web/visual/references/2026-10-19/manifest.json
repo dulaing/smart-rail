@@ -1,0 +1,38 @@
+{
+  "capturedOn": "2026-10-19",
+  "status": "Selected-reference approvals and frozen hashes are in references.json; before images and assets are supporting evidence.",
+  "files": [
+    {
+      "file": "before.png",
+      "bytes": 192354,
+      "sha256": "b806cd29203087c76ce3d8c3938de8bfc31411909cb69a19978d60525cdc9cab",
+      "sha1": "fc198b81b8befd6c1c236564a02cf5c5937b97ec",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "entrance.png",
+      "bytes": 192446,
+      "sha256": "73ec2a71a702966c949fbb53f8c64a20c0a8843f98be54bf513ab5a82052d640",
+      "sha1": "797125d99c0722ced7580ca83406996aa1586854",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "offline-timetable.png",
+      "bytes": 184377,
+      "sha256": "5f86c5e31c3de8ddb74e8eda98a8fc0c46625b3ad9372680bfc23a08100bfada",
+      "sha1": "dbe915abb77f2319ae4e94340ae82c9233e74188",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "platform.png",
+      "bytes": 134091,
+      "sha256": "ffd249a107e8c307f51147efba52dfee79be849bafb1dc89de508e1c12dd6149",
+      "sha1": "34c4f33246c011e499e55bdf536fcf2aad446807",
+      "width": 1920,
+      "height": 1080
+    }
+  ]
+}

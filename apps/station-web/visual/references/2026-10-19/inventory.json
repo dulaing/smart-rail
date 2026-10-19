@@ -1,0 +1,402 @@
+{
+  "capturedOn": "2026-10-19",
+  "fileKey": "38B21GKxgb3wxRar06gHXP",
+  "status": "discovery, not approved baseline",
+  "page": "HiFi · Station displays",
+  "frames": [
+    {
+      "id": "231:36",
+      "name": "S01 · Entrance · normal services",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 01 · Entrance & waiting area"
+    },
+    {
+      "id": "231:178",
+      "name": "S01 · Entrance · terminating arrivals",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 01 · Entrance & waiting area"
+    },
+    {
+      "id": "231:305",
+      "name": "S01 · Entrance · originating departures",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 01 · Entrance & waiting area"
+    },
+    {
+      "id": "234:250",
+      "name": "S03 · Entrance · cancellation and delay",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 01 · Entrance & waiting area"
+    },
+    {
+      "id": "234:357",
+      "name": "S03 · Entrance · before the new final stop",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 01 · Entrance & waiting area"
+    },
+    {
+      "id": "234:465",
+      "name": "S03 · Entrance · final arrival only",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 01 · Entrance & waiting area"
+    },
+    {
+      "id": "234:544",
+      "name": "S03 · Entrance · stop no longer served",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 01 · Entrance & waiting area"
+    },
+    {
+      "id": "234:623",
+      "name": "S01 · Waiting area · confirmed-delay explanation",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 01 · Entrance & waiting area"
+    },
+    {
+      "id": "236:533",
+      "name": "S02 · Platform · next train",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 02 · Platform boards"
+    },
+    {
+      "id": "236:596",
+      "name": "S02 · Platform · moved from Platform 2",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 02 · Platform boards"
+    },
+    {
+      "id": "236:659",
+      "name": "S02 · Platform · moved to Platform 3",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 02 · Platform boards"
+    },
+    {
+      "id": "236:721",
+      "name": "S02 · Platform · move withdrawn",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 02 · Platform boards"
+    },
+    {
+      "id": "236:783",
+      "name": "S03 · Platform · cancelled service",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 02 · Platform boards"
+    },
+    {
+      "id": "236:845",
+      "name": "S03 · Platform · before new final stop",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 02 · Platform boards"
+    },
+    {
+      "id": "236:907",
+      "name": "S03 · Platform · final arrival only",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 02 · Platform boards"
+    },
+    {
+      "id": "236:969",
+      "name": "S03 · Platform · train not stopping here",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 02 · Platform boards"
+    },
+    {
+      "id": "236:1031",
+      "name": "S02 · Platform · departed move cleared",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 02 · Platform boards"
+    },
+    {
+      "id": "236:1093",
+      "name": "S02 · Platform · no next train",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 02 · Platform boards"
+    },
+    {
+      "id": "238:1042",
+      "name": "S01 · Entrance · one ageing observation",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 03 · Observation evidence"
+    },
+    {
+      "id": "238:1169",
+      "name": "S01 · Entrance · one unknown ETA",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 03 · Observation evidence"
+    },
+    {
+      "id": "238:1297",
+      "name": "S01 · Entrance · one failed running read",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 03 · Observation evidence"
+    },
+    {
+      "id": "238:1424",
+      "name": "S02 · Platform · ETA unknown, platform confirmed",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 03 · Observation evidence"
+    },
+    {
+      "id": "239:1315",
+      "name": "S04 · Entrance · saved timetable only",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 04 · Offline & recovery"
+    },
+    {
+      "id": "239:1427",
+      "name": "S05 · Platform · saved scheduled service",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 04 · Offline & recovery"
+    },
+    {
+      "id": "239:1489",
+      "name": "S05 · Platform · no matching saved service",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 04 · Offline & recovery"
+    },
+    {
+      "id": "239:1533",
+      "name": "S04 · Entrance · offline without saved timetable",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 04 · Offline & recovery"
+    },
+    {
+      "id": "239:1574",
+      "name": "S05 · Platform · offline without saved timetable",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 04 · Offline & recovery"
+    },
+    {
+      "id": "239:1618",
+      "name": "S04 · Entrance · refreshing after reconnect",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 04 · Offline & recovery"
+    },
+    {
+      "id": "239:1724",
+      "name": "S01 · Entrance · reconnected, old evidence still unknown",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 04 · Offline & recovery"
+    },
+    {
+      "id": "239:1851",
+      "name": "S04 · Entrance · midnight and an expired service date",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 04 · Offline & recovery"
+    },
+    {
+      "id": "240:1704",
+      "name": "S06 · Display · initial loading",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 05 · Loading, empty & configuration"
+    },
+    {
+      "id": "240:1733",
+      "name": "S06 · Entrance · no upcoming services",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 05 · Loading, empty & configuration"
+    },
+    {
+      "id": "240:1762",
+      "name": "S06 · Display · configuration error",
+      "type": "FRAME",
+      "width": 1920,
+      "height": 1080,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Station displays · 05 · Loading, empty & configuration"
+    }
+  ],
+  "initialAudit": {
+    "page": "229:36",
+    "counts": {
+      "light": 33
+    },
+    "texts": 1319,
+    "fonts": {
+      "Noto Sans/Display SemiBold": 51,
+      "Abhaya Libre/Regular": 328,
+      "Noto Sans Tamil/Regular": 328,
+      "Noto Sans/Display Regular": 160,
+      "Noto Sans/Regular": 264,
+      "Noto Sans/Medium": 81,
+      "Noto Sans/SemiBold": 99
+    },
+    "colors": {
+      "light:VariableID:120:42": 551,
+      "light:VariableID:120:43": 633,
+      "light:VariableID:192:595": 42,
+      "light:VariableID:120:53": 57,
+      "light:VariableID:120:48": 9
+    },
+    "images": {
+      "97c2f48c0c11324cbd5aa2f70df4dd9599ebf215": {
+        "sample": "I231:38;292:2327;292:2326",
+        "name": "Supplied passenger-icon-square PNG",
+        "count": 33
+      }
+    },
+    "missing": []
+  }
+}

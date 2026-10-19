@@ -1,0 +1,644 @@
+{
+  "capturedOn": "2026-10-19",
+  "fileKey": "38B21GKxgb3wxRar06gHXP",
+  "status": "discovery, not approved baseline",
+  "page": "HiFi · Driver screens",
+  "frames": [
+    {
+      "id": "178:36",
+      "name": "DT0 · Staff sign-in",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Tablet · 01 Start duty"
+    },
+    {
+      "id": "178:73",
+      "name": "DT1 · Today’s duty",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Tablet · 01 Start duty"
+    },
+    {
+      "id": "178:178",
+      "name": "DT6 · No duty assignment",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Tablet · 01 Start duty"
+    },
+    {
+      "id": "190:5503",
+      "name": "DT0 · Staff sign-in · Dark",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Tablet · 01 Start duty"
+    },
+    {
+      "id": "190:5540",
+      "name": "DT1 · Today’s duty · Dark",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Tablet · 01 Start duty"
+    },
+    {
+      "id": "190:5638",
+      "name": "DT6 · No duty assignment · Dark",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Tablet · 01 Start duty"
+    },
+    {
+      "id": "182:5068",
+      "name": "DT7 · Confirmed updates list",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Tablet · 02 Confirmed updates"
+    },
+    {
+      "id": "182:5126",
+      "name": "DT2 · Platform change detail",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Tablet · 02 Confirmed updates"
+    },
+    {
+      "id": "182:5180",
+      "name": "DT2 · Delay update detail",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Tablet · 02 Confirmed updates"
+    },
+    {
+      "id": "182:5240",
+      "name": "DT7 · No confirmed changes",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Tablet · 02 Confirmed updates"
+    },
+    {
+      "id": "190:5683",
+      "name": "DT7 · Confirmed updates list · Dark",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Tablet · 02 Confirmed updates"
+    },
+    {
+      "id": "190:5738",
+      "name": "DT2 · Platform change detail · Dark",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Tablet · 02 Confirmed updates"
+    },
+    {
+      "id": "190:5789",
+      "name": "DT2 · Delay update detail · Dark",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Tablet · 02 Confirmed updates"
+    },
+    {
+      "id": "190:5846",
+      "name": "DT7 · No confirmed changes · Dark",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Tablet · 02 Confirmed updates"
+    },
+    {
+      "id": "183:165",
+      "name": "DT3 · Report a problem",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Tablet · 03 Report to Control"
+    },
+    {
+      "id": "183:256",
+      "name": "DT4 · Report — Not sent",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Tablet · 03 Report to Control"
+    },
+    {
+      "id": "183:327",
+      "name": "DT4 · Report — Awaiting Control",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Tablet · 03 Report to Control"
+    },
+    {
+      "id": "183:394",
+      "name": "DT4 · Report — Acknowledged",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Tablet · 03 Report to Control"
+    },
+    {
+      "id": "183:459",
+      "name": "DT8 · Reports list",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Tablet · 03 Report to Control"
+    },
+    {
+      "id": "183:527",
+      "name": "DT8 · No reports yet",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Tablet · 03 Report to Control"
+    },
+    {
+      "id": "190:5888",
+      "name": "DT3 · Report a problem · Dark",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Tablet · 03 Report to Control"
+    },
+    {
+      "id": "190:5965",
+      "name": "DT4 · Report — Not sent · Dark",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Tablet · 03 Report to Control"
+    },
+    {
+      "id": "190:6033",
+      "name": "DT4 · Report — Awaiting Control · Dark",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Tablet · 03 Report to Control"
+    },
+    {
+      "id": "190:6097",
+      "name": "DT4 · Report — Acknowledged · Dark",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Tablet · 03 Report to Control"
+    },
+    {
+      "id": "190:6159",
+      "name": "DT8 · Reports list · Dark",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Tablet · 03 Report to Control"
+    },
+    {
+      "id": "190:6222",
+      "name": "DT8 · No reports yet · Dark",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Tablet · 03 Report to Control"
+    },
+    {
+      "id": "184:294",
+      "name": "DT5 · Offline saved briefing",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Tablet · 04 Offline & account"
+    },
+    {
+      "id": "184:384",
+      "name": "DT9 · Offline — no saved briefing",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Tablet · 04 Offline & account"
+    },
+    {
+      "id": "184:434",
+      "name": "DT10 · Session expired",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Tablet · 04 Offline & account"
+    },
+    {
+      "id": "184:453",
+      "name": "DT11 · Staff account",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Tablet · 04 Offline & account"
+    },
+    {
+      "id": "190:6268",
+      "name": "DT5 · Offline saved briefing · Dark",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Tablet · 04 Offline & account"
+    },
+    {
+      "id": "190:6355",
+      "name": "DT9 · Offline — no saved briefing · Dark",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Tablet · 04 Offline & account"
+    },
+    {
+      "id": "190:6401",
+      "name": "DT10 · Session expired · Dark",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Tablet · 04 Offline & account"
+    },
+    {
+      "id": "190:6419",
+      "name": "DT11 · Staff account · Dark",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Tablet · 04 Offline & account"
+    },
+    {
+      "id": "188:391",
+      "name": "D01 · Staff sign-in",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Phone · Pre-duty companions"
+    },
+    {
+      "id": "188:417",
+      "name": "D02 · Assigned briefing",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Phone · Pre-duty companions"
+    },
+    {
+      "id": "188:470",
+      "name": "D03 · Confirmed update",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Phone · Pre-duty companions"
+    },
+    {
+      "id": "188:507",
+      "name": "D04 · Report a problem",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Phone · Pre-duty companions"
+    },
+    {
+      "id": "188:556",
+      "name": "D05 · Not sent",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Phone · Pre-duty companions"
+    },
+    {
+      "id": "188:603",
+      "name": "D05 · Awaiting Control",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Phone · Pre-duty companions"
+    },
+    {
+      "id": "188:647",
+      "name": "D05 · Control acknowledged",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Phone · Pre-duty companions"
+    },
+    {
+      "id": "189:409",
+      "name": "D06 · Saved offline briefing",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Phone · Pre-duty companions"
+    },
+    {
+      "id": "189:454",
+      "name": "D07 · No duty assignment",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Phone · Pre-duty companions"
+    },
+    {
+      "id": "189:483",
+      "name": "D09 · Staff account",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Light · Phone · Pre-duty companions"
+    },
+    {
+      "id": "190:6471",
+      "name": "D01 · Staff sign-in · Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Phone · Pre-duty companions"
+    },
+    {
+      "id": "190:6497",
+      "name": "D02 · Assigned briefing · Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Phone · Pre-duty companions"
+    },
+    {
+      "id": "190:6551",
+      "name": "D03 · Confirmed update · Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Phone · Pre-duty companions"
+    },
+    {
+      "id": "190:6588",
+      "name": "D04 · Report a problem · Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Phone · Pre-duty companions"
+    },
+    {
+      "id": "190:6633",
+      "name": "D05 · Not sent · Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Phone · Pre-duty companions"
+    },
+    {
+      "id": "190:6680",
+      "name": "D05 · Awaiting Control · Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Phone · Pre-duty companions"
+    },
+    {
+      "id": "190:6724",
+      "name": "D05 · Control acknowledged · Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Phone · Pre-duty companions"
+    },
+    {
+      "id": "190:6768",
+      "name": "D06 · Saved offline briefing · Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Phone · Pre-duty companions"
+    },
+    {
+      "id": "190:6813",
+      "name": "D07 · No duty assignment · Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Phone · Pre-duty companions"
+    },
+    {
+      "id": "190:6842",
+      "name": "D09 · Staff account · Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Phone · Pre-duty companions"
+    }
+  ],
+  "initialAudit": {
+    "page": "174:36",
+    "counts": {
+      "light": 27,
+      "dark": 27
+    },
+    "texts": 1056,
+    "fonts": {
+      "Noto Sans/SemiBold": 360,
+      "Noto Sans/Display SemiBold": 34,
+      "Noto Sans/Regular": 326,
+      "Noto Sans/Medium": 274,
+      "Noto Sans/Display Regular": 50,
+      "Noto Sans/Display Light": 12
+    },
+    "colors": {
+      "light:VariableID:120:42": 194,
+      "light:VariableID:120:43": 250,
+      "light:VariableID:120:48": 17,
+      "light:VariableID:120:45": 23,
+      "light:VariableID:120:58": 14,
+      "light:VariableID:120:53": 23,
+      "dark:VariableID:120:42": 194,
+      "dark:VariableID:120:43": 250,
+      "dark:VariableID:120:48": 17,
+      "dark:VariableID:120:45": 23,
+      "dark:VariableID:120:58": 14,
+      "dark:VariableID:120:53": 23,
+      "light:VariableID:192:596": 2,
+      "light:VariableID:192:595": 5,
+      "dark:VariableID:192:596": 2,
+      "dark:VariableID:192:595": 5
+    },
+    "images": {
+      "a14e09f4c5822813698399bfd5b2586749efe846": {
+        "sample": "I282:10380;281:644",
+        "name": "Transparent logo PNG",
+        "count": 42
+      }
+    },
+    "missing": []
+  }
+}

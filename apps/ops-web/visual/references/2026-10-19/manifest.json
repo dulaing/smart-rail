@@ -1,0 +1,78 @@
+{
+  "capturedOn": "2026-10-19",
+  "status": "Selected-reference approvals and frozen hashes are in references.json; before images and assets are supporting evidence.",
+  "files": [
+    {
+      "file": "account.png",
+      "bytes": 71501,
+      "sha256": "47f06413854526e4a91954b93700483da883fc3190fb1ecb3524679919391689",
+      "sha1": "ad3789cb8c4cb7511f7cd032253c2ebe1cf44688",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "before.png",
+      "bytes": 89936,
+      "sha256": "03b28b8199704b03081eebe5aed28e45d21cca3add8cf24f89841c5080487ad0",
+      "sha1": "a3d830b2406d8949e21c0613f52f3602a12e43d7",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "compose.png",
+      "bytes": 85926,
+      "sha256": "ffc08d438848f7ea070aae445b856adf82fb6940853132f82d7618bead728667",
+      "sha1": "66e0bdd5eb461606a16e1348c8ecfaa1769e9d2f",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "corridor.png",
+      "bytes": 89390,
+      "sha256": "9d92104ce8dc779c16af24e90cde2720fbb927ef0fcb4957650cfb7ca3dbcb33",
+      "sha1": "fb8e71f9c23e30c83f22149fbcedb741257c895b",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "history.png",
+      "bytes": 75745,
+      "sha256": "7e3846e9e1ab7a3743db96cc0946f1d95791dab7ff09ca61dbb35d3094d5ec97",
+      "sha1": "1a25d3a84d2413ca772f45bf7f2257d6270021c8",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "incidents.png",
+      "bytes": 59912,
+      "sha256": "a02db6aeccb0148283372cf8a6a1adc48694dd98484af32f5a5cd4610c4e02d0",
+      "sha1": "a4ceaed32d1e1e505eb2623f08877412eca28571",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "journey.png",
+      "bytes": 88922,
+      "sha256": "c8a2f16223289a8dac52102ff4e32a523bdfc2b66dbc1ed4d16215e40fd6fce3",
+      "sha1": "bfd25ae71b3d91b82e9c74047cdbf8c28e67d2a5",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "report-detail.png",
+      "bytes": 77638,
+      "sha256": "e6348c331a620cab61951313201a5ba5f67c6e7717bc730fd481764b2a0f40b2",
+      "sha1": "ee8cc59ade873aab2ae0a6eb651f8ad58f4229de",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "review.png",
+      "bytes": 96788,
+      "sha256": "99a0d2d757a19fc88be960c16ce1336467f4c283f5b9e65497808a323fb4e6b8",
+      "sha1": "a2653b8442d88fa160f00a34fb73a15153314aa2",
+      "width": 1440,
+      "height": 900
+    }
+  ]
+}

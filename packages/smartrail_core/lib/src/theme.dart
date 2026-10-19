@@ -51,7 +51,8 @@ class SrTheme extends ThemeExtension<SrTheme> {
 }
 
 TextStyle _style(SrTextRole role, String languageCode, Color color) {
-  final lineScale = srLineScale[languageCode] ?? 1;
+  // Script-specific roles already carry their measured line box.
+  final lineScale = role.fontKey == 'latin' ? (srLineScale[languageCode] ?? 1) : 1.0;
   return TextStyle(
     fontFamily: srFontFamilies[role.fontKey],
     fontFamilyFallback: [
@@ -61,8 +62,10 @@ TextStyle _style(SrTextRole role, String languageCode, Color color) {
     package: _packageName,
     fontSize: role.size,
     fontWeight: FontWeight.values[(role.weight ~/ 100) - 1],
-    // The fonts are variable, so the weight axis is set as well as the nominal weight.
-    fontVariations: [FontVariation('wght', role.weight.toDouble())],
+    // Abhaya Libre is the static Regular face; Noto fonts use the weight axis.
+    fontVariations: role.fontKey == 'sinhala'
+        ? null
+        : [FontVariation('wght', role.weight.toDouble())],
     height: role.height * lineScale,
     letterSpacing: role.letterSpacing,
     color: color,

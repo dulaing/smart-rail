@@ -1,0 +1,31 @@
+{
+  "capturedOn": "2026-10-19",
+  "method": "Visible text segments against nearest opaque solid ancestor; resolved variable values. Text bounding boxes checked against screen bounds. Digital checks do not prove glyph clipping, runtime accessibility, physical readability or native-language correctness. Driver tablet clipping ancestors were additionally checked after 14sp label reflow.",
+  "page": "174:36",
+  "minimumRequired": 7,
+  "texts": 528,
+  "minRatio": 7.0118499786565485,
+  "fonts": {
+    "Noto Sans/SemiBold": 197,
+    "Noto Sans/Regular": 188,
+    "Noto Sans/Medium": 137,
+    "Noto Sans/Light": 6
+  },
+  "failures": [],
+  "untested": 0,
+  "overflow": [],
+  "images": {
+    "a14e09f4c5822813698399bfd5b2586749efe846": {
+      "sample": "I282:10380;281:644",
+      "name": "Transparent logo PNG",
+      "count": 21
+    }
+  },
+  "labelChange": {
+    "userConfirmed": true,
+    "minimumTabletArtworkSize": 28,
+    "logicalMinimum": 14,
+    "labelsRaised": 108,
+    "includesDarkCounterparts": true
+  }
+}

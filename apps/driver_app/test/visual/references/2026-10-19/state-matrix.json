@@ -1,0 +1,212 @@
+{
+  "date": "2026-10-19",
+  "status": "User-approved reference rules for existing features",
+  "scope": "Existing implemented feature families only. Future personal Updates/follow and Operations diagnostics/demo UI remain prerequisite exclusions.",
+  "families": [
+    {
+      "frames": "DT0, D01, DT10",
+      "route": "DriverGate sign-in/session states",
+      "code": [
+        "apps/driver_app/lib/gate.dart"
+      ],
+      "status": "existing external identity flow; no PIN or local credentials",
+      "referenceNodes": [
+        "178:36",
+        "188:391",
+        "184:434"
+      ]
+    },
+    {
+      "frames": "DT1, D02, DT6, D07, DT5, D06, DT9",
+      "route": "DriverTab.journeys -> DriverJourneysScreen -> DriverBriefingScreen",
+      "code": [
+        "apps/driver_app/lib/shell.dart",
+        "apps/driver_app/lib/journeys/journey_screens.dart"
+      ],
+      "status": "existing selection, briefing, no-assignment and saved/offline states; DT1 is selected-journey layout, not authority to remove journey selection",
+      "referenceNodes": [
+        "178:73",
+        "188:417",
+        "178:178",
+        "184:294"
+      ]
+    },
+    {
+      "frames": "DT7, DT2, D03",
+      "route": "DriverTab.updates currently shares DriverJourneysScreen; changes are inside selected briefing",
+      "code": [
+        "apps/driver_app/lib/shell.dart",
+        "apps/driver_app/lib/journeys/journey_screens.dart"
+      ],
+      "status": "Reference resolved by supplement 314:127: assigned dated journey -> current Updates list -> selected existing change -> return preserving journey/list/focus. Retain response changeId and targetStopId in T2 Flutter mapper; no backend or read/unread workflow.",
+      "referenceNodes": [
+        "182:5068",
+        "182:5126",
+        "188:470"
+      ]
+    },
+    {
+      "frames": "DT3, D04, DT4, D05, DT8",
+      "route": "DriverReportsScreen -> DriverReportJourneyScreen",
+      "code": [
+        "apps/driver_app/lib/journeys/report_screens.dart"
+      ],
+      "status": "existing list/composer/receipts; retain explicit reconciliation, owner/date boundaries and no automatic resend",
+      "referenceNodes": [
+        "183:165",
+        "183:327",
+        "183:459"
+      ]
+    },
+    {
+      "frames": "DT11, D09",
+      "route": "DriverTab.account",
+      "code": [
+        "apps/driver_app/lib/shell.dart"
+      ],
+      "status": "existing account and permission states",
+      "referenceNodes": [
+        "184:453",
+        "189:483"
+      ]
+    }
+  ],
+  "states": {
+    "normal": {
+      "referenceNodes": [
+        "178:36",
+        "178:73",
+        "182:5068",
+        "182:5126",
+        "183:165",
+        "183:327",
+        "184:453"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=178-36",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=178-73",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=182-5068",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=182-5126",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=183-165",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=183-327",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=184-453"
+      ]
+    },
+    "selected": {
+      "referenceNodes": [
+        "178:73",
+        "183:165"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=178-73",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=183-165"
+      ]
+    },
+    "disabled": {
+      "referenceNodes": [
+        "314:37"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-37"
+      ]
+    },
+    "focus": {
+      "referenceNodes": [
+        "314:37"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-37"
+      ]
+    },
+    "loading": {
+      "referenceNodes": [
+        "314:37"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-37"
+      ]
+    },
+    "empty": {
+      "referenceNodes": [
+        "178:178",
+        "182:5240",
+        "183:527"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=178-178",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=182-5240",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=183-527"
+      ]
+    },
+    "error": {
+      "referenceNodes": [
+        "183:256",
+        "184:384",
+        "314:90"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=183-256",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=184-384",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-90"
+      ]
+    },
+    "offline": {
+      "referenceNodes": [
+        "184:294",
+        "184:384",
+        "189:409"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=184-294",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=184-384",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=189-409"
+      ]
+    },
+    "access": {
+      "referenceNodes": [
+        "184:434",
+        "314:37",
+        "314:90"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=184-434",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-37",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-90"
+      ]
+    },
+    "compact": {
+      "referenceNodes": [
+        "188:417",
+        "188:470",
+        "188:507",
+        "188:556",
+        "189:409",
+        "314:90"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=188-417",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=188-470",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=188-507",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=188-556",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=189-409",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-90"
+      ]
+    },
+    "interaction": {
+      "referenceNodes": [
+        "314:127"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-127"
+      ]
+    }
+  },
+  "sharedRules": "Access/action sheet 314:37; content reflow/keyboard sheet 314:90. Specimens use logical content widths; scale target sizes to each profile. No automatic resend, optimistic confirmation, new cache or permission behavior.",
+  "nonApplicable": [],
+  "validationPending": [
+    "App-rendered overlay/diff and raster calibration",
+    "Actual 200% reflow/keyboard/native-reader checks",
+    "Physical device/display measurements"
+  ],
+  "approvedOn": "2026-10-19"
+}

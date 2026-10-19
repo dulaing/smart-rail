@@ -120,7 +120,7 @@ function validate() {
   for (const file of Object.values(tokens.fonts.files)) {
     if (!fs.existsSync(path.join(fontDir, file))) fail(`font file missing: packages/smartrail_core/fonts/${file}`)
   }
-  for (const licence of ['OFL-NotoSans.txt', 'OFL-NotoSansSinhala.txt', 'OFL-NotoSansTamil.txt']) {
+  for (const licence of ['OFL-NotoSans.txt', 'OFL-AbhayaLibre.txt', 'OFL-NotoSansTamil.txt']) {
     if (!fs.existsSync(path.join(fontDir, licence))) fail(`font licence missing: ${licence}`)
   }
 
@@ -232,7 +232,7 @@ function buildCss() {
       '@font-face {',
       `  font-family: '${family}';`,
       `  src: url('../../../packages/smartrail_core/fonts/${file}') format('truetype');`,
-      '  font-weight: 100 900;',
+      `  font-weight: ${tokens.fonts.fileWeights?.[family] ?? '100 900'};`,
       '  font-display: swap;',
       '}',
     )
@@ -381,7 +381,7 @@ function buildDartTokens() {
       .map(([locale, s]) => `'${locale}': ${s.lineHeightScale}`)
       .join(', ')}};`,
     '',
-    `const srFontFamilies = <String, String>{${Object.entries({ latin: 'NotoSans', sinhala: 'NotoSansSinhala', tamil: 'NotoSansTamil' })
+    `const srFontFamilies = <String, String>{${Object.entries({ latin: 'NotoSans', sinhala: 'AbhayaLibre', tamil: 'NotoSansTamil' })
       .map(([k, v]) => `'${k}': '${v}'`)
       .join(', ')}};`,
     '',

@@ -1,0 +1,52 @@
+{
+  "capturedOn": "2026-10-19",
+  "status": "User-approved dated Figma reference set for existing features; not app-rendered regression baselines",
+  "references": [
+    {
+      "file": "entrance.png",
+      "nodeId": "231:36",
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=231-36",
+      "logical": [
+        1920,
+        1080
+      ],
+      "artworkScale": 1,
+      "dpr": 1,
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "73ec2a71a702966c949fbb53f8c64a20c0a8843f98be54bf513ab5a82052d640"
+    },
+    {
+      "file": "platform.png",
+      "nodeId": "236:533",
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=236-533",
+      "logical": [
+        1920,
+        1080
+      ],
+      "artworkScale": 1,
+      "dpr": 1,
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "ffd249a107e8c307f51147efba52dfee79be849bafb1dc89de508e1c12dd6149"
+    },
+    {
+      "nodeId": "239:1315",
+      "file": "offline-timetable.png",
+      "width": 1920,
+      "height": 1080,
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=239-1315",
+      "logical": [
+        1920,
+        1080
+      ],
+      "artworkScale": 1,
+      "dpr": 1,
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "5f86c5e31c3de8ddb74e8eda98a8fc0c46625b3ad9372680bfc23a08100bfada"
+    }
+  ],
+  "approvedOn": "2026-10-19",
+  "approvalScope": "Representative dated references plus linked state-matrix and T1 supplements. Excludes unavailable feature UI, new themes and implementation/device acceptance."
+}

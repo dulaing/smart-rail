@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-19",
+  "files": [
+    {
+      "file": "access-actions.png",
+      "width": 1440,
+      "height": 1147,
+      "bytes": 146012,
+      "sha256": "a110cabe511c67b8edde8181aff1e86f02f5f1e5a88c8a1267688c26ea148ca8"
+    },
+    {
+      "file": "compact-recovery.png",
+      "width": 1440,
+      "height": 900,
+      "bytes": 142588,
+      "sha256": "82f29cb806bab381baa95a7e1441c76c0b63a1fd75e90be0d142e8cbfdd22284"
+    },
+    {
+      "file": "driver-updates.png",
+      "width": 1440,
+      "height": 700,
+      "bytes": 116786,
+      "sha256": "840f879466898d5e2cfebbc6f18a63562affb82302b1b077a2fed44f3d3d68cc"
+    },
+    {
+      "file": "station-contract.png",
+      "width": 1440,
+      "height": 1333,
+      "bytes": 139587,
+      "sha256": "8a003992190e116f6d79bb100fe22d6edc68ab8e43409be4ddbbaada10434111"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "date": "2026-10-19",
+  "scope": "Existing routes/states only; dark staff frames retained in inventory but excluded from implementation",
+  "families": [
+    {
+      "frames": "O01, O15, O16",
+      "route": "App auth /account",
+      "code": [
+        "apps/ops-web/src/App.tsx",
+        "apps/ops-web/src/Shell.tsx"
+      ],
+      "status": "existing identity, expired and account states"
+    },
+    {
+      "frames": "O02, O03",
+      "route": "/corridor, /corridor/journeys/{journeyId}, /changes",
+      "code": [
+        "apps/ops-web/src/workspace/OperationsWorkspace.tsx"
+      ],
+      "status": "existing corridor/journey families; retain effective permissions and failed-read meanings"
+    },
+    {
+      "frames": "O04-O07",
+      "route": "JourneyWorkspace ChangePanel / ChangeReview",
+      "code": [
+        "apps/ops-web/src/workspace/ChangePanel.tsx",
+        "apps/ops-web/src/workspace/ChangeReview.tsx"
+      ],
+      "status": "existing compose/review/result/conflict/uncertain/withdrawal states"
+    },
+    {
+      "frames": "O08, O09",
+      "route": "/reports, /reports/{reportId}",
+      "code": [
+        "apps/ops-web/src/reports/ReportsWorkspace.tsx"
+      ],
+      "status": "existing report list/detail/acknowledgement"
+    },
+    {
+      "frames": "O10, O11, O14",
+      "route": "/incidents, /incidents/{id}, /audit/...; scoped corridor/access",
+      "code": [
+        "apps/ops-web/src/Shell.tsx",
+        "apps/ops-web/src/access.ts"
+      ],
+      "status": "existing incident/audit/access/scoped-platform families"
+    },
+    {
+      "frames": "O12, O13",
+      "route": "/demo-controls placeholder only",
+      "code": [
+        "apps/ops-web/src/Shell.tsx",
+        "apps/ops-web/src/access.ts"
+      ],
+      "status": "defer functional diagnostics/demo UI to operations-demo-controls T2/T3; do not build under visual work"
+    }
+  ]
+}

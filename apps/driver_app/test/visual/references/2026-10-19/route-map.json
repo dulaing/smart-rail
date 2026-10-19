@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-19",
+  "scope": "Existing routes/states only; dark staff frames retained in inventory but excluded from implementation",
+  "families": [
+    {
+      "frames": "DT0, D01, DT10",
+      "route": "DriverGate sign-in/session states",
+      "code": [
+        "apps/driver_app/lib/gate.dart"
+      ],
+      "status": "existing external identity flow; no PIN or local credentials"
+    },
+    {
+      "frames": "DT1, D02, DT6, D07, DT5, D06, DT9",
+      "route": "DriverTab.journeys -> DriverJourneysScreen -> DriverBriefingScreen",
+      "code": [
+        "apps/driver_app/lib/shell.dart",
+        "apps/driver_app/lib/journeys/journey_screens.dart"
+      ],
+      "status": "existing selection, briefing, no-assignment and saved/offline states; DT1 is selected-journey layout, not authority to remove journey selection"
+    },
+    {
+      "frames": "DT7, DT2, D03",
+      "route": "DriverTab.updates currently shares DriverJourneysScreen; changes are inside selected briefing",
+      "code": [
+        "apps/driver_app/lib/shell.dart",
+        "apps/driver_app/lib/journeys/journey_screens.dart"
+      ],
+      "status": "Reference resolved by supplement 314:127: assigned dated journey -> current Updates list -> selected existing change -> return preserving journey/list/focus. Retain response changeId and targetStopId in T2 Flutter mapper; no backend or read/unread workflow."
+    },
+    {
+      "frames": "DT3, D04, DT4, D05, DT8",
+      "route": "DriverReportsScreen -> DriverReportJourneyScreen",
+      "code": [
+        "apps/driver_app/lib/journeys/report_screens.dart"
+      ],
+      "status": "existing list/composer/receipts; retain explicit reconciliation, owner/date boundaries and no automatic resend"
+    },
+    {
+      "frames": "DT11, D09",
+      "route": "DriverTab.account",
+      "code": [
+        "apps/driver_app/lib/shell.dart"
+      ],
+      "status": "existing account and permission states"
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "capturedOn": "2026-10-19",
+  "status": "User-approved dated Figma reference set for existing features; not app-rendered regression baselines",
+  "references": [
+    {
+      "file": "orders-desktop.png",
+      "nodeId": "253:155",
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=253-155",
+      "logical": [
+        1440,
+        900
+      ],
+      "artworkScale": 1,
+      "dpr": 1,
+      "referenceUserApproved": true,
+      "mappingUserConfirmed": true,
+      "approvedSha256": "7a83a7b48ae23ed7c99164517bce58dbe5446314a5ec76e1e71cc9cc25ae8267",
+      "approvedOn": "2026-10-19"
+    },
+    {
+      "file": "orders-tablet.png",
+      "nodeId": "256:980",
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=256-980",
+      "logical": [
+        1440,
+        900
+      ],
+      "artworkScale": 0.5625,
+      "dpr": 1.7777777777777777,
+      "logicalExport": "orders-tablet.logical.png",
+      "referenceUserApproved": true,
+      "mappingUserConfirmed": true,
+      "approvedSha256": "0e1b5f30d8b63382d3b555cb2150517c3795d5747c343b3ffd1ec47d94dfeab9",
+      "approvedLogicalSha256": "a03fb73b2c01d76b828084712c6f0b5fa5339305c5238e05aff56e029e61a93e",
+      "approvedOn": "2026-10-19"
+    },
+    {
+      "file": "code-phone.png",
+      "nodeId": "256:1109",
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=256-1109",
+      "logical": [
+        390,
+        1200
+      ],
+      "artworkScale": 1,
+      "dpr": 1,
+      "referenceUserApproved": true,
+      "mappingUserConfirmed": true,
+      "approvedSha256": "64b85a3e0426059fcdeb35292109c9b32692a6eed36d5b55f0ca23f924083ba1",
+      "approvedOn": "2026-10-19"
+    },
+    {
+      "nodeId": "252:36",
+      "file": "login.png",
+      "width": 1440,
+      "height": 900,
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=252-36",
+      "logical": [
+        1440,
+        900
+      ],
+      "artworkScale": 1,
+      "dpr": 1,
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "79025a32ba8c062e0414393c628ec4f86c07bf43e5c1f19e3f666a007954fc88"
+    },
+    {
+      "nodeId": "254:469",
+      "file": "code-error.png",
+      "width": 1440,
+      "height": 900,
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=254-469",
+      "logical": [
+        1440,
+        900
+      ],
+      "artworkScale": 1,
+      "dpr": 1,
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "b8381b5a3d5590d8b748ad73b673c2ccf358e942b63b7b133d9d3bcd4077f2ff"
+    },
+    {
+      "nodeId": "255:954",
+      "file": "offline.png",
+      "width": 1440,
+      "height": 900,
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=255-954",
+      "logical": [
+        1440,
+        900
+      ],
+      "artworkScale": 1,
+      "dpr": 1,
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "a7f568db936b4bcb2814fd490a1010f5be56210e7b33fcf02672398bbb1a13b1"
+    }
+  ],
+  "approvedOn": "2026-10-19",
+  "approvalScope": "Representative dated references plus linked state-matrix and T1 supplements. Excludes unavailable feature UI, new themes and implementation/device acceptance."
+}

@@ -1,0 +1,162 @@
+{
+  "capturedOn": "2026-10-19",
+  "status": "User-approved dated Figma reference set for existing features; not app-rendered regression baselines",
+  "references": [
+    {
+      "file": "tablet-duty.png",
+      "nodeId": "178:73",
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=178-73",
+      "logical": [
+        1280,
+        800
+      ],
+      "artworkScale": 0.5,
+      "dpr": 2,
+      "logicalExport": "tablet-duty.logical.png",
+      "referenceUserApproved": true,
+      "approvedSha256": "a6cfc93f583e98b00f5097951dc2cb824d42f68b6c9784e56d65d3c1e05f4265",
+      "approvedLogicalSha256": "edd3c5d8a150ad993909b0e27206d6c17474d5873ac6f8d1a407731898ff7504",
+      "approvedOn": "2026-10-19"
+    },
+    {
+      "file": "phone-briefing.png",
+      "nodeId": "188:417",
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=188-417",
+      "logical": [
+        360,
+        800
+      ],
+      "artworkScale": 0.3333333333333333,
+      "dpr": 3,
+      "logicalExport": "phone-briefing.logical.png",
+      "syntheticInsets": {
+        "top": 40,
+        "right": 0,
+        "bottom": 20,
+        "left": 0,
+        "units": "logical pixels",
+        "userConfirmed": true
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 40,
+        "width": 360,
+        "height": 740
+      },
+      "contentExport": "phone-briefing.content.png",
+      "referenceUserApproved": true,
+      "approvedSha256": "dcd039e56f48a541d2341e0571f1e4aa663ecd0da123c1500437c83c6286fb27",
+      "approvedLogicalSha256": "4561ebb180d018ab63571d9bcecdd733716c5f3aa238b67593212f24a6379165",
+      "approvedContentSha256": "11cdd8b90909a6122946c70a4b58974c7e4079d48ce37495df623c0792a11bc3",
+      "approvedOn": "2026-10-19"
+    },
+    {
+      "nodeId": "182:5068",
+      "file": "updates.png",
+      "width": 2560,
+      "height": 1600,
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=182-5068",
+      "logical": [
+        1280,
+        800
+      ],
+      "artworkScale": 0.5,
+      "dpr": 2,
+      "logicalExport": "updates.logical.png",
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "2cadedf2031848ebb063de9f8cddd47ba064ba91b33210788fee0f7a52d6f52b",
+      "approvedLogicalSha256": "23a59fcffdd584873f50fef1b103941c62b762f37f31781772f4098af2aa9d54"
+    },
+    {
+      "nodeId": "182:5126",
+      "file": "change-detail.png",
+      "width": 2560,
+      "height": 1600,
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=182-5126",
+      "logical": [
+        1280,
+        800
+      ],
+      "artworkScale": 0.5,
+      "dpr": 2,
+      "logicalExport": "change-detail.logical.png",
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "a559085d6af896db835d59f359a220b797b28c40ccb320b0cbd9b33d32fc6223",
+      "approvedLogicalSha256": "3843beaf9503e65d44f857e39c0a86f88786c6adae1433589994fee728cfd723"
+    },
+    {
+      "nodeId": "184:453",
+      "file": "account.png",
+      "width": 2560,
+      "height": 1600,
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=184-453",
+      "logical": [
+        1280,
+        800
+      ],
+      "artworkScale": 0.5,
+      "dpr": 2,
+      "logicalExport": "account.logical.png",
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "147134a1047d35440226bc650894fd392440040a5439d1d4a98c880e393d8f20",
+      "approvedLogicalSha256": "2df54da41296fad4649f4699432e21cadd7ff05519c2708c70cbb4282efadd35"
+    },
+    {
+      "nodeId": "178:36",
+      "file": "tablet-sign-in.png",
+      "logical": [
+        1280,
+        800
+      ],
+      "artworkScale": 0.5,
+      "dpr": 2,
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=178-36",
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "7117115f39b18b2a99a598305147cbbfd3c0b7cf6d7dfa85b3fdc7d9dc9723e1"
+    },
+    {
+      "nodeId": "183:327",
+      "file": "tablet-report-sent.png",
+      "logical": [
+        1280,
+        800
+      ],
+      "artworkScale": 0.5,
+      "dpr": 2,
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=183-327",
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "0fe200953ab8c94eb2710016ad9f5fde7b771c4b65d0703e0c5a98ffc98014dc"
+    }
+  ],
+  "supplementaryReferences": [
+    {
+      "file": "tablet-sign-in.png",
+      "nodeId": "178:36",
+      "logical": [
+        1280,
+        800
+      ],
+      "artworkScale": 0.5,
+      "dpr": 2,
+      "status": "candidate; outside selected-slice approval"
+    },
+    {
+      "file": "tablet-report-sent.png",
+      "nodeId": "183:327",
+      "logical": [
+        1280,
+        800
+      ],
+      "artworkScale": 0.5,
+      "dpr": 2,
+      "status": "candidate; outside selected-slice approval"
+    }
+  ],
+  "approvedOn": "2026-10-19",
+  "approvalScope": "Representative dated references plus linked state-matrix and T1 supplements. Excludes unavailable feature UI, new themes and implementation/device acceptance."
+}

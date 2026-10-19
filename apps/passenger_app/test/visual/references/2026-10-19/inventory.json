@@ -1,0 +1,756 @@
+{
+  "capturedOn": "2026-10-19",
+  "fileKey": "38B21GKxgb3wxRar06gHXP",
+  "status": "discovery, not approved baseline",
+  "page": "HiFi · Passenger screens",
+  "frames": [
+    {
+      "id": "121:47",
+      "name": "P01 · Home — Light",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Hi-Fi v1 — Light · Flow 1: Check the next train"
+    },
+    {
+      "id": "122:53",
+      "name": "P06 · Choose stations — Light",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Hi-Fi v1 — Light · Flow 1: Check the next train"
+    },
+    {
+      "id": "123:67",
+      "name": "P03 · Trains — Light",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Hi-Fi v1 — Light · Flow 1: Check the next train"
+    },
+    {
+      "id": "137:91",
+      "name": "P02 · Train detail — Live",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Flow 1 · Train details, updates & disruption states"
+    },
+    {
+      "id": "137:184",
+      "name": "P04 · Updates",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Flow 1 · Train details, updates & disruption states"
+    },
+    {
+      "id": "137:3119",
+      "name": "P11 · Trains — Offline saved",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Flow 1 · Train details, updates & disruption states"
+    },
+    {
+      "id": "137:3247",
+      "name": "P08 · Train detail — Cancelled",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Flow 1 · Train details, updates & disruption states"
+    },
+    {
+      "id": "137:3318",
+      "name": "P07 · Train detail — Ageing",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Flow 1 · Train details, updates & disruption states"
+    },
+    {
+      "id": "137:3392",
+      "name": "P07 · Train detail — Unknown",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Flow 1 · Train details, updates & disruption states"
+    },
+    {
+      "id": "137:3465",
+      "name": "P09 · Train detail — Ends early",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Flow 1 · Train details, updates & disruption states"
+    },
+    {
+      "id": "138:415",
+      "name": "P10 · Follow — Sign-in gate",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Flow 2 · Follow a train & account"
+    },
+    {
+      "id": "138:479",
+      "name": "P05 · Demo sign in",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Flow 2 · Follow a train & account"
+    },
+    {
+      "id": "138:545",
+      "name": "P10 · Follow — Following confirmed",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Flow 2 · Follow a train & account"
+    },
+    {
+      "id": "138:637",
+      "name": "P17 · Account — Signed in",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Flow 2 · Follow a train & account"
+    },
+    {
+      "id": "138:734",
+      "name": "P17 · Account — Guest",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Flow 2 · Follow a train & account"
+    },
+    {
+      "id": "139:594",
+      "name": "P12 · Food — Menu",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Flow 3 · RailBites station pickup"
+    },
+    {
+      "id": "139:704",
+      "name": "P13 · Food — Review order",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Flow 3 · RailBites station pickup"
+    },
+    {
+      "id": "139:751",
+      "name": "P14 · Order — Confirmed",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Flow 3 · RailBites station pickup"
+    },
+    {
+      "id": "139:802",
+      "name": "P14 · Order — Ready",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Flow 3 · RailBites station pickup"
+    },
+    {
+      "id": "139:854",
+      "name": "P14 · Order — Collected",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Flow 3 · RailBites station pickup"
+    },
+    {
+      "id": "139:902",
+      "name": "P15 · Order — Pickup time changed",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Flow 3 · RailBites station pickup"
+    },
+    {
+      "id": "139:953",
+      "name": "P15 · Order — Cancelled by train change",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Flow 3 · RailBites station pickup"
+    },
+    {
+      "id": "139:998",
+      "name": "P14 · Order — No-show",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Flow 3 · RailBites station pickup"
+    },
+    {
+      "id": "139:1045",
+      "name": "P12 · Food — With current order",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Flow 3 · RailBites station pickup"
+    },
+    {
+      "id": "139:1128",
+      "name": "P16 · Food — Service unavailable",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "Flow 3 · RailBites station pickup"
+    },
+    {
+      "id": "140:834",
+      "name": "P18 · Sinhala — Home",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "P18 · Sinhala & Tamil language checks"
+    },
+    {
+      "id": "140:983",
+      "name": "P18 · Sinhala — Train detail",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "P18 · Sinhala & Tamil language checks"
+    },
+    {
+      "id": "140:1062",
+      "name": "P18 · Sinhala — Updates alert",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "P18 · Sinhala & Tamil language checks"
+    },
+    {
+      "id": "140:1110",
+      "name": "P18 · Tamil — Home",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "P18 · Sinhala & Tamil language checks"
+    },
+    {
+      "id": "140:1238",
+      "name": "P18 · Tamil — Train detail",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "P18 · Sinhala & Tamil language checks"
+    },
+    {
+      "id": "140:1317",
+      "name": "P18 · Tamil — Updates alert",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "P18 · Sinhala & Tamil language checks"
+    },
+    {
+      "id": "149:1118",
+      "name": "P01 · Home — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 1 — Check the next train"
+    },
+    {
+      "id": "149:1260",
+      "name": "P06 · Choose stations — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 1 — Check the next train"
+    },
+    {
+      "id": "149:1366",
+      "name": "P03 · Trains — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 1 — Check the next train"
+    },
+    {
+      "id": "149:1496",
+      "name": "P02 · Train detail — Live — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 1 — Train details & disruption states"
+    },
+    {
+      "id": "149:1577",
+      "name": "P04 · Updates — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 1 — Train details & disruption states"
+    },
+    {
+      "id": "149:1625",
+      "name": "P11 · Trains — Offline saved — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 1 — Train details & disruption states"
+    },
+    {
+      "id": "149:1744",
+      "name": "P08 · Train detail — Cancelled — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 1 — Train details & disruption states"
+    },
+    {
+      "id": "149:1810",
+      "name": "P07 · Train detail — Ageing — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 1 — Train details & disruption states"
+    },
+    {
+      "id": "149:1881",
+      "name": "P07 · Train detail — Unknown — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 1 — Train details & disruption states"
+    },
+    {
+      "id": "149:1951",
+      "name": "P09 · Train detail — Ends early — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 1 — Train details & disruption states"
+    },
+    {
+      "id": "149:2025",
+      "name": "P10 · Follow — Sign-in gate — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 2 — Follow a train & account"
+    },
+    {
+      "id": "149:2116",
+      "name": "P05 · Demo sign in — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 2 — Follow a train & account"
+    },
+    {
+      "id": "149:2177",
+      "name": "P10 · Follow — Following confirmed — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 2 — Follow a train & account"
+    },
+    {
+      "id": "149:2256",
+      "name": "P17 · Account — Signed in — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 2 — Follow a train & account"
+    },
+    {
+      "id": "149:2334",
+      "name": "P17 · Account — Guest — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 2 — Follow a train & account"
+    },
+    {
+      "id": "149:2391",
+      "name": "P12 · Food — Menu — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 3 — RailBites station pickup"
+    },
+    {
+      "id": "149:2486",
+      "name": "P13 · Food — Review order — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 3 — RailBites station pickup"
+    },
+    {
+      "id": "149:2531",
+      "name": "P14 · Order — Confirmed — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 3 — RailBites station pickup"
+    },
+    {
+      "id": "149:2581",
+      "name": "P14 · Order — Ready — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 3 — RailBites station pickup"
+    },
+    {
+      "id": "149:2641",
+      "name": "P14 · Order — Collected — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 3 — RailBites station pickup"
+    },
+    {
+      "id": "149:2688",
+      "name": "P15 · Order — Pickup time changed — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 3 — RailBites station pickup"
+    },
+    {
+      "id": "149:2736",
+      "name": "P15 · Order — Cancelled by train change — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 3 — RailBites station pickup"
+    },
+    {
+      "id": "149:2778",
+      "name": "P14 · Order — No-show — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 3 — RailBites station pickup"
+    },
+    {
+      "id": "149:2823",
+      "name": "P12 · Food — With current order — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 3 — RailBites station pickup"
+    },
+    {
+      "id": "149:2903",
+      "name": "P16 · Food — Service unavailable — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · Flow 3 — RailBites station pickup"
+    },
+    {
+      "id": "149:2963",
+      "name": "P18 · Sinhala — Home — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · P18 — Sinhala & Tamil language checks"
+    },
+    {
+      "id": "149:3091",
+      "name": "P18 · Sinhala — Train detail — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · P18 — Sinhala & Tamil language checks"
+    },
+    {
+      "id": "149:3161",
+      "name": "P18 · Sinhala — Updates alert — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · P18 — Sinhala & Tamil language checks"
+    },
+    {
+      "id": "149:3209",
+      "name": "P18 · Tamil — Home — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · P18 — Sinhala & Tamil language checks"
+    },
+    {
+      "id": "149:3337",
+      "name": "P18 · Tamil — Train detail — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · P18 — Sinhala & Tamil language checks"
+    },
+    {
+      "id": "149:3407",
+      "name": "P18 · Tamil — Updates alert — Dark",
+      "type": "FRAME",
+      "width": 1080,
+      "height": 2400,
+      "modes": {
+        "VariableCollectionId:120:37": "120:1"
+      },
+      "section": "Dark · P18 — Sinhala & Tamil language checks"
+    }
+  ],
+  "initialAudit": {
+    "page": "120:36",
+    "counts": {
+      "light": 31,
+      "dark": 31
+    },
+    "texts": 1576,
+    "fonts": {
+      "Noto Sans/Regular": 488,
+      "Noto Sans/SemiBold": 346,
+      "Noto Sans/Medium": 296,
+      "Noto Sans/Display Light": 66,
+      "Noto Sans/Display Regular": 16,
+      "Noto Sans/Display SemiBold": 80,
+      "Abhaya Libre/Regular": 142,
+      "Noto Sans Tamil/Regular": 142
+    },
+    "colors": {
+      "light:VariableID:120:44": 82,
+      "light:VariableID:120:42": 318,
+      "light:VariableID:120:48": 40,
+      "light:VariableID:120:43": 270,
+      "light:VariableID:120:51": 13,
+      "light:VariableID:120:53": 22,
+      "light:VariableID:120:58": 11,
+      "light:VariableID:120:45": 19,
+      "light:VariableID:120:55": 13,
+      "dark:VariableID:120:43": 348,
+      "dark:VariableID:120:42": 318,
+      "dark:VariableID:120:48": 40,
+      "dark:VariableID:120:51": 13,
+      "dark:VariableID:120:53": 22,
+      "dark:VariableID:120:58": 11,
+      "dark:VariableID:120:45": 19,
+      "dark:VariableID:120:55": 13,
+      "dark:VariableID:120:44": 4
+    },
+    "images": {
+      "2fe3bb74439f64e5ff72cd67b2ce471627f90246": {
+        "sample": "I282:10376;281:642",
+        "name": "Transparent logo PNG",
+        "count": 6
+      },
+      "cc27b1e1b481d1ede0f23a9a303fa2f5624b39c1": {
+        "sample": "I161:2100;159:576",
+        "name": "Food photo / Vegetable rice & curry",
+        "count": 4
+      },
+      "652c6f11d8e8ab36784fd223e80b969077c4b5fd": {
+        "sample": "I161:2118;159:576",
+        "name": "Food photo",
+        "count": 4
+      },
+      "6ca66893123f141155d3ac1d9b3b36e073f4d0bf": {
+        "sample": "I161:2132;159:576",
+        "name": "Food photo",
+        "count": 2
+      },
+      "1515b99dda233d3477e4120d7fd0864317577b6f": {
+        "sample": "I161:2145;159:590",
+        "name": "Food photo",
+        "count": 2
+      }
+    },
+    "missing": []
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "capturedOn": "2026-10-19",
+  "method": "Visible text segments against nearest opaque solid ancestor; resolved variable values. Text bounding boxes checked against screen bounds. Digital checks do not prove glyph clipping, runtime accessibility, physical readability or native-language correctness.",
+  "page": "199:36",
+  "minimumRequired": 4.5,
+  "texts": 1786,
+  "minRatio": 4.575089775871984,
+  "fonts": {
+    "Noto Sans/SemiBold": 529,
+    "Noto Sans/Regular": 534,
+    "Noto Sans/Medium": 707,
+    "Noto Sans/Light": 16
+  },
+  "failures": [],
+  "untested": 0,
+  "overflow": [],
+  "images": {
+    "f0aa009421cc2ab01251124d3af2bab0a11aee8e": {
+      "sample": "I289:3150;288:643",
+      "name": "Supplied operations-icon PNG",
+      "count": 53
+    }
+  }
+}

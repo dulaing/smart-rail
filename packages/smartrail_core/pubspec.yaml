@@ -16,16 +16,17 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
 flutter:
-  # Noto Sans, Noto Sans Sinhala and Noto Sans Tamil are bundled so text renders offline.
-  # Licences (SIL OFL 1.1) sit next to the files in fonts/. Each file is a variable font; the
-  # theme sets the weight axis explicitly.
+  # Noto Sans, Abhaya Libre (Sinhala) and Noto Sans Tamil render offline.
+  # SIL OFL licences sit next to the files. Noto fonts are variable;
+  # the user-approved Sinhala reference uses Abhaya Libre Regular.
   fonts:
     - family: NotoSans
       fonts:
         - asset: fonts/NotoSans-Variable.ttf
-    - family: NotoSansSinhala
+    - family: AbhayaLibre
       fonts:
-        - asset: fonts/NotoSansSinhala-Variable.ttf
+        - asset: fonts/AbhayaLibre-Regular.ttf
+          weight: 400
     - family: NotoSansTamil
       fonts:
         - asset: fonts/NotoSansTamil-Variable.ttf

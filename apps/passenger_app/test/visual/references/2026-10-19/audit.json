@@ -1,0 +1,46 @@
+{
+  "capturedOn": "2026-10-19",
+  "method": "Visible text segments against nearest opaque solid ancestor; resolved variable values. Text bounding boxes checked against screen bounds. Digital checks do not prove glyph clipping, runtime accessibility, physical readability or native-language correctness.",
+  "page": "120:36",
+  "minimumRequired": 4.5,
+  "texts": 1576,
+  "minRatio": 4.575089775871984,
+  "fonts": {
+    "Noto Sans/Regular": 504,
+    "Noto Sans/SemiBold": 426,
+    "Noto Sans/Medium": 296,
+    "Noto Sans/Light": 66,
+    "Abhaya Libre/Regular": 142,
+    "Noto Sans Tamil/Regular": 142
+  },
+  "failures": [],
+  "untested": 0,
+  "overflow": [],
+  "images": {
+    "2fe3bb74439f64e5ff72cd67b2ce471627f90246": {
+      "sample": "I282:10376;281:642",
+      "name": "Transparent logo PNG",
+      "count": 6
+    },
+    "cc27b1e1b481d1ede0f23a9a303fa2f5624b39c1": {
+      "sample": "I161:2100;159:576",
+      "name": "Food photo / Vegetable rice & curry",
+      "count": 4
+    },
+    "652c6f11d8e8ab36784fd223e80b969077c4b5fd": {
+      "sample": "I161:2118;159:576",
+      "name": "Food photo",
+      "count": 4
+    },
+    "6ca66893123f141155d3ac1d9b3b36e073f4d0bf": {
+      "sample": "I161:2132;159:576",
+      "name": "Food photo",
+      "count": 2
+    },
+    "1515b99dda233d3477e4120d7fd0864317577b6f": {
+      "sample": "I161:2145;159:590",
+      "name": "Food photo",
+      "count": 2
+    }
+  }
+}

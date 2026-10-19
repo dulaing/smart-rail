@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-19",
+  "scope": "Existing routes/states only; dark staff frames retained in inventory but excluded from implementation",
+  "families": [
+    {
+      "frames": "S01, S03 entrance, S04, S06",
+      "route": "/?station=GPH&view=entrance; configuration states use missing/invalid config",
+      "code": [
+        "apps/station-web/src/App.tsx",
+        "apps/station-web/src/EntranceBoard.tsx"
+      ],
+      "status": "existing entrance/waiting/disruption/freshness/offline/system families; preserve measured content-fitting behavior"
+    },
+    {
+      "frames": "S02, S03 platform, S05",
+      "route": "/?station=GPH&view=platform&platform=2",
+      "code": [
+        "apps/station-web/src/App.tsx",
+        "apps/station-web/src/PlatformBoard.tsx"
+      ],
+      "status": "existing platform/arrival/move/offline families; no public interaction; Abhaya Libre Regular confirmed; density/type supplement 314:144"
+    }
+  ]
+}

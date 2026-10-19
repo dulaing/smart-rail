@@ -1,0 +1,310 @@
+{
+  "capturedOn": "2026-10-19",
+  "status": "User-approved dated Figma reference set for existing features; not app-rendered regression baselines",
+  "references": [
+    {
+      "file": "home-light.png",
+      "nodeId": "121:47",
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=121-47",
+      "logical": [
+        432,
+        960
+      ],
+      "artworkScale": 0.4,
+      "dpr": 2.5,
+      "logicalExport": "home-light.logical.png",
+      "syntheticInsets": {
+        "top": 44,
+        "right": 0,
+        "bottom": 16,
+        "left": 0,
+        "units": "logical pixels",
+        "userConfirmed": true
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 44,
+        "width": 432,
+        "height": 900
+      },
+      "contentExport": "home-light.content.png",
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "3f723f211e744852775693b26b28931b4e01871b7593a2d63467b9585e2e6e7f",
+      "approvedLogicalSha256": "15049509ae3baebfc0a04ae0529cc30c7b68d2e2c546ffdfb3a3250a6485029c",
+      "approvedContentSha256": "daaf2c5115d8ff94c70246a3a104a013a820a17035e945ffaa9909b4571e7b72"
+    },
+    {
+      "file": "home-dark.png",
+      "nodeId": "149:1118",
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=149-1118",
+      "logical": [
+        432,
+        960
+      ],
+      "artworkScale": 0.4,
+      "dpr": 2.5,
+      "logicalExport": "home-dark.logical.png",
+      "syntheticInsets": {
+        "top": 44,
+        "right": 0,
+        "bottom": 16,
+        "left": 0,
+        "units": "logical pixels",
+        "userConfirmed": true
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 44,
+        "width": 432,
+        "height": 900
+      },
+      "contentExport": "home-dark.content.png",
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "b9b9d07042862a3bd5995ee0322aead1f18e4866dd3da22e353b844bb17ddd41",
+      "approvedLogicalSha256": "472b47cbc1168adce0a16a3a5e77ddceffd245a5c31ba732dfbf755f82140823",
+      "approvedContentSha256": "a8f825ea9cdf29ac897c4ff13d171e9cf71dbc2ea1bf29b75ec6256fb004097b"
+    },
+    {
+      "nodeId": "137:91",
+      "file": "detail.png",
+      "width": 1080,
+      "height": 2400,
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=137-91",
+      "logical": [
+        432,
+        960
+      ],
+      "artworkScale": 0.4,
+      "dpr": 2.5,
+      "logicalExport": "detail.logical.png",
+      "syntheticInsets": {
+        "top": 44,
+        "right": 0,
+        "bottom": 16,
+        "left": 0,
+        "units": "logical pixels",
+        "userConfirmed": true
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 44,
+        "width": 432,
+        "height": 900
+      },
+      "contentExport": "detail.content.png",
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "22d69a0c8de00856ef10351a69b507bb007f1cc185f34fb93a622d07306e7275",
+      "approvedLogicalSha256": "a0ab01d6034a49c7c2afa8120faf4022c5525d2070c0b7b331320034ddf7ffcc",
+      "approvedContentSha256": "5b6e8ecfc1f6d00ef555f5a0ea386079929d5ddb2601035c92ae3c4d7a643b44"
+    },
+    {
+      "nodeId": "138:734",
+      "file": "account-guest.png",
+      "width": 1080,
+      "height": 2400,
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=138-734",
+      "logical": [
+        432,
+        960
+      ],
+      "artworkScale": 0.4,
+      "dpr": 2.5,
+      "logicalExport": "account-guest.logical.png",
+      "syntheticInsets": {
+        "top": 44,
+        "right": 0,
+        "bottom": 16,
+        "left": 0,
+        "units": "logical pixels",
+        "userConfirmed": true
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 44,
+        "width": 432,
+        "height": 900
+      },
+      "contentExport": "account-guest.content.png",
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "1c9287879aab54c7b47b72cb07727130b8e59a7fef79fc7892cdc34a0e35d19b",
+      "approvedLogicalSha256": "6a1f50b22834c3151c1a8e7bbe741861c3890c3006bd1269ecf7f175b89a6b4f",
+      "approvedContentSha256": "3a6b2c13191e42f8cebc422d747904fcc89ac9689fbd0317ffbb5f6dad34ef6b"
+    },
+    {
+      "nodeId": "139:594",
+      "file": "food-menu.png",
+      "width": 1080,
+      "height": 2400,
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=139-594",
+      "logical": [
+        432,
+        960
+      ],
+      "artworkScale": 0.4,
+      "dpr": 2.5,
+      "logicalExport": "food-menu.logical.png",
+      "syntheticInsets": {
+        "top": 44,
+        "right": 0,
+        "bottom": 16,
+        "left": 0,
+        "units": "logical pixels",
+        "userConfirmed": true
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 44,
+        "width": 432,
+        "height": 900
+      },
+      "contentExport": "food-menu.content.png",
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "046932801b96502be16adc7c3b369bbbebb724f18e376709c4ae8954610af2a7",
+      "approvedLogicalSha256": "948c16622c7adca6c8eb7a3f7af23bcb6b9dc21b930359b14b7cceea84f7e66c",
+      "approvedContentSha256": "96e3e1244f550fc55297369693d35e8ad8da37136f2b53d39ff9ff659910ba71"
+    },
+    {
+      "nodeId": "139:704",
+      "file": "food-review.png",
+      "width": 1080,
+      "height": 2400,
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=139-704",
+      "logical": [
+        432,
+        960
+      ],
+      "artworkScale": 0.4,
+      "dpr": 2.5,
+      "logicalExport": "food-review.logical.png",
+      "syntheticInsets": {
+        "top": 44,
+        "right": 0,
+        "bottom": 16,
+        "left": 0,
+        "units": "logical pixels",
+        "userConfirmed": true
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 44,
+        "width": 432,
+        "height": 900
+      },
+      "contentExport": "food-review.content.png",
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "ba60944cb104f1238739c61877f5ee6f232d329c25fcb22b7d7449ecc7cb50d5",
+      "approvedLogicalSha256": "81a1281168303847696843eaa8e81f0d8661856dca0e2e25b10f8e8f636614e6",
+      "approvedContentSha256": "09d58667bfe9e5096918785072720fe9d906779d9e85ce3e88a989df17ac6271"
+    },
+    {
+      "nodeId": "140:834",
+      "file": "home-sinhala.png",
+      "width": 1080,
+      "height": 2400,
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=140-834",
+      "logical": [
+        432,
+        960
+      ],
+      "artworkScale": 0.4,
+      "dpr": 2.5,
+      "logicalExport": "home-sinhala.logical.png",
+      "syntheticInsets": {
+        "top": 44,
+        "right": 0,
+        "bottom": 16,
+        "left": 0,
+        "units": "logical pixels",
+        "userConfirmed": true
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 44,
+        "width": 432,
+        "height": 900
+      },
+      "contentExport": "home-sinhala.content.png",
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "e5afdf88a2bb7b11ca2245f6d1e7b39414f3d5d4d9871435feb964f8024bcc96",
+      "approvedLogicalSha256": "3da793351066b15b1482e75ca840dd0264db058dd897311ba563d6517637a78c",
+      "approvedContentSha256": "b2e8240e781e5ed11f6d0192fb14a83fedd6cbc9c90425864ac14979d5b77d9d"
+    },
+    {
+      "nodeId": "140:1110",
+      "file": "home-tamil.png",
+      "width": 1080,
+      "height": 2400,
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=140-1110",
+      "logical": [
+        432,
+        960
+      ],
+      "artworkScale": 0.4,
+      "dpr": 2.5,
+      "logicalExport": "home-tamil.logical.png",
+      "syntheticInsets": {
+        "top": 44,
+        "right": 0,
+        "bottom": 16,
+        "left": 0,
+        "units": "logical pixels",
+        "userConfirmed": true
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 44,
+        "width": 432,
+        "height": 900
+      },
+      "contentExport": "home-tamil.content.png",
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "b876ea4ed77261a0eeea3f683c25d332a5148cbb7deb87cc002d82ecc3d76fa6",
+      "approvedLogicalSha256": "32f9f87c4bc2185601adfab8018456bb50fe27328e4a9fc159502dd5d1c82e27",
+      "approvedContentSha256": "37cc161eb91b1535e1ab3e78318307d07b1f607ba32471629cab1c27e147a775"
+    },
+    {
+      "nodeId": "137:3119",
+      "file": "offline.png",
+      "width": 1080,
+      "height": 2400,
+      "figmaUrl": "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=137-3119",
+      "logical": [
+        432,
+        960
+      ],
+      "artworkScale": 0.4,
+      "dpr": 2.5,
+      "logicalExport": "offline.logical.png",
+      "syntheticInsets": {
+        "top": 44,
+        "right": 0,
+        "bottom": 16,
+        "left": 0,
+        "units": "logical pixels",
+        "userConfirmed": true
+      },
+      "contentRect": {
+        "x": 0,
+        "y": 44,
+        "width": 432,
+        "height": 900
+      },
+      "contentExport": "offline.content.png",
+      "referenceUserApproved": true,
+      "approvedOn": "2026-10-19",
+      "approvedSha256": "723efc7ed2c619dcc340c55cc61f42ea78eb93f37cd21d98ea333f65ba7d5dbb",
+      "approvedLogicalSha256": "16c7f44c859874c1e9a7479e42737ddf15aad9e3f0ec5280e9916535ed51da6a",
+      "approvedContentSha256": "fd9951f3292fe6921e303e1a80c0ce355e0e118d53a86b41b88135c1f2855de0"
+    }
+  ],
+  "approvedOn": "2026-10-19",
+  "approvalScope": "Representative dated references plus linked state-matrix and T1 supplements. Excludes unavailable feature UI, new themes and implementation/device acceptance."
+}

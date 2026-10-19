@@ -1,0 +1,376 @@
+{
+  "date": "2026-10-19",
+  "fileKey": "38B21GKxgb3wxRar06gHXP",
+  "status": "User-approved T1 reference supplement; not app-rendered regression baselines",
+  "sectionId": "314:36",
+  "frames": [
+    {
+      "id": "314:37",
+      "name": "T1 · Access and action states",
+      "width": 1440,
+      "height": 1147
+    },
+    {
+      "id": "314:90",
+      "name": "T1 · Compact recovery and long content",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "314:127",
+      "name": "T1 · Driver Updates selection and detail",
+      "width": 1440,
+      "height": 700
+    },
+    {
+      "id": "314:144",
+      "name": "T1 · Station type and density contract",
+      "width": 1440,
+      "height": 1333
+    }
+  ],
+  "compactIds": {
+    "passenger": "314:94",
+    "driver": "314:103",
+    "kiosk": "314:110"
+  },
+  "createdNodeIds": [
+    "314:36",
+    "314:37",
+    "314:38",
+    "314:39",
+    "314:40",
+    "314:41",
+    "314:42",
+    "314:43",
+    "314:44",
+    "314:45",
+    "314:46",
+    "314:47",
+    "I314:47;200:608",
+    "314:49",
+    "314:50",
+    "314:51",
+    "314:52",
+    "I314:52;200:608",
+    "314:54",
+    "314:55",
+    "314:56",
+    "314:57",
+    "314:58",
+    "314:59",
+    "I314:59;200:606",
+    "314:61",
+    "314:62",
+    "314:63",
+    "314:64",
+    "314:65",
+    "I314:65;200:614",
+    "314:67",
+    "314:68",
+    "314:69",
+    "314:70",
+    "314:71",
+    "I314:71;200:614",
+    "314:73",
+    "314:74",
+    "314:75",
+    "314:76",
+    "314:77",
+    "I314:77;200:606",
+    "314:79",
+    "314:80",
+    "314:81",
+    "I314:81;200:617",
+    "I314:81;200:617;1:10452",
+    "I314:81;200:619",
+    "314:86",
+    "314:87",
+    "314:88",
+    "314:89",
+    "314:90",
+    "314:91",
+    "314:92",
+    "314:93",
+    "314:94",
+    "314:95",
+    "314:96",
+    "314:97",
+    "314:98",
+    "314:99",
+    "314:100",
+    "I314:100;200:606",
+    "314:102",
+    "314:103",
+    "314:104",
+    "314:105",
+    "314:106",
+    "314:107",
+    "I314:107;176:589",
+    "314:109",
+    "314:110",
+    "314:111",
+    "314:112",
+    "314:113",
+    "314:114",
+    "I314:114;200:630",
+    "314:119",
+    "314:120",
+    "I314:120;200:606",
+    "314:122",
+    "I314:122;200:608",
+    "314:124",
+    "314:125",
+    "314:126",
+    "314:127",
+    "314:128",
+    "314:129",
+    "314:130",
+    "314:131",
+    "314:132",
+    "314:133",
+    "314:134",
+    "314:135",
+    "314:136",
+    "314:137",
+    "314:138",
+    "314:139",
+    "314:140",
+    "314:141",
+    "314:142",
+    "314:143",
+    "314:144",
+    "314:145",
+    "314:146",
+    "314:147",
+    "314:148",
+    "314:149",
+    "314:150",
+    "314:151",
+    "314:152",
+    "314:153",
+    "314:154",
+    "314:155",
+    "314:156",
+    "314:157",
+    "314:158",
+    "314:159",
+    "314:160",
+    "314:161",
+    "314:162",
+    "314:163",
+    "314:164",
+    "314:165",
+    "314:166",
+    "314:167"
+  ],
+  "audit": [
+    {
+      "id": "314:37",
+      "name": "T1 · Access and action states",
+      "width": 1440,
+      "height": 1147,
+      "textCount": 21,
+      "outside": [],
+      "missingFonts": [],
+      "fonts": {
+        "Noto Sans/SemiBold": 10,
+        "Noto Sans/Regular": 11
+      },
+      "minContrast": 5.047107045313088,
+      "lowContrast": [],
+      "instances": [
+        {
+          "id": "314:47",
+          "componentId": "200:607",
+          "name": "Variant=Secondary"
+        },
+        {
+          "id": "314:52",
+          "componentId": "200:607",
+          "name": "Variant=Secondary"
+        },
+        {
+          "id": "314:59",
+          "componentId": "200:605",
+          "name": "Variant=Primary"
+        },
+        {
+          "id": "314:65",
+          "componentId": "200:613",
+          "name": "Variant=Disabled"
+        },
+        {
+          "id": "314:71",
+          "componentId": "200:613",
+          "name": "Variant=Disabled"
+        },
+        {
+          "id": "314:77",
+          "componentId": "200:605",
+          "name": "Variant=Primary"
+        },
+        {
+          "id": "314:81",
+          "componentId": "200:616",
+          "name": "State=Active"
+        },
+        {
+          "id": "I314:81;200:617",
+          "componentId": "10:7766",
+          "name": "Weight=Regular"
+        }
+      ],
+      "contrastMethod": "Resolved bound semantic variables for each consumer; text versus nearest opaque ancestor.",
+      "contrastPairs": 28
+    },
+    {
+      "id": "314:90",
+      "name": "T1 · Compact recovery and long content",
+      "width": 1440,
+      "height": 900,
+      "textCount": 19,
+      "outside": [],
+      "missingFonts": [],
+      "fonts": {
+        "Noto Sans/SemiBold": 8,
+        "Noto Sans/Regular": 9,
+        "Abhaya Libre/Regular": 1,
+        "Noto Sans Tamil/Regular": 1
+      },
+      "minContrast": 5.047107045313088,
+      "lowContrast": [],
+      "instances": [
+        {
+          "id": "314:100",
+          "componentId": "200:605",
+          "name": "Variant=Primary"
+        },
+        {
+          "id": "314:107",
+          "componentId": "176:588",
+          "name": "Variant=Primary"
+        },
+        {
+          "id": "314:114",
+          "componentId": "200:629",
+          "name": "State=Focused"
+        },
+        {
+          "id": "314:120",
+          "componentId": "200:605",
+          "name": "Variant=Primary"
+        },
+        {
+          "id": "314:122",
+          "componentId": "200:607",
+          "name": "Variant=Secondary"
+        }
+      ],
+      "contrastMethod": "Resolved bound semantic variables for each consumer; text versus nearest opaque ancestor.",
+      "contrastPairs": 24
+    },
+    {
+      "id": "314:127",
+      "name": "T1 · Driver Updates selection and detail",
+      "width": 1440,
+      "height": 700,
+      "textCount": 12,
+      "outside": [],
+      "missingFonts": [],
+      "fonts": {
+        "Noto Sans/SemiBold": 5,
+        "Noto Sans/Regular": 7
+      },
+      "minContrast": 17.43880131867644,
+      "lowContrast": [],
+      "instances": [],
+      "contrastMethod": "Resolved bound semantic variables for each consumer; text versus nearest opaque ancestor.",
+      "contrastPairs": 12
+    },
+    {
+      "id": "314:144",
+      "name": "T1 · Station type and density contract",
+      "width": 1440,
+      "height": 1333,
+      "textCount": 16,
+      "outside": [],
+      "missingFonts": [],
+      "fonts": {
+        "Noto Sans/SemiBold": 8,
+        "Noto Sans/Regular": 8
+      },
+      "minContrast": 17.43880131867644,
+      "lowContrast": [],
+      "instances": [],
+      "contrastMethod": "Resolved bound semantic variables for each consumer; text versus nearest opaque ancestor.",
+      "contrastPairs": 16
+    }
+  ],
+  "adviceConversation": "cnv_3e0c16ebc3c84c5abe79",
+  "fontDecision": "User confirmed Abhaya Libre in Figma and bundled apps.",
+  "limitations": [
+    "Digital bounds and contrast checks do not prove runtime reflow or glyph clipping.",
+    "Native readers, physical display distance, real safe areas and app-rendered comparison belong to implementation acceptance."
+  ],
+  "approvedOn": "2026-10-19",
+  "referenceUserApproved": true,
+  "approvedExports": [
+    {
+      "file": "access-actions.png",
+      "sha256": "a110cabe511c67b8edde8181aff1e86f02f5f1e5a88c8a1267688c26ea148ca8"
+    },
+    {
+      "file": "compact-recovery.png",
+      "sha256": "82f29cb806bab381baa95a7e1441c76c0b63a1fd75e90be0d142e8cbfdd22284"
+    },
+    {
+      "file": "driver-updates.png",
+      "sha256": "840f879466898d5e2cfebbc6f18a63562affb82302b1b077a2fed44f3d3d68cc"
+    },
+    {
+      "file": "station-contract.png",
+      "sha256": "8a003992190e116f6d79bb100fe22d6edc68ab8e43409be4ddbbaada10434111"
+    }
+  ],
+  "font": {
+    "family": "Abhaya Libre",
+    "style": "Regular",
+    "weight": 400,
+    "file": "packages/smartrail_core/fonts/AbhayaLibre-Regular.ttf",
+    "sha256": "d4279d38a0012fa54d340979694e70e3235266220dedc0d7000131345fb33bd4",
+    "licence": "packages/smartrail_core/fonts/OFL-AbhayaLibre.txt",
+    "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/abhayalibre/AbhayaLibre-Regular.ttf",
+    "verifiedInternalFamilyAndStyle": true
+  },
+  "approvedSources": [
+    {
+      "file": "shared/design/tokens.json",
+      "sha256": "355ab33d90d60d61c8d9b58c53f6a4e1d56cf0292d96805aaf7df63403fe4e0c"
+    },
+    {
+      "file": "shared/design/generated/tokens.css",
+      "sha256": "5acb0498194208072d0afe7a313beab706a22a5b54dc3b765ec3b1a5ea37614b"
+    },
+    {
+      "file": "packages/smartrail_core/lib/src/generated/tokens.g.dart",
+      "sha256": "c7a0648fc960df8fd89a379b7da4d7435954650f58d049f74ccefc53d82e501d"
+    }
+  ],
+  "checks": {
+    "tokenContrastPairs": 165,
+    "generatedFilesCurrent": 4,
+    "flutterTests": {
+      "smartrail_core": 32,
+      "driver": 41,
+      "passenger": 148
+    },
+    "coreFlutterAnalysis": "passed",
+    "webBuilds": {
+      "operations": "passed",
+      "station": "passed"
+    },
+    "referenceMappingAndHashCheck": "passed; 33 retained reference exports plus four supplement sheets",
+    "diffCheck": "passed"
+  }
+}

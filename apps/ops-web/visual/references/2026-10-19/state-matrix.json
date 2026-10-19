@@ -1,0 +1,226 @@
+{
+  "date": "2026-10-19",
+  "status": "User-approved reference rules for existing features",
+  "scope": "Existing implemented feature families only. Future personal Updates/follow and Operations diagnostics/demo UI remain prerequisite exclusions.",
+  "families": [
+    {
+      "frames": "O01, O15, O16",
+      "route": "App auth /account",
+      "code": [
+        "apps/ops-web/src/App.tsx",
+        "apps/ops-web/src/Shell.tsx"
+      ],
+      "status": "existing identity, expired and account states",
+      "referenceNodes": [
+        "202:36",
+        "207:1813",
+        "207:1835"
+      ]
+    },
+    {
+      "frames": "O02, O03",
+      "route": "/corridor, /corridor/journeys/{journeyId}, /changes",
+      "code": [
+        "apps/ops-web/src/workspace/OperationsWorkspace.tsx"
+      ],
+      "status": "existing corridor/journey families; retain effective permissions and failed-read meanings",
+      "referenceNodes": [
+        "202:66",
+        "202:240",
+        "204:6281"
+      ]
+    },
+    {
+      "frames": "O04-O07",
+      "route": "JourneyWorkspace ChangePanel / ChangeReview",
+      "code": [
+        "apps/ops-web/src/workspace/ChangePanel.tsx",
+        "apps/ops-web/src/workspace/ChangeReview.tsx"
+      ],
+      "status": "existing compose/review/result/conflict/uncertain/withdrawal states",
+      "referenceNodes": [
+        "203:168",
+        "203:264",
+        "205:1051"
+      ]
+    },
+    {
+      "frames": "O08, O09",
+      "route": "/reports, /reports/{reportId}",
+      "code": [
+        "apps/ops-web/src/reports/ReportsWorkspace.tsx"
+      ],
+      "status": "existing report list/detail/acknowledgement",
+      "referenceNodes": [
+        "206:811",
+        "206:926",
+        "206:1200"
+      ]
+    },
+    {
+      "frames": "O10, O11, O14",
+      "route": "/incidents, /incidents/{id}, /audit/...; scoped corridor/access",
+      "code": [
+        "apps/ops-web/src/Shell.tsx",
+        "apps/ops-web/src/access.ts"
+      ],
+      "status": "existing incident/audit/access/scoped-platform families",
+      "referenceNodes": [
+        "206:1267",
+        "207:1060",
+        "207:1769"
+      ]
+    },
+    {
+      "frames": "O12, O13",
+      "route": "/demo-controls placeholder only",
+      "code": [
+        "apps/ops-web/src/Shell.tsx",
+        "apps/ops-web/src/access.ts"
+      ],
+      "status": "defer functional diagnostics/demo UI to operations-demo-controls T2/T3; do not build under visual work",
+      "referenceNodes": [
+        "208:1360",
+        "208:1608"
+      ]
+    }
+  ],
+  "states": {
+    "normal": {
+      "referenceNodes": [
+        "202:36",
+        "202:66",
+        "202:240",
+        "203:168",
+        "203:264",
+        "206:926",
+        "206:1267",
+        "207:1060",
+        "207:1835"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=202-36",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=202-66",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=202-240",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=203-168",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=203-264",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=206-926",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=206-1267",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=207-1060",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=207-1835"
+      ]
+    },
+    "selected": {
+      "referenceNodes": [
+        "314:37"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-37"
+      ]
+    },
+    "disabled": {
+      "referenceNodes": [
+        "314:37"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-37"
+      ]
+    },
+    "focus": {
+      "referenceNodes": [
+        "314:37"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-37"
+      ]
+    },
+    "loading": {
+      "referenceNodes": [
+        "204:6178",
+        "314:37"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=204-6178",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-37"
+      ]
+    },
+    "empty": {
+      "referenceNodes": [
+        "204:6230",
+        "206:1149"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=204-6230",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=206-1149"
+      ]
+    },
+    "error": {
+      "referenceNodes": [
+        "204:6281",
+        "205:967",
+        "205:1051",
+        "206:1200"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=204-6281",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=205-967",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=205-1051",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=206-1200"
+      ]
+    },
+    "offline": {
+      "referenceNodes": [
+        "204:6394"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=204-6394"
+      ]
+    },
+    "access": {
+      "referenceNodes": [
+        "207:1769",
+        "207:1813",
+        "314:37"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=207-1769",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=207-1813",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-37"
+      ]
+    },
+    "compact": {
+      "referenceNodes": [
+        "314:90"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-90"
+      ]
+    },
+    "unavailableFeatureUI": {
+      "referenceNodes": [
+        "208:1360",
+        "208:1483",
+        "208:1608",
+        "208:1684",
+        "208:1762",
+        "209:1511"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=208-1360",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=208-1483",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=208-1608",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=208-1684",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=208-1762",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=209-1511"
+      ]
+    }
+  },
+  "sharedRules": "Access/action sheet 314:37; content reflow/keyboard sheet 314:90. Specimens use logical content widths; scale target sizes to each profile. No automatic resend, optimistic confirmation, new cache or permission behavior.",
+  "nonApplicable": [],
+  "validationPending": [
+    "App-rendered overlay/diff and raster calibration",
+    "Actual 200% reflow/keyboard/native-reader checks",
+    "Physical device/display measurements"
+  ],
+  "approvedOn": "2026-10-19"
+}

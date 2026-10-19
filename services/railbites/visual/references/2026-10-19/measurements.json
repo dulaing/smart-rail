@@ -1,0 +1,663 @@
+{
+  "capturedOn": "2026-10-19",
+  "units": "Figma canvas pixels; apply the uniform surface conversion recorded in the feature spec",
+  "nodes": [
+    {
+      "screen": {
+        "id": "253:155",
+        "name": "RB · ORDERS · Light",
+        "type": "FRAME",
+        "x": 64,
+        "y": 220,
+        "w": 1440,
+        "h": 900,
+        "layout": "NONE",
+        "pad": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "gap": 0,
+        "radius": 0
+      },
+      "children": [
+        {
+          "id": "253:157",
+          "name": "Screen content",
+          "type": "FRAME",
+          "x": 40,
+          "y": 24,
+          "w": 1360,
+          "h": 734,
+          "layout": "VERTICAL",
+          "pad": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "gap": 16,
+          "radius": 0
+        }
+      ],
+      "textSamples": [
+        {
+          "id": "I253:158;250:644",
+          "text": "RailBites",
+          "font": {
+            "family": "Noto Sans",
+            "style": "SemiBold",
+            "variationSettings": {
+              "wght": 600,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 22,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 30
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "I253:158;250:645",
+          "text": "STAFF KIOSK · SIMULATED DATA",
+          "font": {
+            "family": "Noto Sans",
+            "style": "SemiBold",
+            "variationSettings": {
+              "wght": 600,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 12,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 18
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "I253:158;250:647",
+          "text": "COLLECTION POINT",
+          "font": {
+            "family": "Noto Sans",
+            "style": "SemiBold",
+            "variationSettings": {
+              "wght": 600,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 12,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 18
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "I253:158;250:648",
+          "text": "Peradeniya Junction",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Medium",
+            "variationSettings": {
+              "wght": 500,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 16,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 24
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "I253:158;250:649",
+          "text": "Shared staff session",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Regular",
+            "variationSettings": {
+              "wght": 400,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 14,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 20
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "I253:169;200:606",
+          "text": "Open orders",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Medium",
+            "variationSettings": {
+              "wght": 500,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 15,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 20
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "I253:171;200:608",
+          "text": "Completed",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Medium",
+            "variationSettings": {
+              "wght": 500,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 15,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 20
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "I253:173;200:610",
+          "text": "Refresh",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Medium",
+            "variationSettings": {
+              "wght": 500,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 15,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 20
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        }
+      ],
+      "images": []
+    },
+    {
+      "screen": {
+        "id": "256:980",
+        "name": "RB · TABLET_ORDERS · Light",
+        "type": "FRAME",
+        "x": 64,
+        "y": 220,
+        "w": 2560,
+        "h": 1600,
+        "layout": "NONE",
+        "pad": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "gap": 0,
+        "radius": 0
+      },
+      "children": [
+        {
+          "id": "256:982",
+          "name": "Screen content",
+          "type": "FRAME",
+          "x": 440.8888854980469,
+          "y": 42.66666793823242,
+          "w": 1678.22216796875,
+          "h": 1452.2222900390625,
+          "layout": "VERTICAL",
+          "pad": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "gap": 28.44444465637207,
+          "radius": 0
+        }
+      ],
+      "textSamples": [
+        {
+          "id": "256:987",
+          "text": "RailBites · Staff kiosk",
+          "font": {
+            "family": "Noto Sans",
+            "style": "SemiBold",
+            "variationSettings": {
+              "wght": 600,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 39.11111068725586,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 53.33333206176758
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "256:988",
+          "text": "Peradeniya Junction · Shared session",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Regular",
+            "variationSettings": {
+              "wght": 400,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 24.88888931274414,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 35.55555725097656
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "I256:990;200:606",
+          "text": "Open orders",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Medium",
+            "variationSettings": {
+              "wght": 500,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 26.66666603088379,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 35.55555725097656
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "I256:992;200:608",
+          "text": "Completed",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Medium",
+            "variationSettings": {
+              "wght": 500,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 26.66666603088379,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 35.55555725097656
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "I256:994;200:610",
+          "text": "Refresh",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Medium",
+            "variationSettings": {
+              "wght": 500,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 26.66666603088379,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 35.55555725097656
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "I256:996;200:610",
+          "text": "Sign out",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Medium",
+            "variationSettings": {
+              "wght": 500,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 26.66666603088379,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 35.55555725097656
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "256:998",
+          "text": "Today’s pickup orders",
+          "font": {
+            "family": "Noto Sans",
+            "style": "SemiBold",
+            "variationSettings": {
+              "wght": 600,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 56.88888931274414,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 71.11111450195312
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "256:999",
+          "text": "18 Oct · last loaded 10:34",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Regular",
+            "variationSettings": {
+              "wght": 400,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 24.88888931274414,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 35.55555725097656
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        }
+      ],
+      "images": []
+    },
+    {
+      "screen": {
+        "id": "256:1109",
+        "name": "RB · PHONE_CODE · Light",
+        "type": "FRAME",
+        "x": 1654,
+        "y": 2100,
+        "w": 390,
+        "h": 1200,
+        "layout": "NONE",
+        "pad": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "gap": 0,
+        "radius": 0
+      },
+      "children": [
+        {
+          "id": "256:1111",
+          "name": "Screen content",
+          "type": "FRAME",
+          "x": 20,
+          "y": 24,
+          "w": 350,
+          "h": 774,
+          "layout": "VERTICAL",
+          "pad": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "gap": 16,
+          "radius": 0
+        }
+      ],
+      "textSamples": [
+        {
+          "id": "256:1116",
+          "text": "RailBites · Staff kiosk",
+          "font": {
+            "family": "Noto Sans",
+            "style": "SemiBold",
+            "variationSettings": {
+              "wght": 600,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 22,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 30
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "256:1117",
+          "text": "Peradeniya Junction · Shared session",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Regular",
+            "variationSettings": {
+              "wght": 400,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 14,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 20
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "I256:1119;200:606",
+          "text": "Open orders",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Medium",
+            "variationSettings": {
+              "wght": 500,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 15,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 20
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "I256:1121;200:608",
+          "text": "Completed",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Medium",
+            "variationSettings": {
+              "wght": 500,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 15,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 20
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "256:1123",
+          "text": "Collect order RB-1048",
+          "font": {
+            "family": "Noto Sans",
+            "style": "SemiBold",
+            "variationSettings": {
+              "wght": 600,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 32,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 40
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "256:1125",
+          "text": "Ready · DS-E1",
+          "font": {
+            "family": "Noto Sans",
+            "style": "SemiBold",
+            "variationSettings": {
+              "wght": 600,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 22,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 30
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "256:1126",
+          "text": "18 Oct · Peradeniya Junction",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Regular",
+            "variationSettings": {
+              "wght": 400,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 14,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 20
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "256:1127",
+          "text": "Scheduled 10:42\nLast reported 10:42 · 10:29 evidence",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Regular",
+            "variationSettings": {
+              "wght": 400,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 14,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 20
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        }
+      ],
+      "images": []
+    }
+  ]
+}

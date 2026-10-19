@@ -1,0 +1,224 @@
+{
+  "date": "2026-10-19",
+  "status": "User-approved reference rules for existing features",
+  "scope": "Existing implemented feature families only. Future personal Updates/follow and Operations diagnostics/demo UI remain prerequisite exclusions.",
+  "families": [
+    {
+      "frames": "P01, P03, P06, P11",
+      "route": "PassengerTab.home / trains; inline route picker",
+      "code": [
+        "apps/passenger_app/lib/shell.dart",
+        "apps/passenger_app/lib/trains/train_pages.dart"
+      ],
+      "status": "existing screen family; map illustration is presentation only; no GPS claim",
+      "referenceNodes": [
+        "121:47",
+        "123:67",
+        "122:53",
+        "137:3119"
+      ]
+    },
+    {
+      "frames": "P02, P07, P08, P09",
+      "route": "TrainDetailPage via Navigator",
+      "code": [
+        "apps/passenger_app/lib/trains/train_pages.dart"
+      ],
+      "status": "existing detail, freshness and disruption states",
+      "referenceNodes": [
+        "137:91",
+        "137:3247",
+        "137:3318",
+        "137:3392",
+        "137:3465"
+      ]
+    },
+    {
+      "frames": "P04, P10",
+      "route": "no dedicated Updates / follow UI",
+      "code": [
+        "apps/passenger_app/lib/trains/train_pages.dart",
+        "apps/passenger_app/lib/account/account_page.dart"
+      ],
+      "status": "future personal-change and follow UI; prerequisite passenger-saved-journeys T3/T4; current public notices remain in train views",
+      "referenceNodes": [
+        "137:184",
+        "138:415",
+        "138:545"
+      ]
+    },
+    {
+      "frames": "P05, P17",
+      "route": "PassengerTab.account / external Keycloak sign-in",
+      "code": [
+        "apps/passenger_app/lib/account/account_page.dart"
+      ],
+      "status": "account/auth exists; omit design-only follow/saved lists until prerequisite UI exists; no local credential form",
+      "referenceNodes": [
+        "138:734",
+        "138:637",
+        "138:479"
+      ]
+    },
+    {
+      "frames": "P12-P16",
+      "route": "PassengerTab.food; FoodPage browse/menu/ReviewView/OrderView",
+      "code": [
+        "apps/passenger_app/lib/food/food_pages.dart",
+        "apps/passenger_app/lib/food/food_order_pages.dart"
+      ],
+      "status": "existing Food/order workflow; preserve API-only confirmation and entered-code secrecy",
+      "referenceNodes": [
+        "139:594",
+        "139:704",
+        "139:751",
+        "139:1128"
+      ]
+    },
+    {
+      "frames": "P18",
+      "route": "localized Home/detail/Updates counterparts",
+      "code": [
+        "apps/passenger_app/lib/shell.dart"
+      ],
+      "status": "Abhaya Libre Regular confirmed for bundled fonts and live Figma. Localized Home/detail references; Updates still excluded until passenger-saved-journeys T3/T4.",
+      "referenceNodes": [
+        "140:834",
+        "140:983",
+        "140:1110",
+        "140:1238"
+      ]
+    }
+  ],
+  "states": {
+    "normal": {
+      "referenceNodes": [
+        "121:47",
+        "149:1118",
+        "137:91",
+        "139:594",
+        "139:704",
+        "138:734",
+        "140:834",
+        "140:1110"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=121-47",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=149-1118",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=137-91",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=139-594",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=139-704",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=138-734",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=140-834",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=140-1110"
+      ]
+    },
+    "selected": {
+      "referenceNodes": [
+        "122:53",
+        "139:704"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=122-53",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=139-704"
+      ]
+    },
+    "disabled": {
+      "referenceNodes": [
+        "314:37"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-37"
+      ]
+    },
+    "focus": {
+      "referenceNodes": [
+        "314:37"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-37"
+      ]
+    },
+    "loading": {
+      "referenceNodes": [
+        "314:37"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-37"
+      ]
+    },
+    "empty": {
+      "referenceNodes": [
+        "314:90"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-90"
+      ],
+      "rule": "Keep route/account context and explain no matching data in the existing list body; do not imply an offline or failed read. Reuse compact content/recovery container."
+    },
+    "error": {
+      "referenceNodes": [
+        "139:1128",
+        "314:90"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=139-1128",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-90"
+      ]
+    },
+    "offline": {
+      "referenceNodes": [
+        "137:3119",
+        "314:90"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=137-3119",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-90"
+      ]
+    },
+    "access": {
+      "referenceNodes": [
+        "138:479",
+        "138:734",
+        "314:37"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=138-479",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=138-734",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-37"
+      ]
+    },
+    "compact": {
+      "referenceNodes": [
+        "314:90"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-90"
+      ]
+    },
+    "unavailableFeatureUI": {
+      "referenceNodes": [
+        "137:184",
+        "138:415",
+        "138:545",
+        "140:1062",
+        "140:1317"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=137-184",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=138-415",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=138-545",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=140-1062",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=140-1317"
+      ]
+    }
+  },
+  "sharedRules": "Access/action sheet 314:37; content reflow/keyboard sheet 314:90. Specimens use logical content widths; scale target sizes to each profile. No automatic resend, optimistic confirmation, new cache or permission behavior.",
+  "nonApplicable": [],
+  "validationPending": [
+    "App-rendered overlay/diff and raster calibration",
+    "Actual 200% reflow/keyboard/native-reader checks",
+    "Physical device/display measurements"
+  ],
+  "approvedOn": "2026-10-19"
+}

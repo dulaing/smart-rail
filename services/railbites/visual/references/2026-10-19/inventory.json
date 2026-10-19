@@ -1,0 +1,439 @@
+{
+  "capturedOn": "2026-10-19",
+  "fileKey": "38B21GKxgb3wxRar06gHXP",
+  "status": "discovery, not approved baseline",
+  "page": "HiFi · RailBites kiosk",
+  "frames": [
+    {
+      "id": "252:36",
+      "name": "RB · LOGIN · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "01 · Collection-point access · Light only"
+    },
+    {
+      "id": "252:77",
+      "name": "RB · LOGIN_ERROR · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "01 · Collection-point access · Light only"
+    },
+    {
+      "id": "252:124",
+      "name": "RB · LOGIN_RATE · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "01 · Collection-point access · Light only"
+    },
+    {
+      "id": "252:170",
+      "name": "RB · SESSION_EXPIRED · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "01 · Collection-point access · Light only"
+    },
+    {
+      "id": "252:215",
+      "name": "RB · LOGOUT · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "01 · Collection-point access · Light only"
+    },
+    {
+      "id": "252:252",
+      "name": "RB · ACCESS_DENIED · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "01 · Collection-point access · Light only"
+    },
+    {
+      "id": "253:155",
+      "name": "RB · ORDERS · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "02 · Orders & preparation · Light only"
+    },
+    {
+      "id": "253:215",
+      "name": "RB · ACCEPTED · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "02 · Orders & preparation · Light only"
+    },
+    {
+      "id": "253:278",
+      "name": "RB · READY_SAVING · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "02 · Orders & preparation · Light only"
+    },
+    {
+      "id": "253:344",
+      "name": "RB · READY · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "02 · Orders & preparation · Light only"
+    },
+    {
+      "id": "253:414",
+      "name": "RB · LOADING · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "02 · Orders & preparation · Light only"
+    },
+    {
+      "id": "253:446",
+      "name": "RB · EMPTY · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "02 · Orders & preparation · Light only"
+    },
+    {
+      "id": "253:478",
+      "name": "RB · COMPLETED · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "02 · Orders & preparation · Light only"
+    },
+    {
+      "id": "254:354",
+      "name": "RB · CODE · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "03 · Collect by customer code · Light only"
+    },
+    {
+      "id": "254:412",
+      "name": "RB · CODE_REQUIRED · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "03 · Collect by customer code · Light only"
+    },
+    {
+      "id": "254:469",
+      "name": "RB · CODE_ERROR · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "03 · Collect by customer code · Light only"
+    },
+    {
+      "id": "254:526",
+      "name": "RB · COLLECTING · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "03 · Collect by customer code · Light only"
+    },
+    {
+      "id": "254:582",
+      "name": "RB · COLLECT_UNKNOWN · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "03 · Collect by customer code · Light only"
+    },
+    {
+      "id": "254:637",
+      "name": "RB · COLLECTED · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "03 · Collect by customer code · Light only"
+    },
+    {
+      "id": "254:692",
+      "name": "RB · CONFLICT · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "03 · Collect by customer code · Light only"
+    },
+    {
+      "id": "254:747",
+      "name": "RB · NOSHOW_CONFIRM · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "04 · Prove passage & No-show · Light only"
+    },
+    {
+      "id": "254:802",
+      "name": "RB · NOSHOW_CHECKING · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "04 · Prove passage & No-show · Light only"
+    },
+    {
+      "id": "254:854",
+      "name": "RB · NOSHOW_REFUSED · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "04 · Prove passage & No-show · Light only"
+    },
+    {
+      "id": "254:909",
+      "name": "RB · NOSHOW_UNKNOWN · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "04 · Prove passage & No-show · Light only"
+    },
+    {
+      "id": "254:964",
+      "name": "RB · NOSHOW_UNAVAILABLE · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "04 · Prove passage & No-show · Light only"
+    },
+    {
+      "id": "254:1019",
+      "name": "RB · NOSHOW_DONE · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "04 · Prove passage & No-show · Light only"
+    },
+    {
+      "id": "255:796",
+      "name": "RB · DELAYED · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "05 · Train changes & service recovery · Light only"
+    },
+    {
+      "id": "255:851",
+      "name": "RB · ETA_UNKNOWN · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "05 · Train changes & service recovery · Light only"
+    },
+    {
+      "id": "255:906",
+      "name": "RB · CANCELLED · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "05 · Train changes & service recovery · Light only"
+    },
+    {
+      "id": "255:954",
+      "name": "RB · OFFLINE · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "05 · Train changes & service recovery · Light only"
+    },
+    {
+      "id": "255:1005",
+      "name": "RB · NO_CACHE · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "05 · Train changes & service recovery · Light only"
+    },
+    {
+      "id": "255:1041",
+      "name": "RB · RECOVERED · Light",
+      "type": "FRAME",
+      "width": 1440,
+      "height": 900,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "05 · Train changes & service recovery · Light only"
+    },
+    {
+      "id": "256:980",
+      "name": "RB · TABLET_ORDERS · Light",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "06 · Responsive kiosk · Light only"
+    },
+    {
+      "id": "256:1021",
+      "name": "RB · TABLET_CODE · Light",
+      "type": "FRAME",
+      "width": 2560,
+      "height": 1600,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "06 · Responsive kiosk · Light only"
+    },
+    {
+      "id": "256:1072",
+      "name": "RB · PHONE_ORDERS · Light",
+      "type": "FRAME",
+      "width": 390,
+      "height": 1200,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "06 · Responsive kiosk · Light only"
+    },
+    {
+      "id": "256:1109",
+      "name": "RB · PHONE_CODE · Light",
+      "type": "FRAME",
+      "width": 390,
+      "height": 1200,
+      "modes": {
+        "VariableCollectionId:120:37": "120:0"
+      },
+      "section": "06 · Responsive kiosk · Light only"
+    }
+  ],
+  "initialAudit": {
+    "page": "251:36",
+    "counts": {
+      "light": 36
+    },
+    "texts": 883,
+    "fonts": {
+      "Noto Sans/SemiBold": 256,
+      "Noto Sans/Medium": 316,
+      "Noto Sans/Regular": 231,
+      "Noto Sans/Display SemiBold": 80
+    },
+    "colors": {
+      "light:VariableID:120:42": 488,
+      "light:VariableID:120:43": 303,
+      "light:VariableID:120:45": 57,
+      "light:VariableID:192:596": 11,
+      "light:VariableID:120:53": 11,
+      "light:VariableID:192:595": 11,
+      "light:VariableID:120:48": 2
+    },
+    "images": {
+      "cc27b1e1b481d1ede0f23a9a303fa2f5624b39c1": {
+        "sample": "253:259",
+        "name": "Food photo / Vegetable rice & curry",
+        "count": 3
+      },
+      "652c6f11d8e8ab36784fd223e80b969077c4b5fd": {
+        "sample": "253:264",
+        "name": "Food photo / Plain tea",
+        "count": 3
+      }
+    },
+    "missing": []
+  }
+}

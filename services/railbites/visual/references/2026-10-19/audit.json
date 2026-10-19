@@ -1,0 +1,28 @@
+{
+  "capturedOn": "2026-10-19",
+  "method": "Visible text segments against nearest opaque solid ancestor; resolved variable values. Text bounding boxes checked against screen bounds. Digital checks do not prove glyph clipping, runtime accessibility, physical readability or native-language correctness.",
+  "page": "251:36",
+  "minimumRequired": 4.5,
+  "texts": 883,
+  "minRatio": 4.575089775871984,
+  "fonts": {
+    "Noto Sans/SemiBold": 336,
+    "Noto Sans/Medium": 316,
+    "Noto Sans/Regular": 231
+  },
+  "failures": [],
+  "untested": 0,
+  "overflow": [],
+  "images": {
+    "cc27b1e1b481d1ede0f23a9a303fa2f5624b39c1": {
+      "sample": "253:259",
+      "name": "Food photo / Vegetable rice & curry",
+      "count": 3
+    },
+    "652c6f11d8e8ab36784fd223e80b969077c4b5fd": {
+      "sample": "253:264",
+      "name": "Food photo / Plain tea",
+      "count": 3
+    }
+  }
+}

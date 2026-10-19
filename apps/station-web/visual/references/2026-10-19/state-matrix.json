@@ -1,0 +1,140 @@
+{
+  "date": "2026-10-19",
+  "status": "User-approved reference rules for existing features",
+  "scope": "Existing implemented feature families only. Future personal Updates/follow and Operations diagnostics/demo UI remain prerequisite exclusions.",
+  "families": [
+    {
+      "frames": "S01, S03 entrance, S04, S06",
+      "route": "/?station=GPH&view=entrance; configuration states use missing/invalid config",
+      "code": [
+        "apps/station-web/src/App.tsx",
+        "apps/station-web/src/EntranceBoard.tsx"
+      ],
+      "status": "existing entrance/waiting/disruption/freshness/offline/system families; preserve measured content-fitting behavior",
+      "referenceNodes": [
+        "231:36",
+        "234:250",
+        "239:1315",
+        "240:1762"
+      ]
+    },
+    {
+      "frames": "S02, S03 platform, S05",
+      "route": "/?station=GPH&view=platform&platform=2",
+      "code": [
+        "apps/station-web/src/App.tsx",
+        "apps/station-web/src/PlatformBoard.tsx"
+      ],
+      "status": "existing platform/arrival/move/offline families; no public interaction; Abhaya Libre Regular confirmed; density/type supplement 314:144",
+      "referenceNodes": [
+        "236:533",
+        "236:596",
+        "239:1427",
+        "238:1424"
+      ]
+    }
+  ],
+  "states": {
+    "normal": {
+      "referenceNodes": [
+        "231:36",
+        "236:533"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=231-36",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=236-533"
+      ]
+    },
+    "selected": {
+      "referenceNodes": [],
+      "links": []
+    },
+    "disabled": {
+      "referenceNodes": [],
+      "links": []
+    },
+    "focus": {
+      "referenceNodes": [],
+      "links": []
+    },
+    "loading": {
+      "referenceNodes": [
+        "240:1704",
+        "239:1618"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=240-1704",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=239-1618"
+      ]
+    },
+    "empty": {
+      "referenceNodes": [
+        "240:1733",
+        "236:1093"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=240-1733",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=236-1093"
+      ]
+    },
+    "error": {
+      "referenceNodes": [
+        "240:1762",
+        "238:1297"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=240-1762",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=238-1297"
+      ]
+    },
+    "offline": {
+      "referenceNodes": [
+        "239:1315",
+        "239:1427",
+        "239:1489",
+        "239:1533",
+        "239:1574"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=239-1315",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=239-1427",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=239-1489",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=239-1533",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=239-1574"
+      ]
+    },
+    "density": {
+      "referenceNodes": [
+        "314:144"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-144"
+      ]
+    },
+    "unknown": {
+      "referenceNodes": [
+        "238:1169",
+        "238:1424"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=238-1169",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=238-1424"
+      ]
+    }
+  },
+  "sharedRules": "Access/action sheet 314:37; content reflow/keyboard sheet 314:90. Specimens use logical content widths; scale target sizes to each profile. No automatic resend, optimistic confirmation, new cache or permission behavior.",
+  "nonApplicable": [
+    "selected navigation",
+    "disabled controls",
+    "focus",
+    "sign-in",
+    "keyboard",
+    "phone adaptation; retain 1920x1080 passive board"
+  ],
+  "validationPending": [
+    "App-rendered overlay/diff and raster calibration",
+    "Actual 200% reflow/keyboard/native-reader checks",
+    "Physical device/display measurements"
+  ],
+  "approvedOn": "2026-10-19"
+}

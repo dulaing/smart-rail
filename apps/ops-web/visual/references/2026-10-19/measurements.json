@@ -1,0 +1,278 @@
+{
+  "capturedOn": "2026-10-19",
+  "units": "Figma canvas pixels; apply the uniform surface conversion recorded in the feature spec",
+  "nodes": [
+    {
+      "screen": {
+        "id": "202:66",
+        "name": "O02 · Pilot corridor",
+        "type": "FRAME",
+        "x": 1640,
+        "y": 400,
+        "w": 1440,
+        "h": 900,
+        "layout": "NONE",
+        "pad": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "gap": 0,
+        "radius": 0
+      },
+      "children": [
+        {
+          "id": "202:68",
+          "name": "App sidebar",
+          "type": "FRAME",
+          "x": 0,
+          "y": 0,
+          "w": 216,
+          "h": 900,
+          "layout": "VERTICAL",
+          "pad": [
+            16,
+            16,
+            16,
+            16
+          ],
+          "gap": 8,
+          "radius": 0
+        },
+        {
+          "id": "202:99",
+          "name": "Top bar",
+          "type": "FRAME",
+          "x": 216,
+          "y": 0,
+          "w": 1224,
+          "h": 72,
+          "layout": "HORIZONTAL",
+          "pad": [
+            0,
+            32,
+            0,
+            32
+          ],
+          "gap": 24,
+          "radius": 0
+        },
+        {
+          "id": "202:106",
+          "name": "Content",
+          "type": "FRAME",
+          "x": 248,
+          "y": 104,
+          "w": 1160,
+          "h": 712,
+          "layout": "VERTICAL",
+          "pad": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "gap": 24,
+          "radius": 0
+        }
+      ],
+      "textSamples": [
+        {
+          "id": "202:73",
+          "text": "SmartRail",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Medium",
+            "variationSettings": {
+              "wght": 500,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 16,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 24
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "202:74",
+          "text": "OPERATIONS",
+          "font": {
+            "family": "Noto Sans",
+            "style": "SemiBold",
+            "variationSettings": {
+              "wght": 600,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 12,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 18
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "I202:76;200:619",
+          "text": "Trains",
+          "font": {
+            "family": "Noto Sans",
+            "style": "SemiBold",
+            "variationSettings": {
+              "wght": 600,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 15,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 20
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "I202:82;200:623",
+          "text": "Driver reports",
+          "font": {
+            "family": "Noto Sans",
+            "style": "SemiBold",
+            "variationSettings": {
+              "wght": 600,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 15,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 20
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "I202:88;200:623",
+          "text": "Incidents",
+          "font": {
+            "family": "Noto Sans",
+            "style": "SemiBold",
+            "variationSettings": {
+              "wght": 600,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 15,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 20
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "202:95",
+          "text": "Control workspace",
+          "font": {
+            "family": "Noto Sans",
+            "style": "SemiBold",
+            "variationSettings": {
+              "wght": 600,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 12,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 18
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "202:96",
+          "text": "Dilani",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Medium",
+            "variationSettings": {
+              "wght": 500,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 16,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 24
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        },
+        {
+          "id": "I202:97;200:610",
+          "text": "Staff account",
+          "font": {
+            "family": "Noto Sans",
+            "style": "Medium",
+            "variationSettings": {
+              "wght": 500,
+              "wdth": 100,
+              "CTGR": 0
+            }
+          },
+          "size": 15,
+          "lineHeight": {
+            "unit": "PIXELS",
+            "value": 20
+          },
+          "letterSpacing": {
+            "unit": "PIXELS",
+            "value": 0
+          }
+        }
+      ],
+      "images": [
+        {
+          "id": "I289:3152;288:643",
+          "name": "Supplied operations-icon PNG",
+          "type": "RECTANGLE",
+          "x": -4.255319595336914,
+          "y": -4.487428188323975,
+          "w": 48.5106315612793,
+          "h": 48.5106315612793,
+          "pad": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "radius": 0
+        }
+      ]
+    }
+  ]
+}
