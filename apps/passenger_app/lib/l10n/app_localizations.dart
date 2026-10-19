@@ -999,6 +999,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'See your order'**
   String get foodOpenOrder;
+
+  /// No description provided for @foodCancelOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel order'**
+  String get foodCancelOrder;
+
+  /// No description provided for @foodCancelConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel this order?'**
+  String get foodCancelConfirmTitle;
+
+  /// No description provided for @foodCancelConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'SmartRail will ask the food provider. It can refuse, for example after its cutoff.'**
+  String get foodCancelConfirmBody;
+
+  /// No description provided for @foodKeepOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep order'**
+  String get foodKeepOrder;
+
+  /// No description provided for @foodCancelling.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelling…'**
+  String get foodCancelling;
+
+  /// No description provided for @foodCancelUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The food provider could not be reached. Nothing was changed; try again.'**
+  String get foodCancelUnavailable;
+
+  /// No description provided for @foodCancelUnconfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'We could not confirm whether the cancellation went through. The order shown is what SmartRail last reported. Check again before trying a second time.'**
+  String get foodCancelUnconfirmed;
+
+  /// No description provided for @foodReasonInvalidState.
+  ///
+  /// In en, this message translates to:
+  /// **'This order can no longer be cancelled.'**
+  String get foodReasonInvalidState;
+
+  /// No description provided for @foodReasonPlacementPending.
+  ///
+  /// In en, this message translates to:
+  /// **'The order is still being placed. Try again shortly.'**
+  String get foodReasonPlacementPending;
+
+  /// No description provided for @foodRecentOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Your orders'**
+  String get foodRecentOrders;
+
+  /// No description provided for @foodOrderPlacedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Placed {time}'**
+  String foodOrderPlacedAt(Object time);
+
+  /// No description provided for @foodPendingOrderWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'You have an order waiting for confirmation, so a new order cannot be placed yet.'**
+  String get foodPendingOrderWaiting;
+
+  /// No description provided for @foodBackToFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Food'**
+  String get foodBackToFood;
 }
 
 class _AppLocalizationsDelegate

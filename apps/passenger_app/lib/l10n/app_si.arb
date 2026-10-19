@@ -164,5 +164,19 @@
   "foodStatusCancelled": "අවලංගු කළා",
   "foodYourOrder": "ඔබේ ඇණවුම",
   "foodOrderDone": "අවසන්",
-  "foodOpenOrder": "ඔබේ ඇණවුම බලන්න"
+  "foodOpenOrder": "ඔබේ ඇණවුම බලන්න",
+  "foodCancelOrder": "ඇණවුම අවලංගු කරන්න",
+  "foodCancelConfirmTitle": "මෙම ඇණවුම අවලංගු කරන්නද?",
+  "foodCancelConfirmBody": "SmartRail ආහාර සැපයුම්කරුගෙන් විමසයි. අවසන් වේලාවෙන් පසු වැනි අවස්ථාවල එය ප්‍රතික්ෂේප කළ හැක.",
+  "foodKeepOrder": "ඇණවුම තබාගන්න",
+  "foodCancelling": "අවලංගු කරමින්…",
+  "foodCancelUnavailable": "ආහාර සැපයුම්කරු වෙත ළඟා විය නොහැකි විය. කිසිවක් වෙනස් නොවීය; නැවත උත්සාහ කරන්න.",
+  "foodCancelUnconfirmed": "අවලංගු කිරීම සිදු වූවාදැයි තහවුරු කළ නොහැකි විය. පෙන්වන ඇණවුම SmartRail අවසන් වරට වාර්තා කළ දෙයයි. දෙවන වරට උත්සාහ කිරීමට පෙර නැවත පරීක්ෂා කරන්න.",
+  "foodReasonInvalidState": "මෙම ඇණවුම තවදුරටත් අවලංගු කළ නොහැක.",
+  "foodReasonPlacementPending": "ඇණවුම තවමත් තබමින් පවතී. ටික වේලාවකින් නැවත උත්සාහ කරන්න.",
+  "foodRecentOrders": "ඔබේ ඇණවුම්",
+  "foodOrderPlacedAt": "{time} ට තැබුවා",
+  "@foodOrderPlacedAt": { "placeholders": { "time": {} } },
+  "foodPendingOrderWaiting": "ඔබට තහවුරු වීමට බලා සිටින ඇණවුමක් ඇති බැවින් තවම නව ඇණවුමක් තැබිය නොහැක.",
+  "foodBackToFood": "ආහාර වෙත ආපසු"
 }

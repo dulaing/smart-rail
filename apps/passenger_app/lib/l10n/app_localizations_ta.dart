@@ -537,4 +537,50 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get foodOpenOrder => 'உங்கள் ஆர்டரைப் பார்க்கவும்';
+
+  @override
+  String get foodCancelOrder => 'ஆர்டரை ரத்து செய்';
+
+  @override
+  String get foodCancelConfirmTitle => 'இந்த ஆர்டரை ரத்து செய்யவா?';
+
+  @override
+  String get foodCancelConfirmBody =>
+      'SmartRail உணவு வழங்குநரிடம் கேட்கும். கடைசி நேரத்துக்குப் பிறகு போன்ற சமயங்களில் அவர் மறுக்கலாம்.';
+
+  @override
+  String get foodKeepOrder => 'ஆர்டரை வைத்திரு';
+
+  @override
+  String get foodCancelling => 'ரத்து செய்கிறது…';
+
+  @override
+  String get foodCancelUnavailable =>
+      'உணவு வழங்குநரை அடைய முடியவில்லை. எதுவும் மாறவில்லை; மீண்டும் முயலவும்.';
+
+  @override
+  String get foodCancelUnconfirmed =>
+      'ரத்து நடந்ததா என உறுதிப்படுத்த முடியவில்லை. காட்டப்படுவது SmartRail கடைசியாகத் தெரிவித்தது. இரண்டாவது முறை முயலும் முன் மீண்டும் சரிபார்க்கவும்.';
+
+  @override
+  String get foodReasonInvalidState => 'இந்த ஆர்டரை இனி ரத்து செய்ய முடியாது.';
+
+  @override
+  String get foodReasonPlacementPending =>
+      'ஆர்டர் இன்னும் வைக்கப்படுகிறது. சிறிது நேரத்தில் மீண்டும் முயலவும்.';
+
+  @override
+  String get foodRecentOrders => 'உங்கள் ஆர்டர்கள்';
+
+  @override
+  String foodOrderPlacedAt(Object time) {
+    return '$time அன்று வைக்கப்பட்டது';
+  }
+
+  @override
+  String get foodPendingOrderWaiting =>
+      'உறுதிப்படுத்தலுக்காக ஒரு ஆர்டர் காத்திருப்பதால் புதிய ஆர்டரை இப்போது வைக்க முடியாது.';
+
+  @override
+  String get foodBackToFood => 'உணவுக்குத் திரும்பு';
 }

@@ -51,7 +51,7 @@ class ReviewView extends StatelessWidget {
     } else {
       action = FilledButton(
         key: const Key('food-place-order'),
-        onPressed: controller.canReview && orders.phase == OrderPhase.none
+        onPressed: controller.canReview && orders.phase == OrderPhase.none && orders.request == null
             ? () => orders.submit(controller.buildDraft()!, onCommitted: controller.finishOrder)
             : null,
         child: Text(t.foodPlaceOrder),
@@ -76,6 +76,13 @@ class ReviewView extends StatelessWidget {
         if (option != null && !option.orderable)
           FoodNotice(icon: Icons.info_outline, text: foodReasonText(t, option.reasonCode)),
         if (controller.cartAdjusted) FoodNotice(icon: Icons.info_outline, text: t.foodBasketAdjusted),
+        if (orders.request != null)
+          FoodNotice(
+            icon: Icons.hourglass_bottom,
+            text: t.foodPendingOrderWaiting,
+            action: orders.openOrder,
+            actionLabel: t.foodOpenOrder,
+          ),
         FoodCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,7 +250,18 @@ class OrderView extends StatelessWidget {
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(20),
-      children: children,
+      children: [
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: TextButton.icon(
+            key: const Key('food-order-back'),
+            onPressed: orders.closeOrder,
+            icon: const Icon(Icons.arrow_back),
+            label: Text(t.foodBackToFood),
+          ),
+        ),
+        ...children,
+      ],
     );
   }
 
@@ -265,6 +283,29 @@ class OrderView extends StatelessWidget {
         child: Text(orders.checking ? t.foodChecking : t.foodCheckAgain),
       ),
     ];
+  }
+
+  Future<void> _confirmCancel(BuildContext context, AppLocalizations t) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialog) => AlertDialog(
+        title: Text(t.foodCancelConfirmTitle),
+        content: Text(t.foodCancelConfirmBody),
+        actions: [
+          TextButton(
+            key: const Key('food-keep-order'),
+            onPressed: () => Navigator.of(dialog).pop(false),
+            child: Text(t.foodKeepOrder),
+          ),
+          TextButton(
+            key: const Key('food-confirm-cancel'),
+            onPressed: () => Navigator.of(dialog).pop(true),
+            child: Text(t.foodCancelOrder),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) await orders.cancel();
   }
 
   List<Widget> _confirmed(BuildContext context, AppLocalizations t, SrTheme theme, FoodOrder order) {
@@ -341,6 +382,22 @@ class OrderView extends StatelessWidget {
           ),
         ),
       FoodCard(tint: theme.palette.bgSurface2, child: Text(t.foodPayAtKiosk, style: theme.text('body'))),
+      if (orders.cancelProblem != null)
+        FoodNotice(
+          icon: Icons.info_outline,
+          text: switch (orders.cancelProblem) {
+            'PROVIDER_UNAVAILABLE' => t.foodCancelUnavailable,
+            'UNCONFIRMED' => t.foodCancelUnconfirmed,
+            final code => foodReasonText(t, code),
+          },
+        ),
+      if (open)
+        OutlinedButton(
+          key: const Key('food-cancel-order'),
+          onPressed: orders.cancelling ? null : () => _confirmCancel(context, t),
+          child: Text(orders.cancelling ? t.foodCancelling : t.foodCancelOrder),
+        ),
+      const SizedBox(height: 8),
       FilledButton(key: const Key('food-order-done'), onPressed: orders.closeOrder, child: Text(t.foodOrderDone)),
     ];
   }

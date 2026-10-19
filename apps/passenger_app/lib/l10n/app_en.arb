@@ -164,5 +164,19 @@
   "foodStatusCancelled": "Cancelled",
   "foodYourOrder": "Your order",
   "foodOrderDone": "Done",
-  "foodOpenOrder": "See your order"
+  "foodOpenOrder": "See your order",
+  "foodCancelOrder": "Cancel order",
+  "foodCancelConfirmTitle": "Cancel this order?",
+  "foodCancelConfirmBody": "SmartRail will ask the food provider. It can refuse, for example after its cutoff.",
+  "foodKeepOrder": "Keep order",
+  "foodCancelling": "Cancelling…",
+  "foodCancelUnavailable": "The food provider could not be reached. Nothing was changed; try again.",
+  "foodCancelUnconfirmed": "We could not confirm whether the cancellation went through. The order shown is what SmartRail last reported. Check again before trying a second time.",
+  "foodReasonInvalidState": "This order can no longer be cancelled.",
+  "foodReasonPlacementPending": "The order is still being placed. Try again shortly.",
+  "foodRecentOrders": "Your orders",
+  "foodOrderPlacedAt": "Placed {time}",
+  "@foodOrderPlacedAt": { "placeholders": { "time": {} } },
+  "foodPendingOrderWaiting": "You have an order waiting for confirmation, so a new order cannot be placed yet.",
+  "foodBackToFood": "Back to Food"
 }

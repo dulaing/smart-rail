@@ -164,5 +164,19 @@
   "foodStatusCancelled": "ரத்து செய்யப்பட்டது",
   "foodYourOrder": "உங்கள் ஆர்டர்",
   "foodOrderDone": "முடிந்தது",
-  "foodOpenOrder": "உங்கள் ஆர்டரைப் பார்க்கவும்"
+  "foodOpenOrder": "உங்கள் ஆர்டரைப் பார்க்கவும்",
+  "foodCancelOrder": "ஆர்டரை ரத்து செய்",
+  "foodCancelConfirmTitle": "இந்த ஆர்டரை ரத்து செய்யவா?",
+  "foodCancelConfirmBody": "SmartRail உணவு வழங்குநரிடம் கேட்கும். கடைசி நேரத்துக்குப் பிறகு போன்ற சமயங்களில் அவர் மறுக்கலாம்.",
+  "foodKeepOrder": "ஆர்டரை வைத்திரு",
+  "foodCancelling": "ரத்து செய்கிறது…",
+  "foodCancelUnavailable": "உணவு வழங்குநரை அடைய முடியவில்லை. எதுவும் மாறவில்லை; மீண்டும் முயலவும்.",
+  "foodCancelUnconfirmed": "ரத்து நடந்ததா என உறுதிப்படுத்த முடியவில்லை. காட்டப்படுவது SmartRail கடைசியாகத் தெரிவித்தது. இரண்டாவது முறை முயலும் முன் மீண்டும் சரிபார்க்கவும்.",
+  "foodReasonInvalidState": "இந்த ஆர்டரை இனி ரத்து செய்ய முடியாது.",
+  "foodReasonPlacementPending": "ஆர்டர் இன்னும் வைக்கப்படுகிறது. சிறிது நேரத்தில் மீண்டும் முயலவும்.",
+  "foodRecentOrders": "உங்கள் ஆர்டர்கள்",
+  "foodOrderPlacedAt": "{time} அன்று வைக்கப்பட்டது",
+  "@foodOrderPlacedAt": { "placeholders": { "time": {} } },
+  "foodPendingOrderWaiting": "உறுதிப்படுத்தலுக்காக ஒரு ஆர்டர் காத்திருப்பதால் புதிய ஆர்டரை இப்போது வைக்க முடியாது.",
+  "foodBackToFood": "உணவுக்குத் திரும்பு"
 }

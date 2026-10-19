@@ -537,4 +537,50 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get foodOpenOrder => 'See your order';
+
+  @override
+  String get foodCancelOrder => 'Cancel order';
+
+  @override
+  String get foodCancelConfirmTitle => 'Cancel this order?';
+
+  @override
+  String get foodCancelConfirmBody =>
+      'SmartRail will ask the food provider. It can refuse, for example after its cutoff.';
+
+  @override
+  String get foodKeepOrder => 'Keep order';
+
+  @override
+  String get foodCancelling => 'Cancelling…';
+
+  @override
+  String get foodCancelUnavailable =>
+      'The food provider could not be reached. Nothing was changed; try again.';
+
+  @override
+  String get foodCancelUnconfirmed =>
+      'We could not confirm whether the cancellation went through. The order shown is what SmartRail last reported. Check again before trying a second time.';
+
+  @override
+  String get foodReasonInvalidState => 'This order can no longer be cancelled.';
+
+  @override
+  String get foodReasonPlacementPending =>
+      'The order is still being placed. Try again shortly.';
+
+  @override
+  String get foodRecentOrders => 'Your orders';
+
+  @override
+  String foodOrderPlacedAt(Object time) {
+    return 'Placed $time';
+  }
+
+  @override
+  String get foodPendingOrderWaiting =>
+      'You have an order waiting for confirmation, so a new order cannot be placed yet.';
+
+  @override
+  String get foodBackToFood => 'Back to Food';
 }

@@ -70,6 +70,7 @@ CollectionOption option(
   bool orderable = true,
   String? reason,
   DateTime? estimate,
+  DateTime? orderBy,
   int cutoff = 30,
 }) => CollectionOption(
   stopId: stop,
@@ -79,7 +80,7 @@ CollectionOption option(
   cutoffMinutes: cutoff,
   scheduledArrival: colomboMorning.add(const Duration(hours: 1)),
   estimatedArrival: estimate ?? colomboMorning.add(const Duration(hours: 1, minutes: 5)),
-  orderBy: colomboMorning.add(const Duration(minutes: 35)),
+  orderBy: orderBy ?? colomboMorning.add(const Duration(minutes: 35)),
   orderable: orderable,
   reasonCode: reason,
 );

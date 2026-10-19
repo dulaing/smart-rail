@@ -8,6 +8,7 @@ import 'food_format.dart';
 import 'food_models.dart';
 import 'food_order_pages.dart';
 import 'food_widgets.dart';
+import 'order_models.dart';
 import 'orders_controller.dart';
 
 /// The Food tab: public browsing from the dated train to the menu and basket. It never waits for
@@ -62,6 +63,7 @@ class FoodPage extends StatelessWidget {
                   onRefresh: () async {
                     await controller.refreshOptions();
                     await controller.refreshMenu();
+                    await orders.refreshOrders();
                   },
                   child: body,
                 ),
@@ -105,6 +107,7 @@ class _BrowseView extends StatelessWidget {
           ),
         _JourneyCard(controller: controller),
         const SizedBox(height: 4),
+        if (orders.signedIn && orders.recentOrders.isNotEmpty) _RecentOrders(orders: orders),
         if (journey != null) ...[
           Semantics(header: true, child: Text(t.foodPickupHeading, style: theme.text('heading'))),
           const SizedBox(height: 8),
@@ -437,6 +440,51 @@ class _BasketBar extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+
+/// The account's own recent orders, each opening its pickup code and status.
+class _RecentOrders extends StatelessWidget {
+  const _RecentOrders({required this.orders});
+  final FoodOrdersController orders;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final theme = SrTheme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Semantics(header: true, child: Text(t.foodRecentOrders, style: theme.text('heading'))),
+        const SizedBox(height: 8),
+        for (final order in orders.recentOrders.take(5))
+          FoodCard(
+            child: InkWell(
+              key: Key('food-recent-${order.id}'),
+              onTap: () => orders.select(order.id),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: theme.metrics.minTarget),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      [for (final i in order.items ?? const <FoodOrderItem>[]) '${i.quantity} × ${i.name}'].join(', '),
+                      style: theme.text('body'),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${orderStatusText(t, order.status)} · ${t.foodOrderPlacedAt(clockTime(order.createdAt))}',
+                      style: theme.text('body', color: theme.palette.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        const SizedBox(height: 4),
+      ],
     );
   }
 }

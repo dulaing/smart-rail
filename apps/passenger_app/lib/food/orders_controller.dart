@@ -70,6 +70,7 @@ class FoodOrdersController extends ChangeNotifier {
   String? _accountId;
   int _epoch = 0;
   bool _busy = false;
+  bool _listing = false;
   bool _disposed = false;
   VoidCallback? _onCommitted;
 
@@ -81,8 +82,23 @@ class FoodOrdersController extends ChangeNotifier {
   /// The stable `code` of a conclusive refusal, when [phase] is [OrderPhase.refused].
   String? refusalCode;
 
-  /// The current order once the provider confirmed it. Shown only in this authenticated view.
-  FoodOrder? order;
+  final Map<String, FoodOrder> _orders = {};
+  String? _selectedId;
+
+  /// The order being shown, once the provider confirmed it. Shown only in this authenticated view.
+  FoodOrder? get order => _selectedId == null ? null : _orders[_selectedId];
+
+  /// The account's own orders as the server last reported them, newest first (a bounded list, not a
+  /// full history).
+  List<FoodOrder> get recentOrders =>
+      (_orders.values.toList()..sort((a, b) => b.createdAt.compareTo(a.createdAt)));
+
+  /// A cancellation is under way for the shown order.
+  bool cancelling = false;
+
+  /// Why the last cancellation did not happen: a stable code, `PROVIDER_UNAVAILABLE`, or
+  /// `UNCONFIRMED` when the reply was lost and a reread did not settle it.
+  String? cancelProblem;
 
   /// True while a recovery read or replay is running (the button spins; the key never changes).
   bool checking = false;
@@ -107,7 +123,13 @@ class FoodOrdersController extends ChangeNotifier {
       unawaited(_attach(id));
     } else if (id != null && (phase == OrderPhase.sessionEnded || phase == OrderPhase.forbidden) && !account.busy) {
       // The same account signed in again after its session was rejected.
-      if (request != null) unawaited(recover());
+      if (request != null) {
+        unawaited(recover());
+      } else {
+        phase = OrderPhase.none;
+        _notify();
+        unawaited(refreshOrders());
+      }
     }
   }
 
@@ -118,7 +140,11 @@ class FoodOrdersController extends ChangeNotifier {
     _busy = false;
     checking = false;
     request = null;
-    order = null;
+    _orders.clear();
+    _selectedId = null;
+    cancelling = false;
+    cancelProblem = null;
+    _listing = false;
     refusalCode = null;
     phase = OrderPhase.none;
     viewing = false;
@@ -142,6 +168,7 @@ class FoodOrdersController extends ChangeNotifier {
       _notify();
       await recover();
     }
+    await refreshOrders();
   }
 
   /// Freezes the basket under a fresh request key, saves it, then sends it. [onCommitted] runs once
@@ -272,7 +299,8 @@ class FoodOrdersController extends ChangeNotifier {
 
   Future<void> _confirmed(FoodOrder confirmed) async {
     await _clearRequest();
-    order = confirmed;
+    _selectedId = confirmed.id;
+    _merge(confirmed);
     phase = OrderPhase.none;
     viewing = true;
     _committed();
@@ -297,7 +325,15 @@ class FoodOrdersController extends ChangeNotifier {
       await _clearRequest();
       _onCommitted = null;
     }
-    order = null;
+    _sessionLost(status);
+  }
+
+  /// A 401 or 403: private content (orders, pickup codes) is dropped from memory at once. A kept
+  /// request stays saved for the same account to recover after signing in again.
+  void _sessionLost(int status) {
+    _orders.clear();
+    _selectedId = null;
+    cancelling = false;
     phase = status == 401 ? OrderPhase.sessionEnded : OrderPhase.forbidden;
   }
 
@@ -328,6 +364,132 @@ class FoodOrdersController extends ChangeNotifier {
     }
   }
 
+  /// Accepts a server answer about an order only if it moves that order forward. A late response
+  /// can never undo Ready, Collected, No-show or Cancelled, and a terminal order is never revived.
+  /// Returns the order now held.
+  FoodOrder _merge(FoodOrder incoming) {
+    final held = _orders[incoming.id];
+    if (held != null && !_isNewer(incoming, held)) return held;
+    _orders[incoming.id] = incoming;
+    return incoming;
+  }
+
+  static bool _isNewer(FoodOrder incoming, FoodOrder held) {
+    if (held.isTerminal && incoming.status != held.status) return false;
+    if (OrderStatus.rank(incoming.status) < OrderStatus.rank(held.status)) return false;
+    if (incoming.statusSequence != held.statusSequence) return incoming.statusSequence > held.statusSequence;
+    // Same sequence: only fresher details (for example a new pickup estimate) of the same state.
+    return incoming.status == held.status && incoming.updatedAt.isAfter(held.updatedAt);
+  }
+
+  /// Reads the account's own orders and merges what is newer. Orders still PLACING are the
+  /// unresolved request's business ([recover]), not shown as confirmed here.
+  Future<void> refreshOrders() async {
+    final id = _accountId;
+    if (id == null || _listing) return;
+    _listing = true;
+    final epoch = _epoch;
+    try {
+      OrderReply reply;
+      try {
+        reply = await api.list(await account.auth.accessToken());
+      } on StateError {
+        reply = const OrderReply(status: 401);
+      } catch (_) {
+        reply = const OrderReply.lost();
+      }
+      if (epoch != _epoch || _disposed) return;
+      if (reply.status == 401 || reply.status == 403) {
+        _sessionLost(reply.status!);
+      } else if (reply.status == 200) {
+        for (final listed in reply.orders ?? const <FoodOrder>[]) {
+          if (listed.status == OrderStatus.placing || listed.status == OrderStatus.rejected) continue;
+          _merge(listed);
+        }
+      }
+    } finally {
+      if (epoch == _epoch) {
+        _listing = false;
+        _notify();
+      }
+    }
+  }
+
+  /// Shows an order from the list. Its details were already read from the server.
+  void select(String orderId) {
+    if (!_orders.containsKey(orderId)) return;
+    _selectedId = orderId;
+    cancelProblem = null;
+    viewing = true;
+    _notify();
+  }
+
+  /// Asks the server to cancel the shown order, once. The app never decides eligibility or the
+  /// provider cutoff: it rereads the order, sends one cancellation and reports what the server says.
+  /// After a lost reply it rereads before offering another try.
+  Future<void> cancel() async {
+    final id = _accountId, shown = order;
+    if (id == null || shown == null || cancelling || shown.isTerminal) return;
+    cancelling = true;
+    cancelProblem = null;
+    final epoch = _epoch;
+    _notify();
+    try {
+      final token = await account.auth.accessToken();
+      // Freshest state first: it may already be cancelled, collected or past cancellation.
+      final fresh = await api.read(token, shown.id);
+      if (epoch != _epoch || _disposed) return;
+      if (fresh.status == 200 && fresh.order != null) {
+        final now = _merge(fresh.order!);
+        if (now.isTerminal) return;
+      }
+      final reply = await api.cancel(token, shown.id);
+      if (epoch != _epoch || _disposed) return;
+      switch (reply.status) {
+        case 200:
+          final cancelled = reply.order;
+          if (cancelled != null) {
+            _merge(cancelled);
+          } else {
+            cancelProblem = 'UNCONFIRMED';
+          }
+        case 409:
+          cancelProblem = reply.code ?? 'INVALID_STATE';
+        case 503:
+          cancelProblem = 'PROVIDER_UNAVAILABLE';
+        case 404:
+          cancelProblem = 'ORDER_NOT_FOUND';
+        case 401 || 403:
+          _sessionLost(reply.status!);
+        case null:
+          await _reconcileCancellation(token, shown.id, epoch);
+        default:
+          cancelProblem = 'UNCONFIRMED';
+      }
+    } on StateError {
+      if (epoch == _epoch) _sessionLost(401);
+    } catch (_) {
+      if (epoch == _epoch) cancelProblem = 'UNCONFIRMED';
+    } finally {
+      if (epoch == _epoch) {
+        cancelling = false;
+        _notify();
+      }
+    }
+  }
+
+  /// The cancellation reply was lost: read the order to learn whether it took effect.
+  Future<void> _reconcileCancellation(String token, String orderId, int epoch) async {
+    final reread = await api.read(token, orderId);
+    if (epoch != _epoch || _disposed) return;
+    final read = reread.status == 200 ? reread.order : null;
+    if (read != null) {
+      final now = _merge(read);
+      if (now.status == OrderStatus.cancelled) return;
+    }
+    cancelProblem = 'UNCONFIRMED';
+  }
+
   /// Food is on screen and the app is in the foreground. Becoming visible (a tab switch or a resume)
   /// checks at once; while visible an unresolved request is checked every [pollEvery]. Nothing runs
   /// in the background.
@@ -345,6 +507,9 @@ class FoodOrdersController extends ChangeNotifier {
   /// not retried on a timer.
   Future<void> tick() async {
     if (request != null && phase == OrderPhase.uncertain) await recover();
+    if (_accountId != null && (_orders.isEmpty || _orders.values.any((o) => !o.isTerminal))) {
+      await refreshOrders();
+    }
   }
 
   /// The person explicitly gives up a request the server said belongs to a different order. This is
@@ -369,12 +534,15 @@ class FoodOrdersController extends ChangeNotifier {
     }
   }
 
-  /// Closes the order screen once the person has seen a confirmed order.
+  void dismissCancelProblem() {
+    cancelProblem = null;
+    _notify();
+  }
+
+  /// Leaves the order screen. An unresolved request keeps being checked and stays reachable from Food.
   void closeOrder() {
-    if (request == null) {
-      viewing = false;
-      _notify();
-    }
+    viewing = false;
+    _notify();
   }
 
   void openOrder() {

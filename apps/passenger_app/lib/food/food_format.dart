@@ -25,5 +25,7 @@ String foodReasonText(AppLocalizations t, String? code) => switch (code) {
   'PASSENGER_CANCELLED' => t.foodReasonPassengerCancelled,
   'TRAIN_CANCELLED' => t.foodReasonTrainCancelled,
   'TRAIN_ENDED_EARLY' => t.foodReasonTrainEndedEarly,
+  'INVALID_STATE' => t.foodReasonInvalidState,
+  'PLACEMENT_PENDING' => t.foodReasonPlacementPending,
   _ => t.foodReasonGeneric,
 };

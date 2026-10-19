@@ -526,4 +526,50 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get foodOpenOrder => 'ඔබේ ඇණවුම බලන්න';
+
+  @override
+  String get foodCancelOrder => 'ඇණවුම අවලංගු කරන්න';
+
+  @override
+  String get foodCancelConfirmTitle => 'මෙම ඇණවුම අවලංගු කරන්නද?';
+
+  @override
+  String get foodCancelConfirmBody =>
+      'SmartRail ආහාර සැපයුම්කරුගෙන් විමසයි. අවසන් වේලාවෙන් පසු වැනි අවස්ථාවල එය ප්‍රතික්ෂේප කළ හැක.';
+
+  @override
+  String get foodKeepOrder => 'ඇණවුම තබාගන්න';
+
+  @override
+  String get foodCancelling => 'අවලංගු කරමින්…';
+
+  @override
+  String get foodCancelUnavailable =>
+      'ආහාර සැපයුම්කරු වෙත ළඟා විය නොහැකි විය. කිසිවක් වෙනස් නොවීය; නැවත උත්සාහ කරන්න.';
+
+  @override
+  String get foodCancelUnconfirmed =>
+      'අවලංගු කිරීම සිදු වූවාදැයි තහවුරු කළ නොහැකි විය. පෙන්වන ඇණවුම SmartRail අවසන් වරට වාර්තා කළ දෙයයි. දෙවන වරට උත්සාහ කිරීමට පෙර නැවත පරීක්ෂා කරන්න.';
+
+  @override
+  String get foodReasonInvalidState => 'මෙම ඇණවුම තවදුරටත් අවලංගු කළ නොහැක.';
+
+  @override
+  String get foodReasonPlacementPending =>
+      'ඇණවුම තවමත් තබමින් පවතී. ටික වේලාවකින් නැවත උත්සාහ කරන්න.';
+
+  @override
+  String get foodRecentOrders => 'ඔබේ ඇණවුම්';
+
+  @override
+  String foodOrderPlacedAt(Object time) {
+    return '$time ට තැබුවා';
+  }
+
+  @override
+  String get foodPendingOrderWaiting =>
+      'ඔබට තහවුරු වීමට බලා සිටින ඇණවුමක් ඇති බැවින් තවම නව ඇණවුමක් තැබිය නොහැක.';
+
+  @override
+  String get foodBackToFood => 'ආහාර වෙත ආපසු';
 }
