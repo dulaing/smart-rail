@@ -9,6 +9,7 @@ import type { Station } from './api.ts'
 export type Texts = Record<Locale, string>
 
 const local = {
+  moreServices: { en: 'Additional services: {n}', si: 'තවත් සේවා: {n}', ta: 'கூடுதல் சேவைகள்: {n}' },
   platform: { en: 'Platform', si: 'වේදිකාව', ta: 'நடைமேடை' },
   train: { en: 'Train', si: 'දුම්රිය', ta: 'ரயில்' },
   status: { en: 'Status', si: 'තත්ත්වය', ta: 'நிலை' },

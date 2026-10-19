@@ -93,24 +93,26 @@ function Board() {
         <Clock now={now} />
       </header>
 
-      {data.feed === 'unavailable' && days.length > 0 && (
-        <div className="banner banner-offline" role="status">
-          <Lines texts={say('liveUnavailable')} />
-          <span className="banner-detail">
-            <Lines texts={say('timetableOnly', { time: formatClock(savedAt) })} />
-          </span>
-        </div>
-      )}
-      {data.feed === 'live' && data.partial && (
-        <div className="banner banner-partial" role="status">
-          <Lines texts={say('partial')} inline />
-        </div>
-      )}
-      {outOfDate && (
-        <div className="banner banner-offline" role="status">
-          <Lines texts={say('outOfDate')} />
-        </div>
-      )}
+      <div className="board-banners">
+        {data.feed === 'unavailable' && days.length > 0 && (
+          <div className="banner banner-offline" role="status">
+            <Lines texts={say('liveUnavailable')} />
+            <span className="banner-detail">
+              <Lines texts={say('timetableOnly', { time: formatClock(savedAt) })} />
+            </span>
+          </div>
+        )}
+        {data.feed === 'live' && data.partial && (
+          <div className="banner banner-partial" role="status">
+            <Lines texts={say('partial')} inline />
+          </div>
+        )}
+        {outOfDate && (
+          <div className="banner banner-offline" role="status">
+            <Lines texts={say('outOfDate')} />
+          </div>
+        )}
+      </div>
 
       <main className="board-body">{body}</main>
 

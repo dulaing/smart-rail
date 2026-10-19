@@ -12,8 +12,25 @@ export const lookbackMs = 3 * 60 * 60 * 1000
 export const aheadMs = 6 * 60 * 60 * 1000
 /** A train nobody has ever observed, and a cancellation, stay this long past their scheduled time. */
 export const graceMs = 15 * 60 * 1000
-/** What the entrance board has room for at 1920 x 1080 with three languages. */
+/** Upper bound; the entrance also measures the space needed by complete trilingual rows. */
 export const entranceRowLimit = 6
+
+/** Fit complete rows without shrinking the station type. Confirmed disruptions take priority
+ * over ordinary services; the selected rows keep their upcoming-time order. */
+export function fitEntranceRows(rows: readonly BoardRow[], heights: readonly number[], available: number): Set<string> {
+  const selected = new Set<string>()
+  let remaining = available
+  const changed = (row: BoardRow) => row.cancelled || row.unservedHere || row.endsEarly || row.moved !== null || row.confirmedDelay !== null
+  const indices = rows.map((_, i) => i)
+  for (const i of [...indices.filter(i => changed(rows[i])), ...indices.filter(i => !changed(rows[i]))]) {
+    if (selected.size >= entranceRowLimit) break
+    if (heights[i] <= remaining) {
+      selected.add(rows[i].key)
+      remaining -= heights[i]
+    }
+  }
+  return selected
+}
 /** An expected time this much later than the scheduled one is a delay worth saying. */
 const delayThresholdMs = 60 * 1000
 

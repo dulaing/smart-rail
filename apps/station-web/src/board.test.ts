@@ -6,7 +6,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
-import { callingStops, deriveRows, evidenceOf, graceMs, platformView, type BoardInput, type JourneyLive } from './board.ts'
+import { callingStops, deriveRows, evidenceOf, fitEntranceRows, graceMs, platformView, type BoardInput, type JourneyLive } from './board.ts'
 import { at, changes, journey, running, stations } from './fixtures.ts'
 import { stationTexts } from './messages.ts'
 import { describeRow } from './rowText.ts'
@@ -14,6 +14,30 @@ import { describeRow } from './rowText.ts'
 const j = journey()
 const name = (id: string) => stationTexts(stations.find((s) => s.id === id))
 const observedAt = (hhmmss: string) => new Date(Date.parse(`2026-10-15T${hhmmss}+05:30`)).toISOString()
+
+test('entrance fitting keeps complete rows and prioritises service changes over ordinary trains', () => {
+  const base = rowsFor('s-rgm', at('07:45'), null)[0]
+  const rows = [
+    { ...base, key: 'first' },
+    { ...base, key: 'second' },
+    { ...base, key: 'moved', moved: { from: '1', to: '2', confirmedAt: at('07:40') } },
+  ]
+  const selected = fitEntranceRows(rows, [100, 100, 150], 250)
+  assert.deepEqual(rows.filter(row => selected.has(row.key)).map(row => row.key), ['first', 'moved'])
+  assert.equal(fitEntranceRows(rows, [100, 100, 150], 99).size, 0)
+})
+
+test('entrance fitting reserves room for cancellations, early endings and confirmed delays', () => {
+  const base = rowsFor('s-rgm', at('07:45'), null)[0]
+  const rows = [
+    { ...base, key: 'ordinary' },
+    { ...base, key: 'cancelled', cancelled: true },
+    { ...base, key: 'early', unservedHere: true },
+    { ...base, key: 'delay', confirmedDelay: { minutes: 5, at: at('07:40') } },
+  ]
+  assert.deepEqual([...fitEntranceRows(rows, [80, 100, 100, 100], 300)], ['cancelled', 'early', 'delay'])
+  assert.equal(fitEntranceRows(Array.from({ length: 8 }, (_, i) => ({ ...base, key: String(i) })), Array(8).fill(50), 1000).size, 6)
+})
 
 /** Rows for one station with the given live data for SIM-1001. */
 function rowsFor(station: string, now: number, live: Partial<JourneyLive> | null, overrides: Partial<BoardInput> = {}) {

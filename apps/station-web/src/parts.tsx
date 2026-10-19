@@ -6,7 +6,7 @@ import { StatusIcon } from './design/StatusBadge.tsx'
 import type { Pill } from './rowText.ts'
 import type { Texts } from './messages.ts'
 
-/** English, Sinhala and Tamil together at one size, one above the other. Never a carousel. */
+/** English, Sinhala and Tamil together at one size, wrapping to complete lines. Never a carousel. */
 export function Lines({ texts, inline = false }: { texts: Texts; inline?: boolean }) {
   return (
     <span className={inline ? 'lines lines-inline' : 'lines'}>

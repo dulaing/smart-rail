@@ -26,7 +26,7 @@ function stationServiceWorker(): Plugin {
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), stationServiceWorker()],
-  // The Keycloak client registers exactly this origin, so never fall back to another port.
+  // Keep a predictable local origin: it must be included in the API's CORS configuration.
   // The shared design files live in ../../shared and ../../packages (fonts), outside this app.
   server: { port: 5173, strictPort: true, fs: { allow: ['../..'] } },
 })
