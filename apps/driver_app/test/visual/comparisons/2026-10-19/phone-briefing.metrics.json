@@ -1,12 +1,12 @@
 ﻿{
-    "reference":  "test/visual/comparisons/2026-10-19/phone-briefing.reference.png",
-    "actual":  "test/visual/comparisons/2026-10-19/phone-briefing.actual.png",
+    "reference":  "apps/driver_app/test/visual/comparisons/2026-10-19/phone-briefing.14sp.reference.png",
+    "actual":  "apps/driver_app/test/visual/comparisons/2026-10-19/phone-briefing.actual.png",
     "cropTop":  120,
     "cropBottom":  60,
     "width":  1080,
     "height":  2220,
-    "meanAbsoluteChannelError":  14.389621148926704,
-    "pixelsWithChannelDeltaAbove16":  0.089368952285618947,
+    "meanAbsoluteChannelError":  2.8510678734289847,
+    "pixelsWithChannelDeltaAbove16":  0.027808641975308641,
     "maximumChannelDelta":  244,
     "interpretation":  "Diagnostic only. Review geometry and text separately; this is not a whole-image pass threshold."
 }

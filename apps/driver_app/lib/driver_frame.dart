@@ -15,6 +15,7 @@ class DriverFrame extends StatelessWidget {
     this.connection,
     this.phoneAction,
     this.showReports = true,
+    this.onPhoneBack,
   });
 
   final String title, displayName, selected;
@@ -23,6 +24,7 @@ class DriverFrame extends StatelessWidget {
   final DateTime? now;
   final Widget? connection, phoneAction;
   final bool showReports;
+  final VoidCallback? onPhoneBack;
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +68,20 @@ class DriverFrame extends StatelessWidget {
                     padding: const EdgeInsets.fromLTRB(55 / 3, 8, 55 / 3, 0),
                     child: Row(
                       children: [
-                        const DriverLogo(size: 32),
+                        if (onPhoneBack == null)
+                          const DriverLogo(size: 32)
+                        else
+                          SizedBox.square(
+                            dimension: 56,
+                            child: IconButton(
+                              tooltip: 'Back',
+                              onPressed: onPhoneBack,
+                              style: IconButton.styleFrom(
+                                backgroundColor: p.bgSurface,
+                              ),
+                              icon: const DriverAsset('back', size: 24),
+                            ),
+                          ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: DriverText(
@@ -120,7 +135,7 @@ class DriverFrame extends StatelessWidget {
                       55 / 3,
                       16 / 3,
                       55 / 3,
-                      16 / 3,
+                      20 / 3,
                     ),
                     child: phoneAction!,
                   ),
@@ -364,17 +379,19 @@ class DriverAction extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.phone = false,
+    this.outlined = false,
   });
   final String label;
   final VoidCallback? onPressed;
-  final bool phone;
+  final bool phone, outlined;
   @override
   Widget build(BuildContext context) {
     final p = SrTheme.of(context).palette;
     return FilledButton(
       style: FilledButton.styleFrom(
-        backgroundColor: p.navActive,
-        foregroundColor: p.navActiveInk,
+        backgroundColor: outlined ? p.bgSurface : p.navActive,
+        foregroundColor: outlined ? p.textPrimary : p.navActiveInk,
+        side: outlined ? BorderSide(color: p.lineHairline) : null,
         minimumSize: Size(double.infinity, phone ? 64 : 96),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         shape: RoundedRectangleBorder(

@@ -1,0 +1,12 @@
+﻿{
+    "reference":  "apps/driver_app/test/visual/comparisons/2026-10-19/tablet-delay.reference.png",
+    "actual":  "apps/driver_app/test/visual/comparisons/2026-10-19/tablet-delay.actual.png",
+    "cropTop":  0,
+    "cropBottom":  0,
+    "width":  2560,
+    "height":  1600,
+    "meanAbsoluteChannelError":  0.50721891276041664,
+    "pixelsWithChannelDeltaAbove16":  0.005714111328125,
+    "maximumChannelDelta":  244,
+    "interpretation":  "Diagnostic only. Review geometry and text separately; this is not a whole-image pass threshold."
+}

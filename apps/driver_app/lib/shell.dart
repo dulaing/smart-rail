@@ -102,6 +102,14 @@ class _DriverShellState extends State<DriverShell> {
                   offlineOwnerId: widget.offlineOwnerId,
                   displayName: widget.account.displayName,
                   updatesOnly: _tab == DriverTab.updates,
+                  onReports:
+                      !canOpen(DriverTab.reports, widget.account) ||
+                          widget.offlineOwnerId != null
+                      ? null
+                      : () {
+                          Navigator.of(context).pop();
+                          setState(() => _tab = DriverTab.reports);
+                        },
                   onAccount: () {
                     Navigator.of(context).pop();
                     setState(() => _tab = DriverTab.account);

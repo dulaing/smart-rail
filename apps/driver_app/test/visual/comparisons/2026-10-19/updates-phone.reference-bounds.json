@@ -1,0 +1,108 @@
+{
+  "tablet-updates": {
+    "updates-title": {
+      "x": 168,
+      "y": 112,
+      "width": 1080,
+      "height": 36
+    },
+    "update-platform": {
+      "x": 168,
+      "y": 208,
+      "width": 1080,
+      "height": 162
+    },
+    "update-delay": {
+      "x": 168,
+      "y": 394,
+      "width": 1080,
+      "height": 162
+    },
+    "updates-back": {
+      "x": 168,
+      "y": 580,
+      "width": 480,
+      "height": 96
+    }
+  },
+  "tablet-platform": {
+    "update-overview": {
+      "x": 168,
+      "y": 112,
+      "width": 1080,
+      "height": 248
+    },
+    "update-boundary": {
+      "x": 168,
+      "y": 384,
+      "width": 1080,
+      "height": 60
+    },
+    "update-actions": {
+      "x": 168,
+      "y": 468,
+      "width": 1080,
+      "height": 96
+    }
+  },
+  "tablet-delay": {
+    "update-overview": {
+      "x": 168,
+      "y": 112,
+      "width": 1080,
+      "height": 332
+    },
+    "update-boundary": {
+      "x": 168,
+      "y": 468,
+      "width": 1080,
+      "height": 60
+    },
+    "update-actions": {
+      "x": 168,
+      "y": 552,
+      "width": 1080,
+      "height": 96
+    }
+  },
+  "phone-briefing": {
+    "next-stop": {
+      "x": 18.333333333333332,
+      "y": 227.33333333333331,
+      "width": 323.3333333333333,
+      "height": 121.33333333333333
+    },
+    "phone-change": {
+      "x": 18.333333333333332,
+      "y": 606.6666666666666,
+      "width": 323.3333333333333,
+      "height": 72
+    },
+    "safety": {
+      "x": 18.333333333333332,
+      "y": 686.6666666666666,
+      "width": 323.3333333333333,
+      "height": 20
+    },
+    "report-action": {
+      "x": 18.333333333333332,
+      "y": 709.3333333333333,
+      "width": 323.3333333333333,
+      "height": 64
+    }
+  },
+  "phone-platform": {
+    "update-overview": {
+      "x": 18.333333333333332,
+      "y": 244,
+      "width": 323.3333333333333,
+      "height": 170.66666666666666
+    },
+    "update-source": {
+      "x": 18.333333333333332,
+      "y": 425.3333333333333,
+      "width": 323.3333333333333,
+      "height": 166.66666666666666
+    }
+  }
+}

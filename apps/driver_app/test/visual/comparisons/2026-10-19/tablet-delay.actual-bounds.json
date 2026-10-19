@@ -1,0 +1,20 @@
+{
+  "update-overview": {
+    "x": 168.0,
+    "y": 112.0,
+    "width": 1080.0,
+    "height": 332.0
+  },
+  "update-boundary": {
+    "x": 168.0,
+    "y": 468.0,
+    "width": 1080.0,
+    "height": 60.0
+  },
+  "update-actions": {
+    "x": 168.0,
+    "y": 552.0,
+    "width": 1080.0,
+    "height": 96.0
+  }
+}

@@ -7,6 +7,7 @@ import 'package:smartrail_core/smartrail_core.dart';
 
 import '../driver_frame.dart';
 import 'briefing_api.dart';
+import 'update_detail.dart';
 
 /// Presentation of a selected dated journey. Reads, clock correction and cache policy
 /// remain in DriverBriefingScreen; this view never changes server state.
@@ -25,6 +26,7 @@ class DriverDutyView extends StatefulWidget {
     this.onBack,
     this.onAccount,
     this.onReport,
+    this.onReports,
     this.onRefresh,
   });
   final DriverJourney journey;
@@ -34,7 +36,7 @@ class DriverDutyView extends StatefulWidget {
   final bool saved, updatesOnly;
   final DateTime? downloadedAt, checkedAt;
   final String? notice;
-  final VoidCallback? onBack, onAccount, onReport;
+  final VoidCallback? onBack, onAccount, onReport, onReports;
   final Future<void> Function()? onRefresh;
 
   @override
@@ -44,6 +46,37 @@ class DriverDutyView extends StatefulWidget {
 class _DriverDutyViewState extends State<DriverDutyView> {
   late bool _updates = widget.updatesOnly;
   String? _selectedId;
+  final _changeFocus = <String, FocusNode>{};
+  bool _detailFromUpdates = false;
+
+  FocusNode _focusFor(BriefingChange change) => _changeFocus.putIfAbsent(
+    change.id!,
+    () => FocusNode(debugLabel: 'Change ${change.id}'),
+  );
+
+  void _openChange(BriefingChange change) => setState(() {
+    _detailFromUpdates = _updates;
+    _selectedId = change.id;
+  });
+
+  void _closeDetail({required bool updates}) {
+    final id = _selectedId;
+    setState(() {
+      _selectedId = null;
+      _updates = updates;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _changeFocus[id]?.requestFocus();
+    });
+  }
+
+  @override
+  void dispose() {
+    for (final node in _changeFocus.values) {
+      node.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -204,11 +237,12 @@ class _DriverDutyViewState extends State<DriverDutyView> {
                                         change: c,
                                         briefing: b,
                                         running: running,
+                                        focusNode: c.id == null
+                                            ? null
+                                            : _focusFor(c),
                                         onTap: c.id == null
                                             ? null
-                                            : () => setState(
-                                                () => _selectedId = c.id,
-                                              ),
+                                            : () => _openChange(c),
                                       ),
                                     ),
                                     const SizedBox(height: 16),
@@ -254,13 +288,17 @@ class _DriverDutyViewState extends State<DriverDutyView> {
               if (b.changes.isNotEmpty) ...[
                 const SizedBox(height: 8),
                 _ChangeCard(
+                  key: const Key('phone-change'),
                   change: b.changes.first,
                   briefing: b,
                   running: running,
                   compact: true,
+                  focusNode: b.changes.first.id == null
+                      ? null
+                      : _focusFor(b.changes.first),
                   onTap: b.changes.first.id == null
                       ? null
-                      : () => setState(() => _selectedId = b.changes.first.id),
+                      : () => _openChange(b.changes.first),
                 ),
               ],
               const SizedBox(height: 8),
@@ -268,21 +306,33 @@ class _DriverDutyViewState extends State<DriverDutyView> {
             ],
           );
     final content = selected != null
-        ? _detail(context, selected, running)
+        ? DriverUpdateDetail(
+            change: selected,
+            briefing: b,
+            running: running,
+            wide: wide,
+            onAllUpdates: () => _closeDetail(updates: true),
+            onBriefing: () => _closeDetail(updates: false),
+          )
         : _updates || _selectedId != null
         ? _list(context, running)
         : duty;
     return DriverFrame(
       title: selected != null
-          ? 'Confirmed update'
+          ? wide
+                ? 'Confirmed update'
+                : 'Update'
           : _updates
           ? 'Updates'
           : title,
       displayName: widget.displayName,
-      showReports: widget.onReport != null && !widget.saved,
+      showReports: widget.onReports != null && !widget.saved,
       selected: _updates || selected != null ? 'updates' : 'journeys',
       now: widget.now,
       connection: connection,
+      onPhoneBack: selected == null
+          ? null
+          : () => _closeDetail(updates: _detailFromUpdates),
       onSelect: (tab) {
         switch (tab) {
           case 'updates':
@@ -300,41 +350,66 @@ class _DriverDutyViewState extends State<DriverDutyView> {
               widget.onBack?.call();
             }
           case 'reports':
-            widget.onReport?.call();
+            widget.onReports?.call();
           case 'account':
             widget.onAccount?.call();
         }
       },
-      phoneAction: selected == null && !_updates ? report : null,
-      child: widget.onRefresh == null
-          ? content
-          : CallbackShortcuts(
-              bindings: {
-                const SingleActivator(LogicalKeyboardKey.f5): () =>
-                    unawaited(widget.onRefresh!()),
-              },
-              child: Semantics(
-                customSemanticsActions: {
-                  CustomSemanticsAction(label: 'Refresh briefing'): () =>
+      phoneAction: selected != null
+          ? DriverAction(
+              label: 'Back to briefing',
+              phone: true,
+              outlined: true,
+              onPressed: () => _closeDetail(updates: false),
+            )
+          : !_updates
+          ? report
+          : null,
+      child: PopScope(
+        canPop: _selectedId == null && !_updates,
+        onPopInvokedWithResult: (didPop, result) {
+          if (!didPop) {
+            _closeDetail(updates: _selectedId != null && _detailFromUpdates);
+          }
+        },
+        child: widget.onRefresh == null
+            ? content
+            : CallbackShortcuts(
+                bindings: {
+                  const SingleActivator(LogicalKeyboardKey.f5): () =>
                       unawaited(widget.onRefresh!()),
                 },
-                child: RefreshIndicator(
-                  onRefresh: widget.onRefresh!,
-                  child: content,
+                child: Semantics(
+                  customSemanticsActions: {
+                    CustomSemanticsAction(label: 'Refresh briefing'): () =>
+                        unawaited(widget.onRefresh!()),
+                  },
+                  child: RefreshIndicator(
+                    onRefresh: widget.onRefresh!,
+                    child: content,
+                  ),
                 ),
               ),
-            ),
+      ),
     );
   }
 
   Widget _list(BuildContext context, bool running) => ListView(
     physics: const AlwaysScrollableScrollPhysics(),
-    padding: const EdgeInsets.all(32),
+    padding: EdgeInsets.fromLTRB(
+      MediaQuery.sizeOf(context).width >= 1000 ? 32 : 55 / 3,
+      24,
+      MediaQuery.sizeOf(context).width >= 1000 ? 32 : 55 / 3,
+      32,
+    ),
+    key: const PageStorageKey('driver-updates'),
     children: [
       DriverText(
         'Updates from Control',
-        style: driverText(context, 36, 44, weight: FontWeight.w600),
+        key: const Key('updates-title'),
+        style: driverText(context, 28, 36, weight: FontWeight.w600),
       ),
+      const SizedBox(height: 8),
       DriverText(
         'Confirmed changes for ${widget.journey.trainNumber} → ${widget.journey.destination}',
         style: driverText(context, 20, 28, secondary: true),
@@ -347,58 +422,28 @@ class _DriverDutyViewState extends State<DriverDutyView> {
         Padding(
           padding: const EdgeInsets.only(top: 24),
           child: _ChangeCard(
+            key: ValueKey('update-${c.id}'),
             change: c,
             briefing: widget.briefing,
             running: running,
-            onTap: c.id == null
-                ? null
-                : () => setState(() => _selectedId = c.id),
+            focusNode: c.id == null ? null : _focusFor(c),
+            onTap: c.id == null ? null : () => _openChange(c),
           ),
         ),
       if (widget.briefing.changes.isEmpty)
         const _Notice('No confirmed changes for this journey.'),
       const SizedBox(height: 24),
-      OutlinedButton(
-        onPressed: () => setState(() {
-          _updates = false;
-          _selectedId = null;
-        }),
-        child: DriverText('Back to briefing'),
-      ),
-    ],
-  );
-
-  Widget _detail(
-    BuildContext context,
-    BriefingChange c,
-    bool running,
-  ) => ListView(
-    physics: const AlwaysScrollableScrollPhysics(),
-    padding: const EdgeInsets.all(32),
-    children: [
-      _ChangeCard(change: c, briefing: widget.briefing, running: running),
-      const SizedBox(height: 24),
-      DriverText(
-        'Confirmed by ${c.confirmedBy ?? 'name unavailable'} · ${driverTime(c.confirmedAt)}',
-        style: driverText(context, 20, 28),
-      ),
-      const SizedBox(height: 24),
-      _Safety(),
-      const SizedBox(height: 24),
-      DriverAction(
-        label: 'View all updates',
-        onPressed: () => setState(() {
-          _selectedId = null;
-          _updates = true;
-        }),
-      ),
-      const SizedBox(height: 16),
-      OutlinedButton(
-        onPressed: () => setState(() {
-          _selectedId = null;
-          _updates = false;
-        }),
-        child: DriverText('Back to briefing'),
+      Align(
+        alignment: Alignment.centerLeft,
+        child: SizedBox(
+          key: const Key('updates-back'),
+          width: 480,
+          child: DriverAction(
+            label: 'Back to briefing',
+            outlined: true,
+            onPressed: () => _closeDetail(updates: false),
+          ),
+        ),
       ),
     ],
   );
@@ -691,7 +736,9 @@ class _Timetable extends StatelessWidget {
               else if (s.stationId != null &&
                   s.stationId == briefing.lastKnownStationId)
                 DriverText(
-                  'Last observed ${driverTime(briefing.observedAt)}',
+                  briefing.observedAt == null
+                      ? '—'
+                      : 'Last observed ${driverTime(briefing.observedAt)}',
                   style: driverText(context, 16, 22, secondary: true),
                 )
               else
@@ -748,7 +795,7 @@ class _Upcoming extends StatelessWidget {
       children: [
         for (final s in stops)
           Padding(
-            padding: const EdgeInsets.only(bottom: 8 / 3),
+            padding: EdgeInsets.only(bottom: s == stops.last ? 0 : 8 / 3),
             child: Container(
               key: Key('stop-${s.id}'),
               padding: const EdgeInsets.symmetric(
@@ -818,11 +865,13 @@ class _ChangeCard extends StatelessWidget {
     required this.running,
     this.onTap,
     this.compact = false,
+    this.focusNode,
   });
   final BriefingChange change;
   final DriverBriefing briefing;
   final bool running, compact;
   final VoidCallback? onTap;
+  final FocusNode? focusNode;
   @override
   Widget build(BuildContext context) {
     final c = change, p = SrTheme.of(context).palette;
@@ -864,6 +913,7 @@ class _ChangeCard extends StatelessWidget {
       ),
       child: InkWell(
         onTap: onTap,
+        focusNode: focusNode,
         borderRadius: BorderRadius.circular(compact ? 44 / 3 : 28),
         child: Padding(
           padding: EdgeInsets.all(compact ? 32 / 3 : 21),
@@ -936,7 +986,10 @@ class _Safety extends StatelessWidget {
     style: driverText(
       context,
       MediaQuery.sizeOf(context).width < 1000 ? 14 : 16,
-      22,
+      MediaQuery.sizeOf(context).width < 1000 ? 20 : 22,
+      weight: MediaQuery.sizeOf(context).width < 1000
+          ? FontWeight.w600
+          : FontWeight.w400,
       secondary: true,
     ),
   );

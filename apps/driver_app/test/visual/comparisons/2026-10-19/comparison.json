@@ -1,7 +1,7 @@
 {
   "date": "2026-10-19",
   "task": "figma-implementation T2",
-  "status": "First tablet baseline pending user acceptance; other Driver families in progress",
+  "status": "First tablet app baseline approved; remaining Driver families in progress",
   "referenceNodeId": "178:73",
   "referenceCorrections": [
     "User-approved Last observed wording instead of unavailable actual passage time",
@@ -82,6 +82,18 @@
         24
       ],
       "sourceNodeId": "188:465"
+    },
+    "back": {
+      "file": "apps/driver_app/assets/figma/back.svg",
+      "sha256": "ec1fc2958959f96e64367c4184d01e30633b106bd2618884a5f151dd1d7bdc95",
+      "sourceNodeId": "188:477",
+      "renderedLogicalSize": 24
+    },
+    "shield": {
+      "file": "apps/driver_app/assets/figma/shield.svg",
+      "sha256": "dc297bcb51bc69727419f4e57392b85461ebc058ae7ffc4b80368638d3b9e9e8",
+      "sourceNodeId": "182:5172",
+      "renderedLogicalSize": 28
     }
   },
   "symbolFont": {
@@ -92,26 +104,25 @@
     "verifiedGlyph": "U+2192 at cmap glyph 4376"
   },
   "checks": {
-    "flutterAnalysis": "no issues",
-    "driverTests": 50,
+    "flutterAnalysis": "no issues (current continuation)",
+    "driverTests": 63,
     "tokenPairs": 165,
-    "debugApk": "built",
+    "debugApk": "built after observation-null guard",
     "android": "API35 phone 1080x2400 at420dpi; real PKCE sign-in, assigned SIM-1001 briefing UNKNOWN with scheduled/planned data, report composer for same journey; no report submitted"
   },
   "contrast": "7:1 resolved text paints and nearest opaque surfaces; antialiased thin-digit histogram heuristic is not claimed passing",
   "pending": [
-    "First tablet raster acceptance and app golden freeze",
-    "Phone fidelity and its missing/long states",
-    "Updates/detail full reference matching and focus restoration",
-    "Selection/report/account/recovery compositions",
+    "Approve pending phone/Updates reference wording and freeze their reviewed app captures",
+    "Report receipt reference reconciliation for absent station/local-save timestamps and uncertain network outcome",
+    "Selection/report/account/recovery compositions and remaining Driver states",
     "Native report action/offline loop and remaining accessibility checks"
   ],
   "files": {
     "android-briefing-unknown.png": "393e4936954419041cac7d2432b4e8725659dd1fa932cbd0b5044cefd8053b35",
-    "phone-briefing.actual.png": "73f57cc75473d8e73be97addf453326d5bbc4caf698108cb277f44d2946efa00",
-    "phone-briefing.diff.png": "a34b2577ee20cf541392efeac882ac999451d5673f511dc254934a5bb5d83645",
-    "phone-briefing.metrics.json": "3d3588786c544b98fb8265ea81d0f9df071afb1de681d7936b40348534cc3e7a",
-    "phone-briefing.overlay.png": "279a14835b04d70b824758fcd78602aa858a6c1d69a4a5631249c9c52bb5a2e1",
+    "phone-briefing.actual.png": "a07b988ec15fe24f92b7236ac064bb141dc54cffb978c1eff9e547318e21695e",
+    "phone-briefing.diff.png": "d7ce5058ddb0c49e557ac6905e5cdfb2b80a5b39b15d26f3709e677435cdc25a",
+    "phone-briefing.metrics.json": "7bdb5536da18fdd414decad19f93f9c824001251b3cb31f5d87458f3f3200e37",
+    "phone-briefing.overlay.png": "e41f34e6171688e565f5172c0cf7a00c6b4b83a983ed3ad157946089d2eb8d0d",
     "phone-briefing.reference.png": "dcd039e56f48a541d2341e0571f1e4aa663ecd0da123c1500437c83c6286fb27",
     "tablet-duty.actual-bounds.json": "8c9a39b659d3a7fbca561af8e1015225fbd366701e36d8409c135cccf1aa8b8b",
     "tablet-duty.actual.png": "ec9c94760deda31713742e8970d1932a5ede3006fcce3200eedb757d99618461",
@@ -119,17 +130,87 @@
     "tablet-duty.metrics.json": "5ae394bc3182b4630369f07eda6fc7527c4d373787e6e044b9097c0187afb397",
     "tablet-duty.overlay.png": "8c038a34385f10e8a6f35a965b74760746f44895ae25311083a47a6a4ee23a67",
     "tablet-duty.reference-bounds.json": "90c07154659694de08488233525f57f80e244fb42028575753d4fc303905653e",
-    "tablet-duty.reference.png": "a9ff76b3bd1ab29b7409056f541a3d73259cd09adb0295705ea5dc7ae07519cd"
+    "tablet-duty.reference.png": "a9ff76b3bd1ab29b7409056f541a3d73259cd09adb0295705ea5dc7ae07519cd",
+    "android-updates-empty.png": "fda1b74c06a7ecc74f9b9746e9a57c4572d34c439e5dfc5e227b1b86a642ca22",
+    "phone-briefing.14sp.reference.png": "eab396a8a401a206bed7e942a6c3297d4fb8a877d13e2bbef813b49377c25090",
+    "phone-briefing.actual-bounds.json": "5ed4acaaefd793af6ae9db6870a4bab02cdbc310a775ab0e3f9dbf582c57c14e",
+    "phone-label-reconciliation.json": "a4fb6722b13916af7a9f587cd2a47b151e93b169e15da5282dfd79d4868c3d5f",
+    "phone-platform.actual-bounds.json": "506823039e82f35009edeaf3435300674dcfadd52ad29a48eef0edc53b4b1208",
+    "phone-platform.actual.png": "619b8071a13689d9b2b8e1defb49b6d20e1eb0e111a1f31f5d771ae9769959c2",
+    "phone-platform.diff.png": "0433256c019c6eaac65211db35777da5be53200162a1ef1a0f2307b3c6d2fe35",
+    "phone-platform.metrics.json": "4bf5cd61ec93946ce921310c5f12bc2bc3bc936257b064624823c4fc5ab407d2",
+    "phone-platform.overlay.png": "32d7802fcaca719de0cb889a1cee35fdd76dd3881056d77b6de4f090ba479d9f",
+    "phone-platform.reference.png": "261cea6e91440393b3716d42989da83e2c28b1cc91a78186842b3d4a80cc1035",
+    "tablet-delay.actual-bounds.json": "d951e667a4c64d66181c46b492d3340e014553419fadb733eed65d6d7dee49dc",
+    "tablet-delay.actual.png": "5c6f3c2db65929ebc32aa4e98f23dc712e8cf885fb01c36b9e1bd1de44968ae7",
+    "tablet-delay.diff.png": "bd6a6c4a6792fdc77f1bdd69f6d68c1e10616135683699ebb650aa3dcd9611f1",
+    "tablet-delay.metrics.json": "751c58af26dbecb23ad5f7936187e0d4399289893b9942ca8b9098fc8120da1f",
+    "tablet-delay.overlay.png": "164a947e8885d74eb795cddacb11ea2422177edd11d180b5dc23928156d0f1c7",
+    "tablet-delay.reference.png": "90f04b0e02432581213978708d0898e3714ba646fcedbbb2240baf7b801297c3",
+    "tablet-platform.actual-bounds.json": "5c90241d59f999034fea3f3a2dd70f406fe20ab7632c26077c1c4374b7763034",
+    "tablet-platform.actual.png": "bf1ae45abec0fd7d98c5dd63c360a9a7bec928fdfcab96ad5b0e8c146426e6b4",
+    "tablet-platform.diff.png": "1461db38a421aec1feddd1e9dd903394c66b3d7164a07bb8975bf59b4a0ca0e5",
+    "tablet-platform.metrics.json": "56a055e4b9fc2c2188641aa62b6299dbf938889bb81ec6a330b8010f58c46e13",
+    "tablet-platform.overlay.png": "33317d0c615effd2cacdae88f55095549dc4357f812e5b27e9b8d880305e9156",
+    "tablet-platform.reference.png": "a7b7fd78a239d5160ec7ea6c74ae0c0827d78c23a07a86cb710fd993b4a2769f",
+    "tablet-updates.actual-bounds.json": "93f36fef9425b56451e88c7954ae55bf3cd18c8252a1d9d536b3119c75e8a218",
+    "tablet-updates.actual.png": "d6e41944e3e1f01d2ea29841487ca05de47650b4ee842a3de20ec0071db17c8f",
+    "tablet-updates.diff.png": "6ac72fbee10ee3327c8659cfbe1ec6c91d2e929cbfec55975bf1358020c4a823",
+    "tablet-updates.metrics.json": "71229e28ef818e7a3339cd8f1d3ac1d0622b2bf50449ef4a7029d59931a51053",
+    "tablet-updates.overlay.png": "6de736d1a25f6ca44a4f510fb7e37bd5ef18eea4fdddb5267635c7a76ff30967",
+    "tablet-updates.reference.png": "05b54d482fbf9aa42da552ced6566dc64124c2fbc1953995d2b96113182d1779",
+    "updates-phone.reference-bounds.json": "e7e565fb6d1a65c53ec16351a055bd93af61f60c9acb7db7c7eb3a5257f820fa"
   },
   "offlineHandoffFix": "Pass the retained saved row when a signed-in online session falls back to its owner cache; regression test covers opening it read-only.",
   "sourceSha256": {
-    "apps/driver_app/lib/driver_frame.dart": "1f7abf9766593659d9aa67a507ca4ecb10dd792ec25d593cd50907b8fc697637",
-    "apps/driver_app/lib/journeys/briefing_view.dart": "a245f0b4a4461d03c9f9cde3b022b7dcf84f9326570d5d6ce3bffc64ee1aef0f",
+    "apps/driver_app/lib/driver_frame.dart": "ed8fa4b450db3ebbbb6e638f1f7ad238daafeb8aae00f07066a11649dcb8c90c",
+    "apps/driver_app/lib/journeys/briefing_view.dart": "730892b988f9815c9b2caa8a32fd08f7ed5c7c271d0f8b32ba4df2747fc6202b",
     "apps/driver_app/lib/journeys/briefing_api.dart": "5f36eea1c375e3754d16590eb779dfb8775a745366c37306a17df0ddddb60479",
     "apps/driver_app/lib/journeys/briefing_cache.dart": "3e68c9b77edcfc7546849c2d4cb7c7d9a33cae657f480acc84ae5ecbee40406b",
-    "apps/driver_app/lib/journeys/journey_screens.dart": "f2aca5495dbd1f75eb2b4d5fe38a3e75b4764ad00d14724a60d1ea70cf94ed3c",
-    "apps/driver_app/lib/shell.dart": "ab5093afe76631a5f7071748d6144cfee09dff3996b0be9ee9156480e9354cf3",
-    "apps/driver_app/test/visual/fixtures/duty.json": "f17d964fc1ab836ee5e42ae69bd626460222007e320a809e2c87c7ec3def30fe"
+    "apps/driver_app/lib/journeys/journey_screens.dart": "1ab71d8bbe5685ec738ef69cd967a26aff153b4c10d6d104cdeafcb0023a304f",
+    "apps/driver_app/lib/shell.dart": "782161059bd807e0eae08493549bc39968bda4728ea65c8845e461d25c74fd9b",
+    "apps/driver_app/test/visual/fixtures/duty.json": "f17d964fc1ab836ee5e42ae69bd626460222007e320a809e2c87c7ec3def30fe",
+    "apps/driver_app/lib/journeys/update_detail.dart": "298c58fbdb7f93636d907a5827b965484670ecc6c325d71c98577a52f5778956",
+    "apps/driver_app/test/visual/driver_duty_test.dart": "2a103112762bf0f97844b0ebd9218f07fc2913e7d81340df1c346471adfbe05d"
   },
-  "sourceHashFormat": "SHA-256 of UTF-8 source with LF line endings"
+  "sourceHashFormat": "SHA-256 of UTF-8 source with LF line endings",
+  "approval": {
+    "date": "2026-10-19",
+    "scope": "First Driver tablet duty slice only",
+    "appSha256": "ec9c94760deda31713742e8970d1932a5ede3006fcce3200eedb757d99618461",
+    "golden": "test/visual/goldens/tablet-duty.png",
+    "geometryLimitLogicalPixels": 1,
+    "raster": "User reviewed and approved Figma/Flutter text raster differences, including the Noto Sans Math U+2192 fallback."
+  },
+  "phoneAndUpdates": {
+    "status": "Candidates; API-backed reference wording approval pending",
+    "phoneTypography": {
+      "approvedOn": "2026-10-19",
+      "labelSp": 14,
+      "lineLogicalPixels": 20,
+      "allowsScrolling": true,
+      "ledger": "phone-label-reconciliation.json"
+    },
+    "nodes": {
+      "phone-briefing": "188:417",
+      "tablet-updates": "182:5068",
+      "tablet-platform": "182:5126",
+      "tablet-delay": "182:5180",
+      "phone-platform": "188:470"
+    },
+    "additionalMeasuredRegions": 16,
+    "maximumLogicalError": "floating-point rounding only",
+    "limitLogicalPixels": 1,
+    "pendingReferenceCorrections": [
+      "Explicit planned platform labels for unconfirmed phone assignments",
+      "Issuer name without an API-unavailable staff role"
+    ],
+    "checks": [
+      "real fonts, target and label guidelines, 7:1 resolved text paints for duty/Updates/platform detail at both sizes",
+      "stable ID refresh, keyboard focus return and Enter activation, system back retains journey",
+      "200% long Sinhala/Tamil detail and fixed return action",
+      "Reports history navigation separate from report composer"
+    ],
+    "native": "Latest presentation APK installed on API35 emulator; real signed-in SIM-1001 empty Updates -> briefing -> same-journey report composer; no report submitted"
+  }
 }

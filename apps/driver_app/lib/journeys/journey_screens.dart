@@ -33,6 +33,7 @@ class DriverJourneysScreen extends StatefulWidget {
     this.updatesOnly = false,
     this.onReport,
     this.onAccount,
+    this.onReports,
   });
 
   final DriverBriefingApi api;
@@ -43,7 +44,7 @@ class DriverJourneysScreen extends StatefulWidget {
   final String displayName;
   final bool updatesOnly;
   final void Function(DriverJourney)? onReport;
-  final VoidCallback? onAccount;
+  final VoidCallback? onAccount, onReports;
 
   @override
   State<DriverJourneysScreen> createState() => _DriverJourneysScreenState();
@@ -261,6 +262,7 @@ class _DriverJourneysScreenState extends State<DriverJourneysScreen>
                         ? null
                         : () => widget.onReport!(journey),
                     onAccount: widget.onAccount,
+                    onReports: widget.onReports,
                     offlineOwnerId:
                         widget.offlineOwnerId ??
                         (_usingSaved ? _ownerId : null),
@@ -355,6 +357,7 @@ class DriverBriefingScreen extends StatefulWidget {
     this.updatesOnly = false,
     this.onReport,
     this.onAccount,
+    this.onReports,
     this.now,
   });
 
@@ -364,7 +367,7 @@ class DriverBriefingScreen extends StatefulWidget {
   final Map<String, dynamic>? savedRow;
   final String displayName;
   final bool updatesOnly;
-  final VoidCallback? onReport, onAccount;
+  final VoidCallback? onReport, onAccount, onReports;
   final DateTime Function()? now;
 
   @override
@@ -528,6 +531,7 @@ class _DriverBriefingScreenState extends State<DriverBriefingScreen>
         onBack: () => Navigator.of(context).maybePop(),
         onAccount: widget.onAccount,
         onReport: widget.onReport,
+        onReports: widget.onReports,
         onRefresh: widget.offlineOwnerId == null ? _load : null,
       );
     }
