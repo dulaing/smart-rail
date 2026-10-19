@@ -227,4 +227,154 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get simulatedRunning =>
       'Running information, when available, is a SmartRail simulation.';
+
+  @override
+  String get foodTitle => 'Food';
+
+  @override
+  String get foodIntro =>
+      'Order food to collect at a station stop on your train. You pay at the kiosk when you collect.';
+
+  @override
+  String get foodChooseTrain => 'Choose a train';
+
+  @override
+  String get foodChangeTrain => 'Change train';
+
+  @override
+  String get foodNoTrainChosen =>
+      'Pick a dated train to see where you can collect food.';
+
+  @override
+  String foodTrainLine(Object train, Object from, Object to) {
+    return '$train · $from → $to';
+  }
+
+  @override
+  String get foodToday => 'Today';
+
+  @override
+  String get foodOnRoute => 'On your Trains route';
+
+  @override
+  String get foodNoTrains =>
+      'No upcoming trains are saved yet. Open Trains while connected to load the timetable.';
+
+  @override
+  String get foodPickupHeading => 'Where to collect';
+
+  @override
+  String foodArrives(Object time) {
+    return 'Train due $time';
+  }
+
+  @override
+  String foodScheduledAt(Object time) {
+    return 'Scheduled $time';
+  }
+
+  @override
+  String get foodNoEstimate => 'No arrival estimate';
+
+  @override
+  String foodOrderBy(Object time) {
+    return 'Order by $time';
+  }
+
+  @override
+  String get foodSeeMenu => 'See menu';
+
+  @override
+  String get foodNoPickups => 'This train has no food collection points.';
+
+  @override
+  String get foodUnavailableHeading => 'Not available to order';
+
+  @override
+  String get foodReasonJourneyNotToday =>
+      'This train does not run today, so food cannot be ordered yet.';
+
+  @override
+  String get foodReasonStopNotServed => 'This train does not serve this stop.';
+
+  @override
+  String get foodReasonStopPassed => 'The train has already passed this stop.';
+
+  @override
+  String get foodReasonTrainUnknown =>
+      'SmartRail has no recent position for this train, so a pickup time cannot be promised.';
+
+  @override
+  String get foodReasonGeneric => 'Food cannot be ordered here right now.';
+
+  @override
+  String get foodProviderUnavailable =>
+      'Food ordering is unavailable right now. Train information is not affected.';
+
+  @override
+  String get foodLoadFailed =>
+      'Could not load food information. Check your connection and try again.';
+
+  @override
+  String get foodJourneyNotFound =>
+      'SmartRail no longer knows this train. Choose another one.';
+
+  @override
+  String get foodRetry => 'Try again';
+
+  @override
+  String get foodStaleOptions =>
+      'Could not refresh. These options may be out of date.';
+
+  @override
+  String foodMenuHeading(Object point) {
+    return 'Menu · $point';
+  }
+
+  @override
+  String get foodMenuEmpty =>
+      'This collection point has no items available right now.';
+
+  @override
+  String get foodSoldOut => 'Sold out';
+
+  @override
+  String foodAddItem(Object item) {
+    return 'Add one $item';
+  }
+
+  @override
+  String foodRemoveItem(Object item) {
+    return 'Remove one $item';
+  }
+
+  @override
+  String foodQuantityOf(Object item, int count) {
+    return '$item: $count in basket';
+  }
+
+  @override
+  String foodBasketSummary(int count, Object total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items',
+      one: '1 item',
+    );
+    return '$_temp0 · $total';
+  }
+
+  @override
+  String get foodReview => 'Review order';
+
+  @override
+  String get foodBasketAdjusted =>
+      'The menu changed, so your basket was updated.';
+
+  @override
+  String get foodPickupUnavailableNow =>
+      'This pickup is no longer available to order.';
+
+  @override
+  String get foodBack => 'Back to pickup points';
 }

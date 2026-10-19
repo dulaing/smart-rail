@@ -3,6 +3,8 @@ import 'package:smartrail_core/smartrail_core.dart';
 
 import 'account/account_controller.dart';
 import 'account/account_page.dart';
+import 'food/food_controller.dart';
+import 'food/food_pages.dart';
 import 'l10n/app_localizations.dart';
 import 'preferences.dart';
 import 'trains/train_controller.dart';
@@ -19,11 +21,13 @@ class PassengerShell extends StatefulWidget {
     required this.account,
     required this.preferences,
     required this.trains,
+    required this.food,
   });
 
   final AccountController account;
   final PreferencesController preferences;
   final TrainController trains;
+  final FoodController food;
 
   @override
   State<PassengerShell> createState() => _PassengerShellState();
@@ -48,7 +52,13 @@ class _PassengerShellState extends State<PassengerShell>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     widget.trains.paused = state != AppLifecycleState.resumed;
-    if (state == AppLifecycleState.resumed) widget.trains.refresh();
+    if (state == AppLifecycleState.resumed) {
+      widget.trains.refresh();
+      if (widget.food.journey != null) {
+        widget.food.refreshOptions();
+        widget.food.refreshMenu();
+      }
+    }
   }
 
   @override
@@ -114,7 +124,10 @@ class _PassengerShellState extends State<PassengerShell>
                             )
                           : tab == PassengerTab.trains
                           ? TrainsPage(controller: widget.trains)
-                          : _ComingSoon(title: label(tab), body: t.comingSoon),
+                          : FoodPage(
+                              controller: widget.food,
+                              active: _tab == PassengerTab.food,
+                            ),
                     ),
                 ],
               ),
@@ -128,31 +141,6 @@ class _PassengerShellState extends State<PassengerShell>
           ],
         ),
       ),
-    );
-  }
-}
-
-/// Neutral heading and empty content for a destination whose features are built in later specs.
-class _ComingSoon extends StatelessWidget {
-  const _ComingSoon({required this.title, required this.body});
-
-  final String title;
-  final String body;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = SrTheme.of(context);
-    final gap = theme.metrics.space[16]!;
-    return ListView(
-      padding: EdgeInsets.all(gap * 1.5),
-      children: [
-        Semantics(header: true, child: Text(title, style: theme.text('title'))),
-        SizedBox(height: gap / 2),
-        Text(
-          body,
-          style: theme.text('body', color: theme.palette.textSecondary),
-        ),
-      ],
     );
   }
 }

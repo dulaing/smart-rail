@@ -7,6 +7,8 @@ import 'package:smartrail_core/smartrail_core.dart';
 import 'account/account_controller.dart';
 import 'auth/account_api.dart';
 import 'auth/auth_service.dart';
+import 'food/food_api.dart';
+import 'food/food_controller.dart';
 import 'l10n/app_localizations.dart';
 import 'preferences.dart';
 import 'shell.dart';
@@ -36,12 +38,14 @@ class MainApp extends StatefulWidget {
     required this.accounts,
     required this.preferences,
     this.trains,
+    this.food,
   });
 
   final AuthService auth;
   final AccountApi accounts;
   final PreferencesStore preferences;
   final TrainController? trains;
+  final FoodController? food;
 
   @override
   State<MainApp> createState() => _MainAppState();
@@ -61,6 +65,9 @@ class _MainAppState extends State<MainApp> {
         api: PassengerTrainApi(const AuthConfig().apiBaseUrl),
         cache: SharedPreferencesTrainCache(),
       );
+  late final FoodController _food =
+      widget.food ??
+      FoodController(source: FoodApi(const AuthConfig().apiBaseUrl), trains: _trains);
 
   @override
   void initState() {
@@ -75,6 +82,7 @@ class _MainAppState extends State<MainApp> {
   void dispose() {
     _account.dispose();
     _preferences.dispose();
+    _food.dispose();
     _trains.dispose();
     super.dispose();
   }
@@ -102,6 +110,7 @@ class _MainAppState extends State<MainApp> {
             account: _account,
             preferences: _preferences,
             trains: _trains,
+            food: _food,
           ),
         );
       },

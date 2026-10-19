@@ -495,6 +495,234 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Running information, when available, is a SmartRail simulation.'**
   String get simulatedRunning;
+
+  /// No description provided for @foodTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Food'**
+  String get foodTitle;
+
+  /// No description provided for @foodIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Order food to collect at a station stop on your train. You pay at the kiosk when you collect.'**
+  String get foodIntro;
+
+  /// No description provided for @foodChooseTrain.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a train'**
+  String get foodChooseTrain;
+
+  /// No description provided for @foodChangeTrain.
+  ///
+  /// In en, this message translates to:
+  /// **'Change train'**
+  String get foodChangeTrain;
+
+  /// No description provided for @foodNoTrainChosen.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a dated train to see where you can collect food.'**
+  String get foodNoTrainChosen;
+
+  /// No description provided for @foodTrainLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{train} · {from} → {to}'**
+  String foodTrainLine(Object train, Object from, Object to);
+
+  /// No description provided for @foodToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get foodToday;
+
+  /// No description provided for @foodOnRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'On your Trains route'**
+  String get foodOnRoute;
+
+  /// No description provided for @foodNoTrains.
+  ///
+  /// In en, this message translates to:
+  /// **'No upcoming trains are saved yet. Open Trains while connected to load the timetable.'**
+  String get foodNoTrains;
+
+  /// No description provided for @foodPickupHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Where to collect'**
+  String get foodPickupHeading;
+
+  /// No description provided for @foodArrives.
+  ///
+  /// In en, this message translates to:
+  /// **'Train due {time}'**
+  String foodArrives(Object time);
+
+  /// No description provided for @foodScheduledAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled {time}'**
+  String foodScheduledAt(Object time);
+
+  /// No description provided for @foodNoEstimate.
+  ///
+  /// In en, this message translates to:
+  /// **'No arrival estimate'**
+  String get foodNoEstimate;
+
+  /// No description provided for @foodOrderBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Order by {time}'**
+  String foodOrderBy(Object time);
+
+  /// No description provided for @foodSeeMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'See menu'**
+  String get foodSeeMenu;
+
+  /// No description provided for @foodNoPickups.
+  ///
+  /// In en, this message translates to:
+  /// **'This train has no food collection points.'**
+  String get foodNoPickups;
+
+  /// No description provided for @foodUnavailableHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available to order'**
+  String get foodUnavailableHeading;
+
+  /// No description provided for @foodReasonJourneyNotToday.
+  ///
+  /// In en, this message translates to:
+  /// **'This train does not run today, so food cannot be ordered yet.'**
+  String get foodReasonJourneyNotToday;
+
+  /// No description provided for @foodReasonStopNotServed.
+  ///
+  /// In en, this message translates to:
+  /// **'This train does not serve this stop.'**
+  String get foodReasonStopNotServed;
+
+  /// No description provided for @foodReasonStopPassed.
+  ///
+  /// In en, this message translates to:
+  /// **'The train has already passed this stop.'**
+  String get foodReasonStopPassed;
+
+  /// No description provided for @foodReasonTrainUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'SmartRail has no recent position for this train, so a pickup time cannot be promised.'**
+  String get foodReasonTrainUnknown;
+
+  /// No description provided for @foodReasonGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Food cannot be ordered here right now.'**
+  String get foodReasonGeneric;
+
+  /// No description provided for @foodProviderUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Food ordering is unavailable right now. Train information is not affected.'**
+  String get foodProviderUnavailable;
+
+  /// No description provided for @foodLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load food information. Check your connection and try again.'**
+  String get foodLoadFailed;
+
+  /// No description provided for @foodJourneyNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'SmartRail no longer knows this train. Choose another one.'**
+  String get foodJourneyNotFound;
+
+  /// No description provided for @foodRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get foodRetry;
+
+  /// No description provided for @foodStaleOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not refresh. These options may be out of date.'**
+  String get foodStaleOptions;
+
+  /// No description provided for @foodMenuHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu · {point}'**
+  String foodMenuHeading(Object point);
+
+  /// No description provided for @foodMenuEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'This collection point has no items available right now.'**
+  String get foodMenuEmpty;
+
+  /// No description provided for @foodSoldOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold out'**
+  String get foodSoldOut;
+
+  /// No description provided for @foodAddItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Add one {item}'**
+  String foodAddItem(Object item);
+
+  /// No description provided for @foodRemoveItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove one {item}'**
+  String foodRemoveItem(Object item);
+
+  /// No description provided for @foodQuantityOf.
+  ///
+  /// In en, this message translates to:
+  /// **'{item}: {count} in basket'**
+  String foodQuantityOf(Object item, int count);
+
+  /// No description provided for @foodBasketSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 item} other{{count} items}} · {total}'**
+  String foodBasketSummary(int count, Object total);
+
+  /// No description provided for @foodReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Review order'**
+  String get foodReview;
+
+  /// No description provided for @foodBasketAdjusted.
+  ///
+  /// In en, this message translates to:
+  /// **'The menu changed, so your basket was updated.'**
+  String get foodBasketAdjusted;
+
+  /// No description provided for @foodPickupUnavailableNow.
+  ///
+  /// In en, this message translates to:
+  /// **'This pickup is no longer available to order.'**
+  String get foodPickupUnavailableNow;
+
+  /// No description provided for @foodBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to pickup points'**
+  String get foodBack;
 }
 
 class _AppLocalizationsDelegate

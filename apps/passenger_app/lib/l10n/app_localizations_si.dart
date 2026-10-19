@@ -223,4 +223,146 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get simulatedRunning => 'ධාවන තොරතුරු ඇත්නම් ඒවා SmartRail අනුකරණයකි.';
+
+  @override
+  String get foodTitle => 'ආහාර';
+
+  @override
+  String get foodIntro =>
+      'ඔබේ දුම්රිය නැවතුමකදී ලබාගැනීමට ආහාර ඇණවුම් කරන්න. ලබාගන්නා විට කියෝස්කුවේදී ගෙවන්න.';
+
+  @override
+  String get foodChooseTrain => 'දුම්රියක් තෝරන්න';
+
+  @override
+  String get foodChangeTrain => 'දුම්රිය වෙනස් කරන්න';
+
+  @override
+  String get foodNoTrainChosen =>
+      'ආහාර ලබාගත හැකි තැන් බැලීමට දිනයක් සහිත දුම්රියක් තෝරන්න.';
+
+  @override
+  String foodTrainLine(Object train, Object from, Object to) {
+    return '$train · $from → $to';
+  }
+
+  @override
+  String get foodToday => 'අද';
+
+  @override
+  String get foodOnRoute => 'ඔබේ දුම්රිය මාර්ගයේ';
+
+  @override
+  String get foodNoTrains =>
+      'ඉදිරි දුම්රිය තවම සුරැකී නැත. කාලසටහන පූරණය කිරීමට සම්බන්ධව සිට දුම්රිය පිටුව විවෘත කරන්න.';
+
+  @override
+  String get foodPickupHeading => 'ලබාගත හැකි තැන්';
+
+  @override
+  String foodArrives(Object time) {
+    return 'දුම්රිය පැමිණීම $time';
+  }
+
+  @override
+  String foodScheduledAt(Object time) {
+    return 'නියමිත $time';
+  }
+
+  @override
+  String get foodNoEstimate => 'පැමිණීමේ ඇස්තමේන්තුවක් නැත';
+
+  @override
+  String foodOrderBy(Object time) {
+    return '$time ට පෙර ඇණවුම් කරන්න';
+  }
+
+  @override
+  String get foodSeeMenu => 'ආහාර ලැයිස්තුව බලන්න';
+
+  @override
+  String get foodNoPickups => 'මෙම දුම්රියේ ආහාර ලබාගැනීමේ ස්ථාන නැත.';
+
+  @override
+  String get foodUnavailableHeading => 'ඇණවුම් කළ නොහැක';
+
+  @override
+  String get foodReasonJourneyNotToday =>
+      'මෙම දුම්රිය අද ධාවනය නොවන බැවින් තවම ආහාර ඇණවුම් කළ නොහැක.';
+
+  @override
+  String get foodReasonStopNotServed => 'මෙම දුම්රිය මෙම නැවතුමේ නතර නොවේ.';
+
+  @override
+  String get foodReasonStopPassed => 'දුම්රිය දැනටමත් මෙම නැවතුම පසු කර ඇත.';
+
+  @override
+  String get foodReasonTrainUnknown =>
+      'මෙම දුම්රියේ මෑත ස්ථානයක් SmartRail සතුව නැති බැවින් ලබාගැනීමේ වේලාවක් ලබා දිය නොහැක.';
+
+  @override
+  String get foodReasonGeneric => 'දැන් මෙහි ආහාර ඇණවුම් කළ නොහැක.';
+
+  @override
+  String get foodProviderUnavailable =>
+      'ආහාර ඇණවුම් දැන් ලබාගත නොහැක. දුම්රිය තොරතුරු කිසිවක් වෙනස් නොවේ.';
+
+  @override
+  String get foodLoadFailed =>
+      'ආහාර තොරතුරු පූරණය කළ නොහැකි විය. සම්බන්ධතාව පරීක්ෂා කර නැවත උත්සාහ කරන්න.';
+
+  @override
+  String get foodJourneyNotFound =>
+      'SmartRail හට මෙම දුම්රිය තවදුරටත් නොදනී. වෙනත් එකක් තෝරන්න.';
+
+  @override
+  String get foodRetry => 'නැවත උත්සාහ කරන්න';
+
+  @override
+  String get foodStaleOptions =>
+      'නැවුම් කළ නොහැකි විය. මෙම විකල්ප යල් පැන ගිය ඒවා විය හැක.';
+
+  @override
+  String foodMenuHeading(Object point) {
+    return 'ආහාර ලැයිස්තුව · $point';
+  }
+
+  @override
+  String get foodMenuEmpty => 'මෙම ලබාගැනීමේ ස්ථානයේ දැන් ලබාගත හැකි ආහාර නැත.';
+
+  @override
+  String get foodSoldOut => 'අවසන්';
+
+  @override
+  String foodAddItem(Object item) {
+    return '$item එකක් එක් කරන්න';
+  }
+
+  @override
+  String foodRemoveItem(Object item) {
+    return '$item එකක් ඉවත් කරන්න';
+  }
+
+  @override
+  String foodQuantityOf(Object item, int count) {
+    return '$item: කූඩයේ $count';
+  }
+
+  @override
+  String foodBasketSummary(int count, Object total) {
+    return 'අයිතම $count · $total';
+  }
+
+  @override
+  String get foodReview => 'ඇණවුම සමාලෝචනය';
+
+  @override
+  String get foodBasketAdjusted =>
+      'ආහාර ලැයිස්තුව වෙනස් වූ බැවින් ඔබේ කූඩය යාවත්කාලීන කරන ලදී.';
+
+  @override
+  String get foodPickupUnavailableNow => 'මෙම ලබාගැනීම දැන් ඇණවුම් කළ නොහැක.';
+
+  @override
+  String get foodBack => 'ලබාගැනීමේ ස්ථාන වෙත ආපසු';
 }

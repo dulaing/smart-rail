@@ -229,4 +229,149 @@ class AppLocalizationsTa extends AppLocalizations {
   @override
   String get simulatedRunning =>
       'ஓட்டத் தகவல் கிடைத்தால், அது SmartRail உருவகத் தகவல்.';
+
+  @override
+  String get foodTitle => 'உணவு';
+
+  @override
+  String get foodIntro =>
+      'உங்கள் ரயில் நிறுத்தத்தில் பெற்றுக்கொள்ள உணவை ஆர்டர் செய்யுங்கள். பெறும்போது கியோஸ்க்கில் பணம் செலுத்துங்கள்.';
+
+  @override
+  String get foodChooseTrain => 'ரயிலைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get foodChangeTrain => 'ரயிலை மாற்றவும்';
+
+  @override
+  String get foodNoTrainChosen =>
+      'உணவைப் பெறக்கூடிய இடங்களைப் பார்க்க தேதியுடன் கூடிய ரயிலைத் தேர்ந்தெடுக்கவும்.';
+
+  @override
+  String foodTrainLine(Object train, Object from, Object to) {
+    return '$train · $from → $to';
+  }
+
+  @override
+  String get foodToday => 'இன்று';
+
+  @override
+  String get foodOnRoute => 'உங்கள் ரயில் பாதையில்';
+
+  @override
+  String get foodNoTrains =>
+      'வரவிருக்கும் ரயில்கள் இன்னும் சேமிக்கப்படவில்லை. அட்டவணையை ஏற்ற இணைப்பில் இருக்கும்போது ரயில்கள் பகுதியைத் திறக்கவும்.';
+
+  @override
+  String get foodPickupHeading => 'பெறும் இடங்கள்';
+
+  @override
+  String foodArrives(Object time) {
+    return 'ரயில் வருகை $time';
+  }
+
+  @override
+  String foodScheduledAt(Object time) {
+    return 'திட்டமிட்டது $time';
+  }
+
+  @override
+  String get foodNoEstimate => 'வருகை மதிப்பீடு இல்லை';
+
+  @override
+  String foodOrderBy(Object time) {
+    return '$timeக்குள் ஆர்டர் செய்யுங்கள்';
+  }
+
+  @override
+  String get foodSeeMenu => 'மெனுவைப் பார்க்கவும்';
+
+  @override
+  String get foodNoPickups => 'இந்த ரயிலில் உணவு பெறும் இடங்கள் இல்லை.';
+
+  @override
+  String get foodUnavailableHeading => 'ஆர்டர் செய்ய முடியாது';
+
+  @override
+  String get foodReasonJourneyNotToday =>
+      'இந்த ரயில் இன்று இயங்காததால் இப்போது உணவை ஆர்டர் செய்ய முடியாது.';
+
+  @override
+  String get foodReasonStopNotServed =>
+      'இந்த ரயில் இந்த நிறுத்தத்தில் நிற்காது.';
+
+  @override
+  String get foodReasonStopPassed =>
+      'ரயில் ஏற்கனவே இந்த நிறுத்தத்தைக் கடந்துவிட்டது.';
+
+  @override
+  String get foodReasonTrainUnknown =>
+      'இந்த ரயிலின் சமீபத்திய இருப்பிடம் SmartRail இடம் இல்லாததால் பெறும் நேரத்தை உறுதியளிக்க முடியாது.';
+
+  @override
+  String get foodReasonGeneric => 'இப்போது இங்கே உணவை ஆர்டர் செய்ய முடியாது.';
+
+  @override
+  String get foodProviderUnavailable =>
+      'உணவு ஆர்டர் இப்போது கிடைக்கவில்லை. ரயில் தகவல் பாதிக்கப்படவில்லை.';
+
+  @override
+  String get foodLoadFailed =>
+      'உணவுத் தகவலை ஏற்ற முடியவில்லை. இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.';
+
+  @override
+  String get foodJourneyNotFound =>
+      'இந்த ரயிலை SmartRail இனி அறியவில்லை. வேறொன்றைத் தேர்ந்தெடுக்கவும்.';
+
+  @override
+  String get foodRetry => 'மீண்டும் முயலவும்';
+
+  @override
+  String get foodStaleOptions =>
+      'புதுப்பிக்க முடியவில்லை. இந்த விருப்பங்கள் காலாவதியானவையாக இருக்கலாம்.';
+
+  @override
+  String foodMenuHeading(Object point) {
+    return 'மெனு · $point';
+  }
+
+  @override
+  String get foodMenuEmpty => 'இந்த பெறும் இடத்தில் இப்போது பொருட்கள் இல்லை.';
+
+  @override
+  String get foodSoldOut => 'தீர்ந்துவிட்டது';
+
+  @override
+  String foodAddItem(Object item) {
+    return '$item ஒன்றைச் சேர்க்கவும்';
+  }
+
+  @override
+  String foodRemoveItem(Object item) {
+    return '$item ஒன்றை நீக்கவும்';
+  }
+
+  @override
+  String foodQuantityOf(Object item, int count) {
+    return '$item: கூடையில் $count';
+  }
+
+  @override
+  String foodBasketSummary(int count, Object total) {
+    return '$count பொருட்கள் · $total';
+  }
+
+  @override
+  String get foodReview => 'ஆர்டரை மதிப்பாய்வு செய்';
+
+  @override
+  String get foodBasketAdjusted =>
+      'மெனு மாறியதால் உங்கள் கூடை புதுப்பிக்கப்பட்டது.';
+
+  @override
+  String get foodPickupUnavailableNow =>
+      'இந்த பெறுதலை இனி ஆர்டர் செய்ய முடியாது.';
+
+  @override
+  String get foodBack => 'பெறும் இடங்களுக்குத் திரும்பு';
 }

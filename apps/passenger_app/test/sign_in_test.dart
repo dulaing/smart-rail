@@ -106,7 +106,7 @@ void main() {
               ? 'Your next trains'
               : title == 'Trains'
               ? 'Trains'
-              : 'Coming soon',
+              : 'Choose a train',
         ),
         title == 'Trains' ? findsWidgets : findsOneWidget,
         reason: '$title is reachable while restoring',
