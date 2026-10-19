@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../platform_client.dart';
 import 'train_models.dart';
 
 class ApiRead<T> {
@@ -25,7 +26,7 @@ abstract interface class PassengerTrainSource {
 class PassengerTrainApi implements PassengerTrainSource {
   PassengerTrainApi(String baseUrl, {http.Client? client})
     : _base = baseUrl,
-      _client = client ?? http.Client();
+      _client = client ?? platformHttpClient();
   final String _base;
   final http.Client _client;
   Uri _uri(String path, [Map<String, String>? query]) =>

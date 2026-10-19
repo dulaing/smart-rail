@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:cronet_http/cronet_http.dart';
+
+import '../platform_client.dart';
 
 /// The signed-in person's SmartRail account, from `GET /api/me`.
 class Account {
@@ -15,7 +15,9 @@ class Account {
 
   factory Account.fromJson(Map<String, dynamic> json) => Account(
     displayName: json['displayName'] as String,
-    roles: [for (final g in json['grants'] as List) (g as Map)['role'] as String],
+    roles: [
+      for (final g in json['grants'] as List) (g as Map)['role'] as String,
+    ],
     permissions: [
       for (final p in json['permissions'] as List) (p as Map)['code'] as String,
     ],
@@ -51,12 +53,7 @@ abstract class AccountApi {
 
 class HttpAccountApi implements AccountApi {
   HttpAccountApi(this._baseUrl, {http.Client? client})
-    : _client = client ?? _platformClient();
-
-  // On Android, Dart's own HTTP client trusts only the built-in system CAs. Cronet checks
-  // certificates through Android, so it follows network_security_config.xml like AppAuth does.
-  static http.Client _platformClient() =>
-      Platform.isAndroid ? CronetClient.defaultCronetEngine() : http.Client();
+    : _client = client ?? platformHttpClient();
 
   final String _baseUrl;
   final http.Client _client;
