@@ -11,9 +11,10 @@ namespace SmartRail.Api.Modules.Access;
 // Credentials come from configuration (user-secrets or environment), never from source.
 public static class DemoIdentitySeeder
 {
-    private sealed record DemoUser(string Username, string DisplayName, string Role, string? StationCode = null);
+    // Public so the pilot scenario manifest can list the same intended role assignments.
+    public sealed record DemoUser(string Username, string DisplayName, string Role, string? StationCode = null);
 
-    private static readonly DemoUser[] Users =
+    public static readonly IReadOnlyList<DemoUser> Users =
     [
         new("demo-passenger", "Demo Passenger", Roles.Passenger),
         new("demo-driver", "Demo Driver", Roles.Driver),
@@ -25,7 +26,7 @@ public static class DemoIdentitySeeder
     ];
 
     // The demo driver is assigned to every seeded run of this train.
-    private const string DriverTrain = "SIM-1001";
+    public const string DriverTrain = "SIM-1001";
 
     public static async Task SeedAsync(
         SmartRailDbContext db, IConfiguration configuration, CancellationToken cancellationToken = default)

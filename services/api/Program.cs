@@ -107,6 +107,60 @@ if (args.Contains("--migrate-and-seed"))
     return;
 }
 
+// `dotnet run --project services/api -- --seed-demo --anchor <ISO>` prepares the Development
+// presentation scenario for the anchor's Colombo service date and writes its manifest. Run it
+// from the repository root so the manifest lands in artifacts/. Identities and provider data are
+// separate commands: --seed-demo-identities (needs Keycloak) and the RailBites seed.
+if (args.Contains("--seed-demo"))
+{
+    if (!app.Environment.IsDevelopment())
+    {
+        throw new InvalidOperationException("The demo scenario can only be seeded in the Development environment.");
+    }
+
+    if (!PilotScenario.TryParseAnchor(ArgValue(args, "--anchor"), out var anchor, out var anchorError))
+    {
+        Console.Error.WriteLine(anchorError);
+        Environment.ExitCode = 2;
+        return;
+    }
+
+    var run = ArgValue(args, "--run") ?? PilotScenario.DefaultRun(anchor);
+    var manifestPath = ArgValue(args, "--manifest")
+        ?? Path.Combine("artifacts", $"pilot-scenario-{PilotScenario.SafeRun(run)}.json");
+
+    await app.MigrateAndSeedAsync(PilotScenario.ServiceDateOf(anchor));
+
+    await using (var scope = app.Services.CreateAsyncScope())
+    {
+        var manifest = await PilotScenario.BuildManifestAsync(
+            scope.ServiceProvider.GetRequiredService<SmartRailDbContext>(), anchor, run);
+        await PilotScenario.WriteManifestAsync(manifestPath, manifest);
+        PilotScenario.PrintSummary(manifest, manifestPath);
+    }
+
+    return;
+}
+
+// Reads `--name value` or `--name=value` from the command line.
+static string? ArgValue(string[] args, string name)
+{
+    for (var i = 0; i < args.Length; i++)
+    {
+        if (args[i] == name)
+        {
+            return i + 1 < args.Length ? args[i + 1] : null;
+        }
+
+        if (args[i].StartsWith(name + "=", StringComparison.Ordinal))
+        {
+            return args[i][(name.Length + 1)..];
+        }
+    }
+
+    return null;
+}
+
 app.UseHttpsRedirection();
 app.UseCors();
 app.UseAuthentication();
