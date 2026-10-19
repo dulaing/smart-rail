@@ -25,7 +25,7 @@ public static class RunningEndpoints
     }
 
     private static async Task<IResult> GetRunning(
-        HttpContext context, SmartRailDbContext db, TimeProvider time, IConfirmedChangeReader changes, string journeyId)
+        HttpContext context, RunningReader reader, TimeProvider time, string journeyId)
     {
         if (!Guid.TryParse(journeyId, out var id))
         {
@@ -33,26 +33,22 @@ public static class RunningEndpoints
                 statusCode: StatusCodes.Status400BadRequest);
         }
 
-        var journey = await db.Journeys
-            .AsNoTracking()
-            .Include(j => j.Pattern).ThenInclude(p => p.Stops)
-            .SingleOrDefaultAsync(j => j.Id == id, context.RequestAborted);
-        if (journey is null)
+        var now = time.GetUtcNow();
+        var response = await reader.ReadAsync(id, now, context.RequestAborted);
+        if (response is null)
         {
             return Results.Problem(title: "Unknown journey", detail: "No journey has this ID.",
                 statusCode: StatusCodes.Status404NotFound);
         }
 
-        var now = time.GetUtcNow();
-        var observation = await ObservationIngestion.CurrentAsync(db, id, context.RequestAborted);
-        var confirmed = await changes.ReadAsync(id, context.RequestAborted);
-        var state = RunningCalculator.Calculate(journey, observation?.ToRunning(), now, overrides: confirmed);
-
         // Set before the ETag helper so a 304 carries it too. It is not part of the body.
-        context.Response.Headers[ServerTimeHeader] =
-            now.UtcDateTime.ToString("yyyy-MM-dd'T'HH:mm:ss.fff'Z'", CultureInfo.InvariantCulture);
-        return ETagResults.JsonWithETag(context, RunningResponses.Build(journey, state, observation));
+        context.Response.Headers[ServerTimeHeader] = ServerTime(now);
+        return ETagResults.JsonWithETag(context, response);
     }
+
+    // The server's clock as the X-SmartRail-Server-Time header writes it.
+    public static string ServerTime(DateTimeOffset now) =>
+        now.UtcDateTime.ToString("yyyy-MM-dd'T'HH:mm:ss.fff'Z'", CultureInfo.InvariantCulture);
 
     private static async Task<IResult> PostObservation(
         HttpContext context, SmartRailDbContext db, TimeProvider time, ObservationRequest? body)

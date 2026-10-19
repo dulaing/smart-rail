@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:cronet_http/cronet_http.dart';
+
+import '../platform_client.dart';
 
 /// The signed-in person's SmartRail account, from `GET /api/me`.
 class Account {
@@ -15,7 +15,9 @@ class Account {
 
   factory Account.fromJson(Map<String, dynamic> json) => Account(
     displayName: json['displayName'] as String,
-    roles: [for (final g in json['grants'] as List) (g as Map)['role'] as String],
+    roles: [
+      for (final g in json['grants'] as List) (g as Map)['role'] as String,
+    ],
     permissions: [
       for (final p in json['permissions'] as List) (p as Map)['code'] as String,
     ],
@@ -35,6 +37,13 @@ class AccountFound extends AccountResult {
   final Account account;
 }
 
+/// A previously signed-in identity whose session could not be refreshed because the network is
+/// unavailable. It grants access only to owner-bound saved briefing files.
+class AccountOffline extends AccountResult {
+  const AccountOffline(this.ownerId);
+  final String ownerId;
+}
+
 /// Signed in with Keycloak, but no enabled SmartRail account exists for this identity.
 class AccountMissing extends AccountResult {
   const AccountMissing();
@@ -46,8 +55,9 @@ class AccountExpired extends AccountResult {
 }
 
 class AccountFailed extends AccountResult {
-  const AccountFailed(this.message);
+  const AccountFailed(this.message, {this.statusCode});
   final String message;
+  final int? statusCode;
 }
 
 abstract class AccountApi {
@@ -56,12 +66,7 @@ abstract class AccountApi {
 
 class HttpAccountApi implements AccountApi {
   HttpAccountApi(this._baseUrl, {http.Client? client})
-    : _client = client ?? _platformClient();
-
-  // On Android, Dart's own HTTP client trusts only the built-in system CAs. Cronet checks
-  // certificates through Android, so it follows network_security_config.xml like AppAuth does.
-  static http.Client _platformClient() =>
-      Platform.isAndroid ? CronetClient.defaultCronetEngine() : http.Client();
+    : _client = client ?? platformHttpClient();
 
   final String _baseUrl;
   final http.Client _client;
@@ -84,7 +89,10 @@ class HttpAccountApi implements AccountApi {
       if (response.statusCode == 403) {
         return const AccountMissing();
       }
-      return AccountFailed('The server answered ${response.statusCode}.');
+      return AccountFailed(
+        'The server answered ${response.statusCode}.',
+        statusCode: response.statusCode,
+      );
     } catch (error) {
       debugPrint('GET /api/me failed: ${error.runtimeType}: $error');
       return const AccountFailed('Could not reach SmartRail.');

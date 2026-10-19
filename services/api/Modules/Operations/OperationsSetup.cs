@@ -1,3 +1,4 @@
+using SmartRail.Api.Modules.Operations.Briefings;
 using SmartRail.Api.Modules.Operations.Changes;
 using SmartRail.Api.Modules.Operations.Incidents;
 using SmartRail.Api.Modules.Operations.Reports;
@@ -30,6 +31,7 @@ public static class OperationsSetup
     {
         app.MapPublicChanges();
         app.MapStaffChanges();
+        app.MapDriverBriefings();
         app.MapDriverReports();
         app.MapControlReports();
         app.MapIncidents();

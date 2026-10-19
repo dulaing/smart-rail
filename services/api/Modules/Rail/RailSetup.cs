@@ -1,3 +1,5 @@
+using SmartRail.Api.Modules.Rail.Running;
+
 namespace SmartRail.Api.Modules.Rail;
 
 public static class RailSetup
@@ -9,6 +11,8 @@ public static class RailSetup
         {
             builder.Services.AddScoped<IJourneyStopReader, JourneyStopReader>();
             builder.Services.AddScoped<IPickupReader, PickupReader>();
+            builder.Services.AddScoped<RunningReader>();
+            builder.Services.AddScoped<IJourneyRunningReader, JourneyRunningReader>();
         }
     }
 }

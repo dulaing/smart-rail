@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -33,6 +35,9 @@ abstract class AuthService {
   /// Reopens a previous session from secure storage, if there is one.
   Future<bool> restore();
 
+  /// Stable subject from the signed-in ID token, used only to bind private offline data.
+  Future<String?> ownerId();
+
   /// Opens the Keycloak sign-in page. Throws if the person cancels or sign-in fails.
   Future<void> signIn();
 
@@ -55,6 +60,7 @@ class KeycloakAuthService implements AuthService {
 
   static const _refreshTokenKey = 'refresh_token';
   static const _idTokenKey = 'id_token';
+  static const _ownerIdKey = 'offline_owner_id';
   static const _scopes = ['openid', 'profile'];
   static const _refreshMargin = Duration(seconds: 30);
 
@@ -75,9 +81,44 @@ class KeycloakAuthService implements AuthService {
     try {
       await accessToken();
       return true;
-    } catch (_) {
+    } on AuthSessionRejected {
       await _clear();
       return false;
+    } on FlutterAppAuthPlatformException catch (error) {
+      if (error.platformErrorDetails.error ==
+          FlutterAppAuthOAuthError.invalidGrant) {
+        await _clear();
+        return false;
+      }
+      if (error.platformErrorDetails.error == null) {
+        throw const AuthRestoreUnavailable();
+      }
+      // Network and discovery failures do not prove the refresh token was revoked.
+      rethrow;
+    } catch (_) {
+      // Keep the owner and saved briefing during a transport failure.
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String?> ownerId() async {
+    final saved = await _storage.read(key: _ownerIdKey);
+    if (saved != null) return saved;
+    final idToken = await _storage.read(key: _idTokenKey);
+    if (idToken == null) return null;
+    try {
+      final claims = jsonDecode(
+        utf8.decode(
+          base64Url.decode(base64Url.normalize(idToken.split('.')[1])),
+        ),
+      ) as Map<String, dynamic>;
+      final subject = claims['sub'];
+      if (subject is! String || subject.isEmpty) return null;
+      await _storage.write(key: _ownerIdKey, value: subject);
+      return subject;
+    } catch (_) {
+      return null;
     }
   }
 
@@ -113,15 +154,25 @@ class KeycloakAuthService implements AuthService {
     if (refreshToken == null) {
       throw StateError('Not signed in.');
     }
-    final response = await _appAuth.token(
-      TokenRequest(
-        _config.clientId,
-        _config.redirectUrl,
-        issuer: _config.issuer,
-        refreshToken: refreshToken,
-        scopes: _scopes,
-      ),
-    );
+    final TokenResponse response;
+    try {
+      response = await _appAuth.token(
+        TokenRequest(
+          _config.clientId,
+          _config.redirectUrl,
+          issuer: _config.issuer,
+          refreshToken: refreshToken,
+          scopes: _scopes,
+        ),
+      );
+    } on FlutterAppAuthPlatformException catch (error) {
+      if (error.platformErrorDetails.error ==
+          FlutterAppAuthOAuthError.invalidGrant) {
+        await _clear();
+        throw const AuthSessionRejected();
+      }
+      rethrow;
+    }
     await _keep(
       accessToken: response.accessToken,
       expiry: response.accessTokenExpirationDateTime,
@@ -164,6 +215,22 @@ class KeycloakAuthService implements AuthService {
     }
     if (idToken != null) {
       await _storage.write(key: _idTokenKey, value: idToken);
+      final parts = idToken.split('.');
+      if (parts.length == 3) {
+        try {
+          final claims = jsonDecode(
+            utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))),
+          ) as Map<String, dynamic>;
+          if (claims['sub'] is String) {
+            await _storage.write(
+              key: _ownerIdKey,
+              value: claims['sub'] as String,
+            );
+          }
+        } catch (_) {
+          // A malformed ID token will be rejected by the auth server on the next request.
+        }
+      }
     }
   }
 
@@ -172,5 +239,14 @@ class KeycloakAuthService implements AuthService {
     _accessTokenExpiry = null;
     await _storage.delete(key: _refreshTokenKey);
     await _storage.delete(key: _idTokenKey);
+    await _storage.delete(key: _ownerIdKey);
   }
+}
+
+class AuthRestoreUnavailable implements Exception {
+  const AuthRestoreUnavailable();
+}
+
+class AuthSessionRejected implements Exception {
+  const AuthSessionRejected();
 }
