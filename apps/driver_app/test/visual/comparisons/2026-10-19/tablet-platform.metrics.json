@@ -5,8 +5,8 @@
     "cropBottom":  0,
     "width":  2560,
     "height":  1600,
-    "meanAbsoluteChannelError":  0.6292325032552083,
-    "pixelsWithChannelDeltaAbove16":  0.006253173828125,
+    "meanAbsoluteChannelError":  0.53070914713541661,
+    "pixelsWithChannelDeltaAbove16":  0.005728515625,
     "maximumChannelDelta":  244,
     "interpretation":  "Diagnostic only. Review geometry and text separately; this is not a whole-image pass threshold."
 }

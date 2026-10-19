@@ -199,15 +199,10 @@ void main() {
         image.dispose();
         return bytes;
       });
-      if (name == 'tablet-duty') {
-        // Byte matchers perform file I/O directly; run that outside fake time.
-        await tester.runAsync(
-          () => expectLater(
-            captured!,
-            matchesGoldenFile('goldens/tablet-duty.png'),
-          ),
-        );
-      }
+      // Byte matchers perform file I/O directly; run that outside fake time.
+      await tester.runAsync(
+        () => expectLater(captured!, matchesGoldenFile('goldens/$name.png')),
+      );
       if (name == 'tablet-duty' || name == 'phone-briefing') {
         expect(
           tester.getRect(find.byKey(const Key('next-stop'))).width,

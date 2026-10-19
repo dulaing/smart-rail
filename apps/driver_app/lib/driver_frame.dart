@@ -391,7 +391,7 @@ class DriverAction extends StatelessWidget {
       style: FilledButton.styleFrom(
         backgroundColor: outlined ? p.bgSurface : p.navActive,
         foregroundColor: outlined ? p.textPrimary : p.navActiveInk,
-        side: outlined ? BorderSide(color: p.lineHairline) : null,
+        side: outlined && !phone ? BorderSide(color: p.lineHairline) : null,
         minimumSize: Size(double.infinity, phone ? 64 : 96),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         shape: RoundedRectangleBorder(

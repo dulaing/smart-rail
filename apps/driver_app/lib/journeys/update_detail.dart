@@ -289,7 +289,11 @@ class DriverUpdateDetail extends StatelessWidget {
                   children: [
                     const Align(
                       alignment: Alignment.centerLeft,
-                      child: DriverAsset('shield', size: 32),
+                      child: DriverAsset(
+                        'phone-shield',
+                        key: Key('update-shield'),
+                        size: 32,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     text(by, size: 22, line: 28, weight: FontWeight.w600),

@@ -955,7 +955,15 @@ class _ChangeCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  if (compact) const DriverAsset('phone-chevron', size: 24),
+                  if (compact) ...[
+                    const SizedBox(width: 16 / 3),
+                    const DriverAsset(
+                      'phone-chevron',
+                      key: Key('phone-change-chevron'),
+                      size: 24,
+                    ),
+                    const SizedBox(width: 8),
+                  ],
                 ],
               ),
               if (!compact) ...[

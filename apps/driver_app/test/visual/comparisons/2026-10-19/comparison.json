@@ -1,7 +1,7 @@
 {
   "date": "2026-10-19",
   "task": "figma-implementation T2",
-  "status": "First tablet app baseline approved; remaining Driver families in progress",
+  "status": "Selected normal duty, phone and Updates app baselines frozen; T2 remaining Driver families in progress",
   "referenceNodeId": "178:73",
   "referenceCorrections": [
     "User-approved Last observed wording instead of unavailable actual passage time",
@@ -94,6 +94,12 @@
       "sha256": "dc297bcb51bc69727419f4e57392b85461ebc058ae7ffc4b80368638d3b9e9e8",
       "sourceNodeId": "182:5172",
       "renderedLogicalSize": 28
+    },
+    "phone-shield": {
+      "file": "apps/driver_app/assets/figma/phone-shield.svg",
+      "sourceNodeId": "188:498",
+      "sha256": "3ddc50bacb347d653aa61181f823c19f4da6a3f093846281a7f033c0c21c201f",
+      "renderedLogicalSize": 32
     }
   },
   "symbolFont": {
@@ -112,17 +118,17 @@
   },
   "contrast": "7:1 resolved text paints and nearest opaque surfaces; antialiased thin-digit histogram heuristic is not claimed passing",
   "pending": [
-    "Approve pending phone/Updates reference wording and freeze their reviewed app captures",
+    "Approve the concrete report reference proposal before changing those references or UI",
     "Report receipt reference reconciliation for absent station/local-save timestamps and uncertain network outcome",
     "Selection/report/account/recovery compositions and remaining Driver states",
     "Native report action/offline loop and remaining accessibility checks"
   ],
   "files": {
     "android-briefing-unknown.png": "393e4936954419041cac7d2432b4e8725659dd1fa932cbd0b5044cefd8053b35",
-    "phone-briefing.actual.png": "a07b988ec15fe24f92b7236ac064bb141dc54cffb978c1eff9e547318e21695e",
-    "phone-briefing.diff.png": "d7ce5058ddb0c49e557ac6905e5cdfb2b80a5b39b15d26f3709e677435cdc25a",
-    "phone-briefing.metrics.json": "7bdb5536da18fdd414decad19f93f9c824001251b3cb31f5d87458f3f3200e37",
-    "phone-briefing.overlay.png": "e41f34e6171688e565f5172c0cf7a00c6b4b83a983ed3ad157946089d2eb8d0d",
+    "phone-briefing.actual.png": "5031954a5a30aa5ff13d4b425f1d39693a7f2e0f74a4792ea8debb1f6182be19",
+    "phone-briefing.diff.png": "cb2fb821c16e25e42b89a9eff686ae7ad10fcc283e775976af301aa564af5ef7",
+    "phone-briefing.metrics.json": "335ff63040a9df791e62fbb483848745b82c26511d833741bf83a5c4668eaa14",
+    "phone-briefing.overlay.png": "41b4e5c8a295175d4f3d5e4ad093ddd0a295ac5f7c83460a4873883e6c37d3c6",
     "phone-briefing.reference.png": "dcd039e56f48a541d2341e0571f1e4aa663ecd0da123c1500437c83c6286fb27",
     "tablet-duty.actual-bounds.json": "8c9a39b659d3a7fbca561af8e1015225fbd366701e36d8409c135cccf1aa8b8b",
     "tablet-duty.actual.png": "ec9c94760deda31713742e8970d1932a5ede3006fcce3200eedb757d99618461",
@@ -132,15 +138,15 @@
     "tablet-duty.reference-bounds.json": "90c07154659694de08488233525f57f80e244fb42028575753d4fc303905653e",
     "tablet-duty.reference.png": "a9ff76b3bd1ab29b7409056f541a3d73259cd09adb0295705ea5dc7ae07519cd",
     "android-updates-empty.png": "fda1b74c06a7ecc74f9b9746e9a57c4572d34c439e5dfc5e227b1b86a642ca22",
-    "phone-briefing.14sp.reference.png": "eab396a8a401a206bed7e942a6c3297d4fb8a877d13e2bbef813b49377c25090",
-    "phone-briefing.actual-bounds.json": "5ed4acaaefd793af6ae9db6870a4bab02cdbc310a775ab0e3f9dbf582c57c14e",
+    "phone-briefing.14sp.reference.png": "2831ed2d4d64f5abf2880053d5629a22a31f21db113b3e0b74bb58db487b2fa3",
+    "phone-briefing.actual-bounds.json": "5075ab748313c9fb96f088b5a4f3fe756e2703932c0633cf703e26093da27990",
     "phone-label-reconciliation.json": "a4fb6722b13916af7a9f587cd2a47b151e93b169e15da5282dfd79d4868c3d5f",
-    "phone-platform.actual-bounds.json": "506823039e82f35009edeaf3435300674dcfadd52ad29a48eef0edc53b4b1208",
-    "phone-platform.actual.png": "619b8071a13689d9b2b8e1defb49b6d20e1eb0e111a1f31f5d771ae9769959c2",
-    "phone-platform.diff.png": "0433256c019c6eaac65211db35777da5be53200162a1ef1a0f2307b3c6d2fe35",
-    "phone-platform.metrics.json": "4bf5cd61ec93946ce921310c5f12bc2bc3bc936257b064624823c4fc5ab407d2",
-    "phone-platform.overlay.png": "32d7802fcaca719de0cb889a1cee35fdd76dd3881056d77b6de4f090ba479d9f",
-    "phone-platform.reference.png": "261cea6e91440393b3716d42989da83e2c28b1cc91a78186842b3d4a80cc1035",
+    "phone-platform.actual-bounds.json": "63f1d35f758a1a5cce91a297c20f10465c0e9784f26389f31685a624e76792f5",
+    "phone-platform.actual.png": "f5b068d77de7537b848850dc94eb04061484a95fee593f604cda4c62fb73b4c0",
+    "phone-platform.diff.png": "51a9fe7268b4b3fb053ae1c4f1f1146b060fa41d17fb00df072c5bc34689f49d",
+    "phone-platform.metrics.json": "7e12927aad2a4d095d178bfc0032a4a566027b93f7d3aba084ff5fba9cd4dfc0",
+    "phone-platform.overlay.png": "7976d94170220b03b65607e3c5bbf61b28114ca2545c39434dd86724915847b9",
+    "phone-platform.reference.png": "58b77c153aa34c246589595862209571cc7a66030f7f22ab71d076d9233246fe",
     "tablet-delay.actual-bounds.json": "d951e667a4c64d66181c46b492d3340e014553419fadb733eed65d6d7dee49dc",
     "tablet-delay.actual.png": "5c6f3c2db65929ebc32aa4e98f23dc712e8cf885fb01c36b9e1bd1de44968ae7",
     "tablet-delay.diff.png": "bd6a6c4a6792fdc77f1bdd69f6d68c1e10616135683699ebb650aa3dcd9611f1",
@@ -149,29 +155,31 @@
     "tablet-delay.reference.png": "90f04b0e02432581213978708d0898e3714ba646fcedbbb2240baf7b801297c3",
     "tablet-platform.actual-bounds.json": "5c90241d59f999034fea3f3a2dd70f406fe20ab7632c26077c1c4374b7763034",
     "tablet-platform.actual.png": "bf1ae45abec0fd7d98c5dd63c360a9a7bec928fdfcab96ad5b0e8c146426e6b4",
-    "tablet-platform.diff.png": "1461db38a421aec1feddd1e9dd903394c66b3d7164a07bb8975bf59b4a0ca0e5",
-    "tablet-platform.metrics.json": "56a055e4b9fc2c2188641aa62b6299dbf938889bb81ec6a330b8010f58c46e13",
-    "tablet-platform.overlay.png": "33317d0c615effd2cacdae88f55095549dc4357f812e5b27e9b8d880305e9156",
-    "tablet-platform.reference.png": "a7b7fd78a239d5160ec7ea6c74ae0c0827d78c23a07a86cb710fd993b4a2769f",
+    "tablet-platform.diff.png": "f2d3a2de55211b5614faa26271c90e890a79b7ae9e18234aa7242aa9e79b8718",
+    "tablet-platform.metrics.json": "8b21c37a93f33752ee812bd654ede8e1a2e15cfca6c81c1591deef6d8b8a4e16",
+    "tablet-platform.overlay.png": "a87a21851bcacb18ce06702a8389c6c78bb10023f5c3d5b99b11f0aeddc00de0",
+    "tablet-platform.reference.png": "0ab1fa7adb2be8c8c6659dfd1d63c6edb8700063af8b0545047a49f10b9ea00a",
     "tablet-updates.actual-bounds.json": "93f36fef9425b56451e88c7954ae55bf3cd18c8252a1d9d536b3119c75e8a218",
     "tablet-updates.actual.png": "d6e41944e3e1f01d2ea29841487ca05de47650b4ee842a3de20ec0071db17c8f",
     "tablet-updates.diff.png": "6ac72fbee10ee3327c8659cfbe1ec6c91d2e929cbfec55975bf1358020c4a823",
     "tablet-updates.metrics.json": "71229e28ef818e7a3339cd8f1d3ac1d0622b2bf50449ef4a7029d59931a51053",
     "tablet-updates.overlay.png": "6de736d1a25f6ca44a4f510fb7e37bd5ef18eea4fdddb5267635c7a76ff30967",
     "tablet-updates.reference.png": "05b54d482fbf9aa42da552ced6566dc64124c2fbc1953995d2b96113182d1779",
-    "updates-phone.reference-bounds.json": "e7e565fb6d1a65c53ec16351a055bd93af61f60c9acb7db7c7eb3a5257f820fa"
+    "updates-phone.reference-bounds.json": "131fa39b9d4c8e923e48a799b8b4d0279a9d1070da2723eb7679bb430e1ca773",
+    "api-wording-reconciliation.json": "d8b79ad4fab65fbe5e53587e595e2c08ece2d95f5b8ae762376fff1818ed4772",
+    "report-reference-proposal.html": "8e171a220e1b731bee6c9b0e17d3f48a9d7c8e0157a404ab0b71ad71db41b4aa"
   },
   "offlineHandoffFix": "Pass the retained saved row when a signed-in online session falls back to its owner cache; regression test covers opening it read-only.",
   "sourceSha256": {
-    "apps/driver_app/lib/driver_frame.dart": "ed8fa4b450db3ebbbb6e638f1f7ad238daafeb8aae00f07066a11649dcb8c90c",
-    "apps/driver_app/lib/journeys/briefing_view.dart": "730892b988f9815c9b2caa8a32fd08f7ed5c7c271d0f8b32ba4df2747fc6202b",
+    "apps/driver_app/lib/driver_frame.dart": "784eabd7370fd36269f6fd9dec744fbe8e9cb0963110b119927160a462f0a279",
+    "apps/driver_app/lib/journeys/briefing_view.dart": "f5da72d1a97d1055c75f81f500d36c51cc289c667f0c39b0034ef2c3e7013aba",
     "apps/driver_app/lib/journeys/briefing_api.dart": "5f36eea1c375e3754d16590eb779dfb8775a745366c37306a17df0ddddb60479",
     "apps/driver_app/lib/journeys/briefing_cache.dart": "3e68c9b77edcfc7546849c2d4cb7c7d9a33cae657f480acc84ae5ecbee40406b",
     "apps/driver_app/lib/journeys/journey_screens.dart": "1ab71d8bbe5685ec738ef69cd967a26aff153b4c10d6d104cdeafcb0023a304f",
     "apps/driver_app/lib/shell.dart": "782161059bd807e0eae08493549bc39968bda4728ea65c8845e461d25c74fd9b",
     "apps/driver_app/test/visual/fixtures/duty.json": "f17d964fc1ab836ee5e42ae69bd626460222007e320a809e2c87c7ec3def30fe",
-    "apps/driver_app/lib/journeys/update_detail.dart": "298c58fbdb7f93636d907a5827b965484670ecc6c325d71c98577a52f5778956",
-    "apps/driver_app/test/visual/driver_duty_test.dart": "2a103112762bf0f97844b0ebd9218f07fc2913e7d81340df1c346471adfbe05d"
+    "apps/driver_app/lib/journeys/update_detail.dart": "72d2609072a5d05c82aa60c9fa39af1e83545be1e81fec58f9c397e6cc48a697",
+    "apps/driver_app/test/visual/driver_duty_test.dart": "3b9a85a3cb7595ecb50e218f4fe56809fb157b00d997f7c1b820bc7e06d4c0fc"
   },
   "sourceHashFormat": "SHA-256 of UTF-8 source with LF line endings",
   "approval": {
@@ -183,7 +191,7 @@
     "raster": "User reviewed and approved Figma/Flutter text raster differences, including the Noto Sans Math U+2192 fallback."
   },
   "phoneAndUpdates": {
-    "status": "Candidates; API-backed reference wording approval pending",
+    "status": "Reference wording approved; app goldens frozen after final overlay review",
     "phoneTypography": {
       "approvedOn": "2026-10-19",
       "labelSp": 14,
@@ -198,19 +206,48 @@
       "tablet-delay": "182:5180",
       "phone-platform": "188:470"
     },
-    "additionalMeasuredRegions": 16,
+    "additionalMeasuredRegions": 18,
     "maximumLogicalError": "floating-point rounding only",
     "limitLogicalPixels": 1,
-    "pendingReferenceCorrections": [
-      "Explicit planned platform labels for unconfirmed phone assignments",
-      "Issuer name without an API-unavailable staff role"
-    ],
     "checks": [
       "real fonts, target and label guidelines, 7:1 resolved text paints for duty/Updates/platform detail at both sizes",
       "stable ID refresh, keyboard focus return and Enter activation, system back retains journey",
       "200% long Sinhala/Tamil detail and fixed return action",
       "Reports history navigation separate from report composer"
     ],
-    "native": "Latest presentation APK installed on API35 emulator; real signed-in SIM-1001 empty Updates -> briefing -> same-journey report composer; no report submitted"
+    "native": "Latest presentation APK installed on API35 emulator; real signed-in SIM-1001 empty Updates -> briefing -> same-journey report composer; no report submitted",
+    "referenceWordingApprovedOn": "2026-10-19",
+    "wordingLedger": "api-wording-reconciliation.json",
+    "finalFidelityFixes": [
+      "Chevron horizontal box corrected from307 to299 logical pixels",
+      "Exact phone shield SVG instead of tablet shield",
+      "Phone secondary action has no border, matching its component"
+    ],
+    "goldens": {
+      "tablet-duty": {
+        "file": "apps/driver_app/test/visual/goldens/tablet-duty.png",
+        "sha256": "ec9c94760deda31713742e8970d1932a5ede3006fcce3200eedb757d99618461"
+      },
+      "phone-briefing": {
+        "file": "apps/driver_app/test/visual/goldens/phone-briefing.png",
+        "sha256": "5031954a5a30aa5ff13d4b425f1d39693a7f2e0f74a4792ea8debb1f6182be19"
+      },
+      "tablet-updates": {
+        "file": "apps/driver_app/test/visual/goldens/tablet-updates.png",
+        "sha256": "d6e41944e3e1f01d2ea29841487ca05de47650b4ee842a3de20ec0071db17c8f"
+      },
+      "tablet-platform": {
+        "file": "apps/driver_app/test/visual/goldens/tablet-platform.png",
+        "sha256": "bf1ae45abec0fd7d98c5dd63c360a9a7bec928fdfcab96ad5b0e8c146426e6b4"
+      },
+      "tablet-delay": {
+        "file": "apps/driver_app/test/visual/goldens/tablet-delay.png",
+        "sha256": "5c6f3c2db65929ebc32aa4e98f23dc712e8cf885fb01c36b9e1bd1de44968ae7"
+      },
+      "phone-platform": {
+        "file": "apps/driver_app/test/visual/goldens/phone-platform.png",
+        "sha256": "f5b068d77de7537b848850dc94eb04061484a95fee593f604cda4c62fb73b4c0"
+      }
+    }
   }
 }

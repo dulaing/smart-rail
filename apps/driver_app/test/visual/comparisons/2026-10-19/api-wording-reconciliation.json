@@ -1,0 +1,65 @@
+{
+  "approvedOn": "2026-10-19",
+  "fileKey": "38B21GKxgb3wxRar06gHXP",
+  "scope": "API-backed phone platform labels and issuer names without staff-role inference",
+  "mutatedNodeIds": [
+    "182:5170",
+    "190:5766",
+    "188:455",
+    "188:460",
+    "190:6532",
+    "190:6537",
+    "188:500",
+    "190:6577"
+  ],
+  "changed": [
+    {
+      "id": "182:5170",
+      "text": "Confirmed by Dilani",
+      "w": 604,
+      "h": 56
+    },
+    {
+      "id": "190:5766",
+      "text": "Confirmed by Dilani",
+      "w": 604,
+      "h": 56
+    },
+    {
+      "id": "188:455",
+      "text": "Sched. 7:30 · Planned platform 2",
+      "w": 922,
+      "h": 66
+    },
+    {
+      "id": "188:460",
+      "text": "Sched. 8:01 · Planned platform 4",
+      "w": 922,
+      "h": 66
+    },
+    {
+      "id": "190:6532",
+      "text": "Sched. 7:30 · Planned platform 2",
+      "w": 922,
+      "h": 66
+    },
+    {
+      "id": "190:6537",
+      "text": "Sched. 8:01 · Planned platform 4",
+      "w": 922,
+      "h": 66
+    },
+    {
+      "id": "188:500",
+      "text": "Dilani",
+      "w": 890,
+      "h": 84
+    },
+    {
+      "id": "190:6577",
+      "text": "Dilani",
+      "w": 890,
+      "h": 84
+    }
+  ]
+}
