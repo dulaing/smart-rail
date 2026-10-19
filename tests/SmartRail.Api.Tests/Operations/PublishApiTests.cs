@@ -32,6 +32,10 @@ public class PublishApiTests(AccessApi api) : IClassFixture<AccessApi>
 
         public Task<IReadOnlyList<AuditRecord>> ReadForTargetsAsync(IReadOnlyList<AuditTargets> targets, int limit, CancellationToken cancellationToken) =>
             throw new InvalidOperationException("audit down");
+
+        public Task<AuditPage> ReadPageAsync(
+            IReadOnlyList<AuditTargets> targets, DateTimeOffset? afterTime, Guid? afterId, int limit, CancellationToken cancellationToken) =>
+            throw new InvalidOperationException("audit down");
     }
 
     // Every test uses its own journey, because they share one database.

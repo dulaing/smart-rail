@@ -271,6 +271,42 @@ no secret, exact redirect `http://localhost:5173/`), an audience mapper that add
 
 ### Operations web app
 
+#### Seed journeys for the Operations T1 check
+
+With the local Aspire database running and migrated (one-time setup above), set
+`ConnectionStrings__smartrail` to its connection string, then run from the repository root:
+
+```powershell
+dotnet run --project services/api -- --seed-operations-demo
+```
+
+This command runs only in Development and exits after adding four fictional Fort–Ragama–Gampaha
+journeys. It prints their service dates, workspace paths and the UTC seed anchor:
+
+| Train | Evidence when seeded |
+| --- | --- |
+| `SIM-OPS-FRESH` | Current observation, two-minute reported delay |
+| `SIM-OPS-AGEING` | Observation 185 seconds old; becomes unknown 55 seconds later |
+| `SIM-OPS-UNKNOWN` | Observation five minutes old; schedule/history remain, position/ETA unknown |
+| `SIM-OPS-OVERNIGHT` | Previous service date, 23:45 departure and 00:45 arrival; no observation |
+
+Open the Operations corridor as `demo-controller` immediately after seeding. The fresh sample
+returns unchanged ETags between polls, becomes ageing after three minutes and unknown after four.
+The samples are excluded from the continuous simulator, so reading or restarting the API never
+refreshes their evidence. Near midnight, their service date remains the date of departure.
+
+Each run with a new anchor adds a new set; previous journeys, observations, changes and audit
+history remain intact. To repeat the same set without duplicates or refreshing evidence, pass
+the printed anchor, for example `--Seed:OperationsAnchor=2026-10-18T12:00:00Z` after the command.
+Anchors must include a time-zone offset and cannot be in the future. To get fresh evidence for
+a new check, omit the anchor and use the newly printed journey IDs.
+
+For the remaining T1 browser checks, block one running request in browser developer tools
+(partial failure), switch the browser offline (connection lost), then restore it (reconnect).
+Seeding alone does not verify those screen states.
+
+#### Run the app
+
     npm --prefix apps/ops-web install
     npm --prefix apps/ops-web run dev        # http://localhost:5173 (the port is fixed)
 
@@ -303,6 +339,8 @@ the server, never from the request body.
 
 | Request | Who | Result |
 | --- | --- | --- |
+| `GET /api/driver/journeys?serviceDate=yyyy-MM-dd` | assigned driver (`driver.briefing.read`) | The caller's own journeys on that date; `200` with an empty list when none, `403` without the permission. ETag, `private`. |
+| `GET /api/driver/journeys/{journeyId}/briefing` | assigned driver (`driver.briefing.read`) | Dated stop IDs, timetable, running evidence with its thresholds and the confirmed changes with who confirmed each and when (`confirmedByName` is `null` when unknown). `404` unknown journey, `403` not assigned. ETag and `X-SmartRail-Server-Time`. The public `/api/journeys/{id}/changes` still names nobody. |
 | `POST /api/driver/journeys/{journeyId}/reports` `{ "clientReportId", "reasonCode" }` | assigned driver (`driver.reports.create`) | `201` new, `200` an identical retry with the report's current state. Reason codes: `TRAIN_FAULT`, `SIGNAL_DELAY`, `OBSTRUCTION`, `CANNOT_CONTINUE`. A key already used for different input is a generic `409`. |
 | `GET /api/driver/journeys/{journeyId}/reports[?clientReportId=&limit=&cursor=]` and `.../{reportId}` | assigned driver (`driver.reports.read`) | Only the caller's own reports; another driver's report is `404`. |
 | `GET /api/operations/reports[?journeyId=&acknowledged=&limit=&cursor=]` and `.../{reportId}` | Controller (`incidents.manage`) | The report inbox, newest first. |

@@ -1,10 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:driver_app/auth/account_api.dart';
 import 'package:driver_app/auth/auth_service.dart';
+import 'package:driver_app/journeys/briefing_api.dart';
 import 'package:driver_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 
 class FakeAuth implements AuthService {
   FakeAuth({this.signInFails = false, this.restoreGate, this.restores = false});
@@ -30,6 +34,9 @@ class FakeAuth implements AuthService {
 
   @override
   Future<String> accessToken() async => 'access-token';
+
+  @override
+  Future<String?> ownerId() async => signedIn ? 'driver-subject' : null;
 
   @override
   Future<void> signOut() async {
@@ -64,6 +71,25 @@ const _controller = Account(
   roles: ['CONTROLLER'],
   permissions: ['changes.publish', 'incidents.read'],
 );
+
+const _journeyId = '11111111-1111-4111-8111-111111111111';
+
+String _assignedJourneys() => jsonEncode({
+  'serviceDate': '2026-10-18',
+  'journeys': [
+    {
+      'journeyId': _journeyId,
+      'serviceDate': '2026-10-18',
+      'trainNumber': 'SIM-1001',
+      'timetableLabel': 'Morning express',
+      'originName': 'Gampaha',
+      'scheduledDeparture': '2026-10-18T02:00:00Z',
+      'destinationName': 'Colombo Fort',
+      'scheduledArrival': '2026-10-18T03:00:00Z',
+      'availability': 'AS_SCHEDULED',
+    },
+  ],
+});
 
 Future<void> _pump(WidgetTester tester, FakeAuth auth, FakeAccounts accounts) async {
   await tester.pumpWidget(MainApp(auth: auth, accounts: accounts));
@@ -205,6 +231,28 @@ void main() {
         expect(find.byKey(Key('tab-$key')), findsOneWidget, reason: key);
       }
       expect(find.text('Not available yet'), findsOneWidget);
+    });
+
+    testWidgets('the shell renders the assigned journeys list, not a blank pane', (tester) async {
+      _phone(tester);
+      final api = DriverBriefingApi(
+        'https://api.test',
+        FakeAuth(restores: true),
+        client: MockClient((_) async => http.Response(_assignedJourneys(), 200)),
+      );
+      await tester.pumpWidget(
+        MainApp(
+          auth: FakeAuth(restores: true),
+          accounts: FakeAccounts(const AccountFound(_driver)),
+          journeyApi: api,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.byKey(const Key('driver-journeys-list')), findsOneWidget);
+      expect(find.byKey(const Key('journey-$_journeyId')), findsOneWidget);
+      expect(find.text('SIM-1001'), findsOneWidget);
     });
 
     testWidgets('a staff account without driver permissions gets Account only and an explanation', (tester) async {

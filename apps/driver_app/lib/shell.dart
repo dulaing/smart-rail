@@ -5,6 +5,10 @@ import 'package:smartrail_core/smartrail_core.dart';
 import 'account/account_controller.dart';
 import 'auth/account_api.dart';
 import 'l10n/app_localizations.dart';
+import 'journeys/briefing_api.dart';
+import 'journeys/journey_screens.dart';
+import 'journeys/report_api.dart';
+import 'journeys/report_screens.dart';
 
 /// The driver destinations from the hi-fi navigation.
 enum DriverTab { journeys, updates, reports, account }
@@ -14,8 +18,11 @@ enum DriverTab { journeys, updates, reports, account }
 bool canOpen(DriverTab tab, Account account) {
   final held = account.permissions;
   return switch (tab) {
-    DriverTab.journeys || DriverTab.updates => held.contains('driver.briefing.read'),
-    DriverTab.reports => held.contains('driver.reports.read') || held.contains('driver.reports.create'),
+    DriverTab.journeys ||
+    DriverTab.updates => held.contains('driver.briefing.read'),
+    DriverTab.reports =>
+      held.contains('driver.reports.read') ||
+          held.contains('driver.reports.create'),
     DriverTab.account => true,
   };
 }
@@ -30,10 +37,20 @@ const _icons = {
 /// Light staff shell: navigation for the permitted destinations with empty content until the
 /// journey features exist. A rail on tablets, a bottom bar on phones.
 class DriverShell extends StatefulWidget {
-  const DriverShell({super.key, required this.account, required this.controller});
+  const DriverShell({
+    super.key,
+    required this.account,
+    required this.controller,
+    this.journeyApi,
+    this.reportApi,
+    this.offlineOwnerId,
+  });
 
   final Account account;
   final AccountController controller;
+  final DriverBriefingApi? journeyApi;
+  final DriverReportApi? reportApi;
+  final String? offlineOwnerId;
 
   @override
   State<DriverShell> createState() => _DriverShellState();
@@ -42,7 +59,10 @@ class DriverShell extends StatefulWidget {
 class _DriverShellState extends State<DriverShell> {
   late DriverTab _tab = _tabs.first;
 
-  List<DriverTab> get _tabs => [for (final tab in DriverTab.values) if (canOpen(tab, widget.account)) tab];
+  List<DriverTab> get _tabs => [
+    for (final tab in DriverTab.values)
+      if (canOpen(tab, widget.account)) tab,
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -62,9 +82,35 @@ class _DriverShellState extends State<DriverShell> {
     final content = _Content(
       title: label(_tab),
       child: switch (_tab) {
-        DriverTab.account => _AccountBody(account: widget.account, controller: widget.controller, hasDriverAccess: tabs.length > 1),
+        DriverTab.account => SingleChildScrollView(
+          child: _AccountBody(
+            account: widget.account,
+            controller: widget.controller,
+            hasDriverAccess: tabs.length > 1,
+            offline: widget.offlineOwnerId != null,
+          ),
+        ),
         _ when !canOpen(_tab, widget.account) => Text(t.accessDenied),
-        _ => Text(t.notAvailableYet, style: theme.text('body', color: theme.palette.textSecondary)),
+        DriverTab.journeys || DriverTab.updates =>
+          widget.journeyApi == null
+              ? Text(
+                  t.notAvailableYet,
+                  style: theme.text('body', color: theme.palette.textSecondary),
+                )
+              : DriverJourneysScreen(
+                  api: widget.journeyApi!,
+                  offlineOwnerId: widget.offlineOwnerId,
+                ),
+        DriverTab.reports =>
+          widget.journeyApi == null || widget.reportApi == null
+              ? Text(
+                  t.notAvailableYet,
+                  style: theme.text('body', color: theme.palette.textSecondary),
+                )
+              : DriverReportsScreen(
+                  journeyApi: widget.journeyApi!,
+                  reportApi: widget.reportApi!,
+                ),
       },
     );
 
@@ -81,8 +127,18 @@ class _DriverShellState extends State<DriverShell> {
               onSelect: (tab) => setState(() => _tab = tab),
             );
             return wide
-                ? Row(children: [bar, Expanded(child: content)])
-                : Column(children: [Expanded(child: content), bar]);
+                ? Row(
+                    children: [
+                      bar,
+                      Expanded(child: content),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      Expanded(child: content),
+                      bar,
+                    ],
+                  );
           },
         ),
       ),
@@ -101,28 +157,47 @@ class _Content extends StatelessWidget {
     final theme = SrTheme.of(context);
     final locale = Localizations.localeOf(context).languageCode;
     final gap = theme.metrics.space[24]!;
-    return ListView(
-      padding: EdgeInsets.all(gap),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          srMessages['footer.simulation']![locale] ?? srMessages['footer.simulation']!['en']!,
-          style: theme.text('caption', color: theme.palette.textSecondary),
+        Padding(
+          padding: EdgeInsets.fromLTRB(gap, gap, gap, gap / 2),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                srMessages['footer.simulation']![locale] ??
+                    srMessages['footer.simulation']!['en']!,
+                style: theme.text('caption', color: theme.palette.textSecondary),
+              ),
+              SizedBox(height: gap / 2),
+              Semantics(
+                header: true,
+                child: Text(title, style: theme.text('title')),
+              ),
+            ],
+          ),
         ),
-        SizedBox(height: gap / 2),
-        Semantics(header: true, child: Text(title, style: theme.text('title'))),
-        SizedBox(height: gap / 2),
-        child,
+        // The child owns its own scrolling (a list or a column), so it must get a bounded
+        // height: an unbounded one collapses a nested scrollable to nothing.
+        Expanded(child: child),
       ],
     );
   }
 }
 
 class _AccountBody extends StatelessWidget {
-  const _AccountBody({required this.account, required this.controller, required this.hasDriverAccess});
+  const _AccountBody({
+    required this.account,
+    required this.controller,
+    required this.hasDriverAccess,
+    this.offline = false,
+  });
 
   final Account account;
   final AccountController controller;
   final bool hasDriverAccess;
+  final bool offline;
 
   @override
   Widget build(BuildContext context) {
@@ -134,16 +209,29 @@ class _AccountBody extends StatelessWidget {
       children: [
         Text(account.displayName, style: theme.text('heading')),
         SizedBox(height: gap / 2),
-        Text(account.roles.join(', '), style: theme.text('body', color: theme.palette.textSecondary)),
+        Text(
+          account.roles.join(', '),
+          style: theme.text('body', color: theme.palette.textSecondary),
+        ),
         if (!hasDriverAccess) ...[
           SizedBox(height: gap),
-          Text(t.noDriverAccess, key: const Key('no-driver-access'), style: theme.text('body', color: theme.palette.statusDangerInk)),
+          Text(
+            t.noDriverAccess,
+            key: const Key('no-driver-access'),
+            style: theme.text('body', color: theme.palette.statusDangerInk),
+          ),
         ],
         SizedBox(height: gap),
-        OutlinedButton(
-          onPressed: controller.busy ? null : controller.signOut,
-          child: Text(t.signOut),
-        ),
+        if (offline)
+          OutlinedButton(
+            onPressed: controller.busy ? null : controller.signIn,
+            child: const Text('Reconnect and sign in'),
+          )
+        else
+          OutlinedButton(
+            onPressed: controller.busy ? null : controller.signOut,
+            child: Text(t.signOut),
+          ),
         if (kDebugMode) ...[
           SizedBox(height: gap / 2),
           TextButton(
@@ -201,8 +289,12 @@ class _Nav extends StatelessWidget {
           decoration: BoxDecoration(
             color: palette.bgSurface,
             border: Border(
-              right: vertical ? BorderSide(color: palette.lineHairline) : BorderSide.none,
-              top: vertical ? BorderSide.none : BorderSide(color: palette.lineHairline),
+              right: vertical
+                  ? BorderSide(color: palette.lineHairline)
+                  : BorderSide.none,
+              top: vertical
+                  ? BorderSide.none
+                  : BorderSide(color: palette.lineHairline),
             ),
           ),
           child: Padding(
@@ -212,7 +304,13 @@ class _Nav extends StatelessWidget {
                     width: 128,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [for (final c in children) Padding(padding: EdgeInsets.only(bottom: gap), child: c)],
+                      children: [
+                        for (final c in children)
+                          Padding(
+                            padding: EdgeInsets.only(bottom: gap),
+                            child: c,
+                          ),
+                      ],
                     ),
                   )
                 : Row(children: [for (final c in children) Expanded(child: c)]),
@@ -224,7 +322,13 @@ class _Nav extends StatelessWidget {
 }
 
 class _NavItem extends StatelessWidget {
-  const _NavItem({super.key, required this.label, required this.icons, required this.selected, required this.onTap});
+  const _NavItem({
+    super.key,
+    required this.label,
+    required this.icons,
+    required this.selected,
+    required this.onTap,
+  });
 
   final String label;
   final (IconData, IconData) icons;
@@ -252,7 +356,9 @@ class _NavItem extends StatelessWidget {
             borderRadius: radius,
             onTap: onTap,
             child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: theme.metrics.minTarget + 16),
+              constraints: BoxConstraints(
+                minHeight: theme.metrics.minTarget + 16,
+              ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
                 child: Column(
@@ -260,7 +366,14 @@ class _NavItem extends StatelessWidget {
                   children: [
                     Icon(selected ? icons.$2 : icons.$1, color: ink, size: 28),
                     const SizedBox(height: 2),
-                    FittedBox(fit: BoxFit.scaleDown, child: Text(label, style: theme.text('nav', color: ink), maxLines: 1)),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        label,
+                        style: theme.text('nav', color: ink),
+                        maxLines: 1,
+                      ),
+                    ),
                   ],
                 ),
               ),

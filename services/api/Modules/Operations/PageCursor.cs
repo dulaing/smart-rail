@@ -4,8 +4,8 @@ using System.Text;
 
 namespace SmartRail.Api.Modules.Operations;
 
-// Where the next page of a newest-first list starts: strictly after this time and ID. The
-// client treats the text as opaque and sends it back unchanged.
+// Where the next page of a list starts: strictly after this time and ID. The client treats
+// the text as opaque and sends it back unchanged.
 public sealed record PageCursor(DateTimeOffset Time, Guid Id)
 {
     public const int DefaultSize = 50;

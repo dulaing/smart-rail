@@ -4,6 +4,7 @@ import { canOpen, findDestination, homeFor, visibleDestinations } from './access
 import type { Me } from './auth'
 import { messages } from '../../../shared/design/generated/status.ts'
 import { navigate } from './router'
+import { OperationsWorkspace } from './workspace/OperationsWorkspace'
 
 export function Shell({
   me,
@@ -62,7 +63,7 @@ export function Shell({
             <li key={link.path}>
               <a
                 href={link.path}
-                aria-current={link.path === path ? 'page' : undefined}
+                aria-current={link.path === destination?.path ? 'page' : undefined}
                 onClick={(event) => {
                   event.preventDefault()
                   navigate(link.path)
@@ -100,7 +101,10 @@ export function Shell({
         {destination && allowed && destination.path === '/account' && (
           <AccountPage me={me} onRefresh={onRefresh} onSignOut={onSignOut} />
         )}
-        {destination && allowed && destination.path !== '/account' && (
+        {destination && allowed && (destination.path === '/corridor' || destination.path === '/changes') && (
+          <OperationsWorkspace me={me} path={path} onRefreshMe={onRefresh} />
+        )}
+        {destination && allowed && !['/account', '/corridor', '/changes'].includes(destination.path) && (
           <section className="notice neutral">
             <h2>Not available yet</h2>
             <p>{destination.summary}</p>
