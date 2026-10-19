@@ -16,6 +16,7 @@ public static class RunningEndpoints
     public static void MapRunningEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapGroup("/api").AllowAnonymous().MapGet("/journeys/{journeyId}/running", GetRunning);
+        app.MapLiveNextTrains();
 
         // AllowAnonymous only skips the signed-in-user fallback; the service key is the guard.
         app.MapPost(ObservationsPath, PostObservation)

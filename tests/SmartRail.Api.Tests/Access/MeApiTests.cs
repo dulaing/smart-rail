@@ -147,7 +147,7 @@ public class MeApiTests(AccessApi api) : IClassFixture<AccessApi>
         Assert.Equal(
             [
                 "/api/food/collection-points/{collectionPointId}/menu",
-                "/api/journeys", "/api/journeys/{journeyId:guid}/changes", "/api/journeys/{journeyId:guid}/collection-options", "/api/journeys/{journeyId}/running", "/api/next-trains", "/api/stations", "/health/live", "/health/ready",
+                "/api/journeys", "/api/journeys/{journeyId:guid}/changes", "/api/journeys/{journeyId:guid}/collection-options", "/api/journeys/{journeyId}/running", "/api/live-next-trains", "/api/next-trains", "/api/stations", "/health/live", "/health/ready",
                 "/internal/catering/journeys/{journeyId:guid}/stops/{stopId:guid}/passage", "/internal/catering/order-updates",
                 "/internal/rail/observations",
                 "/internal/rail/simulator/journeys/{journeyId}/pause", "/internal/rail/simulator/journeys/{journeyId}/resume",
