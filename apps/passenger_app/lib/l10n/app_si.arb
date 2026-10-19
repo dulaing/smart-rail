@@ -178,5 +178,6 @@
   "foodOrderPlacedAt": "{time} ට තැබුවා",
   "@foodOrderPlacedAt": { "placeholders": { "time": {} } },
   "foodPendingOrderWaiting": "ඔබට තහවුරු වීමට බලා සිටින ඇණවුමක් ඇති බැවින් තවම නව ඇණවුමක් තැබිය නොහැක.",
-  "foodBackToFood": "ආහාර වෙත ආපසු"
+  "foodBackToFood": "ආහාර වෙත ආපසු",
+  "foodOrderHistory": "ඇණවුම් ඉතිහාසය"
 }

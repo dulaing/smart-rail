@@ -309,6 +309,43 @@ void main() {
       c.dispose();
     });
 
+    testWidgets('open orders sit above the pickups and finished ones below them', (tester) async {
+      await tall(tester);
+      final source = fakeSource(
+        options: (id) async => optionsFor(id, [option('pdn', 'peradeniya')]),
+        menu: (point) async => menuFor(point, [lamprais]),
+      );
+      final c = FoodController(
+        source: source,
+        trains: trainsWith([journey('today-3001', 'SIM-3001', DateTime(2026, 10, 20))]),
+      );
+      await c.selectJourney(c.choices().single);
+      final account = TestAccount();
+      final api = FakeOrderSource();
+      api.listScript.add(
+        () async => reply(
+          200,
+          listBody([
+            orderJson(id: 'open-1'),
+            orderJson(id: 'done-1', status: 'COLLECTED', sequence: 3),
+          ]),
+        ),
+      );
+      final orders = ordersFor(account, api);
+      await tester.pumpWidget(foodApp(c, account: account, orders: orders));
+      await tester.runAsync(() => account.signInAs('acc-1'));
+      await tester.pumpAndSettle();
+
+      final openY = tester.getTopLeft(find.byKey(const Key('food-recent-open-1'))).dy;
+      final pickupY = tester.getTopLeft(find.text('Where to collect')).dy;
+      final historyY = tester.getTopLeft(find.text('Order history')).dy;
+      expect(openY, lessThan(pickupY), reason: 'an open order is found before browsing');
+      expect(historyY, greaterThan(pickupY), reason: 'finished orders do not push the pickups down');
+      expect(find.byKey(const Key('food-recent-done-1')), findsOneWidget);
+      orders.dispose();
+      c.dispose();
+    });
+
     testWidgets('a collected or cancelled order shows no pickup code', (tester) async {
       await tall(tester);
       final (c, _, _, orders) = await ready(tester, order: orderJson(status: 'COLLECTED', sequence: 3));

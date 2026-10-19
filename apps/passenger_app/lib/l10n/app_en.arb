@@ -178,5 +178,6 @@
   "foodOrderPlacedAt": "Placed {time}",
   "@foodOrderPlacedAt": { "placeholders": { "time": {} } },
   "foodPendingOrderWaiting": "You have an order waiting for confirmation, so a new order cannot be placed yet.",
-  "foodBackToFood": "Back to Food"
+  "foodBackToFood": "Back to Food",
+  "foodOrderHistory": "Order history"
 }

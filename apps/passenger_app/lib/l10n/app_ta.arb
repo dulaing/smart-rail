@@ -178,5 +178,6 @@
   "foodOrderPlacedAt": "{time} அன்று வைக்கப்பட்டது",
   "@foodOrderPlacedAt": { "placeholders": { "time": {} } },
   "foodPendingOrderWaiting": "உறுதிப்படுத்தலுக்காக ஒரு ஆர்டர் காத்திருப்பதால் புதிய ஆர்டரை இப்போது வைக்க முடியாது.",
-  "foodBackToFood": "உணவுக்குத் திரும்பு"
+  "foodBackToFood": "உணவுக்குத் திரும்பு",
+  "foodOrderHistory": "ஆர்டர் வரலாறு"
 }

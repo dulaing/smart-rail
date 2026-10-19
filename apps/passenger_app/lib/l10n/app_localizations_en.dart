@@ -583,4 +583,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get foodBackToFood => 'Back to Food';
+
+  @override
+  String get foodOrderHistory => 'Order history';
 }

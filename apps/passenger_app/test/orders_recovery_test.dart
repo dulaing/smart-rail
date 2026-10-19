@@ -332,4 +332,20 @@ void main() {
     expect(orders.order, isNull);
     orders.dispose();
   });
+
+  test('signing in again with nothing unresolved leaves no empty order screen', () async {
+    final account = TestAccount();
+    final api = FakeOrderSource();
+    api.placeScript.add(() async => problem(401, 'UNAUTHORIZED'));
+    final orders = ordersFor(account, api);
+    await account.signInAs('acc-1');
+    await orders.submit(sampleDraft());
+    expect(orders.phase, OrderPhase.sessionEnded);
+    expect(orders.showingOrder, isTrue, reason: 'the session-ended notice is shown');
+    await account.signInAs('acc-1');
+    await Future<void>.delayed(Duration.zero);
+    expect(orders.phase, OrderPhase.none);
+    expect(orders.showingOrder, isFalse, reason: 'nothing to show, so Food browses');
+    orders.dispose();
+  });
 }

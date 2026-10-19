@@ -307,7 +307,7 @@ class OrderView extends StatelessWidget {
     final estimate = pickup?.estimatedArrival;
     final evidence = pickup?.etaEvidenceAt;
     return [
-      Semantics(header: true, child: Text(t.foodOrderConfirmed, style: theme.text('title'))),
+      Semantics(header: true, child: Text(open ? t.foodOrderConfirmed : t.foodYourOrder, style: theme.text('title'))),
       const SizedBox(height: 12),
       FoodCard(
         child: Column(

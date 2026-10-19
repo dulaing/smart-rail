@@ -93,6 +93,12 @@ class FoodOrdersController extends ChangeNotifier {
   List<FoodOrder> get recentOrders =>
       (_orders.values.toList()..sort((a, b) => b.createdAt.compareTo(a.createdAt)));
 
+  /// Orders still in progress (accepted or ready), newest first: the ones a passenger needs to find fast.
+  List<FoodOrder> get openOrders => [for (final o in recentOrders) if (!o.isTerminal) o];
+
+  /// Finished orders (collected, no-show, cancelled), newest first.
+  List<FoodOrder> get pastOrders => [for (final o in recentOrders) if (o.isTerminal) o];
+
   /// A cancellation is under way for the shown order.
   bool cancelling = false;
 
@@ -105,6 +111,10 @@ class FoodOrdersController extends ChangeNotifier {
 
   /// True while the order screen should be showing rather than browse or review.
   bool viewing = false;
+
+  /// The order screen has something to show: a phase to explain or an order to read. Without that
+  /// (for example after signing in again with nothing unresolved) Food falls back to browsing.
+  bool get showingOrder => viewing && _accountId != null && (phase != OrderPhase.none || order != null);
 
   String? get accountId => _accountId;
   bool get signedIn => _accountId != null;

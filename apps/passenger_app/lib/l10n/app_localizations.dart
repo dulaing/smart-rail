@@ -1077,6 +1077,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Back to Food'**
   String get foodBackToFood;
+
+  /// No description provided for @foodOrderHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Order history'**
+  String get foodOrderHistory;
 }
 
 class _AppLocalizationsDelegate

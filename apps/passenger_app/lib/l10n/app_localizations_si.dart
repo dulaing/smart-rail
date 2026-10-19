@@ -572,4 +572,7 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get foodBackToFood => 'ආහාර වෙත ආපසු';
+
+  @override
+  String get foodOrderHistory => 'ඇණවුම් ඉතිහාසය';
 }

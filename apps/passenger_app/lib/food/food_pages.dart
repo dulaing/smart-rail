@@ -34,7 +34,7 @@ class FoodPage extends StatelessWidget {
     return ListenableBuilder(
       listenable: Listenable.merge([controller, orders, account]),
       builder: (context, _) {
-        final viewingOrder = orders.viewing && orders.signedIn;
+        final viewingOrder = orders.showingOrder;
         final inReview = !viewingOrder && controller.reviewing && controller.selectedOption != null;
         final inMenu = !viewingOrder && !inReview && controller.selectedOption != null;
         final Widget body = viewingOrder
@@ -98,16 +98,17 @@ class _BrowseView extends StatelessWidget {
         const SizedBox(height: 8),
         Text(t.foodIntro, style: theme.text('body', color: theme.palette.textSecondary)),
         const SizedBox(height: 16),
-        if (orders.signedIn && (orders.request != null || orders.order != null))
+        if (orders.signedIn && orders.request != null)
           FoodNotice(
-            icon: Icons.receipt_long_outlined,
-            text: orders.request != null ? t.foodUncertainTitle : t.foodYourOrder,
+            icon: Icons.hourglass_bottom,
+            text: t.foodUncertainTitle,
             action: orders.openOrder,
             actionLabel: t.foodOpenOrder,
           ),
+        if (orders.signedIn && orders.openOrders.isNotEmpty)
+          _OrderList(orders: orders, heading: t.foodRecentOrders, list: orders.openOrders),
         _JourneyCard(controller: controller),
         const SizedBox(height: 4),
-        if (orders.signedIn && orders.recentOrders.isNotEmpty) _RecentOrders(orders: orders),
         if (journey != null) ...[
           Semantics(header: true, child: Text(t.foodPickupHeading, style: theme.text('heading'))),
           const SizedBox(height: 8),
@@ -140,6 +141,8 @@ class _BrowseView extends StatelessWidget {
                 onChoose: () => controller.selectOption(option),
               ),
         ],
+        if (orders.signedIn && orders.pastOrders.isNotEmpty)
+          _OrderList(orders: orders, heading: t.foodOrderHistory, list: orders.pastOrders),
       ],
     );
   }
@@ -446,9 +449,11 @@ class _BasketBar extends StatelessWidget {
 
 
 /// The account's own recent orders, each opening its pickup code and status.
-class _RecentOrders extends StatelessWidget {
-  const _RecentOrders({required this.orders});
+class _OrderList extends StatelessWidget {
+  const _OrderList({required this.orders, required this.heading, required this.list});
   final FoodOrdersController orders;
+  final String heading;
+  final List<FoodOrder> list;
 
   @override
   Widget build(BuildContext context) {
@@ -457,9 +462,9 @@ class _RecentOrders extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Semantics(header: true, child: Text(t.foodRecentOrders, style: theme.text('heading'))),
+        Semantics(header: true, child: Text(heading, style: theme.text('heading'))),
         const SizedBox(height: 8),
-        for (final order in orders.recentOrders.take(5))
+        for (final order in list.take(5))
           FoodCard(
             child: InkWell(
               key: Key('food-recent-${order.id}'),

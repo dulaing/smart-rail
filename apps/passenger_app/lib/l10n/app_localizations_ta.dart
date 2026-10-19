@@ -583,4 +583,7 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get foodBackToFood => 'உணவுக்குத் திரும்பு';
+
+  @override
+  String get foodOrderHistory => 'ஆர்டர் வரலாறு';
 }
