@@ -710,10 +710,13 @@ components:
     KioskOrder:
       type: object
       description: An order as kiosk staff see it. No pickup code, no passenger data.
-      required: [id, collectionPointId, status, statusSequence, items, pickupTime, cancellationReason]
+      required: [id, collectionPointId, trainNumber, serviceDate, pickupStopId, status, statusSequence, items, pickupTime, cancellationReason]
       properties:
         id: { type: string }
         collectionPointId: { type: string }
+        trainNumber: { type: string, description: Non-secret train identity, so staff can match the order to the train }
+        serviceDate: { type: string, format: date }
+        pickupStopId: { type: string, format: uuid, description: The dated stop occurrence the order is collected at }
         status: { $ref: "#/components/schemas/OrderStatus" }
         statusSequence: { type: integer }
         items: { type: array, items: { $ref: "#/components/schemas/OrderItem" } }

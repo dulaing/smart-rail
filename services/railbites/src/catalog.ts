@@ -57,6 +57,12 @@ export function getCollectionPoint(db: Db, id: string): Reply {
   return { status: 200, body: toCollectionPoint(findCollectionPoint(db, id)), headers: NO_STORE };
 }
 
+// A display name for the staff page heading. Falls back to the id so a page never shows blank.
+export function collectionPointName(db: Db, id: string): string {
+  const row = db.prepare("SELECT name FROM collection_points WHERE id = ?").get(id) as { name: string } | undefined;
+  return row?.name ?? id;
+}
+
 export function getMenu(db: Db, collectionPointId: string): Reply {
   const point = findCollectionPoint(db, collectionPointId);
   const items = db

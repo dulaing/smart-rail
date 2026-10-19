@@ -83,3 +83,15 @@ export async function readJson(req: IncomingMessage): Promise<unknown> {
     throw new ApiError(400, "INVALID_REQUEST", "Body must be valid JSON.");
   }
 }
+
+// The staff login form posts application/x-www-form-urlencoded. Bounded like readJson.
+export async function readForm(req: IncomingMessage): Promise<URLSearchParams> {
+  const chunks: Buffer[] = [];
+  let size = 0;
+  for await (const chunk of req) {
+    size += (chunk as Buffer).length;
+    if (size > MAX_BODY_BYTES) throw new ApiError(413, "PAYLOAD_TOO_LARGE", "Request body is too large.");
+    chunks.push(chunk as Buffer);
+  }
+  return new URLSearchParams(Buffer.concat(chunks).toString("utf8"));
+}
