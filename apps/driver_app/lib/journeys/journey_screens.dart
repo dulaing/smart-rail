@@ -5,6 +5,7 @@ import 'package:smartrail_core/smartrail_core.dart';
 
 import 'briefing_api.dart';
 import 'briefing_cache.dart';
+import 'briefing_view.dart';
 
 const _colomboOffset = Duration(hours: 5, minutes: 30);
 
@@ -28,6 +29,10 @@ class DriverJourneysScreen extends StatefulWidget {
     required this.api,
     this.offlineOwnerId,
     this.cache,
+    this.displayName = 'Driver',
+    this.updatesOnly = false,
+    this.onReport,
+    this.onAccount,
   });
 
   final DriverBriefingApi api;
@@ -35,6 +40,10 @@ class DriverJourneysScreen extends StatefulWidget {
 
   /// Where saved briefings are read from; tests pass a fake, the app uses the default.
   final BriefingCache? cache;
+  final String displayName;
+  final bool updatesOnly;
+  final void Function(DriverJourney)? onReport;
+  final VoidCallback? onAccount;
 
   @override
   State<DriverJourneysScreen> createState() => _DriverJourneysScreenState();
@@ -229,8 +238,7 @@ class _DriverJourneysScreenState extends State<DriverJourneysScreen>
             if (widget.offlineOwnerId != null || _usingSaved)
               const _Notice(
                 key: Key('no-saved-journeys'),
-                message:
-                    'No saved briefing for this date. Reconnect to check your assignments.',
+                message: 'No saved briefing for this date. Reconnect to check your assignments.',
               )
             else
               const _Notice(
@@ -247,10 +255,16 @@ class _DriverJourneysScreenState extends State<DriverJourneysScreen>
                   builder: (_) => DriverBriefingScreen(
                     api: widget.api,
                     journey: journey,
+                    displayName: widget.displayName,
+                    updatesOnly: widget.updatesOnly,
+                    onReport: widget.onReport == null
+                        ? null
+                        : () => widget.onReport!(journey),
+                    onAccount: widget.onAccount,
                     offlineOwnerId:
                         widget.offlineOwnerId ??
                         (_usingSaved ? _ownerId : null),
-                    savedRow: widget.offlineOwnerId == null
+                    savedRow: widget.offlineOwnerId == null && !_usingSaved
                         ? null
                         : _savedRows.firstWhere(
                             (row) => row['journeyId'] == journey.id,
@@ -337,12 +351,21 @@ class DriverBriefingScreen extends StatefulWidget {
     required this.journey,
     this.offlineOwnerId,
     this.savedRow,
+    this.displayName = 'Driver',
+    this.updatesOnly = false,
+    this.onReport,
+    this.onAccount,
+    this.now,
   });
 
   final DriverBriefingApi api;
   final DriverJourney journey;
   final String? offlineOwnerId;
   final Map<String, dynamic>? savedRow;
+  final String displayName;
+  final bool updatesOnly;
+  final VoidCallback? onReport, onAccount;
+  final DateTime Function()? now;
 
   @override
   State<DriverBriefingScreen> createState() => _DriverBriefingScreenState();
@@ -357,7 +380,7 @@ class _DriverBriefingScreenState extends State<DriverBriefingScreen>
   bool _loading = true;
   bool _refreshing = false;
   Duration _clockOffset = Duration.zero;
-  DateTime _deviceNow = DateTime.now();
+  late DateTime _deviceNow = widget.now?.call() ?? DateTime.now();
   Timer? _poll;
   Timer? _clock;
   final BriefingCache _cache = BriefingCache();
@@ -380,7 +403,9 @@ class _DriverBriefingScreenState extends State<DriverBriefingScreen>
       );
     }
     _clock = Timer.periodic(const Duration(seconds: 15), (_) {
-      if (mounted) setState(() => _deviceNow = DateTime.now());
+      if (mounted) {
+        setState(() => _deviceNow = widget.now?.call() ?? DateTime.now());
+      }
     });
   }
 
@@ -404,7 +429,7 @@ class _DriverBriefingScreenState extends State<DriverBriefingScreen>
     if (_refreshing) return;
     _refreshing = true;
     if (_briefing == null && mounted) setState(() => _loading = true);
-    final deviceAtResponse = DateTime.now();
+    final deviceAtResponse = widget.now?.call() ?? DateTime.now();
     final result = await widget.api.briefing(widget.journey.id, etag: _etag);
     if (!mounted) return;
     final serverTime = switch (result) {
@@ -418,7 +443,7 @@ class _DriverBriefingScreenState extends State<DriverBriefingScreen>
         deviceTimeAtResponse: deviceAtResponse,
       );
     }
-    _deviceNow = DateTime.now();
+    _deviceNow = widget.now?.call() ?? DateTime.now();
     switch (result) {
       case DriverReadOk<DriverBriefing>(:final value, :final etag):
         final owner = await widget.api.ownerId();
@@ -428,6 +453,8 @@ class _DriverBriefingScreenState extends State<DriverBriefingScreen>
         }
         setState(() {
           _briefing = value;
+          _downloadedAt = null;
+          _checkedAt = null;
           _etag = etag;
           _error = null;
           _status = null;
@@ -486,42 +513,30 @@ class _DriverBriefingScreenState extends State<DriverBriefingScreen>
 
   @override
   Widget build(BuildContext context) {
-    final theme = SrTheme.of(context);
-    final locale = Localizations.localeOf(context).languageCode;
-    final gap = theme.metrics.space[16]!;
     final briefing = _briefing;
-    final now = _deviceNow.add(_clockOffset);
-    final evidence = freshnessOf(
-      observedAt: briefing?.observedAt,
-      now: now,
-      ageingAfterSeconds: briefing?.ageingAfterSeconds ?? 180,
-      unknownAfterSeconds: briefing?.unknownAfterSeconds ?? 240,
-    );
-    final showEstimates = evidence != SrEvidence.unknown;
-
+    if (briefing != null) {
+      return DriverDutyView(
+        journey: widget.journey,
+        briefing: briefing,
+        now: _deviceNow.add(_clockOffset),
+        displayName: widget.displayName,
+        updatesOnly: widget.updatesOnly,
+        saved: _downloadedAt != null || widget.offlineOwnerId != null,
+        downloadedAt: _downloadedAt,
+        checkedAt: _checkedAt,
+        notice: _error,
+        onBack: () => Navigator.of(context).maybePop(),
+        onAccount: widget.onAccount,
+        onReport: widget.onReport,
+        onRefresh: widget.offlineOwnerId == null ? _load : null,
+      );
+    }
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.journey.trainNumber),
-        actions: widget.offlineOwnerId == null
-            ? [
-                IconButton(
-                  tooltip: 'Refresh',
-                  onPressed: () => unawaited(_load()),
-                  icon: const Icon(Icons.refresh),
-                ),
-              ]
-            : null,
-      ),
+      appBar: AppBar(title: Text(widget.journey.trainNumber)),
       body: ListView(
-        key: const Key('driver-briefing'),
-        padding: EdgeInsets.all(gap),
+        padding: const EdgeInsets.all(16),
         children: [
-          if (_loading) const LinearProgressIndicator(),
-          if (_downloadedAt != null)
-            _Notice(
-              message:
-                  'Saved copy · read only · downloaded ${_time(_downloadedAt)} · last checked ${_time(_checkedAt)}',
-            ),
+          if (_loading) const Center(child: CircularProgressIndicator()),
           if (_error != null)
             _Notice(
               key: const Key('briefing-error'),
@@ -530,125 +545,10 @@ class _DriverBriefingScreenState extends State<DriverBriefingScreen>
                   ? null
                   : () => unawaited(_load()),
             ),
-          if (briefing != null) ...[
-            Text(
-              '${widget.journey.origin}  ${_time(widget.journey.departure)}  →  ${widget.journey.destination}  ${_time(widget.journey.arrival)}',
-              style: theme.text('heading'),
-            ),
-            SizedBox(height: gap / 2),
-            Text(briefing.timetableLabel, style: theme.text('body')),
-            SizedBox(height: gap / 2),
-            FreshnessLine(
-              observedAt: briefing.observedAt,
-              now: now,
-              locale: locale,
-              ageingAfterSeconds: briefing.ageingAfterSeconds,
-              unknownAfterSeconds: briefing.unknownAfterSeconds,
-            ),
-            if (briefing.availability == 'CANCELLED') ...[
-              SizedBox(height: gap),
-              const _Notice(message: 'This journey is cancelled.'),
-            ] else if (briefing.availability == 'ENDS_EARLY') ...[
-              SizedBox(height: gap),
-              const _Notice(
-                message: 'This journey ends before its scheduled destination. Stops after its final station are not served.',
-              ),
-            ],
-            SizedBox(height: gap),
-            Text('Stops', style: theme.text('heading')),
-            for (final stop in briefing.stops) ...[
-              SizedBox(height: gap / 2),
-              _StopRow(stop: stop, showEstimates: showEstimates, theme: theme),
-            ],
-            if (briefing.changes.isNotEmpty) ...[
-              SizedBox(height: gap),
-              Text('Confirmed changes', style: theme.text('heading')),
-              for (final change in briefing.changes) ...[
-                SizedBox(height: gap / 2),
-                Text(_changeText(change), style: theme.text('body')),
-              ],
-            ],
-          ],
-          if (_loading && briefing == null)
-            const Padding(
-              padding: EdgeInsets.only(top: 24),
-              child: Center(child: CircularProgressIndicator()),
-            ),
         ],
       ),
     );
   }
-}
-
-class _StopRow extends StatelessWidget {
-  const _StopRow({
-    required this.stop,
-    required this.showEstimates,
-    required this.theme,
-  });
-  final BriefingStop stop;
-  final bool showEstimates;
-  final SrTheme theme;
-
-  @override
-  Widget build(BuildContext context) {
-    final gap = theme.metrics.space[8]!;
-    final scheduled = stop.scheduledArrival ?? stop.scheduledDeparture;
-    final expected = stop.estimatedArrival ?? stop.estimatedDeparture;
-    final platform = stop.confirmedPlatform ?? stop.plannedPlatform;
-    return Container(
-      key: Key('stop-${stop.id}'),
-      padding: EdgeInsets.all(theme.metrics.space[16]!),
-      decoration: BoxDecoration(
-        color: theme.palette.bgSurface,
-        border: Border.all(color: theme.palette.lineHairline),
-        borderRadius: BorderRadius.circular(theme.metrics.radius['md']!),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(child: Text(stop.station, style: theme.text('body'))),
-              Text(_time(scheduled), style: theme.text('time')),
-            ],
-          ),
-          if (!stop.served) ...[
-            SizedBox(height: gap / 2),
-            Text(
-              'Not served on this journey',
-              style: theme.text('body', color: theme.palette.statusDangerInk),
-            ),
-          ],
-          if (showEstimates && expected != null) ...[
-            SizedBox(height: gap / 2),
-            Text('Expected ${_time(expected)}', style: theme.text('body')),
-          ],
-          if (platform != null) ...[
-            SizedBox(height: gap / 2),
-            Text(
-              stop.confirmedPlatform == null
-                  ? 'Planned platform $platform'
-                  : 'Confirmed platform $platform${stop.confirmedPlatformAt == null ? '' : ' · ${_time(stop.confirmedPlatformAt)}'}',
-              style: theme.text('body'),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-String _changeText(BriefingChange change) {
-  final kind = switch (change.kind) {
-    'DELAY' => 'Staff confirmed ${change.delayMinutes ?? 'a'} minute delay',
-    'CANCEL' => 'Staff confirmed cancellation',
-    'PLATFORM' => 'Staff confirmed platform ${change.newPlatform ?? 'change'}',
-    'EARLY_END' => 'Staff confirmed an early ending',
-    _ => 'Staff confirmed a service change',
-  };
-  final by = change.confirmedBy ?? 'name unavailable';
-  return '$kind · $by · ${_time(change.confirmedAt)}';
 }
 
 class _Notice extends StatelessWidget {

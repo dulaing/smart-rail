@@ -154,7 +154,11 @@ void main() {
     expect(kept.map((r) => r['journeyId']), ['a', 'c']);
     // Nothing listed for the day means every saved briefing of that day goes.
     expect(
-      BriefingCache.withoutUnlisted(rows, '2026-10-19', {}).map((r) => r['journeyId']),
+      BriefingCache.withoutUnlisted(
+        rows,
+        '2026-10-19',
+        {},
+      ).map((r) => r['journeyId']),
       ['c'],
     );
   });
@@ -220,6 +224,43 @@ void main() {
     },
   );
 
+  testWidgets(
+    'an online session can open its saved briefing after a network failure',
+    (tester) async {
+      final day = colomboToday().toIso8601String().split('T').first;
+      final row = Map<String, dynamic>.from(
+        (jsonDecode(_journeys())['journeys'] as List).first as Map,
+      );
+      row['serviceDate'] = day;
+      row['briefing'] = jsonDecode(
+        _briefing(observedAt: DateTime.now().toUtc()),
+      );
+      row['downloadedAt'] = DateTime.now().toUtc().toIso8601String();
+      row['checkedAt'] = row['downloadedAt'];
+      final api = DriverBriefingApi(
+        'https://api.test',
+        _OwnedAuth(),
+        client: MockClient((_) async => throw http.ClientException('offline')),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: srTheme(SrProfile.driver, Brightness.light),
+          home: DriverJourneysScreen(api: api, cache: _FakeCache([row])),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('journey-$_journeyId')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('driver-briefing')), findsOneWidget);
+      expect(
+        find.textContaining('Saved copy · read only · downloaded'),
+        findsOneWidget,
+      );
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      expect(find.text('Report a problem'), findsNothing);
+    },
+  );
+
   testWidgets('shows an explicit empty assignment state', (tester) async {
     final api = _api(
       (_) async => http.Response(_journeys(includeJourney: false), 200),
@@ -246,6 +287,7 @@ void main() {
   testWidgets(
     'opens the assigned briefing with truthful early endpoint, platform, issuer and stop list',
     (tester) async {
+      final semantics = tester.ensureSemantics();
       final api = _api((request) async {
         if (request.url.path.endsWith('/briefing')) {
           return http.Response(
@@ -266,24 +308,29 @@ void main() {
       await tester.tap(find.byKey(const Key('journey-$_journeyId')));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('driver-briefing')), findsOneWidget);
-      expect(find.textContaining('Confirmed platform 3'), findsOneWidget);
+      expect(
+        find.bySemanticsLabel(RegExp('Confirmed platform 3')),
+        findsOneWidget,
+      );
       expect(find.text('Not served on this journey'), findsOneWidget);
       expect(
         find.textContaining('ends before its scheduled destination'),
         findsOneWidget,
       );
       await tester.scrollUntilVisible(
-        find.textContaining('Control desk'),
+        find.textContaining('CONTROL DESK'),
         200,
         scrollable: find.byType(Scrollable).last,
       );
-      expect(find.textContaining('Control desk'), findsOneWidget);
+      expect(find.textContaining('CONTROL DESK'), findsOneWidget);
+      semantics.dispose();
     },
   );
 
   testWidgets('removes an old expected time once evidence reaches unknown', (
     tester,
   ) async {
+    final semantics = tester.ensureSemantics();
     final api = _api((request) async {
       if (request.url.path.endsWith('/briefing')) {
         return http.Response(
@@ -303,6 +350,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.textContaining('Expected 02:04'), findsNothing);
     expect(find.textContaining('Position unknown'), findsOneWidget);
-    expect(find.textContaining('Confirmed platform 3'), findsOneWidget);
+    expect(
+      find.bySemanticsLabel(RegExp('Confirmed platform 3')),
+      findsOneWidget,
+    );
+    semantics.dispose();
   });
 }

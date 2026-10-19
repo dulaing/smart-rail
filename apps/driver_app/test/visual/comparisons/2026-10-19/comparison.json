@@ -1,0 +1,135 @@
+{
+  "date": "2026-10-19",
+  "task": "figma-implementation T2",
+  "status": "First tablet baseline pending user acceptance; other Driver families in progress",
+  "referenceNodeId": "178:73",
+  "referenceCorrections": [
+    "User-approved Last observed wording instead of unavailable actual passage time",
+    "Previously approved 14sp minimum applied to missed inherited Driver/Label source components"
+  ],
+  "viewport": {
+    "logical": [
+      1280,
+      800
+    ],
+    "dpr": 2,
+    "safeInsets": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "geometry": {
+    "regions": 13,
+    "maximumLogicalError": 0,
+    "perFieldLimit": 1
+  },
+  "raster": "No whole-image pass threshold. Review glyph raster and the explicit Noto Sans Math U+2192 fallback separately.",
+  "assets": {
+    "briefing": {
+      "file": "apps/driver_app/assets/figma/briefing.svg",
+      "source": "apps/driver_app/test/visual/references/2026-10-19/assets/a2d74.svg",
+      "sha256": "4d3f5e8c8b1f0594ab0c8157dc8d6b96d885a393056bf7fb6a85029d922efbd2",
+      "renderedLogicalSize": 32
+    },
+    "updates": {
+      "file": "apps/driver_app/assets/figma/updates.svg",
+      "source": "apps/driver_app/test/visual/references/2026-10-19/assets/8e538.svg",
+      "sha256": "53eec05497588d30545754a93b72e7767d514bf33e9a1ed7c20c22b30d289c76",
+      "renderedLogicalSize": 32
+    },
+    "reports": {
+      "file": "apps/driver_app/assets/figma/reports.svg",
+      "source": "apps/driver_app/test/visual/references/2026-10-19/assets/336e3.svg",
+      "sha256": "c0e7c3d363a239141c11d85e0fdbb23f6cd09d37965ec4498fcdcffcb9c97500",
+      "renderedLogicalSize": 32
+    },
+    "chevron": {
+      "file": "apps/driver_app/assets/figma/chevron.svg",
+      "source": "apps/driver_app/test/visual/references/2026-10-19/assets/bc77c.svg",
+      "sha256": "e379a0f82396568782b8dc437020e26a93c81a97326164960115b2d4fc194740",
+      "renderedLogicalSize": 24
+    },
+    "live": {
+      "file": "apps/driver_app/assets/figma/live.svg",
+      "source": "apps/driver_app/test/visual/references/2026-10-19/assets/7c009.svg",
+      "sha256": "611840135e99943a1a2c19df4651f9c2234088c7549155114e3add9e7ca902fb",
+      "renderedLogicalSize": 8
+    },
+    "logo": {
+      "file": "apps/driver_app/assets/figma/driver-logo.png",
+      "source": "shared/design/logo/driver-logo.png",
+      "sha256": "3192267b3e89808bfa03dc99ad604f4184d806d3277857d4b3d9597a88502cbd",
+      "tabletLogicalSize": [
+        48,
+        48
+      ],
+      "phoneLogicalSize": [
+        32,
+        32
+      ],
+      "sourceSize": [
+        1254,
+        1254
+      ]
+    },
+    "phone-chevron": {
+      "file": "apps/driver_app/assets/figma/phone-chevron.svg",
+      "sha256": "91cb3fd76f05620cf87ae20bf5be4e2a6f14579a05938e177b64659bf4734359",
+      "logicalSize": [
+        24,
+        24
+      ],
+      "sourceNodeId": "188:465"
+    }
+  },
+  "symbolFont": {
+    "file": "apps/driver_app/assets/fonts/NotoSansMath-Regular.ttf",
+    "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/notosansmath/NotoSansMath-Regular.ttf",
+    "licence": "apps/driver_app/assets/fonts/OFL-NotoSansMath.txt",
+    "sha256": "3f495fe933c06786e4d5f6d86b8ee70b6753a68ee3b9d87528726de0f6e2c47d",
+    "verifiedGlyph": "U+2192 at cmap glyph 4376"
+  },
+  "checks": {
+    "flutterAnalysis": "no issues",
+    "driverTests": 50,
+    "tokenPairs": 165,
+    "debugApk": "built",
+    "android": "API35 phone 1080x2400 at420dpi; real PKCE sign-in, assigned SIM-1001 briefing UNKNOWN with scheduled/planned data, report composer for same journey; no report submitted"
+  },
+  "contrast": "7:1 resolved text paints and nearest opaque surfaces; antialiased thin-digit histogram heuristic is not claimed passing",
+  "pending": [
+    "First tablet raster acceptance and app golden freeze",
+    "Phone fidelity and its missing/long states",
+    "Updates/detail full reference matching and focus restoration",
+    "Selection/report/account/recovery compositions",
+    "Native report action/offline loop and remaining accessibility checks"
+  ],
+  "files": {
+    "android-briefing-unknown.png": "393e4936954419041cac7d2432b4e8725659dd1fa932cbd0b5044cefd8053b35",
+    "phone-briefing.actual.png": "73f57cc75473d8e73be97addf453326d5bbc4caf698108cb277f44d2946efa00",
+    "phone-briefing.diff.png": "a34b2577ee20cf541392efeac882ac999451d5673f511dc254934a5bb5d83645",
+    "phone-briefing.metrics.json": "3d3588786c544b98fb8265ea81d0f9df071afb1de681d7936b40348534cc3e7a",
+    "phone-briefing.overlay.png": "279a14835b04d70b824758fcd78602aa858a6c1d69a4a5631249c9c52bb5a2e1",
+    "phone-briefing.reference.png": "dcd039e56f48a541d2341e0571f1e4aa663ecd0da123c1500437c83c6286fb27",
+    "tablet-duty.actual-bounds.json": "8c9a39b659d3a7fbca561af8e1015225fbd366701e36d8409c135cccf1aa8b8b",
+    "tablet-duty.actual.png": "ec9c94760deda31713742e8970d1932a5ede3006fcce3200eedb757d99618461",
+    "tablet-duty.diff.png": "2aeb420d0998eda9551ba76263d79f8df9719bc53d358048dcc8721201c9d7f7",
+    "tablet-duty.metrics.json": "5ae394bc3182b4630369f07eda6fc7527c4d373787e6e044b9097c0187afb397",
+    "tablet-duty.overlay.png": "8c038a34385f10e8a6f35a965b74760746f44895ae25311083a47a6a4ee23a67",
+    "tablet-duty.reference-bounds.json": "90c07154659694de08488233525f57f80e244fb42028575753d4fc303905653e",
+    "tablet-duty.reference.png": "a9ff76b3bd1ab29b7409056f541a3d73259cd09adb0295705ea5dc7ae07519cd"
+  },
+  "offlineHandoffFix": "Pass the retained saved row when a signed-in online session falls back to its owner cache; regression test covers opening it read-only.",
+  "sourceSha256": {
+    "apps/driver_app/lib/driver_frame.dart": "1f7abf9766593659d9aa67a507ca4ecb10dd792ec25d593cd50907b8fc697637",
+    "apps/driver_app/lib/journeys/briefing_view.dart": "a245f0b4a4461d03c9f9cde3b022b7dcf84f9326570d5d6ce3bffc64ee1aef0f",
+    "apps/driver_app/lib/journeys/briefing_api.dart": "5f36eea1c375e3754d16590eb779dfb8775a745366c37306a17df0ddddb60479",
+    "apps/driver_app/lib/journeys/briefing_cache.dart": "3e68c9b77edcfc7546849c2d4cb7c7d9a33cae657f480acc84ae5ecbee40406b",
+    "apps/driver_app/lib/journeys/journey_screens.dart": "f2aca5495dbd1f75eb2b4d5fe38a3e75b4764ad00d14724a60d1ea70cf94ed3c",
+    "apps/driver_app/lib/shell.dart": "ab5093afe76631a5f7071748d6144cfee09dff3996b0be9ee9156480e9354cf3",
+    "apps/driver_app/test/visual/fixtures/duty.json": "f17d964fc1ab836ee5e42ae69bd626460222007e320a809e2c87c7ec3def30fe"
+  },
+  "sourceHashFormat": "SHA-256 of UTF-8 source with LF line endings"
+}

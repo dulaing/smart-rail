@@ -57,6 +57,7 @@ class DriverJourney {
 
 class BriefingStop {
   const BriefingStop({
+    this.stationId,
     required this.id,
     required this.station,
     required this.sequence,
@@ -71,6 +72,7 @@ class BriefingStop {
   });
 
   factory BriefingStop.fromJson(Map<String, dynamic> json) => BriefingStop(
+    stationId: json['stationId'] as String?,
     id: json['stopId'] as String,
     station: json['stationName'] as String,
     sequence: json['sequence'] as int,
@@ -86,6 +88,7 @@ class BriefingStop {
 
   final String id;
   final String station;
+  final String? stationId;
   final int sequence;
   final bool served;
   final DateTime? scheduledArrival;
@@ -99,6 +102,8 @@ class BriefingStop {
 
 class BriefingChange {
   const BriefingChange({
+    this.id,
+    this.targetStopId,
     required this.kind,
     required this.confirmedAt,
     required this.confirmedBy,
@@ -108,6 +113,8 @@ class BriefingChange {
   });
 
   factory BriefingChange.fromJson(Map<String, dynamic> json) => BriefingChange(
+    id: json['changeId'] as String?,
+    targetStopId: json['targetStopId'] as String?,
     kind: json['kind'] as String,
     confirmedAt: DateTime.parse(json['confirmedAt'] as String),
     confirmedBy: json['confirmedByName'] as String?,
@@ -117,6 +124,8 @@ class BriefingChange {
   );
 
   final String kind;
+  final String? id;
+  final String? targetStopId;
   final DateTime confirmedAt;
   final String? confirmedBy;
   final int? delayMinutes;
@@ -126,6 +135,10 @@ class BriefingChange {
 
 class DriverBriefing {
   const DriverBriefing({
+    this.positionFromStopId,
+    this.positionToStopId,
+    this.positionProgressPermille,
+    this.lastKnownStationId,
     required this.id,
     required this.trainNumber,
     required this.serviceDate,
@@ -143,7 +156,12 @@ class DriverBriefing {
   factory DriverBriefing.fromJson(Map<String, dynamic> json) {
     final thresholds = json['thresholds'] as Map<String, dynamic>;
     final observation = json['lastObservation'] as Map<String, dynamic>?;
+    final position = json['currentPosition'] as Map<String, dynamic>?;
     return DriverBriefing(
+      positionFromStopId: position?['fromStopId'] as String?,
+      positionToStopId: position?['toStopId'] as String?,
+      positionProgressPermille: position?['progressPermille'] as int?,
+      lastKnownStationId: observation?['lastKnownStationId'] as String?,
       id: json['journeyId'] as String,
       trainNumber: json['trainNumber'] as String,
       serviceDate: DateTime.parse(json['serviceDate'] as String),
@@ -168,6 +186,8 @@ class DriverBriefing {
 
   final String id;
   final String trainNumber;
+  final String? positionFromStopId, positionToStopId, lastKnownStationId;
+  final int? positionProgressPermille;
   final DateTime serviceDate;
   final String timetableLabel;
   final String runningLabel;

@@ -100,6 +100,27 @@ class _DriverShellState extends State<DriverShell> {
               : DriverJourneysScreen(
                   api: widget.journeyApi!,
                   offlineOwnerId: widget.offlineOwnerId,
+                  displayName: widget.account.displayName,
+                  updatesOnly: _tab == DriverTab.updates,
+                  onAccount: () {
+                    Navigator.of(context).pop();
+                    setState(() => _tab = DriverTab.account);
+                  },
+                  onReport:
+                      widget.reportApi == null ||
+                          !widget.account.permissions.contains(
+                            'driver.reports.create',
+                          )
+                      ? null
+                      : (journey) => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => DriverReportJourneyScreen(
+                              journey: journey,
+                              api: widget.reportApi!,
+                              journeyApi: widget.journeyApi!,
+                            ),
+                          ),
+                        ),
                 ),
         DriverTab.reports =>
           widget.journeyApi == null || widget.reportApi == null
@@ -168,7 +189,10 @@ class _Content extends StatelessWidget {
               Text(
                 srMessages['footer.simulation']![locale] ??
                     srMessages['footer.simulation']!['en']!,
-                style: theme.text('caption', color: theme.palette.textSecondary),
+                style: theme.text(
+                  'caption',
+                  color: theme.palette.textSecondary,
+                ),
               ),
               SizedBox(height: gap / 2),
               Semantics(

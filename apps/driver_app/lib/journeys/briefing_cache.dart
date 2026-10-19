@@ -131,13 +131,24 @@ extension BriefingCacheJson on DriverBriefing {
       'ageingAfterSeconds': ageingAfterSeconds,
       'unknownAfterSeconds': unknownAfterSeconds,
     },
-    'lastObservation': {'observedAt': observedAt?.toUtc().toIso8601String()},
+    'lastObservation': {
+      'observedAt': observedAt?.toUtc().toIso8601String(),
+      'lastKnownStationId': lastKnownStationId,
+    },
+    'currentPosition': positionFromStopId == null || positionToStopId == null
+        ? null
+        : {
+            'fromStopId': positionFromStopId,
+            'toStopId': positionToStopId,
+            'progressPermille': positionProgressPermille,
+          },
     'availability': availability,
     'finalStopId': finalStopId,
     'stops': [
       for (final stop in stops)
         {
           'stopId': stop.id,
+          'stationId': stop.stationId,
           'stationName': stop.station,
           'sequence': stop.sequence,
           'served': stop.served,
@@ -159,6 +170,8 @@ extension BriefingCacheJson on DriverBriefing {
     'changes': [
       for (final change in changes)
         {
+          'changeId': change.id,
+          'targetStopId': change.targetStopId,
           'kind': change.kind,
           'confirmedAt': change.confirmedAt.toUtc().toIso8601String(),
           'confirmedByName': change.confirmedBy,

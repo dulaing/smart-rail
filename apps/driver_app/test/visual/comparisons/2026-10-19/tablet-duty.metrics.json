@@ -1,0 +1,12 @@
+﻿{
+    "reference":  "test/visual/comparisons/2026-10-19/tablet-duty.reference.png",
+    "actual":  "test/visual/comparisons/2026-10-19/tablet-duty.actual.png",
+    "cropTop":  0,
+    "cropBottom":  0,
+    "width":  2560,
+    "height":  1600,
+    "meanAbsoluteChannelError":  0.81599430338541667,
+    "pixelsWithChannelDeltaAbove16":  0.010461669921875,
+    "maximumChannelDelta":  250,
+    "interpretation":  "Diagnostic only. Review geometry and text separately; this is not a whole-image pass threshold."
+}

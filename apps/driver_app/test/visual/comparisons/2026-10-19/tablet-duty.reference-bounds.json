@@ -1,0 +1,121 @@
+{
+  "bounds": {
+    "rail": {
+      "nodeId": "178:75",
+      "x": 0,
+      "y": 0,
+      "width": 136,
+      "height": 800
+    },
+    "top-bar": {
+      "nodeId": "178:102",
+      "x": 136,
+      "y": 0,
+      "width": 1144,
+      "height": 88
+    },
+    "duty-title": {
+      "nodeId": "178:114",
+      "x": 168,
+      "y": 112,
+      "width": 616,
+      "height": 44
+    },
+    "next-stop": {
+      "nodeId": "178:116",
+      "x": 168,
+      "y": 198,
+      "width": 616,
+      "height": 148
+    },
+    "stop-veyangoda": {
+      "nodeId": "178:133",
+      "x": 168,
+      "y": 458,
+      "width": 616,
+      "height": 72
+    },
+    "stop-gampaha": {
+      "nodeId": "178:138",
+      "x": 168,
+      "y": 538,
+      "width": 616,
+      "height": 72
+    },
+    "stop-ragama": {
+      "nodeId": "178:143",
+      "x": 168,
+      "y": 618,
+      "width": 616,
+      "height": 72
+    },
+    "stop-fort": {
+      "nodeId": "178:148",
+      "x": 168,
+      "y": 698,
+      "width": 616,
+      "height": 72
+    },
+    "change-platform": {
+      "nodeId": "178:156",
+      "x": 808,
+      "y": 164,
+      "width": 432,
+      "height": 162
+    },
+    "change-delay": {
+      "nodeId": "178:165",
+      "x": 808,
+      "y": 342,
+      "width": 432,
+      "height": 162
+    },
+    "report-action": {
+      "nodeId": "178:175",
+      "x": 808,
+      "y": 638,
+      "width": 440,
+      "height": 96
+    },
+    "safety": {
+      "nodeId": "178:177",
+      "x": 808,
+      "y": 746,
+      "width": 440,
+      "height": 22
+    },
+    "simulation": {
+      "nodeId": "178:105",
+      "x": 838.5,
+      "y": 26,
+      "width": 141.5,
+      "height": 36
+    }
+  },
+  "labels": [
+    {
+      "id": "I178:105;176:605",
+      "fontSize": 28,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 40
+      }
+    },
+    {
+      "id": "I178:156;176:630",
+      "fontSize": 28,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 40
+      }
+    },
+    {
+      "id": "I178:165;176:638",
+      "fontSize": 28,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 40
+      }
+    }
+  ]
+}
