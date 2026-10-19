@@ -11,6 +11,7 @@ public static class RailSetup
         {
             builder.Services.AddScoped<IJourneyStopReader, JourneyStopReader>();
             builder.Services.AddScoped<IPickupReader, PickupReader>();
+            builder.Services.AddScoped<IRailReferenceReader, RailReferenceReader>();
             builder.Services.AddScoped<RunningReader>();
             builder.Services.AddScoped<IJourneyRunningReader, JourneyRunningReader>();
         }

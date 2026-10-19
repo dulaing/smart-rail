@@ -135,6 +135,7 @@ if (hasDatabase)
     app.MapRunningEndpoints();
     app.MapAccessEndpoints();
     app.MapAccessAdminEndpoints();
+    app.MapPassengerEndpoints();
     app.MapOperationsEndpoints();
     app.MapCateringEndpoints();
 
