@@ -28,5 +28,5 @@ export default defineConfig({
   plugins: [react(), stationServiceWorker()],
   // Keep a predictable local origin: it must be included in the API's CORS configuration.
   // The shared design files live in ../../shared and ../../packages (fonts), outside this app.
-  server: { port: 5173, strictPort: true, fs: { allow: ['../..'] } },
+  server: { port: 5173, strictPort: false, fs: { allow: ['../..'] } },
 })
