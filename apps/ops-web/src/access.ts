@@ -1,4 +1,5 @@
-import type { Me } from './auth'
+/** The part of GET /api/me that decides this. The sign-in code's `Me` fits it; it is not imported so tests stay free of Keycloak. */
+type Me = { permissions: { code: string }[] }
 
 // Which workspaces a person sees follows the effective permissions from GET /api/me, never the
 // Keycloak role claims. Hiding a link is only a convenience: the API checks every action itself,
@@ -29,8 +30,9 @@ export const destinations: readonly Destination[] = [
   {
     path: '/reports',
     label: 'Reports',
-    summary: 'Driver reports and incidents.',
-    anyOf: ['incidents.read', 'incidents.manage'],
+    summary: 'Driver reports waiting for Control.',
+    // The raw inbox is Control's. An Auditor reads incidents and history, never the inbox.
+    anyOf: ['incidents.manage'],
   },
   {
     path: '/demo-controls',
@@ -59,9 +61,29 @@ export function visibleDestinations(me: Me): Destination[] {
 /** A journey opened from the corridor: /corridor/journeys/{journeyId}. It needs the Corridor permissions. */
 export const journeyPathPattern = /^\/corridor\/journeys\/([^/]+)$/
 
+/** Workspaces whose pages live under their own path: /reports/{reportId}, /incidents/{incidentId}, /audit/... */
+const nestedWorkspaces = ['/reports']
+
 export function findDestination(path: string): Destination | undefined {
   const own = destinations.find((d) => d.path === path)
-  return own ?? (journeyPathPattern.test(path) ? destinations.find((d) => d.path === '/corridor') : undefined)
+  if (own) return own
+  if (journeyPathPattern.test(path)) return destinations.find((d) => d.path === '/corridor')
+  return destinations.find((d) => nestedWorkspaces.includes(d.path) && path.startsWith(`${d.path}/`))
+}
+
+/** May this person open that path? Used to show a link to another workspace only when it would open. */
+export function canOpenPath(me: Me, path: string): boolean {
+  const destination = findDestination(path)
+  return destination !== undefined && canOpen(me, destination)
+}
+
+/**
+ * The page group focus belongs to. Moving between pages of one list-and-detail workspace keeps
+ * keyboard focus where the person put it; any other move lands on the new page.
+ */
+export function focusScope(path: string): string {
+  const nested = nestedWorkspaces.find((root) => path === root || path.startsWith(`${root}/`))
+  return nested ?? path
 }
 
 /** Where someone lands when they open the site root. */

@@ -52,7 +52,7 @@ export function staffFetcher(
   }
 }
 
-async function send<T>(call: Fetcher, path: string, init: RequestInit): Promise<CallResult<T>> {
+export async function send<T>(call: Fetcher, path: string, init: RequestInit): Promise<CallResult<T>> {
   let response: Response
   try {
     response = await call(path, init)
@@ -87,7 +87,7 @@ async function send<T>(call: Fetcher, path: string, init: RequestInit): Promise<
   }
 }
 
-const post = (body: unknown): RequestInit => ({
+export const post = (body: unknown): RequestInit => ({
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(body),

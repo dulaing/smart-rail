@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react'
 import { AccountPage } from './AccountPage'
-import { canOpen, findDestination, homeFor, visibleDestinations } from './access'
+import { canOpen, findDestination, focusScope, homeFor, visibleDestinations } from './access'
 import type { Me } from './auth'
 import { messages } from '../../../shared/design/generated/status.ts'
 import { navigate } from './router'
+import { ReportsWorkspace } from './reports/ReportsWorkspace'
 import { OperationsWorkspace } from './workspace/OperationsWorkspace'
 
 export function Shell({
@@ -18,7 +19,7 @@ export function Shell({
   onSignOut: () => void
 }) {
   const mainRef = useRef<HTMLElement>(null)
-  const lastPath = useRef(path)
+  const lastScope = useRef(focusScope(path))
 
   // The site root opens the first workspace this person may use.
   useEffect(() => {
@@ -33,8 +34,9 @@ export function Shell({
   useEffect(() => {
     document.title = `${title} · SmartRail Operations`
     // Only a real change of page moves focus; the first render leaves it at the top of the page.
-    if (lastPath.current !== path) {
-      lastPath.current = path
+    const scope = focusScope(path)
+    if (lastScope.current !== scope) {
+      lastScope.current = scope
       mainRef.current?.focus()
     }
   }, [title, path])
@@ -104,7 +106,10 @@ export function Shell({
         {destination && allowed && (destination.path === '/corridor' || destination.path === '/changes') && (
           <OperationsWorkspace me={me} path={path} onRefreshMe={onRefresh} />
         )}
-        {destination && allowed && !['/account', '/corridor', '/changes'].includes(destination.path) && (
+        {destination && allowed && destination.path === '/reports' && (
+          <ReportsWorkspace me={me} path={path} onRefreshMe={onRefresh} />
+        )}
+        {destination && allowed && !['/account', '/corridor', '/changes', '/reports'].includes(destination.path) && (
           <section className="notice neutral">
             <h2>Not available yet</h2>
             <p>{destination.summary}</p>
