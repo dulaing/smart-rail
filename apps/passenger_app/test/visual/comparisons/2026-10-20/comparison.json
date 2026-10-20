@@ -1,0 +1,80 @@
+﻿{
+    "date":  "2026-10-20",
+    "viewport":  {
+                     "logical":  "432x900",
+                     "capturePhysical":  "1080x2250",
+                     "dpr":  2.5,
+                     "inset":  "Passenger synthetic top 44/bottom 16 logical pixels excluded from app content; Figma content crops exclude illustrated system bars",
+                     "downsample":  "Actual capture reduced to 432x900 with HighQualityBicubic for diagnostics"
+                 },
+    "method":  "Reviewed image overlays and diffs; metrics are diagnostics, not pass thresholds.",
+    "screens":  [
+                    {
+                        "screen":  "home-light",
+                        "reference":  "../../references/2026-10-19/home-light.content.png",
+                        "actual":  "home-light.actual.png",
+                        "overlay":  "home-light.overlay.png",
+                        "diff":  "home-light.diff.png",
+                        "meanAbsoluteChannelError":  16.859,
+                        "pixelsWithChannelDeltaAbove16":  0.21578,
+                        "reviewed":  true
+                    },
+                    {
+                        "screen":  "home-dark",
+                        "reference":  "../../references/2026-10-19/home-dark.content.png",
+                        "actual":  "home-dark.actual.png",
+                        "overlay":  "home-dark.overlay.png",
+                        "diff":  "home-dark.diff.png",
+                        "meanAbsoluteChannelError":  17.172,
+                        "pixelsWithChannelDeltaAbove16":  0.23421,
+                        "reviewed":  true
+                    },
+                    {
+                        "screen":  "detail",
+                        "reference":  "../../references/2026-10-19/detail.content.png",
+                        "actual":  "detail.actual.png",
+                        "overlay":  "detail.overlay.png",
+                        "diff":  "detail.diff.png",
+                        "meanAbsoluteChannelError":  25.069,
+                        "pixelsWithChannelDeltaAbove16":  0.24615,
+                        "reviewed":  true
+                    },
+                    {
+                        "screen":  "account-guest",
+                        "reference":  "../../references/2026-10-19/account-guest.content.png",
+                        "actual":  "account-guest.actual.png",
+                        "overlay":  "account-guest.overlay.png",
+                        "diff":  "account-guest.diff.png",
+                        "meanAbsoluteChannelError":  12.471,
+                        "pixelsWithChannelDeltaAbove16":  0.10760,
+                        "reviewed":  true
+                    },
+                    {
+                        "screen":  "food-menu",
+                        "reference":  "../../references/2026-10-19/food-menu.content.png",
+                        "actual":  "food-menu.actual.png",
+                        "overlay":  "food-menu.overlay.png",
+                        "diff":  "food-menu.diff.png",
+                        "meanAbsoluteChannelError":  14.360,
+                        "pixelsWithChannelDeltaAbove16":  0.21306,
+                        "reviewed":  true
+                    },
+                    {
+                        "screen":  "food-review",
+                        "reference":  "../../references/2026-10-19/food-review.content.png",
+                        "actual":  "food-review.actual.png",
+                        "overlay":  "food-review.overlay.png",
+                        "diff":  "food-review.diff.png",
+                        "meanAbsoluteChannelError":  28.323,
+                        "pixelsWithChannelDeltaAbove16":  0.20899,
+                        "reviewed":  true
+                    }
+                ],
+    "reviewNotes":  [
+                        "Home Light/Dark retain the approved next-train and platform-change content. The app schematic map is a simplified route painter, so station labels and linework differ from Figma.",
+                        "Train detail now uses a compact Train details header and simulated marker. The app retains the available stop schedule and timetable source; follow/saved-journey UI is not implemented and remains a separate prerequisite.",
+                        "Account matches the approved guest/language crop. Existing System/Light/Dark controls are under Appearance after the reference viewport, as directed by the user.",
+                        "Food menu uses the approved DS-E1 / Peradeniya Jn example, 110px photo crops, 48px control hit areas, integer-LKR price display and a normal-flow basket action. Review retains existing payment and no-show disclosures."
+                    ],
+    "nativeSmoke":  "native-smoke.json"
+}

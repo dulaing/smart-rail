@@ -6,14 +6,22 @@ class FoodHeading extends StatelessWidget {
   final String text;
 
   @override
-  Widget build(BuildContext context) =>
-      Semantics(header: true, child: Text(text, style: SrTheme.of(context).text('title')));
+  Widget build(BuildContext context) => Semantics(
+    header: true,
+    child: Text(text, style: SrTheme.of(context).text('title')),
+  );
 }
 
 class FoodCard extends StatelessWidget {
-  const FoodCard({super.key, required this.child, this.tint});
+  const FoodCard({
+    super.key,
+    required this.child,
+    this.tint,
+    this.padding = const EdgeInsets.all(16),
+  });
   final Widget child;
   final Color? tint;
+  final EdgeInsetsGeometry padding;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +34,7 @@ class FoodCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(theme.metrics.radius['lg']!),
           border: Border.all(color: theme.palette.lineHairline),
         ),
-        child: Padding(padding: const EdgeInsets.all(16), child: child),
+        child: Padding(padding: padding, child: child),
       ),
     );
   }
@@ -34,7 +42,13 @@ class FoodCard extends StatelessWidget {
 
 /// A short notice with an icon; used for empty, error and provider states.
 class FoodNotice extends StatelessWidget {
-  const FoodNotice({super.key, required this.icon, required this.text, this.action, this.actionLabel});
+  const FoodNotice({
+    super.key,
+    required this.icon,
+    required this.text,
+    this.action,
+    this.actionLabel,
+  });
   final IconData icon;
   final String text;
   final VoidCallback? action;
@@ -66,11 +80,16 @@ class FoodNotice extends StatelessWidget {
   }
 }
 
-
 /// A label with an amount on the right. At large text sizes the amount wraps under the label
 /// instead of overflowing, so neither is ever clipped.
 class FoodPriceRow extends StatelessWidget {
-  const FoodPriceRow({super.key, required this.label, required this.amount, this.style, this.amountKey});
+  const FoodPriceRow({
+    super.key,
+    required this.label,
+    required this.amount,
+    this.style,
+    this.amountKey,
+  });
 
   final String label, amount;
   final TextStyle? style;

@@ -109,7 +109,10 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get guestNotice =>
-      'ගිණුමක් නොමැතිව කාලසටහන් සහ දුම්රිය වේලාවන් බැලිය හැක.';
+      'දුම්රිය අනුගමනය කිරීමට හෝ ආහාර ඇණවුම් කිරීමට පමණක් පුරන්න.';
+
+  @override
+  String get guestBrowseNote => 'ගිණුමක් නොමැතිව දුම්රිය තොරතුරු නැරඹිය හැක.';
 
   @override
   String get signIn => 'පිවිසෙන්න';
@@ -128,6 +131,9 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get language => 'භාෂාව';
+
+  @override
+  String get appearance => 'පෙනුම';
 
   @override
   String get theme => 'තේමාව';
@@ -151,6 +157,12 @@ class AppLocalizationsSi extends AppLocalizations {
   String get homeNextTrains => 'ඔබගේ මීළඟ දුම්රියන්';
 
   @override
+  String get homeGreeting => 'සුභ උදෑසනක්';
+
+  @override
+  String get homeBoardHere => 'මෙතැනින් ගොඩවන්න';
+
+  @override
   String get loadingStations => 'දුම්රිය ස්ථාන පූරණය වෙමින්…';
 
   @override
@@ -163,6 +175,9 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get trainHeader => 'දුම්රිය';
+
+  @override
+  String get trainDetails => 'දුම්රිය විස්තර';
 
   @override
   String get trainIntro =>
@@ -382,6 +397,9 @@ class AppLocalizationsSi extends AppLocalizations {
   @override
   String get foodPayAtKiosk =>
       'ලබාගන්නා විට කියෝස්කුවේදී ගෙවන්න. මාර්ගගත ගෙවීමක් නැත.';
+
+  @override
+  String get foodPayAtPickup => 'එකතු කරන විට ගෙවන්න';
 
   @override
   String get foodNoShowPolicy =>

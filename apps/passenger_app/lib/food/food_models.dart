@@ -45,14 +45,16 @@ class CollectionOptions {
     required this.options,
   });
 
-  factory CollectionOptions.fromJson(Map<String, dynamic> j) => CollectionOptions(
-    journeyId: j['journeyId'] as String,
-    trainNumber: j['trainNumber'] as String,
-    serviceDate: j['serviceDate'] as String,
-    options: [
-      for (final o in j['options'] as List) CollectionOption.fromJson(o as Map<String, dynamic>),
-    ],
-  );
+  factory CollectionOptions.fromJson(Map<String, dynamic> j) =>
+      CollectionOptions(
+        journeyId: j['journeyId'] as String,
+        trainNumber: j['trainNumber'] as String,
+        serviceDate: j['serviceDate'] as String,
+        options: [
+          for (final o in j['options'] as List)
+            CollectionOption.fromJson(o as Map<String, dynamic>),
+        ],
+      );
 
   final String journeyId, trainNumber, serviceDate;
   final List<CollectionOption> options;
@@ -78,19 +80,26 @@ class FoodMenuItem {
 }
 
 class FoodMenu {
-  const FoodMenu({required this.collectionPointId, required this.currency, required this.items});
+  const FoodMenu({
+    required this.collectionPointId,
+    required this.currency,
+    required this.items,
+  });
 
   factory FoodMenu.fromJson(Map<String, dynamic> j) => FoodMenu(
     collectionPointId: j['collectionPointId'] as String,
     currency: j['currency'] as String,
-    items: [for (final i in j['items'] as List) FoodMenuItem.fromJson(i as Map<String, dynamic>)],
+    items: [
+      for (final i in j['items'] as List)
+        FoodMenuItem.fromJson(i as Map<String, dynamic>),
+    ],
   );
 
   final String collectionPointId, currency;
   final List<FoodMenuItem> items;
 }
 
-/// Prices travel as integer minor LKR (65000 = Rs 650.00), so they are formatted from integers and
+/// Prices travel as integer minor LKR (65000 = Rs 650), so they are formatted from integers and
 /// never pass through a floating-point rupee value.
 String formatLkr(int minor) {
   final negative = minor < 0;
@@ -102,7 +111,9 @@ String formatLkr(int minor) {
     grouped.write(rupees[i]);
   }
   final cents = (abs % 100).toString().padLeft(2, '0');
-  return '${negative ? '-' : ''}LKR $grouped.$cents';
+  final amount = abs % 100 == 0 ? grouped.toString() : '$grouped.$cents';
+  return '${negative ? '-' : ''}LKR $amount';
 }
 
-DateTime? _instant(Object? value) => value == null ? null : DateTime.parse(value as String);
+DateTime? _instant(Object? value) =>
+    value == null ? null : DateTime.parse(value as String);

@@ -1,0 +1,28 @@
+﻿{
+    "date":  "2026-10-20",
+    "package":  "com.example.passenger_app",
+    "device":  {
+                   "id":  "emulator-5554",
+                   "kind":  "Android emulator",
+                   "resolution":  "1080x2400",
+                   "densityDpi":  420,
+                   "systemFontScale":  1
+               },
+    "actions":  [
+                    "Installed and launched the debug APK. The public Trains tab opened without sign-in.",
+                    "Opened Home, Trains, Food and Account as a guest.",
+                    "Changed the Trains origin from Gampaha to Veyangoda; the route picker updated and returned the expected empty schedule state for that route.",
+                    "Scrolled Account below the approved 432x900 crop to Appearance, selected Dark then Light, and returned to the guest Account view.",
+                    "No sign-in was started and no server write was sent."
+                ],
+    "screenshots":  [
+                        "native-home.png",
+                        "native-trains-route.png",
+                        "native-food-guest.png",
+                        "native-account-guest.png"
+                    ],
+    "limitations":  [
+                        "Emulator smoke only; no physical-device claim.",
+                        "This smoke does not verify API-backed live train data or food ordering."
+                    ]
+}

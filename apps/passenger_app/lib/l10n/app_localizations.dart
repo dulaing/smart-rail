@@ -277,19 +277,25 @@ abstract class AppLocalizations {
   /// No description provided for @guest.
   ///
   /// In en, this message translates to:
-  /// **'Guest'**
+  /// **'Browsing as guest'**
   String get guest;
 
   /// No description provided for @guestNotice.
   ///
   /// In en, this message translates to:
-  /// **'Timetables and train times are available without an account.'**
+  /// **'Sign in only to follow trains or order food.'**
   String get guestNotice;
+
+  /// No description provided for @guestBrowseNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Train browsing works without an account.'**
+  String get guestBrowseNote;
 
   /// No description provided for @signIn.
   ///
   /// In en, this message translates to:
-  /// **'Sign in'**
+  /// **'Sign in to demo'**
   String get signIn;
 
   /// No description provided for @signOut.
@@ -321,6 +327,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Language'**
   String get language;
+
+  /// No description provided for @appearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearance;
 
   /// No description provided for @theme.
   ///
@@ -361,8 +373,20 @@ abstract class AppLocalizations {
   /// No description provided for @homeNextTrains.
   ///
   /// In en, this message translates to:
-  /// **'Your next trains'**
+  /// **'Next train'**
   String get homeNextTrains;
+
+  /// No description provided for @homeGreeting.
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning'**
+  String get homeGreeting;
+
+  /// No description provided for @homeBoardHere.
+  ///
+  /// In en, this message translates to:
+  /// **'BOARD HERE'**
+  String get homeBoardHere;
 
   /// No description provided for @loadingStations.
   ///
@@ -387,6 +411,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Trains'**
   String get trainHeader;
+
+  /// No description provided for @trainDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Train details'**
+  String get trainDetails;
 
   /// No description provided for @trainIntro.
   ///
@@ -747,6 +777,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pay at the kiosk when you collect. There is no online payment.'**
   String get foodPayAtKiosk;
+
+  /// No description provided for @foodPayAtPickup.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay when you collect'**
+  String get foodPayAtPickup;
 
   /// No description provided for @foodNoShowPolicy.
   ///

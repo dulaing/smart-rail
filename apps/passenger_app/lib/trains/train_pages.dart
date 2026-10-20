@@ -25,16 +25,30 @@ class TrainsPage extends StatelessWidget {
       final origin = controller.station(controller.originId),
           destination = controller.station(controller.destinationId);
       final theme = Theme.of(context);
+      final srTheme = SrTheme.of(context);
       final children = <Widget>[
-        Text(
-          home ? t.homeNextTrains : t.trainHeader,
-          style: theme.textTheme.headlineSmall,
-        ),
-        const SizedBox(height: 8),
-        Text(t.trainIntro, style: theme.textTheme.bodyMedium),
-        const SizedBox(height: 16),
-        _RoutePicker(controller: controller, locale: locale),
-        const SizedBox(height: 12),
+        if (home) ...[
+          _HomeHero(controller: controller, locale: locale),
+          const SizedBox(height: 10),
+          _HomeRouteCard(controller: controller, locale: locale),
+          const SizedBox(height: 22),
+          Row(
+            children: [
+              Expanded(
+                child: Text(t.homeNextTrains, style: srTheme.text('heading')),
+              ),
+              _LiveIndicator(controller: controller),
+            ],
+          ),
+          const SizedBox(height: 8),
+        ] else ...[
+          _TrainPageHeader(title: t.trainHeader, theme: srTheme),
+          const SizedBox(height: 8),
+          Text(t.trainIntro, style: theme.textTheme.bodyMedium),
+          const SizedBox(height: 16),
+          _RoutePicker(controller: controller, locale: locale),
+          const SizedBox(height: 12),
+        ],
         if (controller.offline)
           _NoticeBox(
             icon: Icons.cloud_off,
@@ -46,7 +60,7 @@ class TrainsPage extends StatelessWidget {
           _NoticeBox(icon: Icons.error_outline, text: t.liveRefreshFailed),
         if (controller.partialError != null && !controller.offline)
           _NoticeBox(icon: Icons.info_outline, text: t.partialSchedule),
-        if (origin != null && destination != null)
+        if (!home && origin != null && destination != null)
           Text(
             '${origin.name(locale)} (${origin.code})  →  ${destination.name(locale)} (${destination.code})',
             style: theme.textTheme.titleMedium,
@@ -70,12 +84,30 @@ class TrainsPage extends StatelessWidget {
             ),
           ),
         if (!controller.offline && controller.liveTrains.isNotEmpty) ...[
-          for (final train in controller.liveTrains)
-            _LiveTrainCard(
-              train: train,
+          if (home)
+            _HomeLiveTrainCard(
+              train: controller.liveTrains.first,
               controller: controller,
               locale: locale,
             ),
+          if (home)
+            for (final train in controller.liveTrains.skip(1))
+              if (train.confirmedPlatform != null)
+                _PlatformChangeCard(train: train),
+          if (home)
+            for (final train in controller.liveTrains.skip(1))
+              _CompactLiveTrainCard(
+                train: train,
+                controller: controller,
+                locale: locale,
+              )
+          else
+            for (final train in controller.liveTrains)
+              _LiveTrainCard(
+                train: train,
+                controller: controller,
+                locale: locale,
+              ),
         ],
         if (controller.offline && controller.hasSavedTimetable) ...[
           for (final choice in controller.savedChoices())
@@ -108,23 +140,713 @@ class TrainsPage extends StatelessWidget {
               historical: controller.offline,
             ),
         ],
-        const SizedBox(height: 12),
-        if (home)
-          Align(
-            alignment: Alignment.centerLeft,
-            child: OutlinedButton.icon(
-              onPressed: onShowTrains,
-              icon: const Icon(Icons.train),
-              label: Text(t.browseAllTrains),
-            ),
-          ),
       ];
       return RefreshIndicator(
         onRefresh: controller.refresh,
-        child: ListView(padding: const EdgeInsets.all(20), children: children),
+        child: ListView(
+          padding: home
+              ? EdgeInsets.zero
+              : const EdgeInsets.fromLTRB(22, 12, 22, 20),
+          children: children,
+        ),
       );
     },
   );
+}
+
+class _TrainPageHeader extends StatelessWidget {
+  const _TrainPageHeader({required this.title, required this.theme});
+  final String title;
+  final SrTheme theme;
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      Expanded(child: Text(title, style: theme.text('heading'))),
+      Text(
+        Localizations.localeOf(context).languageCode.toUpperCase(),
+        style: theme.text('label'),
+      ),
+      const SizedBox(width: 8),
+      Icon(
+        Icons.notifications_none,
+        color: theme.palette.textPrimary,
+        size: 22,
+      ),
+    ],
+  );
+}
+
+class _HomeHero extends StatelessWidget {
+  const _HomeHero({required this.controller, required this.locale});
+  final TrainController controller;
+  final String locale;
+  @override
+  Widget build(BuildContext context) {
+    final sr = SrTheme.of(context);
+    final t = AppLocalizations.of(context);
+    final origin = controller.station(controller.originId);
+    final destination = controller.station(controller.destinationId);
+    final last = controller.stations.length > 1
+        ? controller.stations.last
+        : null;
+    final date = DateFormat(
+      'EEE d MMM',
+      locale,
+    ).format(controller.now).toUpperCase();
+    return SizedBox(
+      height: 302,
+      child: Stack(
+        clipBehavior: Clip.hardEdge,
+        children: [
+          Positioned.fill(
+            child: CustomPaint(
+              painter: _NetworkMapPainter(
+                sr.palette.bgMap,
+                sr.palette.lineHairline,
+                sr.palette.accentPrimary,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 4, 22, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    CustomPaint(
+                      size: const Size(25, 20),
+                      painter: _RailMarkPainter(sr.palette.accentPrimary),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      t.appTitle,
+                      style: sr
+                          .text('body-l')
+                          .copyWith(fontWeight: FontWeight.w600),
+                    ),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 13,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: sr.palette.bgSurface,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: sr.palette.effectShadowKey.withValues(
+                              alpha: .1,
+                            ),
+                            blurRadius: 10,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        locale.toUpperCase(),
+                        style: sr.text('label'),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: sr.palette.bgSurface,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: sr.palette.effectShadowKey.withValues(
+                              alpha: .1,
+                            ),
+                            blurRadius: 10,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.notifications_none,
+                        size: 19,
+                        color: sr.palette.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                Text(
+                  date,
+                  style: sr
+                      .text('label', color: sr.palette.textSecondary)
+                      .copyWith(fontSize: 10),
+                ),
+                const SizedBox(height: 4),
+                SizedBox(
+                  width: 205,
+                  child: Text(
+                    t.homeGreeting,
+                    maxLines: 2,
+                    style: sr.text('display-l').copyWith(height: 1.03),
+                  ),
+                ),
+                const Spacer(),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      if (last != null)
+                        Text(
+                          last.name(locale),
+                          style: sr.text(
+                            'caption',
+                            color: sr.palette.textSecondary,
+                          ),
+                        ),
+                      if (last != null)
+                        Text(last.code, style: sr.text('label')),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (destination != null)
+                            Text(
+                              destination.name(locale),
+                              style: sr.text('body-l'),
+                            ),
+                          Text(
+                            t.homeBoardHere,
+                            style: sr
+                                .text('label', color: sr.palette.textSecondary)
+                                .copyWith(fontSize: 10),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (origin != null)
+                      Text(origin.name(locale), style: sr.text('body-l')),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NetworkMapPainter extends CustomPainter {
+  const _NetworkMapPainter(this.fill, this.line, this.route);
+  final Color fill, line, route;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final background = Paint()..color = fill;
+    canvas.drawRect(Offset.zero & size, background);
+    final rail = Paint()
+      ..color = line.withValues(alpha: .75)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3;
+    final path = Path()
+      ..moveTo(size.width * .48, -12)
+      ..lineTo(size.width * .73, size.height * .29)
+      ..lineTo(size.width * .45, size.height * .58)
+      ..lineTo(size.width * .16, size.height * .91);
+    canvas.drawPath(path, rail);
+    final branch = Path()
+      ..moveTo(size.width * .77, -5)
+      ..lineTo(size.width * .6, size.height * .34)
+      ..lineTo(size.width * .31, size.height * .43)
+      ..lineTo(size.width * .06, size.height * .8);
+    canvas.drawPath(branch, rail);
+    final active = Paint()
+      ..color = route.withValues(alpha: .72)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4
+      ..strokeCap = StrokeCap.round;
+    final journey = Path()
+      ..moveTo(size.width * .8, size.height * .32)
+      ..lineTo(size.width * .58, size.height * .57)
+      ..quadraticBezierTo(
+        size.width * .51,
+        size.height * .65,
+        size.width * .4,
+        size.height * .65,
+      )
+      ..lineTo(size.width * .24, size.height * .65);
+    canvas.drawPath(journey, active);
+    for (final p in [
+      Offset(size.width * .8, size.height * .32),
+      Offset(size.width * .58, size.height * .57),
+      Offset(size.width * .4, size.height * .65),
+      Offset(size.width * .24, size.height * .65),
+    ]) {
+      canvas.drawCircle(p, 5, Paint()..color = route);
+      canvas.drawCircle(p, 2.2, Paint()..color = fill);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _NetworkMapPainter old) =>
+      fill != old.fill || line != old.line || route != old.route;
+}
+
+class _RailMarkPainter extends CustomPainter {
+  const _RailMarkPainter(this.color);
+  final Color color;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 2.4
+      ..strokeCap = StrokeCap.round;
+    canvas.drawLine(
+      Offset(1, size.height * .72),
+      Offset(size.width * .4, size.height * .72),
+      paint,
+    );
+    canvas.drawLine(
+      Offset(size.width * .34, size.height * .28),
+      Offset(size.width * .96, size.height * .28),
+      paint,
+    );
+    canvas.drawLine(
+      Offset(size.width * .22, size.height * .5),
+      Offset(size.width * .78, size.height * .5),
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _RailMarkPainter old) => color != old.color;
+}
+
+class _HomeRouteCard extends StatelessWidget {
+  const _HomeRouteCard({required this.controller, required this.locale});
+  final TrainController controller;
+  final String locale;
+  @override
+  Widget build(BuildContext context) {
+    final sr = SrTheme.of(context);
+    if (controller.stations.isEmpty)
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 22),
+        child: Text(
+          controller.loadingStations
+              ? AppLocalizations.of(context).loadingStations
+              : AppLocalizations.of(context).stationsUnavailable,
+        ),
+      );
+    final origin = controller.originId ?? controller.stations.first.id;
+    final destination =
+        controller.destinationId ??
+        controller.stations.firstWhere((s) => s.id != origin).id;
+    Widget selector(
+      String id,
+      String label,
+      String key,
+      ValueChanged<String?> change,
+    ) => Expanded(
+      child: DropdownButtonFormField<String>(
+        key: Key(key),
+        value: id,
+        isExpanded: true,
+        icon: const SizedBox.shrink(),
+        decoration: InputDecoration(
+          labelText: label,
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
+          isDense: true,
+        ),
+        items: [
+          for (final s in controller.stations)
+            DropdownMenuItem(
+              value: s.id,
+              child: Text(
+                s.name(locale),
+                overflow: TextOverflow.ellipsis,
+                style: sr.text('body-l'),
+              ),
+            ),
+        ],
+        onChanged: change,
+      ),
+    );
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 22),
+      padding: const EdgeInsets.fromLTRB(14, 8, 8, 8),
+      decoration: BoxDecoration(
+        color: sr.palette.bgSurface,
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: sr.palette.effectShadowKey.withValues(alpha: .12),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Column(
+            children: [
+              Icon(
+                Icons.radio_button_checked,
+                size: 13,
+                color: sr.palette.accentPrimary,
+              ),
+              Container(width: 1, height: 18, color: sr.palette.lineHairline),
+              Icon(Icons.circle, size: 12, color: sr.palette.accentPrimary),
+            ],
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      AppLocalizations.of(context).routeFrom.toUpperCase(),
+                      style: sr
+                          .text('label', color: sr.palette.textSecondary)
+                          .copyWith(fontSize: 9),
+                    ),
+                    const SizedBox(width: 10),
+                    selector(origin, '', 'route-origin', (v) {
+                      if (v != null && v != destination)
+                        controller.setRoute(v, destination);
+                    }),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text(
+                      AppLocalizations.of(context).routeTo.toUpperCase(),
+                      style: sr
+                          .text('label', color: sr.palette.textSecondary)
+                          .copyWith(fontSize: 9),
+                    ),
+                    const SizedBox(width: 18),
+                    selector(destination, '', 'route-destination', (v) {
+                      if (v != null && v != origin)
+                        controller.setRoute(origin, v);
+                    }),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          IconButton.filledTonal(
+            tooltip: 'Swap route',
+            onPressed: () => controller.setRoute(destination, origin),
+            icon: const Icon(Icons.swap_vert),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LiveIndicator extends StatelessWidget {
+  const _LiveIndicator({required this.controller});
+  final TrainController controller;
+  @override
+  Widget build(BuildContext context) {
+    final sr = SrTheme.of(context);
+    final text = controller.offline
+        ? 'Saved offline'
+        : controller.observedAt == null
+        ? 'Live'
+        : 'Live · ${_time(controller.observedAt!)} · Simulated';
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 7,
+          height: 7,
+          decoration: BoxDecoration(
+            color: controller.offline
+                ? sr.palette.statusWarningInk
+                : sr.palette.statusSuccessInk,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 5),
+        Text(text, style: sr.text('caption', color: sr.palette.textSecondary)),
+      ],
+    );
+  }
+}
+
+class _HomeLiveTrainCard extends StatelessWidget {
+  const _HomeLiveTrainCard({
+    required this.train,
+    required this.controller,
+    required this.locale,
+  });
+  final PassengerLiveTrain train;
+  final TrainController controller;
+  final String locale;
+  @override
+  Widget build(BuildContext context) {
+    final sr = SrTheme.of(context);
+    final freshness = controller.freshnessFor(train);
+    final dep = freshness == 'UNKNOWN'
+        ? train.scheduledDeparture
+        : train.estimatedDeparture ?? train.scheduledDeparture;
+    final originStop = controller
+        .cachedJourney(train.journeyId)
+        ?.stops
+        .where((stop) => stop.id == train.originStopId)
+        .firstOrNull;
+    final origin = originStop == null
+        ? controller.station(controller.originId)?.name(locale) ?? ''
+        : controller.station(originStop.stationId)?.name(locale) ??
+              originStop.stationCode;
+    final destinationStop = controller
+        .cachedJourney(train.journeyId)
+        ?.stops
+        .where((stop) => stop.id == train.destinationStopId)
+        .firstOrNull;
+    final destination = destinationStop == null
+        ? controller.station(controller.destinationId)?.name(locale) ?? ''
+        : controller.station(destinationStop.stationId)?.name(locale) ??
+              destinationStop.stationCode;
+    final delayMinutes = _delayMinutes(train);
+    final platform = train.confirmedPlatform ?? train.plannedPlatform;
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      decoration: BoxDecoration(
+        color: sr.palette.bgSurface,
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: [
+          BoxShadow(
+            color: sr.palette.effectShadowKey.withValues(alpha: .08),
+            blurRadius: 16,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(22),
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) =>
+                  TrainDetailPage(train: train, controller: controller),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 14, 18, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      'In ${_minutesUntil(dep, controller.now)} min',
+                      style: sr.text('label', color: sr.palette.accentPrimary),
+                    ),
+                    const Spacer(),
+                    StatusBadge.fromKey(
+                      delayMinutes > 0 ? 'delayed' : 'on-time',
+                      locale: locale,
+                    ),
+                  ],
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _time(dep),
+                            style: sr
+                                .text('number')
+                                .copyWith(
+                                  fontSize: 48,
+                                  fontWeight: FontWeight.w300,
+                                  height: 1,
+                                ),
+                          ),
+                          Text(
+                            'Expected at $origin',
+                            style: sr.text(
+                              'caption',
+                              color: sr.palette.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (platform != null)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            'PLATFORM',
+                            style: sr
+                                .text('label', color: sr.palette.textSecondary)
+                                .copyWith(fontSize: 9),
+                          ),
+                          Text(
+                            platform,
+                            style: sr
+                                .text('number', color: sr.palette.accentPrimary)
+                                .copyWith(fontSize: 38),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Text(
+                      train.trainNumber,
+                      style: sr.text('label').copyWith(fontSize: 10),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(child: Divider(color: sr.palette.accentPrimary)),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${destination.split(' ').last} ${_time(train.estimatedArrival ?? train.scheduledArrival)}',
+                      style: sr.text(
+                        'caption',
+                        color: sr.palette.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CompactLiveTrainCard extends StatelessWidget {
+  const _CompactLiveTrainCard({
+    required this.train,
+    required this.controller,
+    required this.locale,
+  });
+  final PassengerLiveTrain train;
+  final TrainController controller;
+  final String locale;
+  @override
+  Widget build(BuildContext context) {
+    final sr = SrTheme.of(context);
+    final freshness = controller.freshnessFor(train);
+    final departure = freshness == 'UNKNOWN'
+        ? train.scheduledDeparture
+        : train.estimatedDeparture ?? train.scheduledDeparture;
+    final platform = train.confirmedPlatform ?? train.plannedPlatform;
+    final delay = _delayMinutes(train);
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      decoration: BoxDecoration(
+        color: sr.palette.bgSurface,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: sr.palette.effectShadowKey.withValues(alpha: .08),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(18),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(18),
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) =>
+                  TrainDetailPage(train: train, controller: controller),
+            ),
+          ),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 56),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              child: Row(
+                children: [
+                  Text(_time(departure), style: sr.text('body-l')),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(train.trainNumber, style: sr.text('label')),
+                        Text(
+                          delay > 0
+                              ? '$delay min late · sched. ${_time(train.scheduledDeparture)}'
+                              : 'On time',
+                          style: sr.text(
+                            'caption',
+                            color: delay > 0
+                                ? sr.palette.statusWarningInk
+                                : sr.palette.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (platform != null) Text(platform, style: sr.text('body')),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PlatformChangeCard extends StatelessWidget {
+  const _PlatformChangeCard({required this.train});
+  final PassengerLiveTrain train;
+
+  @override
+  Widget build(BuildContext context) {
+    final sr = SrTheme.of(context);
+    final old = train.plannedPlatform;
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      decoration: BoxDecoration(
+        color: sr.palette.accentSoft,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: ListTile(
+        minTileHeight: 52,
+        leading: Icon(Icons.swap_horiz, color: sr.palette.accentPrimary),
+        title: Text(
+          '${train.trainNumber} now Platform ${train.confirmedPlatform}',
+        ),
+        subtitle: Text(
+          '${old == null || old == train.confirmedPlatform ? '' : 'Was $old · '}'
+          'confirmed ${train.confirmedPlatformAt == null ? 'time unavailable' : _time(train.confirmedPlatformAt!)}',
+          style: sr.text('caption', color: sr.palette.textSecondary),
+        ),
+      ),
+    );
+  }
 }
 
 class _RoutePicker extends StatelessWidget {
@@ -340,20 +1062,125 @@ class _TrainDetailPageState extends State<TrainDetailPage> {
     final destinationIndex =
         journey?.stops.indexWhere((s) => s.id == train.destinationStopId) ?? -1;
     final markerIndex = _lastKnownIndex(journey, lastKnownStationId);
+    final originStation = originIndex >= 0
+        ? c.station(journey!.stops[originIndex].stationId)
+        : null;
+    final destinationStation = destinationIndex >= 0
+        ? c.station(journey!.stops[destinationIndex].stationId)
+        : null;
     return Scaffold(
-      appBar: AppBar(title: Text(train.trainNumber)),
+      appBar: AppBar(
+        leading: const BackButton(),
+        title: Text(AppLocalizations.of(context).trainDetails),
+        actions: [
+          Padding(
+            padding: const EdgeInsetsDirectional.only(end: 12),
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: SrTheme.of(context).palette.bgSurface2,
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Text(
+                  'SIMULATED',
+                  style: SrTheme.of(context)
+                      .text('label')
+                      .copyWith(fontSize: 9),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
       body: ListView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(22, 10, 22, 20),
         children: [
-          Text(
-            AppLocalizations.of(context).journeyDetails,
-            style: Theme.of(context).textTheme.headlineSmall,
+          Row(
+            children: [
+              Flexible(
+                child: Text(
+                  '${train.trainNumber} · ${originStation?.name(locale) ?? train.originStopId}',
+                  style: SrTheme.of(context).text('body-l'),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 6),
+                child: Icon(Icons.arrow_forward, size: 16),
+              ),
+              Flexible(
+                child: Text(
+                  destinationStation?.name(locale) ?? train.destinationStopId,
+                  style: SrTheme.of(context).text('body-l'),
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.end,
+                ),
+              ),
+            ],
           ),
           Text(
-            '${AppLocalizations.of(context).serviceDate} ${DateFormat.yMMMd(locale).format(train.serviceDate)} · ${journey?.sourceLabel ?? AppLocalizations.of(context).scheduleSource}',
+            'Scheduled at ${originStation?.name(locale) ?? train.originStopId} ${DateFormat.jm(locale).format(train.scheduledDeparture.add(const Duration(hours: 5, minutes: 30)))}',
+            style: SrTheme.of(
+              context,
+            ).text('caption', color: SrTheme.of(context).palette.textSecondary),
           ),
-          const SizedBox(height: 12),
-          StatusBadge.fromKey(f, locale: locale),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Container(
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: f == 'UNKNOWN'
+                      ? SrTheme.of(context).palette.statusWarningInk
+                      : SrTheme.of(context).palette.statusSuccessInk,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 5),
+              Text(
+                f == 'UNKNOWN' || train.lastObservedAt == null
+                    ? 'Live · observation time unavailable · Simulated'
+                    : 'Live · updated ${_time(train.lastObservedAt!)} · Simulated',
+                style: SrTheme.of(context).text(
+                  'caption',
+                  color: SrTheme.of(context).palette.textSecondary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          _DetailEstimate(
+            train: train,
+            freshness: f,
+            origin: originStation?.name(locale) ?? train.originStopId,
+            destination:
+                destinationStation?.name(locale) ?? train.destinationStopId,
+            locale: locale,
+          ),
+          if (train.confirmedPlatform != null)
+            _DetailFact(
+              icon: Icons.compare_arrows,
+              title:
+                  '${AppLocalizations.of(context).platformConfirmed} ${train.confirmedPlatform}',
+              detail: AppLocalizations.of(context).staffConfirmedChange(
+                _dateTime(
+                  train.confirmedPlatformAt,
+                  AppLocalizations.of(context).timeUnavailable,
+                ),
+              ),
+            ),
+          if (lastKnownStationId != null)
+            _DetailFact(
+              icon: Icons.location_on_outlined,
+              title: 'Last known station',
+              detail:
+                  '${c.station(lastKnownStationId!)?.name(locale) ?? lastKnownStationId} · last seen ${train.lastObservedAt == null ? '—' : _time(train.lastObservedAt!)}',
+            ),
           if (train.overdue && f == 'UNKNOWN')
             _NoticeBox(
               icon: Icons.help_outline,
@@ -373,10 +1200,23 @@ class _TrainDetailPageState extends State<TrainDetailPage> {
             ),
           if (journey != null) ...[
             const SizedBox(height: 16),
+            Text('Route overview', style: SrTheme.of(context).text('heading')),
             Text(
-              'Route · scheduled stops',
-              style: Theme.of(context).textTheme.titleMedium,
+              'Station progress, not exact GPS',
+              style: SrTheme.of(context).text(
+                'caption',
+                color: SrTheme.of(context).palette.textSecondary,
+              ),
             ),
+            const SizedBox(height: 10),
+            _DetailRoute(
+              journey: journey!,
+              controller: c,
+              locale: locale,
+              markerIndex: f == 'UNKNOWN' ? -1 : markerIndex,
+            ),
+            const SizedBox(height: 12),
+            Text('Scheduled stops', style: SrTheme.of(context).text('body-l')),
             for (var i = 0; i < journey!.stops.length; i++)
               _StopRow(
                 stop: journey!.stops[i],
@@ -399,6 +1239,232 @@ class _TrainDetailPageState extends State<TrainDetailPage> {
             '${AppLocalizations.of(context).timetableSource}: ${journey?.sourceLabel ?? AppLocalizations.of(context).publicRailwayTimetable}',
           ),
           Text(AppLocalizations.of(context).simulatedRunning),
+        ],
+      ),
+    );
+  }
+}
+
+class _DetailEstimate extends StatelessWidget {
+  const _DetailEstimate({
+    required this.train,
+    required this.freshness,
+    required this.origin,
+    required this.destination,
+    required this.locale,
+  });
+  final PassengerLiveTrain train;
+  final String freshness;
+  final String origin;
+  final String destination;
+  final String locale;
+  @override
+  Widget build(BuildContext context) {
+    final sr = SrTheme.of(context);
+    final t = AppLocalizations.of(context);
+    final departure = freshness == 'UNKNOWN'
+        ? train.scheduledDeparture
+        : train.estimatedDeparture ?? train.scheduledDeparture;
+    final arrival = freshness == 'UNKNOWN'
+        ? train.scheduledArrival
+        : train.estimatedArrival ?? train.scheduledArrival;
+    final delay = _delayMinutes(train);
+    final platform = train.confirmedPlatform ?? train.plannedPlatform;
+    return Container(
+      margin: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: sr.palette.bgSurface,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: sr.palette.effectShadowKey.withValues(alpha: .08),
+            blurRadius: 15,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (delay > 0) StatusBadge.fromKey('delayed', locale: locale),
+          if (delay > 0) const SizedBox(height: 4),
+          Text(
+            freshness == 'UNKNOWN'
+                ? t.scheduledDeparture
+                : 'Expected at $origin',
+            style: sr.text('body', color: sr.palette.textSecondary),
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: Text(
+                  _time(departure),
+                  style: sr
+                      .text('number')
+                      .copyWith(
+                        fontSize: 54,
+                        height: 1,
+                        fontWeight: FontWeight.w300,
+                      ),
+                ),
+              ),
+              if (platform != null)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      'PLATFORM',
+                      style: sr.text('label').copyWith(fontSize: 9),
+                    ),
+                    Text(
+                      platform,
+                      style: sr
+                          .text('number', color: sr.palette.accentPrimary)
+                          .copyWith(fontSize: 38),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+          Text(
+            '${destination.split(' ').last} arrival est. ${DateFormat.jm(locale).format(arrival.add(const Duration(hours: 5, minutes: 30)))}',
+            style: sr.text('body', color: sr.palette.textSecondary),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DetailFact extends StatelessWidget {
+  const _DetailFact({
+    required this.icon,
+    required this.title,
+    required this.detail,
+  });
+  final IconData icon;
+  final String title;
+  final String detail;
+  @override
+  Widget build(BuildContext context) {
+    final sr = SrTheme.of(context);
+    return Container(
+      margin: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: sr.palette.accentSoft,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: sr.palette.accentPrimary),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: sr.text('body-l')),
+                Text(
+                  detail,
+                  style: sr.text('caption', color: sr.palette.textSecondary),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DetailRoute extends StatelessWidget {
+  const _DetailRoute({
+    required this.journey,
+    required this.controller,
+    required this.locale,
+    required this.markerIndex,
+  });
+  final PassengerJourney journey;
+  final TrainController controller;
+  final String locale;
+  final int markerIndex;
+  @override
+  Widget build(BuildContext context) {
+    final sr = SrTheme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(13),
+      decoration: BoxDecoration(
+        color: sr.palette.bgSurface,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: sr.palette.effectShadowKey.withValues(alpha: .06),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              for (var i = 0; i < journey.stops.length; i++)
+                Expanded(
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: i <= markerIndex
+                              ? sr.palette.accentPrimary
+                              : sr.palette.bgSurface,
+                          border: Border.all(
+                            color: sr.palette.accentPrimary,
+                            width: 2,
+                          ),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      if (i < journey.stops.length - 1)
+                        Expanded(
+                          child: Container(
+                            height: 2,
+                            color: sr.palette.lineHairline,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              for (var i = 0; i < journey.stops.length; i++)
+                Expanded(
+                  child: Text(
+                    controller
+                            .station(journey.stops[i].stationId)
+                            ?.name(locale) ??
+                        journey.stops[i].stationCode,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: i == 0
+                        ? TextAlign.start
+                        : i == journey.stops.length - 1
+                        ? TextAlign.end
+                        : TextAlign.center,
+                    style: sr
+                        .text('caption', color: sr.palette.textSecondary)
+                        .copyWith(fontSize: 10),
+                  ),
+                ),
+            ],
+          ),
         ],
       ),
     );
@@ -607,6 +1673,21 @@ DateTime _colomboTime(DateTime d) =>
     d.toUtc().add(const Duration(hours: 5, minutes: 30));
 
 String _time(DateTime d) => DateFormat.Hm().format(_colomboTime(d));
+int _minutesUntil(DateTime departure, DateTime now) {
+  final minutes = departure.toUtc().difference(now.toUtc()).inMinutes;
+  return minutes < 0 ? 0 : minutes;
+}
+
+int _delayMinutes(PassengerLiveTrain train) {
+  final estimated = train.estimatedDeparture;
+  if (estimated == null) return 0;
+  final minutes = estimated
+      .toUtc()
+      .difference(train.scheduledDeparture.toUtc())
+      .inMinutes;
+  return minutes > 0 ? minutes : 0;
+}
+
 String _dateTime(DateTime? d, String unavailable) => d == null
     ? unavailable
     : DateFormat.yMMMd().add_Hm().format(_colomboTime(d));

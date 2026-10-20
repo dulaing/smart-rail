@@ -105,14 +105,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get comingSoon => 'Coming soon';
 
   @override
-  String get guest => 'Guest';
+  String get guest => 'Browsing as guest';
 
   @override
-  String get guestNotice =>
-      'Timetables and train times are available without an account.';
+  String get guestNotice => 'Sign in only to follow trains or order food.';
 
   @override
-  String get signIn => 'Sign in';
+  String get guestBrowseNote => 'Train browsing works without an account.';
+
+  @override
+  String get signIn => 'Sign in to demo';
 
   @override
   String get signOut => 'Sign out';
@@ -129,6 +131,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get language => 'Language';
+
+  @override
+  String get appearance => 'Appearance';
 
   @override
   String get theme => 'Theme';
@@ -149,7 +154,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statusSample => 'Status sample';
 
   @override
-  String get homeNextTrains => 'Your next trains';
+  String get homeNextTrains => 'Next train';
+
+  @override
+  String get homeGreeting => 'Good morning';
+
+  @override
+  String get homeBoardHere => 'BOARD HERE';
 
   @override
   String get loadingStations => 'Loading stations…';
@@ -164,6 +175,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trainHeader => 'Trains';
+
+  @override
+  String get trainDetails => 'Train details';
 
   @override
   String get trainIntro =>
@@ -394,6 +408,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get foodPayAtKiosk =>
       'Pay at the kiosk when you collect. There is no online payment.';
+
+  @override
+  String get foodPayAtPickup => 'Pay when you collect';
 
   @override
   String get foodNoShowPolicy =>

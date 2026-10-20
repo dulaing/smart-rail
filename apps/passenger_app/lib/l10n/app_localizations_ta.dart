@@ -109,7 +109,10 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get guestNotice =>
-      'கணக்கு இல்லாமலே கால அட்டவணைகளையும் ரயில் நேரங்களையும் பார்க்கலாம்.';
+      'ரயில்களைப் பின்தொடர அல்லது உணவு ஆர்டர் செய்ய மட்டும் உள்நுழையுங்கள்.';
+
+  @override
+  String get guestBrowseNote => 'கணக்கு இல்லாமலே ரயில் தகவல்களைப் பார்க்கலாம்.';
 
   @override
   String get signIn => 'உள்நுழை';
@@ -130,6 +133,9 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get language => 'மொழி';
+
+  @override
+  String get appearance => 'தோற்றம்';
 
   @override
   String get theme => 'தோற்றம்';
@@ -153,6 +159,12 @@ class AppLocalizationsTa extends AppLocalizations {
   String get homeNextTrains => 'உங்கள் அடுத்த ரயில்கள்';
 
   @override
+  String get homeGreeting => 'காலை வணக்கம்';
+
+  @override
+  String get homeBoardHere => 'இங்கே ஏறுங்கள்';
+
+  @override
   String get loadingStations => 'ரயில் நிலையங்கள் ஏற்றப்படுகின்றன…';
 
   @override
@@ -165,6 +177,9 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get trainHeader => 'ரயில்கள்';
+
+  @override
+  String get trainDetails => 'ரயில் விவரங்கள்';
 
   @override
   String get trainIntro =>
@@ -391,6 +406,9 @@ class AppLocalizationsTa extends AppLocalizations {
   @override
   String get foodPayAtKiosk =>
       'பெறும்போது கியோஸ்க்கில் பணம் செலுத்துங்கள். ஆன்லைன் கட்டணம் இல்லை.';
+
+  @override
+  String get foodPayAtPickup => 'பெறும்போது பணம் செலுத்துங்கள்';
 
   @override
   String get foodNoShowPolicy =>

@@ -42,7 +42,8 @@ class _PassengerShellState extends State<PassengerShell>
   bool _foreground = true;
 
   /// Food polls an unresolved order only while it is on screen in the foreground.
-  void _syncOrders() => widget.orders.setVisible(_foreground && _tab == PassengerTab.food);
+  void _syncOrders() =>
+      widget.orders.setVisible(_foreground && _tab == PassengerTab.food);
 
   @override
   void initState() {
@@ -73,9 +74,6 @@ class _PassengerShellState extends State<PassengerShell>
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final theme = SrTheme.of(context);
-    final locale = Localizations.localeOf(context).languageCode;
-    final gap = theme.metrics.space[16]!;
 
     String label(PassengerTab tab) => switch (tab) {
       PassengerTab.home => t.tabHome,
@@ -88,30 +86,6 @@ class _PassengerShellState extends State<PassengerShell>
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(gap * 1.5, gap, gap * 1.5, gap / 2),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Semantics(
-                      header: true,
-                      child: Text(t.appTitle, style: theme.text('heading')),
-                    ),
-                  ),
-                  Flexible(
-                    child: Text(
-                      srMessages['footer.simulation']![locale] ??
-                          srMessages['footer.simulation']!['en']!,
-                      textAlign: TextAlign.end,
-                      style: theme.text(
-                        'caption',
-                        color: theme.palette.textSecondary,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
             Expanded(
               child: IndexedStack(
                 index: _tab.index,
@@ -184,7 +158,6 @@ class _NavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = SrTheme.of(context);
     final palette = theme.palette;
-    final gap = theme.metrics.space[16]!;
 
     // Labels grow with the system text size up to 160%; the bar must not outgrow the screen.
     return MediaQuery.withClampedTextScaling(
@@ -194,24 +167,24 @@ class _NavBar extends StatelessWidget {
         explicitChildNodes: true,
         label: label,
         child: Padding(
-          padding: EdgeInsets.fromLTRB(gap, gap / 2, gap, gap),
+          padding: const EdgeInsets.fromLTRB(22, 4, 22, 4),
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: palette.bgSurface,
-              borderRadius: BorderRadius.circular(
-                theme.metrics.radius['xl']! + 8,
+              borderRadius: BorderRadius.circular(48),
+              border: Border.all(
+                color: palette.lineHairline.withValues(alpha: .7),
               ),
-              border: Border.all(color: palette.lineHairline),
               boxShadow: [
                 BoxShadow(
-                  color: palette.effectShadowKey,
-                  blurRadius: 24,
-                  offset: const Offset(0, 8),
+                  color: palette.effectShadowKey.withValues(alpha: .12),
+                  blurRadius: 22,
+                  offset: const Offset(0, 7),
                 ),
               ],
             ),
             child: Padding(
-              padding: EdgeInsets.all(gap / 4),
+              padding: const EdgeInsets.all(5),
               child: Row(
                 children: [
                   for (final (tab, text) in tabs)
@@ -253,7 +226,9 @@ class _NavItem extends StatelessWidget {
     final theme = SrTheme.of(context);
     final palette = theme.palette;
     final ink = selected ? palette.navActiveInk : palette.textSecondary;
-    final style = theme.text('label', color: ink).copyWith(letterSpacing: 0);
+    final style = theme
+        .text('caption', color: ink)
+        .copyWith(letterSpacing: 0, fontSize: 12);
 
     return Semantics(
       button: true,
@@ -264,16 +239,14 @@ class _NavItem extends StatelessWidget {
       child: ExcludeSemantics(
         child: Material(
           color: selected ? palette.navActive : Colors.transparent,
-          borderRadius: BorderRadius.circular(theme.metrics.radius['full']!),
+          borderRadius: BorderRadius.circular(40),
           child: InkWell(
-            borderRadius: BorderRadius.circular(theme.metrics.radius['full']!),
+            borderRadius: BorderRadius.circular(40),
             onTap: onTap,
             child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: theme.metrics.minTarget + 8,
-              ),
+              constraints: BoxConstraints(minHeight: 64),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

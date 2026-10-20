@@ -1,0 +1,12 @@
+﻿{
+    "reference":  "C:\\Projects\\260929-SmartRail\\apps\\passenger_app\\test\\visual\\references\\2026-10-19\\food-review.content.png",
+    "actual":  "C:\\Projects\\260929-SmartRail\\apps\\passenger_app\\test\\visual\\comparisons\\2026-10-20\\food-review.actual.png",
+    "cropTop":  0,
+    "cropBottom":  0,
+    "width":  432,
+    "height":  900,
+    "meanAbsoluteChannelError":  28.321098251028808,
+    "pixelsWithChannelDeltaAbove16":  0.20897376543209878,
+    "maximumChannelDelta":  255,
+    "interpretation":  "Diagnostic only. Review geometry and text separately; this is not a whole-image pass threshold."
+}

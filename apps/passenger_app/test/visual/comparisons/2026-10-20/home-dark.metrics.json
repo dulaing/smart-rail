@@ -1,0 +1,12 @@
+﻿{
+    "reference":  "C:\\Projects\\260929-SmartRail\\apps\\passenger_app\\test\\visual\\references\\2026-10-19\\home-dark.content.png",
+    "actual":  "C:\\Projects\\260929-SmartRail\\apps\\passenger_app\\test\\visual\\comparisons\\2026-10-20\\home-dark.actual.png",
+    "cropTop":  0,
+    "cropBottom":  0,
+    "width":  432,
+    "height":  900,
+    "meanAbsoluteChannelError":  17.173442215363512,
+    "pixelsWithChannelDeltaAbove16":  0.23420781893004114,
+    "maximumChannelDelta":  248,
+    "interpretation":  "Diagnostic only. Review geometry and text separately; this is not a whole-image pass threshold."
+}

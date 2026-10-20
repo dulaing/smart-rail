@@ -13,7 +13,12 @@ import 'orders_controller.dart';
 /// The last step before submitting: what, where, when, how it is paid, and the rules. A guest sees
 /// the same page with a sign-in button instead of Place order.
 class ReviewView extends StatelessWidget {
-  const ReviewView({super.key, required this.controller, required this.orders, required this.account});
+  const ReviewView({
+    super.key,
+    required this.controller,
+    required this.orders,
+    required this.account,
+  });
 
   final FoodController controller;
   final FoodOrdersController orders;
@@ -51,97 +56,140 @@ class ReviewView extends StatelessWidget {
     } else {
       action = FilledButton(
         key: const Key('food-place-order'),
-        onPressed: controller.canReview && orders.phase == OrderPhase.none && orders.request == null
-            ? () => orders.submit(controller.buildDraft()!, onCommitted: controller.finishOrder)
+        onPressed:
+            controller.canReview &&
+                orders.phase == OrderPhase.none &&
+                orders.request == null
+            ? () => orders.submit(
+                controller.buildDraft()!,
+                onCommitted: controller.finishOrder,
+              )
             : null,
         child: Text(t.foodPlaceOrder),
       );
     }
 
-    return ListView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(20),
-      children: [
-        Align(
-          alignment: AlignmentDirectional.centerStart,
-          child: TextButton.icon(
+    final details = <Widget>[
+      Row(
+        children: [
+          IconButton(
             key: const Key('food-review-back'),
+            tooltip: t.foodBackToMenu,
             onPressed: controller.endReview,
             icon: const Icon(Icons.arrow_back),
-            label: Text(t.foodBackToMenu),
           ),
+          Expanded(child: FoodHeading(t.foodReviewHeading)),
+          Text('SIMULATED', style: theme.text('label').copyWith(fontSize: 9)),
+        ],
+      ),
+      const SizedBox(height: 12),
+      if (option != null && !option.orderable)
+        FoodNotice(
+          icon: Icons.info_outline,
+          text: foodReasonText(t, option.reasonCode),
         ),
-        FoodHeading(t.foodReviewHeading),
-        const SizedBox(height: 12),
-        if (option != null && !option.orderable)
-          FoodNotice(icon: Icons.info_outline, text: foodReasonText(t, option.reasonCode)),
-        if (controller.cartAdjusted) FoodNotice(icon: Icons.info_outline, text: t.foodBasketAdjusted),
-        if (orders.request != null)
-          FoodNotice(
-            icon: Icons.hourglass_bottom,
-            text: t.foodPendingOrderWaiting,
-            action: orders.openOrder,
-            actionLabel: t.foodOpenOrder,
-          ),
-        FoodCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (journey != null) ...[
-                Text(
-                  t.foodTrainLine(journey.trainNumber, journey.originCode, journey.finalCode),
-                  style: theme.text('heading'),
-                ),
-                Text(
-                  controller.isToday(journey.serviceDate)
-                      ? '${t.foodToday} · ${dayLabel(journey.serviceDate)}'
-                      : dayLabel(journey.serviceDate),
-                  style: secondary,
-                ),
-                const SizedBox(height: 8),
-              ],
-              if (option != null) Text(t.foodCollectAt(option.pointName), style: theme.text('body')),
-              if (estimate != null) Text(t.foodTrainExpected(clockTime(estimate)), style: secondary),
-              if (option?.orderBy != null) Text(t.foodOrderBy(clockTime(option!.orderBy!)), style: secondary),
-            ],
-          ),
+      if (controller.cartAdjusted)
+        FoodNotice(icon: Icons.info_outline, text: t.foodBasketAdjusted),
+      if (orders.request != null)
+        FoodNotice(
+          icon: Icons.hourglass_bottom,
+          text: t.foodPendingOrderWaiting,
+          action: orders.openOrder,
+          actionLabel: t.foodOpenOrder,
         ),
-        FoodCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (final (item, quantity) in controller.cartLines)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: FoodPriceRow(
-                    label: '$quantity × ${item.name}',
-                    amount: formatLkr(item.priceMinorLkr * quantity),
-                  ),
+      FoodCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (journey != null) ...[
+              Text(
+                t.foodTrainLine(
+                  journey.trainNumber,
+                  journey.originCode,
+                  journey.finalCode,
                 ),
-              const Divider(),
-              FoodPriceRow(
-                label: t.foodTotal,
-                amount: formatLkr(controller.totalMinorLkr ?? 0),
-                amountKey: const Key('food-review-total'),
                 style: theme.text('heading'),
               ),
+              Text(
+                controller.isToday(journey.serviceDate)
+                    ? '${t.foodToday} · ${dayLabel(journey.serviceDate)}'
+                    : dayLabel(journey.serviceDate),
+                style: secondary,
+              ),
+              const SizedBox(height: 8),
             ],
+            if (option != null)
+              Text(
+                t.foodCollectAt(option.pointName),
+                style: theme.text('body'),
+              ),
+            if (estimate != null)
+              Text(t.foodTrainExpected(clockTime(estimate)), style: secondary),
+            if (option?.orderBy != null)
+              Text(
+                t.foodOrderBy(clockTime(option!.orderBy!)),
+                style: secondary,
+              ),
+          ],
+        ),
+      ),
+      FoodCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final (item, quantity) in controller.cartLines)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: FoodPriceRow(
+                  label: '$quantity × ${item.name}',
+                  amount: formatLkr(item.priceMinorLkr * quantity),
+                ),
+              ),
+            const Divider(),
+            FoodPriceRow(
+              label: t.foodTotal,
+              amount: formatLkr(controller.totalMinorLkr ?? 0),
+              amountKey: const Key('food-review-total'),
+              style: theme.text('heading'),
+            ),
+          ],
+        ),
+      ),
+      FoodCard(
+        tint: theme.palette.bgSurface2,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(t.foodPayAtKiosk, style: theme.text('body')),
+            const SizedBox(height: 8),
+            Text(t.foodNoShowPolicy, style: theme.text('body')),
+            const SizedBox(height: 8),
+            Text(t.foodCancelPolicy, style: theme.text('body')),
+          ],
+        ),
+      ),
+    ];
+    final largeText = MediaQuery.textScalerOf(context).scale(1) >= 1.5;
+    if (largeText) {
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+        children: [...details, action],
+      );
+    }
+    return Column(
+      children: [
+        Expanded(
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+            children: details,
           ),
         ),
-        FoodCard(
-          tint: theme.palette.bgSurface2,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(t.foodPayAtKiosk, style: theme.text('body')),
-              const SizedBox(height: 8),
-              Text(t.foodNoShowPolicy, style: theme.text('body')),
-              const SizedBox(height: 8),
-              Text(t.foodCancelPolicy, style: theme.text('body')),
-            ],
-          ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+          child: action,
         ),
-        action,
       ],
     );
   }
@@ -180,9 +228,15 @@ class OrderView extends StatelessWidget {
           const SizedBox(height: 16),
           Row(
             children: [
-              const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 3)),
+              const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 3),
+              ),
               const SizedBox(width: 12),
-              Expanded(child: Text(t.foodSubmitting, style: theme.text('body'))),
+              Expanded(
+                child: Text(t.foodSubmitting, style: theme.text('body')),
+              ),
             ],
           ),
         ]);
@@ -192,7 +246,10 @@ class OrderView extends StatelessWidget {
         children.addAll([
           FoodHeading(t.foodYourOrder),
           const SizedBox(height: 12),
-          FoodNotice(icon: Icons.warning_amber_outlined, text: t.foodConflictBody),
+          FoodNotice(
+            icon: Icons.warning_amber_outlined,
+            text: t.foodConflictBody,
+          ),
           OutlinedButton(
             key: const Key('food-discard-request'),
             onPressed: orders.discardConflict,
@@ -203,7 +260,10 @@ class OrderView extends StatelessWidget {
         children.addAll([
           FoodHeading(t.foodRefusedTitle),
           const SizedBox(height: 12),
-          FoodNotice(icon: Icons.info_outline, text: foodReasonText(t, orders.refusalCode)),
+          FoodNotice(
+            icon: Icons.info_outline,
+            text: foodReasonText(t, orders.refusalCode),
+          ),
           FilledButton(
             key: const Key('food-refused-back'),
             onPressed: orders.dismissProblem,
@@ -226,17 +286,24 @@ class OrderView extends StatelessWidget {
           FoodHeading(t.foodYourOrder),
           const SizedBox(height: 12),
           FoodNotice(icon: Icons.block, text: t.foodNoPermission),
-          FilledButton(onPressed: orders.dismissProblem, child: Text(t.foodRefusedBack)),
+          FilledButton(
+            onPressed: orders.dismissProblem,
+            child: Text(t.foodRefusedBack),
+          ),
         ]);
       case OrderPhase.storageFailed:
         children.addAll([
           FoodHeading(t.foodYourOrder),
           const SizedBox(height: 12),
           FoodNotice(icon: Icons.error_outline, text: t.foodStorageFailed),
-          FilledButton(onPressed: orders.dismissProblem, child: Text(t.foodRefusedBack)),
+          FilledButton(
+            onPressed: orders.dismissProblem,
+            child: Text(t.foodRefusedBack),
+          ),
         ]);
       case OrderPhase.none:
-        if (order != null) children.addAll(_confirmed(context, t, theme, order));
+        if (order != null)
+          children.addAll(_confirmed(context, t, theme, order));
     }
 
     return ListView(
@@ -257,13 +324,21 @@ class OrderView extends StatelessWidget {
     );
   }
 
-  List<Widget> _uncertain(BuildContext context, AppLocalizations t, SrTheme theme) {
+  List<Widget> _uncertain(
+    BuildContext context,
+    AppLocalizations t,
+    SrTheme theme,
+  ) {
     final request = orders.request;
     return [
       Semantics(
         liveRegion: true,
         header: true,
-        child: Text(t.foodUncertainTitle, style: theme.text('title'), key: const Key('food-uncertain-title')),
+        child: Text(
+          t.foodUncertainTitle,
+          style: theme.text('title'),
+          key: const Key('food-uncertain-title'),
+        ),
       ),
       const SizedBox(height: 12),
       Text(t.foodUncertainBody, style: theme.text('body')),
@@ -300,14 +375,25 @@ class OrderView extends StatelessWidget {
     if (confirmed == true) await orders.cancel();
   }
 
-  List<Widget> _confirmed(BuildContext context, AppLocalizations t, SrTheme theme, FoodOrder order) {
+  List<Widget> _confirmed(
+    BuildContext context,
+    AppLocalizations t,
+    SrTheme theme,
+    FoodOrder order,
+  ) {
     final secondary = theme.text('body', color: theme.palette.textSecondary);
     final open = !order.isTerminal;
     final pickup = order.pickupTime;
     final estimate = pickup?.estimatedArrival;
     final evidence = pickup?.etaEvidenceAt;
     return [
-      Semantics(header: true, child: Text(open ? t.foodOrderConfirmed : t.foodYourOrder, style: theme.text('title'))),
+      Semantics(
+        header: true,
+        child: Text(
+          open ? t.foodOrderConfirmed : t.foodYourOrder,
+          style: theme.text('title'),
+        ),
+      ),
       const SizedBox(height: 12),
       FoodCard(
         child: Column(
@@ -321,15 +407,21 @@ class OrderView extends StatelessWidget {
                 style: theme.text('heading'),
               ),
             ),
-            if (order.reasonCode != null && (order.status == OrderStatus.cancelled || order.status == OrderStatus.rejected)) ...[
+            if (order.reasonCode != null &&
+                (order.status == OrderStatus.cancelled ||
+                    order.status == OrderStatus.rejected)) ...[
               const SizedBox(height: 4),
-              Text(foodReasonText(t, order.reasonCode), style: theme.text('body')),
+              Text(
+                foodReasonText(t, order.reasonCode),
+                style: theme.text('body'),
+              ),
             ],
             if (open && order.pickupCode != null) ...[
               const SizedBox(height: 12),
               Text(t.foodPickupCode, style: secondary),
               Semantics(
-                label: '${t.foodPickupCode}: ${order.pickupCode!.split('').join(' ')}',
+                label:
+                    '${t.foodPickupCode}: ${order.pickupCode!.split('').join(' ')}',
                 excludeSemantics: true,
                 child: Text(
                   order.pickupCode!,
@@ -340,9 +432,15 @@ class OrderView extends StatelessWidget {
               Text(t.foodPickupCodeHint, style: secondary),
             ],
             const SizedBox(height: 12),
-            if (estimate != null) Text(t.foodArrives(clockTime(estimate)), style: theme.text('body')),
-            if (estimate == null && pickup != null) Text(t.foodNoEstimate, style: theme.text('body')),
-            if (evidence != null) Text(t.foodEvidenceAt(clockTime(evidence)), style: secondary),
+            if (estimate != null)
+              Text(
+                t.foodArrives(clockTime(estimate)),
+                style: theme.text('body'),
+              ),
+            if (estimate == null && pickup != null)
+              Text(t.foodNoEstimate, style: theme.text('body')),
+            if (evidence != null)
+              Text(t.foodEvidenceAt(clockTime(evidence)), style: secondary),
           ],
         ),
       ),
@@ -361,12 +459,19 @@ class OrderView extends StatelessWidget {
                 ),
               if (order.totalMinorLkr != null) ...[
                 const Divider(),
-                FoodPriceRow(label: t.foodTotal, amount: formatLkr(order.totalMinorLkr!), style: theme.text('heading')),
+                FoodPriceRow(
+                  label: t.foodTotal,
+                  amount: formatLkr(order.totalMinorLkr!),
+                  style: theme.text('heading'),
+                ),
               ],
             ],
           ),
         ),
-      FoodCard(tint: theme.palette.bgSurface2, child: Text(t.foodPayAtKiosk, style: theme.text('body'))),
+      FoodCard(
+        tint: theme.palette.bgSurface2,
+        child: Text(t.foodPayAtKiosk, style: theme.text('body')),
+      ),
       if (orders.cancelProblem != null)
         FoodNotice(
           icon: Icons.info_outline,
@@ -379,11 +484,17 @@ class OrderView extends StatelessWidget {
       if (open)
         OutlinedButton(
           key: const Key('food-cancel-order'),
-          onPressed: orders.cancelling ? null : () => _confirmCancel(context, t),
+          onPressed: orders.cancelling
+              ? null
+              : () => _confirmCancel(context, t),
           child: Text(orders.cancelling ? t.foodCancelling : t.foodCancelOrder),
         ),
       const SizedBox(height: 8),
-      FilledButton(key: const Key('food-order-done'), onPressed: orders.closeOrder, child: Text(t.foodOrderDone)),
+      FilledButton(
+        key: const Key('food-order-done'),
+        onPressed: orders.closeOrder,
+        child: Text(t.foodOrderDone),
+      ),
     ];
   }
 }
@@ -401,7 +512,10 @@ class _SummaryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(display.pointName, style: theme.text('heading')),
-          Text(display.trainNumber, style: theme.text('body', color: theme.palette.textSecondary)),
+          Text(
+            display.trainNumber,
+            style: theme.text('body', color: theme.palette.textSecondary),
+          ),
           const SizedBox(height: 8),
           for (final line in display.lines)
             Padding(
@@ -412,7 +526,11 @@ class _SummaryCard extends StatelessWidget {
               ),
             ),
           const Divider(),
-          FoodPriceRow(label: t.foodTotal, amount: formatLkr(display.totalMinorLkr), style: theme.text('heading')),
+          FoodPriceRow(
+            label: t.foodTotal,
+            amount: formatLkr(display.totalMinorLkr),
+            style: theme.text('heading'),
+          ),
         ],
       ),
     );

@@ -287,8 +287,8 @@ void main() {
       expect(find.textContaining('Scheduled arrival'), findsOneWidget);
       await tester.tap(find.byKey(const Key('train-one')));
       await tester.pumpAndSettle();
-      expect(find.text('Ragama'), findsOneWidget);
-      expect(find.text('Colombo Fort'), findsOneWidget);
+      expect(find.text('Ragama'), findsWidgets);
+      expect(find.text('Colombo Fort'), findsWidgets);
       c.dispose();
     },
   );
@@ -398,6 +398,11 @@ void main() {
       expect(find.textContaining('SIM-1002'), findsOneWidget);
       await tester.tap(find.byKey(const Key('train-one')));
       await tester.pumpAndSettle();
+      await tester.dragUntilVisible(
+        find.textContaining('Not served'),
+        find.byType(ListView).last,
+        const Offset(0, -300),
+      );
       expect(find.textContaining('Not served'), findsOneWidget);
       expect(find.byIcon(Icons.train), findsOneWidget);
       c.dispose();
