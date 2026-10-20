@@ -46,8 +46,15 @@ const local = {
     si: 'මෙය අවසන් නැවතුමයි · ඉදිරියට පිටත්වීමක් නැත',
     ta: 'இதுவே இறுதி நிறுத்தம் · மேற்கொண்டு புறப்பாடு இல்லை',
   },
-  endsAt: { en: 'Train ends at {station}', si: 'දුම්රිය {station} හි අවසන් වේ', ta: 'ரயில் {station} இல் முடிவடையும்' },
-  notStopping: { en: 'Does not stop here', si: 'මෙහි නොනවතී', ta: 'இங்கு நிற்காது' },
+  // {stationAt} is the station's name in the place form of each language ("Ragama" stays as it is,
+  // "රාගම" becomes "රාගමදී", "ராகம" becomes "ராகமவில்"); see atStation below.
+  endsAt: {
+    en: 'Train now ends at {station}',
+    si: 'දුම්රිය දැන් {stationAt} අවසන් වේ',
+    ta: 'ரயில் இப்போது {stationAt} நிறைவடைகிறது',
+  },
+  endsAtLower: { en: 'ends at {station}', si: '{stationAt} අවසන් වේ', ta: '{stationAt} நிறைவடைகிறது' },
+  notStopping: { en: 'Not stopping here', si: 'මෙහි නවතින්නේ නැත', ta: 'இங்கு நிற்காது' },
   moved: {
     en: 'Moved from platform {from} to platform {to}',
     si: 'වේදිකාව {from} සිට වේදිකාව {to} වෙත මාරු කළා',
@@ -131,6 +138,36 @@ const local = {
     si: 'දුම්රිය ස්ථානය හෝ වේදිකා සැකසුම වැරදියි · SD-CONFIG',
     ta: 'நிலையம் அல்லது நடைமேடை அமைப்பு தவறு · SD-CONFIG',
   },
+  refreshing: {
+    en: 'Refreshing live information · timetable only for now',
+    si: 'යාවත්කාලීන තොරතුරු ලබා ගනිමින් · දැනට කාලසටහන පමණි',
+    ta: 'நேரலைத் தகவல் புதுப்பிக்கப்படுகிறது · இப்போது அட்டவணை மட்டும்',
+  },
+  expiredDate: {
+    en: 'Today’s timetable unavailable · saved service date is {date}',
+    si: 'අද කාලසටහන නොමැත · සුරැකි සේවා දිනය {date}',
+    ta: 'இன்றைய அட்டவணை கிடைக்கவில்லை · சேமித்த சேவை தேதி {date}',
+  },
+  overnightNote: {
+    en: 'Overnight service from {date} · not today’s timetable',
+    si: '{date} රාත්‍රී සේවාව · අද කාලසටහන නොවේ',
+    ta: '{date} இரவுச் சேவை · இன்றைய அட்டவணை அல்ல',
+  },
+  noMatchingSaved: {
+    en: 'No saved scheduled service for Platform {n}',
+    si: 'වේදිකාව {n} සඳහා සුරැකි නියමිත සේවාවක් නැත',
+    ta: 'நடைமேடை {n}-க்கு சேமித்த திட்டமிட்ட சேவை இல்லை',
+  },
+  moveWithdrawn: {
+    en: 'Platform change withdrawn · use Platform {to}',
+    si: 'වේදිකා වෙනස ඉවත් කර ඇත · වේදිකාව {to} භාවිත කරන්න',
+    ta: 'நடைமேடை மாற்றம் திரும்பப் பெறப்பட்டது · நடைமேடை {to}-ஐ பயன்படுத்தவும்',
+  },
+  etaUnknownConfirmed: {
+    en: 'Arrival time unknown · Platform {n} confirmed',
+    si: 'පැමිණීමේ වේලාව නොදනී · වේදිකාව {n} තහවුරුයි',
+    ta: 'வருகை நேரம் தெரியவில்லை · நடைமேடை {n} உறுதி',
+  },
 } as const satisfies Record<string, Texts>
 
 export type LocalKey = keyof typeof local
@@ -148,7 +185,34 @@ export function fill(texts: Texts, values: Values): Texts {
   return { en: apply('en'), si: apply('si'), ta: apply('ta') }
 }
 
-export const say = (key: LocalKey, values: Values = {}): Texts => fill(local[key], values)
+
+/**
+ * A station's name in the place form of each language: "at Ragama" is just the name in English,
+ * "රාගමදී" in Sinhala and "ராகமவில்" in Tamil. This is a plain suffix rule for names in the
+ * timetable, not full grammar, and like every Sinhala and Tamil string here it has no native review.
+ */
+export function atStation(name: Texts): Texts {
+  const last = [...name.ta].at(-1) ?? ''
+  const tamil = 'ைிீெே'.includes(last) ? 'யில்' : 'ாம'.includes(last) ? 'வில்' : 'இல்'
+  return { en: name.en, si: `${name.si}දී`, ta: `${name.ta}${tamil}` }
+}
+
+const months = {
+  en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  si: ['ජනවාරි', 'පෙබරවාරි', 'මාර්තු', 'අප්‍රේල්', 'මැයි', 'ජූනි', 'ජූලි', 'අගෝස්තු', 'සැප්තැම්බර්', 'ඔක්තෝබර්', 'නොවැම්බර්', 'දෙසැම්බර්'],
+  ta: ['ஜன.', 'பிப்.', 'மார்.', 'ஏப்.', 'மே', 'ஜூன்', 'ஜூலை', 'ஆக.', 'செப்.', 'அக்.', 'நவ.', 'டிச.'],
+}
+
+/** A service date such as "2026-10-11" as "11 Oct", "ඔක්තෝබර් 11" and "அக். 11". */
+export function shortDate(date: string): Texts {
+  const [, month, day] = date.split('-').map(Number)
+  return { en: `${day} ${months.en[month - 1]}`, si: `${months.si[month - 1]} ${day}`, ta: `${months.ta[month - 1]} ${day}` }
+}
+
+export const say = (key: LocalKey, values: Values = {}): Texts => {
+  const station = values.station
+  return fill(local[key], station && typeof station === 'object' ? { stationAt: atStation(station), ...values } : values)
+}
 
 /** A shared message such as change.confirmed, with its {time} filled in. */
 export const sayShared = (key: keyof typeof shared, values: Values = {}): Texts =>

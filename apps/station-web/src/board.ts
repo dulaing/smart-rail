@@ -64,6 +64,8 @@ export type BoardRow = {
   /** Journey and stop occurrence, so the same stop never produces two rows or two notices. */
   key: string
   journeyId: string
+  /** The service date the journey belongs to; an overnight train after midnight belongs to the day before. */
+  serviceDate: string
   stopId: string
   trainNumber: string
   /** The row is about this stop's arrival (the train ends here) or its departure. */
@@ -207,6 +209,7 @@ function rowFor(journey: Journey, stops: readonly JourneyStop[], index: number, 
   return {
     key: `${journey.journeyId}:${stop.stopId}`,
     journeyId: journey.journeyId,
+    serviceDate: journey.serviceDate,
     stopId: stop.stopId,
     trainNumber: journey.trainNumber,
     kind,

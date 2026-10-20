@@ -121,10 +121,11 @@ const each = (by: (locale: Locale) => string): Texts => ({ en: by('en'), si: by(
  * now ends earlier, or a staff-confirmed delay. "DS-B1 · Cancelled · scheduled 08:05" in each
  * language, further sentences if any, then who confirmed it and when. Nothing here names a cause.
  */
-export function DisruptionNotice({ row, station }: { row: BoardRow; station: (id: string) => Texts }) {
+export function DisruptionNotice({ row, station, onPlatform = false }: { row: BoardRow; station: (id: string) => Texts; onPlatform?: boolean }) {
   const scheduled = say('scheduledLower')
   const when = formatClock(row.scheduledAt)
   const endsAt = row.endsAtStationId ? say('endsAt', { station: station(row.endsAtStationId) }) : null
+  const endsAtLower = row.endsAtStationId ? say('endsAtLower', { station: station(row.endsAtStationId) }) : null
   let tone: Tone = 'warning'
   let title: Texts
   let confirmedAt = row.confirmedChangeAt
@@ -134,7 +135,8 @@ export function DisruptionNotice({ row, station }: { row: BoardRow; station: (id
     title = each((l) => ` · ${statuses.cancelled.text[l]} · ${scheduled[l]} ${when}`)
   } else if (row.unservedHere) {
     const stop = say('notStopping')
-    title = each((l) => ` · ${scheduled[l]} ${when} · ${stop[l]}${endsAt ? ` · ${endsAt[l]}` : ''}`)
+    // The platform view already shows the scheduled time in its service card, so its notice leaves it out.
+    title = each((l) => ` · ${onPlatform ? '' : `${scheduled[l]} ${when} · `}${stop[l]}${endsAtLower ? ` · ${endsAtLower[l]}` : ''}`)
   } else if (row.endsEarly) {
     const text = row.endsHere ? say('finalStop') : endsAt!
     title = each((l) => ` · ${text[l]}`)
@@ -149,7 +151,7 @@ export function DisruptionNotice({ row, station }: { row: BoardRow; station: (id
     <NoticeCard
       cardKey={row.key}
       tone={tone}
-      glyph={row.confirmedDelay !== null && !row.cancelled && !row.unservedHere && !row.endsEarly ? 'clock' : 'warning'}
+      glyph="warning"
       title={title}
       prefix={<span className="train-id">{row.trainNumber}</span>}
       attribution={confirmed}

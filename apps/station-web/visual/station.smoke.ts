@@ -21,8 +21,9 @@ async function start() {
 }
 
 async function stop() {
+  if (!server) return
   const closed = new Promise((resolve) => server?.once('exit', resolve))
-  server?.kill()
+  server.kill()
   await closed
   server = null
 }
@@ -34,8 +35,7 @@ test.beforeAll(async () => {
 test.afterAll(stop)
 
 test('offline then reconnect on the production build', async ({ page }) => {
-  const scenario = { ...scenarios['entrance-normal'] }
-  await open(page, scenario, base)
+  const api = await open(page, scenarios['entrance-normal'], base)
 
   // Live: no banner, rows with their observations; then a reload shows the page is controlled by
   // the service worker, which has cached the shell.
@@ -48,7 +48,7 @@ test('offline then reconnect on the production build', async ({ page }) => {
 
   // The network goes: the next refresh fails and the saved timetable shows, with the banner.
   await stop()
-  scenario.offline = true
+  api.offline = true
   await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')))
   await expect(page.locator('[data-notice="offline"]')).toBeVisible()
   await expect(page.locator('.row').first()).toBeVisible()
@@ -63,9 +63,11 @@ test('offline then reconnect on the production build', async ({ page }) => {
 
   // The network returns: live rows come back and the banner goes.
   await start()
-  scenario.offline = false
+  api.offline = false
   await page.evaluate(() => window.dispatchEvent(new Event('online')))
   await expect(page.locator('[data-notice="offline"]')).toHaveCount(0, { timeout: 15_000 })
   await expect(page.getByText('Timetable only')).toHaveCount(0)
   await expect(page.getByText('Obs.').first()).toBeVisible()
+  // After a loss the board says when it was last refreshed, as the reconnect frame does.
+  await expect(page.locator('.observations')).toContainText('Refreshed')
 })

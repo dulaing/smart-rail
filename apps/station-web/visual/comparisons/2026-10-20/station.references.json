@@ -20,5 +20,16 @@
   "entrance-confirmed-delay": "states/234-623-confirmed-delay.png",
   "platform-ends-early": "states/236-845-platform-ends-early.png",
   "platform-not-stopping": "states/236-969-platform-not-stopping.png",
-  "platform-no-next": "states/236-1093-platform-no-next.png"
+  "platform-no-next": "states/236-1093-platform-no-next.png",
+  "entrance-originating": "states/231-305-originating-departures.png",
+  "entrance-final-arrival": "states/234-465-final-arrival.png",
+  "platform-final-arrival": "states/236-907-platform-final-arrival.png",
+  "platform-moved-to": "states/236-659-platform-moved-to.png",
+  "platform-move-withdrawn": "states/236-721-move-withdrawn.png",
+  "platform-on-time": "states/236-1031-departed-move-cleared.png",
+  "platform-eta-unknown": "states/238-1424-eta-unknown-platform-confirmed.png",
+  "platform-no-matching-saved": "states/239-1489-no-matching-saved.png",
+  "entrance-refreshing": "states/239-1618-reconnect-refresh.png",
+  "entrance-reconnected": "states/239-1724-reconnected.png",
+  "entrance-expired-date": "states/239-1851-expired-service-date.png"
 }

@@ -116,6 +116,14 @@
 }
 .notice-spacer { flex: none; height: 36px; }
 .notice-glyph { flex: none; width: 56px; height: 56px; }
+/* The frames draw an icon in the tone's icon colour (a stronger shade than its text): success
+   #046848, warning #b45309, danger #ae1b13, accent #0b7899 and, for neutral, the primary ink. */
+.sr-tone-neutral { --tone-icon: var(--sr-color-text-primary); }
+.sr-tone-accent { --tone-icon: var(--sr-color-accent-primary); }
+.sr-tone-success { --tone-icon: #046848; } /* the Passenger/Ops success ink; Station has no token for it */
+.sr-tone-warning { --tone-icon: var(--sr-color-status-warning); }
+.sr-tone-danger { --tone-icon: #ae1b13; } /* the Passenger/Ops danger ink */
+.glyph path { fill: var(--tone-icon, currentColor); }
 .notice-body { display: flex; flex: 1; flex-direction: column; gap: var(--sr-space-12); min-width: 0; }
 .notice-text .type-small { margin-top: var(--sr-space-8); }
 .notice-card .type-small, .notice-card .type-meta { color: var(--sr-color-text-secondary); }
@@ -124,7 +132,7 @@
 .train-id { color: var(--sr-color-text-primary); font-family: var(--sr-font-stack); font-size: 48px; font-weight: 600; line-height: 56px; }
 /* A line led by the 48px train number is 56px tall in the frames. Aligning the number and the
    words on one baseline in a fixed-height flex row keeps every language's line the same height. */
-.has-prefix > span { display: flex; align-items: baseline; height: 56px; }
+.has-prefix > span { display: flex; align-items: baseline; height: 56px; white-space: pre; }
 
 /* Entrance: Scheduled, Destination, Platform, Expected, Status. */
 .entrance-board {
@@ -191,6 +199,8 @@
 .status-line { display: flex; align-items: center; gap: var(--sr-space-16); color: var(--tone-ink); }
 .cell-status > .type-small { color: var(--sr-color-text-secondary); }
 .more-services { flex: none; }
+/* A saved train of the day before (an overnight service after midnight) is explained below the rows. */
+.overnight-note { flex: none; padding: var(--sr-space-24); border-radius: 20px; background: var(--sr-color-bg-surface-2); }
 
 /* Passive information: loading, nothing to list, no saved timetable, a setup problem. */
 .passive-state {
@@ -246,20 +256,14 @@
   border-radius: 20px;
   background: var(--sr-color-bg-surface);
 }
-.service-empty { display: flex; align-items: center; height: 100%; padding: var(--sr-space-24); }
+.service-empty { display: flex; flex-direction: column; gap: var(--sr-space-32); height: 100%; padding: var(--sr-space-24); }
 .service-card { display: flex; flex-direction: column; gap: var(--sr-space-12); }
 .service-head { display: flex; align-items: center; gap: var(--sr-space-24); height: 64px; --inline-gap: 16px; }
 .service-head .train-number { flex: none; width: 220px; font-size: 56px; line-height: 64px; }
 .basis { flex: none; width: 240px; margin-left: auto; color: var(--sr-color-text-secondary); font-size: var(--sr-type-small-en-size); line-height: 32px; }
 .service-where { display: flex; gap: var(--sr-space-24); height: 184px; overflow: hidden; }
-.service-where > .lines { flex: none; max-width: 60%; }
+.service-where > .lines { flex: none; }
 .service-times { display: flex; align-items: flex-start; gap: var(--sr-space-24); }
 .time-block { display: flex; flex: 1; flex-direction: column; gap: var(--sr-space-4); min-width: 0; --inline-gap: 16px; }
 .service-times .time { line-height: 80px; }
 .service-times .time.expected { font-size: var(--sr-type-hero-time-size); line-height: 120px; }
-.calls { flex: 1; min-width: 0; height: 100%; overflow: hidden; --inline-gap: 16px; }
-.calls h3 { font: inherit; }
-.calls ol { display: flex; flex-wrap: wrap; gap: 0 var(--sr-space-32); padding: 0; margin: 0; list-style: none; }
-.calls li { color: var(--sr-color-text-primary); }
-.calls .stop-off { color: var(--sr-color-text-secondary); }
-.calls .time.small { font-size: var(--sr-type-small-en-size); line-height: 32px; font-weight: 500; }

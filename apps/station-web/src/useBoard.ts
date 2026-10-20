@@ -11,12 +11,18 @@ const pollMs = 15_000
 export type BoardData = FeedData & {
   /** False until the first refresh has finished, so a first boot can say "loading". */
   refreshed: boolean
+  /** The browser is back (or the page is visible again) and live information is being asked for again. */
+  reconnecting: boolean
+  /** When live information was last refreshed successfully (device time), else null. */
+  refreshedAt: number | null
+  /** Live information was lost and has returned since the page opened. */
+  recovered: boolean
 }
 
 function initial(): BoardData {
   // The saved timetable is shown at once, as timetable only, while the first refresh runs.
   const snapshot = loadSnapshot(window.localStorage) ?? emptySnapshot()
-  return { snapshot, live: new Map(), feed: 'connecting', partial: false, offsetMs: 0, refreshed: false }
+  return { snapshot, live: new Map(), feed: 'connecting', partial: false, offsetMs: 0, refreshed: false, reconnecting: false, refreshedAt: null, recovered: false }
 }
 
 /**
@@ -35,13 +41,25 @@ export function useBoard(stationReference: string | null): BoardData {
     let timer: number | undefined
     let busy = false
 
-    const run = async () => {
+    const run = async (askedForAgain = false) => {
       if (busy || controller.signal.aborted || document.hidden) return
       busy = true
       try {
-        const next = await refresh(client, latest.current, stationReference, Date.now, controller.signal)
+        const before = latest.current
+        // Asking again after live information was lost shows "refreshing" until the answer comes.
+        if (askedForAgain && before.feed === 'unavailable') {
+          latest.current = { ...before, reconnecting: true }
+          setData(latest.current)
+        }
+        const next = await refresh(client, before, stationReference, Date.now, controller.signal)
         if (controller.signal.aborted) return
-        latest.current = { ...next, refreshed: true }
+        latest.current = {
+          ...next,
+          refreshed: true,
+          reconnecting: false,
+          refreshedAt: next.feed === 'live' ? Date.now() : before.refreshedAt,
+          recovered: before.recovered || (before.feed === 'unavailable' && next.feed === 'live'),
+        }
         saveSnapshot(window.localStorage, next.snapshot)
         setData(latest.current)
       } finally {
@@ -54,7 +72,7 @@ export function useBoard(stationReference: string | null): BoardData {
     }
     const runNow = () => {
       window.clearTimeout(timer)
-      void run().then(schedule)
+      void run(true).then(schedule)
     }
 
     runNow()

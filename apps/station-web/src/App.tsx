@@ -1,14 +1,15 @@
-import { useMemo, type ReactNode } from 'react'
-import { callingStops, deriveRows, platformView } from './board.ts'
+import { useMemo, useState, type ReactNode } from 'react'
+import { deriveRows, platformView, type BoardRow } from './board.ts'
 import { Clock } from './Clock'
 import { parseConfig, validateConfig, type ConfigProblem } from './config.ts'
 import logo from '../../../shared/design/logo/passenger-icon-square.png'
 import { StatusSample } from './design/StatusSample'
 import { EntranceBoard } from './EntranceBoard'
-import { say, sayShared, stationTexts, type Texts } from './messages.ts'
+import { say, sayShared, shortDate, stationTexts, type Texts } from './messages.ts'
 import { Lines, NoticeCard, PassiveState } from './parts'
 import { PlatformBoard } from './PlatformBoard'
 import { journeysOf } from './snapshot.ts'
+import { knownStationNames } from './stationNames.ts'
 import { colomboDate, formatClock } from './time.ts'
 import { useBoard, useNow } from './useBoard'
 import './App.css'
@@ -30,6 +31,31 @@ const problemText: Record<ConfigProblem, (station: string, platform: string) => 
   'missing-platform': () => 'A platform board needs ?platform=<platform number>, for example /?station=FOT&view=platform&platform=4.',
   'unknown-station': (station) => `No station matches "${station}".`,
   'unknown-platform': (station, platform) => `Platform "${platform}" is not one of the platforms planned at "${station}".`,
+}
+
+type Withdrawn = ReadonlyMap<string, { platform: string; at: number }>
+
+/**
+ * The public reads only list changes that are in force, so a platform change that staff withdraw
+ * simply disappears. The board remembers the moves it has shown; when one goes while the train is
+ * still due, it says the change was withdrawn (with the time the board noticed) until the train goes.
+ */
+function useWithdrawnMoves(rows: readonly BoardRow[], now: number, live: boolean): Withdrawn {
+  const [state, setState] = useState<{ moved: ReadonlySet<string>; withdrawn: Withdrawn }>({ moved: new Set(), withdrawn: new Map() })
+  // Without live reads no move is known, so nothing can be said to have been withdrawn. The state
+  // is adjusted while rendering (React's way to derive state from changing input) and only when it changes.
+  if (live) {
+    const moved = new Set<string>()
+    const withdrawn = new Map<string, { platform: string; at: number }>()
+    for (const row of rows) {
+      if (row.moved) moved.add(row.key)
+      else if (state.moved.has(row.key)) withdrawn.set(row.key, { platform: row.platform ?? '', at: now })
+      else if (state.withdrawn.has(row.key)) withdrawn.set(row.key, state.withdrawn.get(row.key)!)
+    }
+    const same = moved.size === state.moved.size && [...moved].every((k) => state.moved.has(k)) && withdrawn.size === state.withdrawn.size && [...withdrawn.keys()].every((k) => state.withdrawn.has(k))
+    if (!same) setState({ moved, withdrawn })
+  }
+  return state.withdrawn
 }
 
 function Board() {
@@ -54,24 +80,26 @@ function Board() {
   )
   const platform = parsed.ok && parsed.config.view === 'platform' ? parsed.config.platform : null
   const platformRows = platform ? platformView(rows, platform) : null
-  const nextJourney = platformRows?.next ? journeys.find((j) => j.journeyId === platformRows.next?.journeyId) : undefined
-  const calls =
-    platformRows?.next && nextJourney
-      ? callingStops(nextJourney, timetableOnly ? null : (data.live.get(nextJourney.journeyId)?.running ?? null), platformRows.next.stopId)
-      : []
+  const withdrawn = useWithdrawnMoves(rows, data.refreshedAt ?? now, !timetableOnly)
 
   const savedText = sayShared('freshness.saved', { time: formatClock(savedAt) })
+  const savedDates = Object.keys(snapshot.days).sort()
   const outOfDate = days.length > 0 && !snapshot.days[today]
   const noSavedCopy = days.length === 0 && data.refreshed
-  // One notice for losing live updates; it is not mixed with per-train warnings.
+  // One notice at a time for what is wrong with the live information: an out-of-date saved
+  // timetable first (it says why the rows below are not today's), then "refreshing" while the
+  // answer to a new request is awaited, then "unavailable".
   const banners: ReactNode[] = []
-  if (data.feed === 'unavailable' && (days.length > 0 || noSavedCopy)) {
+  if (outOfDate) {
+    banners.push(
+      <NoticeCard key="out-of-date" cardKey="out-of-date" tone="warning" glyph="warning" title={say('expiredDate', { date: shortDate(savedDates[savedDates.length - 1]) })} attribution={[savedText]} />,
+    )
+  } else if (days.length > 0 && (data.feed === 'connecting' || data.reconnecting)) {
+    banners.push(<NoticeCard key="refreshing" cardKey="refreshing" tone="warning" glyph="warning" title={say('refreshing')} attribution={[savedText]} />)
+  } else if (data.feed === 'unavailable' && (days.length > 0 || noSavedCopy)) {
     banners.push(
       <NoticeCard key="offline" cardKey="offline" tone="warning" glyph="warning" title={say('liveUnavailable')} attribution={days.length > 0 ? [savedText] : []} reserveAttribution />,
     )
-  }
-  if (outOfDate) {
-    banners.push(<NoticeCard key="out-of-date" cardKey="out-of-date" tone="warning" glyph="warning" title={say('outOfDate')} attribution={[savedText]} />)
   }
 
   let body
@@ -87,7 +115,7 @@ function Board() {
   } else if (days.length === 0 || snapshot.stations.length === 0) {
     body =
       platform && data.refreshed ? (
-        <PlatformBoard platform={platform} view={{ next: null, notices: [] }} calls={[]} station={nameOf} savedAt={savedAt} banner={banners[0]} emptyTitle={say('noTimetable')} />
+        <PlatformBoard platform={platform} view={{ next: null, notices: [] }} station={nameOf} here={station ? stationTexts(station) : say('stationDisplay')} savedAt={savedAt} banner={banners[0]} emptyTitle={say('noTimetable')} />
       ) : (
         <>
           {banners}
@@ -99,12 +127,22 @@ function Board() {
         </>
       )
   } else if (platformRows && platform) {
-    body = <PlatformBoard platform={platform} view={platformRows} calls={calls} station={nameOf} savedAt={savedAt} updatedAt={data.feed === 'live' ? savedAt : null} banner={banners[0]} />
+    body = <PlatformBoard
+        platform={platform}
+        view={platformRows}
+        station={nameOf}
+        here={station ? stationTexts(station) : say('stationDisplay')}
+        savedAt={savedAt}
+        updatedAt={data.feed === 'live' ? data.refreshedAt : null}
+        banner={banners[0]}
+        emptyTitle={timetableOnly ? say('noMatchingSaved', { n: platform }) : undefined}
+        withdrawn={withdrawn}
+      />
   } else {
     body = (
       <>
         {banners}
-        <EntranceBoard rows={rows} station={nameOf} banner={banners.length > 0} savedAt={savedAt} />
+        <EntranceBoard rows={rows} station={nameOf} banner={banners.length > 0} savedAt={savedAt} today={today} refreshedAt={data.recovered ? data.refreshedAt : null} />
       </>
     )
   }
@@ -114,7 +152,7 @@ function Board() {
       <header className="board-head">
         <span className="board-logo" role="img" aria-label="SmartRail" style={{ backgroundImage: `url(${logo})` }} />
         <h1>
-          <Lines texts={station ? stationTexts(station) : say('stationDisplay')} type="title" layout="names" />
+          <Lines texts={station ? stationTexts(station) : ((parsed.ok && knownStationNames(parsed.config.station)) || say('stationDisplay'))} type="title" layout="names" />
         </h1>
         <Clock now={now} />
       </header>

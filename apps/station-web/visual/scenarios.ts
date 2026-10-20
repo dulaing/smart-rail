@@ -5,7 +5,13 @@
 import type { ChangesResponse, Journey, JourneysResponse, RunningResponse, Station } from '../src/api.ts'
 
 export const day = '2026-10-12'
-export const at = (hhmm: string, date = day): string => new Date(`${date}T${hhmm}:00+05:30`).toISOString()
+/** Colombo wall time on a date as an ISO instant; "00:12+1" is 00:12 on the day after `date`. */
+export const at = (hhmm: string, date = day): string => {
+  const [time, plus] = hhmm.split('+')
+  const shifted = new Date(`${date}T00:00:00Z`)
+  shifted.setUTCDate(shifted.getUTCDate() + Number(plus ?? 0))
+  return new Date(`${shifted.toISOString().slice(0, 10)}T${time}:00+05:30`).toISOString()
+}
 
 export const stations: Station[] = [
   { id: 's-vya', code: 'VYA', nameEn: 'Veyangoda', nameSi: 'වේයන්ගොඩ', nameTa: 'வெயங்கொடை' },
@@ -18,6 +24,8 @@ export const stations: Station[] = [
 export type Stop = [station: string, arrival: string | null, departure: string | null, platform: string]
 
 export type Train = {
+  /** The service date the train belongs to; the fixture date unless stated. */
+  date?: string
   id: string
   number: string
   stops: Stop[]
@@ -48,7 +56,7 @@ const stationIdOf = (code: string) => stations.find((s) => s.code === code)!.id
 export function journeyOf(train: Train): Journey {
   return {
     journeyId: train.id,
-    serviceDate: day,
+    serviceDate: train.date ?? day,
     trainNumber: train.number,
     sourceKind: 'FICTIONAL_DEMO',
     sourceLabel: 'Fictional demo timetable',
@@ -59,8 +67,8 @@ export function journeyOf(train: Train): Journey {
       sequence: index + 1,
       stationId: stationIdOf(code),
       stationCode: code,
-      scheduledArrival: arrival ? at(arrival) : null,
-      scheduledDeparture: departure ? at(departure) : null,
+      scheduledArrival: arrival ? at(arrival, train.date) : null,
+      scheduledDeparture: departure ? at(departure, train.date) : null,
       plannedPlatform: platform,
     })),
   }
@@ -75,7 +83,7 @@ export function runningOf(train: Train): RunningResponse | null {
     thresholds: { ageingAfterSeconds: 180, unknownAfterSeconds: 240 },
     freshness: live.freshness ?? 'CURRENT',
     lastObservation: {
-      observedAt: at(live.observedAt),
+      observedAt: at(live.observedAt, train.date),
       fromStopId: stopId(train, live.toIndex - 1),
       toStopId: stopId(train, live.toIndex),
       progressPermille: 800,
@@ -90,14 +98,14 @@ export function runningOf(train: Train): RunningResponse | null {
         stopId: stopId(train, index),
         stationId: stationIdOf(code),
         sequence: index + 1,
-        scheduledArrival: arrival ? at(arrival) : null,
-        scheduledDeparture: departure ? at(departure) : null,
+        scheduledArrival: arrival ? at(arrival, train.date) : null,
+        scheduledDeparture: departure ? at(departure, train.date) : null,
         plannedPlatform: platform,
-        estimatedArrival: estimate?.[0] ? at(estimate[0]) : null,
-        estimatedDeparture: estimate?.[1] ? at(estimate[1]) : null,
+        estimatedArrival: estimate?.[0] ? at(estimate[0], train.date) : null,
+        estimatedDeparture: estimate?.[1] ? at(estimate[1], train.date) : null,
         served: !(live.unserved ?? []).includes(index),
         confirmedPlatform: confirmed ? confirmed[0] : null,
-        confirmedPlatformAt: confirmed ? at(confirmed[1]) : null,
+        confirmedPlatformAt: confirmed ? at(confirmed[1], train.date) : null,
         platform: confirmed ? confirmed[0] : platform,
       }
     }),
@@ -109,7 +117,7 @@ export function changesOf(train: Train): ChangesResponse {
 }
 
 export function journeysResponse(trains: Train[], date: string): JourneysResponse {
-  return { serviceDate: date, scheduleNote: '', journeys: date === day ? trains.map(journeyOf) : [] }
+  return { serviceDate: date, scheduleNote: '', journeys: trains.filter((train) => (train.date ?? day) === date).map(journeyOf) }
 }
 
 /** Three trains from Gampaha to Colombo Fort, as in the entrance frames. */
@@ -246,3 +254,52 @@ export const crowded: Train[] = [
     gph(`j-x${i}`, `DS-X${i + 1}`, time, String((i % 3) + 1), { observedAt: '07:07', toIndex: 1, estimates: { 1: [time, time] } }),
   ),
 ]
+
+/** Colombo Fort at 07:08: two trains start here and run on time. */
+export const originatingDepartures: Train[] = [
+  { id: 'j-f1', number: 'DS-F1', stops: [['FOT', null, '07:24', '2'], ['RGM', '07:50', null, '1']], live: { observedAt: '07:07', toIndex: 0, estimates: { 0: [null, '07:24'] } } },
+  { id: 'j-f2', number: 'DS-F2', stops: [['FOT', null, '07:40', '1'], ['GPH', '08:10', null, '1']], live: { observedAt: '07:07', toIndex: 0, estimates: { 0: [null, '07:40'] } } },
+]
+
+/** DS-B1 runs 19 minutes late and now ends at Ragama, where it arrives at 07:49 instead of 07:30. */
+export const finalArrival: Train[] = [
+  {
+    id: 'j-b1',
+    number: 'DS-B1',
+    stops: [['VYA', null, '07:00', '1'], ['RGM', '07:30', '07:31', '2'], ['FOT', '07:55', null, '4']],
+    live: { observedAt: '07:37', toIndex: 1, availability: 'ENDS_EARLY', finalIndex: 1, estimates: { 1: ['07:49', '07:49'] } },
+    changes: earlyEnd('07:06'),
+  },
+]
+
+/** The train of the platform frames at 07:21, back on platform 2 after its move to 3 was withdrawn. */
+export const moveWithdrawn: Train[] = [delayedB1('07:21', {})]
+
+/** DS-F3 is the next train on platform 2 at 07:29, on time. */
+export const platformOnTime: Train[] = [
+  { id: 'j-f3', number: 'DS-F3', stops: [['VYA', null, '07:15', '1'], ['GPH', '07:49', '07:50', '2'], ['FOT', '08:30', null, '4']], live: { observedAt: '07:28', toIndex: 1, estimates: { 1: ['07:49', '07:50'] } } },
+]
+
+/** DS-B1 was last seen 07:15, so its time is unknown, but its platform 3 was confirmed at 07:04. */
+export const platformEtaUnknown: Train[] = [gph('j-b1', 'DS-B1', '07:10', '3', { observedAt: '07:15', toIndex: 1, platforms: { 1: ['3', '07:04'] } })]
+
+/** After a lost connection: DS-A1 on time, DS-B1 late on platform 3 (confirmed 07:04), DS-C1 not seen since 07:16. */
+export const reconnected: Train[] = [
+  gph('j-a1', 'DS-A1', '07:24', '2', { observedAt: '07:21', toIndex: 1, estimates: { 1: ['07:24', '07:24'] } }),
+  gph('j-b1', 'DS-B1', '07:10', '3', { observedAt: '07:21', toIndex: 1, estimates: { 1: ['07:27', '07:27'] }, platforms: { 1: ['3', '07:04'] } }),
+  gph('j-c1', 'DS-C1', '07:40', '1', { observedAt: '07:16', toIndex: 1, platforms: { 1: ['1', '06:59'] } }),
+]
+
+/** An overnight train of service date 11 October, due at Gampaha at 00:12 on the 12th. */
+export const overnight: Train[] = [
+  { date: '2026-10-11', id: 'j-n1', number: 'DS-N1', stops: [['VYA', null, '23:50', '1'], ['GPH', '00:11+1', '00:12+1', '2'], ['FOT', '01:00+1', null, '4']] },
+]
+
+/** A late-evening train planned on platform 3, so that a platform 3 board is a valid configuration. */
+const platform3Evening: Train = { id: 'j-z3', number: 'DS-Z3', stops: [['VYA', null, '20:45', '1'], ['GPH', '20:59', '21:00', '3'], ['FOT', '21:40', null, '4']] }
+
+/** Platform 3 at 07:20: DS-B1 was moved here from platform 2. */
+export const platformMovedTo: Train[] = [...platformMoved, platform3Evening]
+
+/** The saved timetable, plus the evening train that plans platform 3 (nothing saved is due on it soon). */
+export const savedWithPlatform3: Train[] = [...savedTimetable, platform3Evening]

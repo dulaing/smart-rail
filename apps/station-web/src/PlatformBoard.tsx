@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, type ReactNode } from 'react'
-import { hasNotice, type BoardRow, type CallingStop, type PlatformView } from './board.ts'
+import { hasNotice, type BoardRow, type PlatformView } from './board.ts'
 import { say, sayShared, type Texts } from './messages.ts'
+import { GlyphIcon } from './design/glyphs.tsx'
 import { DisruptionNotice, Lines, NoticeCard } from './parts.tsx'
 import { describeRow, type Pill } from './rowText.ts'
 import { formatClock } from './time.ts'
@@ -9,8 +10,6 @@ import type { Tone } from '../../../shared/design/generated/status.ts'
 type Props = {
   platform: string
   view: PlatformView
-  /** The stops after this one for the next train, in order. */
-  calls: CallingStop[]
   station: (id: string) => Texts
   /** When the saved timetable was downloaded; used when only the timetable is known. */
   savedAt: number
@@ -20,6 +19,10 @@ type Props = {
   banner: ReactNode
   /** Replaces "no next train" when there is no timetable to read (offline without a saved copy). */
   emptyTitle?: Texts
+  /** This station's own name, shown for a train whose final stop is here. */
+  here: Texts
+  /** Planned platform changes that staff withdrew since the board last showed them, by train. */
+  withdrawn?: ReadonlyMap<string, { platform: string; at: number }>
 }
 
 const toneRank: Record<Tone, number> = { danger: 4, warning: 3, accent: 2, neutral: 1, success: 0 }
@@ -48,7 +51,7 @@ function purposeOf(row: BoardRow): Texts {
  * notice here until the evidence shows it gone, so a waiting passenger can understand where it
  * went; a cancelled train or one that no longer stops here is shown the same way.
  */
-export function PlatformBoard({ platform, view, calls, station, savedAt, updatedAt: boardUpdatedAt = null, banner, emptyTitle }: Props) {
+export function PlatformBoard({ platform, view, station, here, savedAt, updatedAt: boardUpdatedAt = null, banner, emptyTitle, withdrawn }: Props) {
   const { next, notices } = view
   const root = useRef<HTMLDivElement>(null)
   // Extra notices are whole cards: list as many as fit below the first one, never a cut-off card.
@@ -73,9 +76,13 @@ export function PlatformBoard({ platform, view, calls, station, savedAt, updated
   // A moved train gets the sentence the frames use: where to go now, or where it went.
   const move = subject && !hasNotice(subject) ? subject.moved : null
   const moveTitle = move ? say(move.to === platform ? 'movedHere' : 'movedAway', { to: move.to, from: move.from }) : null
+  // Arrival time unknown but the platform was confirmed by staff: say both, as the frame does.
+  const etaUnknown = subject !== null && !subject.timetableOnly && subject.evidence === 'UNKNOWN' && subject.platformConfirmedAt !== null && !hasNotice(subject)
   const moveConfirmed = move && move.confirmedAt !== null ? [sayShared('change.confirmed', { time: formatClock(move.confirmedAt) })] : []
-  const confirmed = subject && subject.confirmedChangeAt !== null ? [sayShared('change.confirmed', { time: formatClock(subject.confirmedChangeAt) })] : []
+  const confirmedAt = subject ? (subject.confirmedChangeAt ?? (etaUnknown ? subject.platformConfirmedAt : null)) : null
+  const confirmed = confirmedAt !== null ? [sayShared('change.confirmed', { time: formatClock(confirmedAt) })] : []
   const updatedAt = subject ? (subject.observedAt ?? subject.checkedAt) : null
+  const withdrawal = subject && !move ? withdrawn?.get(subject.key) : undefined
   const extraNotices = subject ? notices.filter((row) => row !== subject) : notices
 
   return (
@@ -87,9 +94,12 @@ export function PlatformBoard({ platform, view, calls, station, savedAt, updated
         </div>
         <div className="hero-body">
           {subject ? (
-            <ServiceCard row={subject} calls={next ? calls : []} station={station} savedAt={savedAt} />
+            <ServiceCard row={subject} station={station} here={here} savedAt={savedAt} />
           ) : (
             <div className="service-empty">
+              <span className="passive-glyph">
+                <GlyphIcon name="info" size={72} />
+              </span>
               <h2 id="hero-title">
                 <Lines texts={emptyTitle ?? say('noNextTrain')} type="hero" />
               </h2>
@@ -99,27 +109,35 @@ export function PlatformBoard({ platform, view, calls, station, savedAt, updated
       </section>
 
       {banner ?? null}
-      {!banner && subject && hasNotice(subject) && <DisruptionNotice row={subject} station={station} />}
+      {!banner && subject && hasNotice(subject) && <DisruptionNotice row={subject} station={station} onPlatform />}
       {!banner && moveTitle && <NoticeCard tone="accent" glyph="info" title={moveTitle} attribution={moveConfirmed} />}
-      {!banner && !moveTitle && status && described && !hasNotice(subject!) && (
+      {!banner && !moveTitle && withdrawal && (
+        <NoticeCard tone="accent" glyph="info" title={say('moveWithdrawn', { to: withdrawal.platform })} attribution={[sayShared('change.confirmed', { time: formatClock(withdrawal.at) })]} />
+      )}
+      {!banner && !moveTitle && !withdrawal && subject && etaUnknown && (
+        <NoticeCard tone="warning" glyph="warning" title={say('etaUnknownConfirmed', { n: subject.platform ?? platform })} attribution={confirmed} />
+      )}
+      {!banner && !moveTitle && !withdrawal && !etaUnknown && status && described && !hasNotice(subject!) && (
+        // The frames draw an on-time train as a plain card with the same triangle as every other notice.
         <NoticeCard
           tone={status.id === 'on-time' ? 'neutral' : status.tone}
-          glyph={status.glyph}
+          glyph={status.id === 'on-time' ? 'warning' : status.glyph}
           title={status.texts}
           lines={described.notes.filter((note) => !confirmed.some((c) => c.en === note.en))}
           attribution={confirmed.length > 0 ? confirmed : updatedAt !== null ? [sayShared('freshness.current', { time: formatClock(updatedAt) })] : []}
         />
       )}
       {!banner && !status && !subject && (
-        <NoticeCard tone="neutral" glyph="info" title={say('noTrains')} attribution={boardUpdatedAt === null ? [] : [sayShared('freshness.current', { time: formatClock(boardUpdatedAt) })]} reserveAttribution />
+        <NoticeCard tone="neutral" glyph="warning" title={say('noTrains')} attribution={boardUpdatedAt === null ? [] : [sayShared('freshness.current', { time: formatClock(boardUpdatedAt) })]} reserveAttribution />
       )}
       {!banner && extraNotices.map((row) => <div key={row.key} data-extra><ExtraNotice row={row} station={station} /></div>)}
     </div>
   )
 }
 
-function ServiceCard({ row, calls, station, savedAt }: { row: BoardRow; calls: CallingStop[]; station: (id: string) => Texts; savedAt: number }) {
-  const other = station(row.otherStationId)
+function ServiceCard({ row, station, here, savedAt }: { row: BoardRow; station: (id: string) => Texts; here: Texts; savedAt: number }) {
+  // A train that ends here is shown by this station; one that no longer reaches it by where it now ends.
+  const other = row.endsHere ? here : station(row.unservedHere && row.endsAtStationId ? row.endsAtStationId : row.otherStationId)
   const text = basis(row, savedAt)
   const expected = row.expectedAt !== null ? formatClock(row.expectedAt) : row.timetableOnly || row.cancelled || row.unservedHere ? '—' : 'Unknown'
   return (
@@ -132,8 +150,7 @@ function ServiceCard({ row, calls, station, savedAt }: { row: BoardRow; calls: C
         {text && <span className="basis">{text}</span>}
       </div>
       <div className="service-where">
-        <Lines texts={row.kind === 'arrival' && !row.endsHere ? say('from', { station: other }) : other} type="hero" />
-        <Calls calls={calls.filter((stop) => stop.stationId !== row.otherStationId)} station={station} />
+        <Lines texts={row.kind === 'arrival' && !row.endsHere && !row.unservedHere ? say('from', { station: other }) : other} type="hero" />
       </div>
       <div className="service-times">
         <div className="time-block">
@@ -151,48 +168,6 @@ function ServiceCard({ row, calls, station, savedAt }: { row: BoardRow; calls: C
           </span>
         </div>
       </div>
-    </div>
-  )
-}
-
-/**
- * Where the train calls next. The approved frame leaves the right of the destination free, so as
- * many whole stops as fit are listed there; a stop is never cut in half.
- */
-function Calls({ calls, station }: { calls: CallingStop[]; station: (id: string) => Texts }) {
-  const root = useRef<HTMLDivElement>(null)
-  useLayoutEffect(() => {
-    const element = root.current
-    if (!element) return
-    const fit = () => {
-      const items = [...element.querySelectorAll<HTMLElement>('li')]
-      items.forEach((item) => { item.hidden = false })
-      items.forEach((item) => { item.hidden = item.offsetTop + item.offsetHeight > element.clientHeight })
-      element.style.visibility = items.some((item) => !item.hidden) ? 'visible' : 'hidden'
-    }
-    fit()
-    void document.fonts.ready.then(fit)
-  }, [calls])
-  if (calls.length === 0) return null
-  return (
-    <div className="calls" ref={root}>
-      <h3>
-        <Lines texts={say('callsAt')} type="meta" layout="inline" />
-      </h3>
-      <ol>
-        {calls.map((stop) => (
-          <li key={stop.stopId} className={stop.served ? undefined : 'stop-off'}>
-            {stop.served && stop.scheduledAt !== null ? (
-              <span className="time small">{formatClock(stop.scheduledAt)}</span>
-            ) : (
-              <span className="sub">
-                <Lines texts={say('notServed')} type="meta" layout="inline" />
-              </span>
-            )}
-            <Lines texts={station(stop.stationId)} type="meta" />
-          </li>
-        ))}
-      </ol>
     </div>
   )
 }
