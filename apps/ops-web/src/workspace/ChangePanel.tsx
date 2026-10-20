@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef, type FormEvent, type RefObject } from 'react'
+import { useEffect, useReducer, useRef, useState, type FormEvent, type RefObject } from 'react'
 import { messages } from '../../../../shared/design/generated/status.ts'
 import { ChangeReview } from './ChangeReview.tsx'
 import { incidentStillOpen } from '../reports/incidentActions.ts'
@@ -58,6 +58,7 @@ export function ChangePanel({
   onRefreshMe: () => void
 }) {
   const [flow, dispatch] = useReducer(flowReducer, startableKinds(rights)[0] ?? 'DELAY', initialFlow)
+  const [composeOpen, setComposeOpen] = useState(false)
   const sending = useRef(false)
   const headingRef = useRef<HTMLHeadingElement>(null)
 
@@ -125,8 +126,10 @@ export function ChangePanel({
   }
 
   return (
-    <section className="panel" aria-labelledby="change-heading">
-      <h3 id="change-heading">Make a change</h3>
+    <section className="panel change-workspace" aria-labelledby="change-heading">
+      <h3 id="change-heading">
+        {composeOpen || flow.step.name !== 'editing' ? 'Compose service change' : 'Current changes'}
+      </h3>
       {flow.step.name === 'denied' ? (
         <div className="notice" role="alert">
           <p>
@@ -148,7 +151,7 @@ export function ChangePanel({
             </p>
           )}
 
-          {draft && flow.step.name !== 'confirmed' && flow.step.name !== 'uncertain' && (
+          {draft && flow.step.name !== 'confirmed' && flow.step.name !== 'uncertain' && (composeOpen || flow.step.name !== 'editing') && (
             <DraftForm
               draft={draft}
               kinds={kinds}
@@ -200,7 +203,7 @@ export function ChangePanel({
             </section>
           ) : null}
 
-          {flow.step.name === 'confirmed' && <Confirmed flow={flow} stopLabel={stopLabel} headingRef={headingRef} onReset={() => dispatch({ type: 'reset' })} />}
+          {flow.step.name === 'confirmed' && <Confirmed flow={flow} stopLabel={stopLabel} headingRef={headingRef} onReset={() => { dispatch({ type: 'reset' }); setComposeOpen(true) }} />}
 
           {flow.step.name === 'uncertain' && (
             <section className="notice warning" aria-labelledby="uncertain-heading">
@@ -220,7 +223,7 @@ export function ChangePanel({
                 <button type="button" className="primary" onClick={() => void runPreview(flow.target)}>
                   Preview again
                 </button>
-                <button type="button" onClick={() => dispatch({ type: 'reset' })}>
+                <button type="button" onClick={() => { dispatch({ type: 'reset' }); setComposeOpen(false) }}>
                   Start a different change
                 </button>
               </div>
@@ -243,6 +246,16 @@ export function ChangePanel({
               void runPreview({ type: 'withdraw', changeId })
             }}
           />
+          {flow.step.name === 'editing' && !composeOpen && (
+            <div className="change-empty-state">
+              {changes.activeChanges.length === 0 && <p className="muted">No confirmed changes are in force.</p>}
+              {kinds.length > 0 && (
+                <button type="button" className="primary" onClick={() => setComposeOpen(true)}>
+                  Compose change
+                </button>
+              )}
+            </div>
+          )}
         </>
       )}
     </section>

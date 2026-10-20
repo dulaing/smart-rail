@@ -72,16 +72,22 @@ export function JourneyWorkspace({ me, journeyId, onRefreshMe }: { me: Me; journ
   const someFailed = data.runningFailure !== null || data.changesFailure !== null
   const rights = changeRights(me)
 
+  const route = running.stops.length > 1
+    ? `${stationName(data.stations, running.stops[0].stationId)} → ${stationName(data.stations, running.stops[running.stops.length - 1].stationId)}`
+    : 'Journey details'
+
   return (
-    <section className="stack" aria-label={`Train ${running.trainNumber}`}>
+    <section className="stack journey-page" aria-label={`Train ${running.trainNumber}`}>
       {back}
-      <div>
-        <h2>
-          Train {running.trainNumber} · {running.serviceDate}
-        </h2>
-        <p className="muted">
-          Timetable: {running.timetable.label}. Running information: {running.runningLabel}. Times are Sri Lanka time.
-        </p>
+      <div className="journey-heading">
+        <div>
+          <h2>
+            {running.trainNumber} → {route.split(' → ').at(-1)}
+          </h2>
+          <p className="muted">
+            {running.serviceDate} · {running.timetable.label} · {running.runningLabel} · Sri Lanka time
+          </p>
+        </div>
         {canOpenPath(me, `/audit/journeys/${running.journeyId}`) && (
           <p>
             <AppLink to={`/audit/journeys/${running.journeyId}`}>View this journey’s history</AppLink>
@@ -105,7 +111,7 @@ export function JourneyWorkspace({ me, journeyId, onRefreshMe }: { me: Me; journ
         )
       )}
 
-      <dl className="facts">
+      <dl className="facts journey-facts">
         <div>
           <dt>Observation</dt>
           <dd>
@@ -134,11 +140,16 @@ export function JourneyWorkspace({ me, journeyId, onRefreshMe }: { me: Me; journ
         </div>
       </dl>
 
-      <StopsTable running={running} stations={data.stations} evidenceUnknown={evidence === 'UNKNOWN'} />
+      <div className="journey-detail-grid">
+        <section className="journey-stops" aria-labelledby="stops-heading">
+          <h3 id="stops-heading">Stops and times</h3>
+          <StopsTable running={running} stations={data.stations} evidenceUnknown={evidence === 'UNKNOWN'} />
+        </section>
 
-      {canChange(rights) ? (
-        data.changes ? (
-          <ChangePanel
+        <div className="journey-change-column">
+          {canChange(rights) ? (
+            data.changes ? (
+              <ChangePanel
             // A new journey starts a new, empty change.
             key={running.journeyId}
             journeyId={running.journeyId}
@@ -148,18 +159,20 @@ export function JourneyWorkspace({ me, journeyId, onRefreshMe }: { me: Me; journ
             rights={rights}
             onChanged={refresh}
             onRefreshMe={onRefreshMe}
-          />
-        ) : (
-          <p className="notice warning" role="status">
-            The confirmed changes could not be read, so changes cannot be made from this page right now.{' '}
-            {failureText(data.changesFailure)}
-          </p>
-        )
-      ) : (
-        <p className="notice neutral">
-          You can view this journey but your account cannot change it, so there are no change controls here.
-        </p>
-      )}
+              />
+            ) : (
+              <p className="notice warning" role="status">
+                The confirmed changes could not be read, so changes cannot be made from this page right now.{' '}
+                {failureText(data.changesFailure)}
+              </p>
+            )
+          ) : (
+            <p className="notice neutral">
+              You can view this journey but your account cannot change it, so there are no change controls here.
+            </p>
+          )}
+        </div>
+      </div>
     </section>
   )
 }

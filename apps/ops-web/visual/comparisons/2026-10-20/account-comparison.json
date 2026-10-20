@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-20",
+  "reference": "../../references/2026-10-19/account.png",
+  "actual": "account.actual.png",
+  "overlay": "account.overlay.png",
+  "difference": "account.diff.png",
+  "viewport": [
+    1440,
+    900
+  ],
+  "dpr": 1,
+  "fixture": "Synthetic Controller account; visual-only, no API writes. API Me has no email field, so no email is invented.",
+  "geometryLogicalPx": {
+    "sidebar": [
+      216,
+      900
+    ],
+    "topbar": [
+      216,
+      0,
+      1224,
+      72
+    ],
+    "title": [
+      248,
+      104,
+      206,
+      40
+    ],
+    "profileCard": [
+      248,
+      192,
+      568,
+      276
+    ],
+    "accessCard": [
+      840,
+      192,
+      568,
+      276
+    ],
+    "accountNote": [
+      248,
+      492,
+      1160,
+      89
+    ]
+  },
+  "result": "Profile/access card bounds match the approved frame. Account text keeps API-backed identity and permission facts."
+}

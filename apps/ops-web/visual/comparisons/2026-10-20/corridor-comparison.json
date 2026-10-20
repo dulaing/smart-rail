@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-20",
+  "reference": "../../references/2026-10-19/corridor.png",
+  "actual": "corridor.actual.png",
+  "overlay": "corridor.overlay.png",
+  "difference": "corridor.diff.png",
+  "viewport": [
+    1440,
+    900
+  ],
+  "dpr": 1,
+  "capture": "T3 collaborative browser at 2880x1800; uniformly downsampled by 0.5",
+  "fixture": "Synthetic Controller fixture; visual-only, no API writes. Dynamic timetable/observation values differ from the Figma example.",
+  "geometryLogicalPx": {
+    "sidebar": [
+      216,
+      900
+    ],
+    "topbar": [
+      216,
+      0,
+      1224,
+      72
+    ],
+    "title": [
+      248,
+      104,
+      1160,
+      40
+    ],
+    "summary": [
+      248,
+      192,
+      1160,
+      116
+    ],
+    "filters": [
+      248,
+      336,
+      1160,
+      80
+    ],
+    "table": [
+      248,
+      440,
+      1160,
+      332
+    ]
+  },
+  "result": "Measured major bounds match the approved corridor reference exactly. Remaining differences are content values and browser text rasterisation."
+}

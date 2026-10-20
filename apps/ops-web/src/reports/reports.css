@@ -2,14 +2,22 @@
 
 .reports-layout {
   display: grid;
-  grid-template-columns: minmax(280px, 1fr) minmax(320px, 1.2fr);
-  gap: var(--sr-space-32);
+  grid-template-columns: minmax(340px, 0.9fr) minmax(440px, 1.3fr);
+  gap: var(--sr-space-24);
   align-items: start;
+}
+.reports-layout > section { min-width: 0; }
+.reports-layout > section > h2 {
+  margin: 0;
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 600;
 }
 @media (max-width: 900px) {
   .reports-layout {
     grid-template-columns: minmax(0, 1fr);
   }
+  .reports-layout .panel .facts > div { grid-template-columns: minmax(120px, 0.8fr) minmax(0, 1.2fr); }
 }
 
 .filters {
@@ -33,13 +41,13 @@
 }
 
 .report-list {
-  max-width: 640px;
+  max-width: none;
 }
 .report-row {
   display: grid;
   gap: var(--sr-space-4);
-  min-height: var(--sr-min-target);
-  padding: var(--sr-space-12) var(--sr-space-16);
+  min-height: 76px;
+  padding: var(--sr-space-16);
   border: 1px solid var(--sr-color-line-hairline);
   border-left: 4px solid var(--sr-color-line-hairline);
   border-radius: var(--sr-radius-xs);
@@ -63,12 +71,37 @@
   gap: var(--sr-space-8);
 }
 
+.reports-layout .panel {
+  min-width: 0;
+  padding: var(--sr-space-24);
+}
+.reports-layout .panel > h2 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 36px;
+}
+.reports-layout .panel .facts { display: grid; gap: var(--sr-space-16); }
+.reports-layout .panel .facts > div {
+  display: grid;
+  grid-template-columns: minmax(140px, 0.8fr) minmax(0, 1.2fr);
+  gap: var(--sr-space-16);
+  align-items: baseline;
+}
+.reports-layout .panel .facts dd { margin: 0; }
+.reports-layout .form.panel { padding: var(--sr-space-20); border-radius: var(--sr-radius-lg); }
+
 .panel h2:focus {
   outline: none;
 }
 .panel h2:focus-visible {
   outline: 3px solid var(--sr-color-accent-primary);
   outline-offset: 2px;
+}
+
+@media (max-width: 520px) {
+  .reports-layout > section > h2 { font-size: 26px; line-height: 32px; }
+  .reports-layout .panel { padding: var(--sr-space-16); }
+  .reports-layout .panel .facts > div { grid-template-columns: minmax(0, 1fr); gap: var(--sr-space-4); }
 }
 
 /* Audit table: keep an outcome badge on one line and let long IDs wrap instead of widening the table. */
