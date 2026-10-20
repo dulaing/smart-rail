@@ -10,6 +10,7 @@ import 'package:driver_app/journeys/reports_view.dart';
 import 'package:driver_app/journeys/selector_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartrail_core/smartrail_core.dart';
@@ -319,6 +320,46 @@ void main() {
       await tester.tap(find.byKey(const Key('journey-DS-B1')));
       expect(calls, ['previous', 'next', 'open']);
       expect(find.text('Mon 12 Oct'), findsWidgets);
+    },
+  );
+
+  testWidgets(
+    'screen-reader activation reaches every control that has a tap target',
+    (tester) async {
+      final handle = tester.ensureSemantics();
+      bool canTapLabel(String label) => tester
+          .getSemantics(find.bySemanticsLabel(label))
+          .getSemanticsData()
+          .hasAction(SemanticsAction.tap);
+      bool canTap(String key) => tester
+          .getSemantics(find.byKey(Key(key)))
+          .getSemanticsData()
+          .hasAction(SemanticsAction.tap);
+      await _pump(
+        tester,
+        _selector(items: [journeyItem(_b1, saved: false, onTap: () {})]),
+      );
+      for (final key in [
+        'journey-DS-B1',
+        'date-previous',
+        'date-next',
+        'tab-journeys',
+        'tab-updates',
+        'tab-reports',
+      ]) {
+        expect(canTap(key), isTrue, reason: key);
+      }
+      expect(canTapLabel('Account'), isTrue, reason: 'tablet Account');
+      await _pump(
+        tester,
+        _selector(items: [journeyItem(_b1, saved: false, onTap: () {})]),
+        phone: true,
+      );
+      for (final key in ['journey-DS-B1', 'date-previous']) {
+        expect(canTap(key), isTrue, reason: 'phone $key');
+      }
+      expect(canTapLabel('Account'), isTrue, reason: 'phone Account');
+      handle.dispose();
     },
   );
 

@@ -124,6 +124,7 @@ class DriverRow extends StatelessWidget {
       button: onTap != null,
       label: semantics,
       excludeSemantics: true,
+      onTap: onTap,
       child: ConstrainedBox(
         constraints: BoxConstraints(minHeight: wide ? 112 : 72),
         child: Material(
@@ -211,6 +212,7 @@ class DriverDateControl extends StatelessWidget {
           button: true,
           label: name,
           excludeSemantics: true,
+          onTap: onTap,
           child: SizedBox.square(
             key: key,
             dimension: 56,
