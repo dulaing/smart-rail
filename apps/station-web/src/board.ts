@@ -31,6 +31,12 @@ export function fitEntranceRows(rows: readonly BoardRow[], heights: readonly num
   }
   return selected
 }
+/** A cancelled train, or one that no longer stops here, is a notice above the list, not a row. */
+export const isNotice = (row: BoardRow): boolean => row.cancelled || row.unservedHere
+
+/** Rows whose change also gets a notice card: those above, a train ending early, a staff-confirmed delay. */
+export const hasNotice = (row: BoardRow): boolean => isNotice(row) || row.endsEarly || row.confirmedDelay !== null
+
 /** An expected time this much later than the scheduled one is a delay worth saying. */
 const delayThresholdMs = 60 * 1000
 
@@ -58,6 +64,8 @@ export type BoardRow = {
   /** Journey and stop occurrence, so the same stop never produces two rows or two notices. */
   key: string
   journeyId: string
+  /** The service date the journey belongs to; an overnight train after midnight belongs to the day before. */
+  serviceDate: string
   stopId: string
   trainNumber: string
   /** The row is about this stop's arrival (the train ends here) or its departure. */
@@ -84,6 +92,10 @@ export type BoardRow = {
   /** Only ever true with CURRENT evidence. */
   onTime: boolean
   evidence: Evidence
+  /** When the newest position observation for this train was made; null when none, or timetable only. */
+  observedAt: number | null
+  /** When the platform shown was staff-confirmed, if it was. */
+  platformConfirmedAt: number | null
   /** Staff-confirmed delay with its own confirmation time, shown even when position is unknown. */
   confirmedDelay: { minutes: number; at: number | null } | null
   /** When the cancellation or early ending was confirmed. */
@@ -197,6 +209,7 @@ function rowFor(journey: Journey, stops: readonly JourneyStop[], index: number, 
   return {
     key: `${journey.journeyId}:${stop.stopId}`,
     journeyId: journey.journeyId,
+    serviceDate: journey.serviceDate,
     stopId: stop.stopId,
     trainNumber: journey.trainNumber,
     kind,
@@ -216,6 +229,8 @@ function rowFor(journey: Journey, stops: readonly JourneyStop[], index: number, 
     delayMinutes: delayed ? delayMinutes : null,
     onTime: usable && evidence === 'CURRENT' && estimate !== null && !delayed,
     evidence,
+    observedAt: input.timetableOnly ? null : ms(running?.lastObservation?.observedAt),
+    platformConfirmedAt: input.timetableOnly ? null : ms(runningStop?.confirmedPlatformAt),
     confirmedDelay: delayed && confirmedMinutes !== null && confirmedMinutes > 0 ? { minutes: confirmedMinutes, at: delayChangeAt } : null,
     confirmedChangeAt: changeTime(['CANCEL', 'EARLY_END']),
     refreshFailed: live?.refreshFailed ?? false,

@@ -6,6 +6,14 @@ const zone = 'Asia/Colombo'
 const clockFormat = new Intl.DateTimeFormat('en-GB', { timeZone: zone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
 const dateFormat = new Intl.DateTimeFormat('en-CA', { timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit' })
 
+const dateParts = new Intl.DateTimeFormat('en-GB', { timeZone: zone, weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+
+/** "Mon 12 Oct 2026" in Colombo time, as the board header shows it. */
+export const formatDate = (instant: number): string => {
+  const part = Object.fromEntries(dateParts.formatToParts(new Date(instant)).map((p) => [p.type, p.value]))
+  return `${part.weekday} ${part.day} ${part.month} ${part.year}`
+}
+
 /** HH:mm in Colombo time. */
 export const formatClock = (instant: number | Date | string): string => clockFormat.format(new Date(instant))
 

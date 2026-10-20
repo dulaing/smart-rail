@@ -189,8 +189,8 @@ test('an early ending keeps the earlier served stops and the new final stop, and
   assert.equal(unserved.expectedAt, null)
   assert.equal(platformView([unserved], '4').next, null)
   const text = describeRow(unserved, name)
-  assert.ok(text.notes.some((n) => n.en === 'Train ends at Maradana'))
-  assert.ok(text.notes.some((n) => n.en === 'Does not stop here'))
+  assert.ok(text.notes.some((n) => n.en === 'Train now ends at Maradana'))
+  assert.ok(text.notes.some((n) => n.en === 'Not stopping here'))
 
   const stops = callingStops(j, early, 'st-1')
   assert.deepEqual(stops.map((s) => [s.stopId, s.served]), [['st-2', true], ['st-3', true], ['st-4', false]])

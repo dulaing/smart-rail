@@ -40,12 +40,14 @@ self.addEventListener('fetch', (event) => {
   if (request.mode === 'navigate') {
     event.respondWith(
       Promise.race([fetch(request), new Promise((_, reject) => setTimeout(reject, navigateTimeoutMs))]).catch(() =>
-        caches.match('/').then((cached) => cached || Response.error()),
+        caches.match('/', { ignoreVary: true }).then((cached) => cached || Response.error()),
       ),
     )
     return
   }
 
-  // Built files have content hashes in their names, so a cached copy is never out of date.
-  event.respondWith(caches.match(request).then((cached) => cached || fetch(request)))
+  // Built files have content hashes in their names, so a cached copy is never out of date. Vary is
+  // ignored: a host that sends `Vary: Origin` would otherwise never match the same-origin module
+  // script and stylesheet requests (which carry an Origin header) against the copy cached at install.
+  event.respondWith(caches.match(request, { ignoreVary: true }).then((cached) => cached || fetch(request)))
 })

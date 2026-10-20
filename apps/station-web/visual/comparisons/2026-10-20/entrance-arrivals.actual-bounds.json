@@ -1,0 +1,170 @@
+{
+  ".board-head": {
+    "x": 0,
+    "y": 0,
+    "width": 1920,
+    "height": 184
+  },
+  ".board-logo": {
+    "x": 32,
+    "y": 60,
+    "width": 64,
+    "height": 64
+  },
+  ".board-head h1": {
+    "x": 120,
+    "y": 23.984375,
+    "width": 1474.609375,
+    "height": 136.03125
+  },
+  ".clock": {
+    "x": 1618.609375,
+    "y": 20,
+    "width": 245.390625,
+    "height": 112
+  },
+  ".board-date": {
+    "x": 1672.859375,
+    "y": 132,
+    "width": 191.140625,
+    "height": 32
+  },
+  ".board-foot": {
+    "x": 0,
+    "y": 1016,
+    "width": 1920,
+    "height": 64
+  },
+  ".board-purpose": {
+    "x": 48,
+    "y": 216,
+    "width": 1824,
+    "height": 56
+  },
+  ".observations": {
+    "x": 1654.578125,
+    "y": 228,
+    "width": 217.421875,
+    "height": 32
+  },
+  ".labels": {
+    "x": 48,
+    "y": 288,
+    "width": 1824,
+    "height": 108
+  },
+  ".service-rows": {
+    "x": 48,
+    "y": 412,
+    "width": 1824,
+    "height": 551.953125
+  },
+  ".row:nth-child(1)": {
+    "x": 48,
+    "y": 412,
+    "width": 1824,
+    "height": 175.984375
+  },
+  ".row:nth-child(1) .cell-time": {
+    "x": 64,
+    "y": 429.984375,
+    "width": 176,
+    "height": 140
+  },
+  ".row:nth-child(1) .cell-destination": {
+    "x": 264,
+    "y": 428,
+    "width": 488,
+    "height": 143.984375
+  },
+  ".row:nth-child(1) .cell-platform": {
+    "x": 776,
+    "y": 443.984375,
+    "width": 144,
+    "height": 112
+  },
+  ".row:nth-child(1) .cell-expected": {
+    "x": 944,
+    "y": 441.984375,
+    "width": 256,
+    "height": 116
+  },
+  ".row:nth-child(1) .cell-status .lines": {
+    "x": 1288,
+    "y": 434,
+    "width": 291.609375,
+    "height": 131.984375
+  },
+  ".row:nth-child(2)": {
+    "x": 48,
+    "y": 599.984375,
+    "width": 1824,
+    "height": 175.984375
+  },
+  ".row:nth-child(2) .cell-time": {
+    "x": 64,
+    "y": 617.96875,
+    "width": 176,
+    "height": 140
+  },
+  ".row:nth-child(2) .cell-destination": {
+    "x": 264,
+    "y": 615.984375,
+    "width": 488,
+    "height": 143.984375
+  },
+  ".row:nth-child(2) .cell-platform": {
+    "x": 776,
+    "y": 631.96875,
+    "width": 144,
+    "height": 112
+  },
+  ".row:nth-child(2) .cell-expected": {
+    "x": 944,
+    "y": 629.96875,
+    "width": 256,
+    "height": 116
+  },
+  ".row:nth-child(2) .cell-status .lines": {
+    "x": 1288,
+    "y": 621.984375,
+    "width": 245.296875,
+    "height": 131.984375
+  },
+  ".row:nth-child(3)": {
+    "x": 48,
+    "y": 787.96875,
+    "width": 1824,
+    "height": 175.984375
+  },
+  ".row:nth-child(3) .cell-time": {
+    "x": 64,
+    "y": 805.953125,
+    "width": 176,
+    "height": 140
+  },
+  ".row:nth-child(3) .cell-destination": {
+    "x": 264,
+    "y": 803.96875,
+    "width": 488,
+    "height": 143.984375
+  },
+  ".row:nth-child(3) .cell-platform": {
+    "x": 776,
+    "y": 819.953125,
+    "width": 144,
+    "height": 112
+  },
+  ".row:nth-child(3) .cell-expected": {
+    "x": 944,
+    "y": 817.953125,
+    "width": 256,
+    "height": 116
+  },
+  ".row:nth-child(3) .cell-status .lines": {
+    "x": 1288,
+    "y": 809.96875,
+    "width": 291.609375,
+    "height": 131.984375
+  }
+}
