@@ -1,11 +1,12 @@
-import { useMemo } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import { callingStops, deriveRows, platformView } from './board.ts'
 import { Clock } from './Clock'
 import { parseConfig, validateConfig, type ConfigProblem } from './config.ts'
+import logo from '../../../shared/design/logo/passenger-icon-square.png'
 import { StatusSample } from './design/StatusSample'
 import { EntranceBoard } from './EntranceBoard'
 import { say, sayShared, stationTexts, type Texts } from './messages.ts'
-import { Lines } from './parts'
+import { Lines, NoticeCard, PassiveState } from './parts'
 import { PlatformBoard } from './PlatformBoard'
 import { journeysOf } from './snapshot.ts'
 import { colomboDate, formatClock } from './time.ts'
@@ -59,66 +60,70 @@ function Board() {
       ? callingStops(nextJourney, timetableOnly ? null : (data.live.get(nextJourney.journeyId)?.running ?? null), platformRows.next.stopId)
       : []
 
+  const savedText = sayShared('freshness.saved', { time: formatClock(savedAt) })
+  const outOfDate = days.length > 0 && !snapshot.days[today]
+  const noSavedCopy = days.length === 0 && data.refreshed
+  // One notice for losing live updates; it is not mixed with per-train warnings.
+  const banners: ReactNode[] = []
+  if (data.feed === 'unavailable' && (days.length > 0 || noSavedCopy)) {
+    banners.push(
+      <NoticeCard key="offline" cardKey="offline" tone="warning" glyph="warning" title={say('liveUnavailable')} attribution={days.length > 0 ? [savedText] : []} reserveAttribution />,
+    )
+  }
+  if (outOfDate) {
+    banners.push(<NoticeCard key="out-of-date" cardKey="out-of-date" tone="warning" glyph="warning" title={say('outOfDate')} attribution={[savedText]} />)
+  }
+
   let body
   if (problem) {
     body = (
-      <section className="state" aria-labelledby="state-title">
-        <h2 id="state-title">
-          <Lines texts={say('configError')} />
-        </h2>
-        <p className="detail">
-          {problemText[problem](parsed.ok ? parsed.config.station : '', platform ?? '')}
-        </p>
-      </section>
+      <PassiveState
+        stateKey="config-error"
+        title={say('configError')}
+        detail={say('configErrorDetail')}
+        extra={<p className="visually-hidden">{problemText[problem](parsed.ok ? parsed.config.station : '', platform ?? '')}</p>}
+      />
     )
   } else if (days.length === 0 || snapshot.stations.length === 0) {
-    body = (
-      <section className="state">
-        <p className="state-text">
-          <Lines texts={say(data.refreshed ? 'noTimetable' : 'loading')} />
-        </p>
-      </section>
-    )
+    body =
+      platform && data.refreshed ? (
+        <PlatformBoard platform={platform} view={{ next: null, notices: [] }} calls={[]} station={nameOf} savedAt={savedAt} banner={banners[0]} emptyTitle={say('noTimetable')} />
+      ) : (
+        <>
+          {banners}
+          <PassiveState
+            stateKey={data.refreshed ? 'no-saved-timetable' : 'loading'}
+            title={say(data.refreshed ? 'noTimetable' : 'loading')}
+            detail={data.refreshed ? say('noTimetableDetail') : sayShared('board.noData')}
+          />
+        </>
+      )
   } else if (platformRows && platform) {
-    body = <PlatformBoard platform={platform} view={platformRows} calls={calls} station={nameOf} />
+    body = <PlatformBoard platform={platform} view={platformRows} calls={calls} station={nameOf} savedAt={savedAt} updatedAt={data.feed === 'live' ? savedAt : null} banner={banners[0]} />
   } else {
-    body = <EntranceBoard rows={rows} station={nameOf} />
+    body = (
+      <>
+        {banners}
+        <EntranceBoard rows={rows} station={nameOf} banner={banners.length > 0} savedAt={savedAt} />
+      </>
+    )
   }
 
-  const outOfDate = days.length > 0 && !snapshot.days[today]
   return (
     <div className="board">
       <header className="board-head">
-        <h1>{station ? <Lines texts={stationTexts(station)} inline /> : <span className="visually-hidden">SmartRail</span>}</h1>
+        <span className="board-logo" role="img" aria-label="SmartRail" style={{ backgroundImage: `url(${logo})` }} />
+        <h1>
+          <Lines texts={station ? stationTexts(station) : say('stationDisplay')} type="title" layout="names" />
+        </h1>
         <Clock now={now} />
       </header>
-
-      <div className="board-banners">
-        {data.feed === 'unavailable' && days.length > 0 && (
-          <div className="banner banner-offline" role="status">
-            <Lines texts={say('liveUnavailable')} />
-            <span className="banner-detail">
-              <Lines texts={say('timetableOnly', { time: formatClock(savedAt) })} />
-            </span>
-          </div>
-        )}
-        {data.feed === 'live' && data.partial && (
-          <div className="banner banner-partial" role="status">
-            <Lines texts={say('partial')} inline />
-          </div>
-        )}
-        {outOfDate && (
-          <div className="banner banner-offline" role="status">
-            <Lines texts={say('outOfDate')} />
-          </div>
-        )}
-      </div>
 
       <main className="board-body">{body}</main>
 
       <footer className="board-foot">
-        <p className="trilingual">
-          <Lines texts={sayShared('footer.simulation')} inline />
+        <p>
+          <Lines texts={sayShared('footer.simulation')} type="meta" layout="columns" />
         </p>
       </footer>
     </div>

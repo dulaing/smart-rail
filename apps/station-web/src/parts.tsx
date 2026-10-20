@@ -1,17 +1,39 @@
-// Small pieces the two boards share: the three languages together, a status pill and the arrow
-// that says whether a row is a departure or an arrival.
+// Small pieces the two boards share: the three languages together, a status, a notice card and the
+// passive information state. Sizes come from the Station type roles in the shared tokens; the
+// roles are named after where the reference uses them (row, status, notice, hero, small, meta).
 
-import { locales } from '../../../shared/design/generated/status.ts'
-import { StatusIcon } from './design/StatusBadge.tsx'
+import type { ReactNode } from 'react'
+import { locales, statuses, type Locale, type Tone } from '../../../shared/design/generated/status.ts'
+import type { Glyph } from './design/glyph.ts'
+import { GlyphIcon } from './design/glyphs.tsx'
+import type { BoardRow } from './board.ts'
+import { say, sayShared, type Texts } from './messages.ts'
 import type { Pill } from './rowText.ts'
-import type { Texts } from './messages.ts'
+import { formatClock } from './time.ts'
 
-/** English, Sinhala and Tamil together at one size, wrapping to complete lines. Never a carousel. */
-export function Lines({ texts, inline = false }: { texts: Texts; inline?: boolean }) {
+export type TextType = 'row' | 'status' | 'notice' | 'hero' | 'small' | 'meta' | 'label' | 'title'
+
+/**
+ * English, Sinhala and Tamil together, each at the size of its own script, never a carousel.
+ * `stack` puts one language per line, `inline` puts them side by side and wraps, `columns` gives
+ * each an equal third (the attribution line). `prefix` leads every language, such as a train number.
+ */
+export function Lines({
+  texts,
+  type,
+  layout = 'stack',
+  prefix,
+}: {
+  texts: Texts
+  type: TextType
+  layout?: 'stack' | 'inline' | 'columns' | 'names'
+  prefix?: ReactNode
+}) {
   return (
-    <span className={inline ? 'lines lines-inline' : 'lines'}>
+    <span className={`lines lines-${layout} type-${type}${prefix ? ' has-prefix' : ''}`}>
       {locales.map((locale) => (
         <span key={locale} lang={locale}>
+          {prefix}
           {texts[locale]}
         </span>
       ))}
@@ -19,25 +41,118 @@ export function Lines({ texts, inline = false }: { texts: Texts; inline?: boolea
   )
 }
 
-/** A status: icon shape plus its words in all three languages. */
-export function StatusPill({ pill }: { pill: Pill }) {
+/** A status: its shape and its words in all three languages, in the colour of its tone. */
+export function StatusLine({ pill }: { pill: Pill }) {
   return (
-    <span className={`pill sr-tone-${pill.tone}`}>
-      <StatusIcon name={pill.icon} />
-      <Lines texts={pill.texts} />
+    <span className={`status-line sr-tone-${pill.tone}`}>
+      <GlyphIcon name={pill.glyph} size={48} />
+      <Lines texts={pill.texts} type="status" />
     </span>
   )
 }
 
-const arrows = {
-  departure: 'M5 12h14M13 6l6 6-6 6',
-  arrival: 'M19 12H5M11 6l-6 6 6 6',
-} as const
-
-export function ArrowIcon({ kind }: { kind: 'departure' | 'arrival' }) {
+/**
+ * A public notice: what has changed or is unavailable, in three languages, with who or when
+ * (the attribution) beneath. `lines` are further sentences, `attribution` is a row of thirds.
+ */
+export function NoticeCard({
+  tone,
+  glyph,
+  title,
+  prefix,
+  lines = [],
+  attribution = [],
+  reserveAttribution = false,
+  cardKey,
+}: {
+  tone: Tone
+  glyph: Glyph
+  title: Texts
+  prefix?: ReactNode
+  lines?: Texts[]
+  attribution?: Texts[]
+  /** Keep the attribution line's height when there is nothing to attribute, as the frames do. */
+  reserveAttribution?: boolean
+  cardKey?: string
+}) {
   return (
-    <svg className="sr-icon arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d={arrows[kind]} />
-    </svg>
+    <aside className={`notice-card sr-tone-${tone}`} role="status" data-notice={cardKey}>
+      <span className="notice-glyph">
+        <GlyphIcon name={glyph} size={56} />
+      </span>
+      <div className="notice-body">
+        <div className="notice-text">
+          <Lines texts={title} type="notice" prefix={prefix} />
+          {lines.map((line, i) => (
+            <Lines key={i} texts={line} type="small" />
+          ))}
+        </div>
+        {attribution.map((line, i) => (
+          <Lines key={i} texts={line} type="meta" layout="columns" />
+        ))}
+        {reserveAttribution && attribution.length === 0 && <span className="notice-spacer" aria-hidden="true" />}
+      </div>
+    </aside>
+  )
+}
+
+/** The board has nothing to list: loading, no services, no saved timetable, a setup problem. */
+export function PassiveState({ title, detail, extra, stateKey }: { title: Texts; detail: Texts; extra?: ReactNode; stateKey: string }) {
+  return (
+    <section className="passive-state" data-state={stateKey}>
+      <span className="passive-glyph">
+        <GlyphIcon name="info" size={72} />
+      </span>
+      <h2 className="passive-title">
+        <Lines texts={title} type="hero" />
+      </h2>
+      <div className="passive-detail">
+        <Lines texts={detail} type="small" />
+        {extra}
+      </div>
+    </section>
+  )
+}
+
+const each = (by: (locale: Locale) => string): Texts => ({ en: by('en'), si: by('si'), ta: by('ta') })
+
+/**
+ * A change worth a notice of its own: a cancelled train, one that no longer stops here, one that
+ * now ends earlier, or a staff-confirmed delay. "DS-B1 · Cancelled · scheduled 08:05" in each
+ * language, further sentences if any, then who confirmed it and when. Nothing here names a cause.
+ */
+export function DisruptionNotice({ row, station }: { row: BoardRow; station: (id: string) => Texts }) {
+  const scheduled = say('scheduledLower')
+  const when = formatClock(row.scheduledAt)
+  const endsAt = row.endsAtStationId ? say('endsAt', { station: station(row.endsAtStationId) }) : null
+  let tone: Tone = 'warning'
+  let title: Texts
+  let confirmedAt = row.confirmedChangeAt
+  let plain: Texts[] = []
+  if (row.cancelled) {
+    tone = 'danger'
+    title = each((l) => ` · ${statuses.cancelled.text[l]} · ${scheduled[l]} ${when}`)
+  } else if (row.unservedHere) {
+    const stop = say('notStopping')
+    title = each((l) => ` · ${scheduled[l]} ${when} · ${stop[l]}${endsAt ? ` · ${endsAt[l]}` : ''}`)
+  } else if (row.endsEarly) {
+    const text = row.endsHere ? say('finalStop') : endsAt!
+    title = each((l) => ` · ${text[l]}`)
+  } else {
+    const late = say('delayMinutes', { n: row.delayMinutes ?? row.confirmedDelay?.minutes ?? 0 })
+    title = each((l) => ` · ${late[l]}`)
+    confirmedAt = row.confirmedDelay?.at ?? null
+    if (confirmedAt === null) plain = [say('confirmedDelayPlain')]
+  }
+  const confirmed = confirmedAt === null ? plain : [sayShared('change.confirmed', { time: formatClock(confirmedAt) })]
+  return (
+    <NoticeCard
+      cardKey={row.key}
+      tone={tone}
+      glyph={row.confirmedDelay !== null && !row.cancelled && !row.unservedHere && !row.endsEarly ? 'clock' : 'warning'}
+      title={title}
+      prefix={<span className="train-id">{row.trainNumber}</span>}
+      attribution={confirmed}
+    />
   )
 }

@@ -62,6 +62,12 @@ still require people on site; digital tests cannot establish those results.
 npm --prefix apps/station-web test
 npm --prefix apps/station-web run lint
 npm --prefix apps/station-web run build
+npm --prefix apps/station-web run visual
 ```
+
+`visual` runs the 1920 x 1080 Figma comparisons, the contrast/clipping/language checks and the
+offline/reconnect smoke test on the production build (it builds and serves it itself). Update the
+goldens with `npm --prefix apps/station-web run visual -- --update-snapshots` only after reviewing
+the new captures against the approved frames.
 
 See `_specs/station-boards.md` for browser evidence and remaining human checks.

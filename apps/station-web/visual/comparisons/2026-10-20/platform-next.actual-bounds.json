@@ -1,0 +1,110 @@
+{
+  ".board-head": {
+    "x": 0,
+    "y": 0,
+    "width": 1920,
+    "height": 184
+  },
+  ".board-logo": {
+    "x": 32,
+    "y": 60,
+    "width": 64,
+    "height": 64
+  },
+  ".board-head h1": {
+    "x": 120,
+    "y": 23.984375,
+    "width": 1474.609375,
+    "height": 136.03125
+  },
+  ".clock": {
+    "x": 1618.609375,
+    "y": 20,
+    "width": 245.390625,
+    "height": 112
+  },
+  ".board-date": {
+    "x": 1672.859375,
+    "y": 132,
+    "width": 191.140625,
+    "height": 32
+  },
+  ".board-foot": {
+    "x": 0,
+    "y": 1016,
+    "width": 1920,
+    "height": 64
+  },
+  ".hero": {
+    "x": 48,
+    "y": 216,
+    "width": 1824,
+    "height": 492
+  },
+  ".platform-id": {
+    "x": 48,
+    "y": 216,
+    "width": 360,
+    "height": 492
+  },
+  ".platform-id .platform-number": {
+    "x": 72,
+    "y": 426,
+    "width": 312,
+    "height": 232
+  },
+  ".hero-body": {
+    "x": 432,
+    "y": 216,
+    "width": 1440,
+    "height": 492
+  },
+  ".service-head .train-number": {
+    "x": 456,
+    "y": 240,
+    "width": 220,
+    "height": 64
+  },
+  ".basis": {
+    "x": 1608,
+    "y": 256,
+    "width": 240,
+    "height": 32
+  },
+  ".service-where > .lines": {
+    "x": 456,
+    "y": 316,
+    "width": 403.84375,
+    "height": 184
+  },
+  ".time-block:nth-child(1)": {
+    "x": 456,
+    "y": 512,
+    "width": 684,
+    "height": 120
+  },
+  ".time-block:nth-child(2)": {
+    "x": 1164,
+    "y": 512,
+    "width": 684,
+    "height": 160
+  },
+  ".notice-card": {
+    "x": 48,
+    "y": 724,
+    "width": 1824,
+    "height": 240
+  },
+  ".notice-glyph": {
+    "x": 72,
+    "y": 748,
+    "width": 56,
+    "height": 56
+  },
+  ".notice-body": {
+    "x": 152,
+    "y": 748,
+    "width": 1696,
+    "height": 192
+  }
+}

@@ -1,0 +1,68 @@
+{
+  ".board-head": {
+    "x": 0,
+    "y": 0,
+    "width": 1920,
+    "height": 184
+  },
+  ".board-logo": {
+    "x": 32,
+    "y": 60,
+    "width": 64,
+    "height": 64
+  },
+  ".board-head h1": {
+    "x": 120,
+    "y": 23.984375,
+    "width": 1474.609375,
+    "height": 136.03125
+  },
+  ".clock": {
+    "x": 1618.609375,
+    "y": 20,
+    "width": 245.390625,
+    "height": 112
+  },
+  ".board-date": {
+    "x": 1672.859375,
+    "y": 132,
+    "width": 191.140625,
+    "height": 32
+  },
+  ".board-foot": {
+    "x": 0,
+    "y": 1016,
+    "width": 1920,
+    "height": 64
+  },
+  ".notice-card": {
+    "x": 48,
+    "y": 216,
+    "width": 1824,
+    "height": 264
+  },
+  ".notice-glyph": {
+    "x": 72,
+    "y": 240,
+    "width": 56,
+    "height": 56
+  },
+  ".labels": {
+    "x": 48,
+    "y": 496,
+    "width": 1824,
+    "height": 108
+  },
+  ".row:nth-child(1)": {
+    "x": 48,
+    "y": 620,
+    "width": 1824,
+    "height": 175.984375
+  },
+  ".row:nth-child(2)": {
+    "x": 48,
+    "y": 807.984375,
+    "width": 1824,
+    "height": 175.984375
+  }
+}

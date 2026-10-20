@@ -17,6 +17,11 @@ html {
   -webkit-font-smoothing: antialiased;
 }
 
+/* A language's own face leads its text, so the line is measured by that face rather than by the
+   Latin face that happens to come first in the stack (digits inside Sinhala use Abhaya Libre too). */
+[lang='si'] { font-family: 'Abhaya Libre', var(--sr-font-stack); }
+[lang='ta'] { font-family: 'Noto Sans Tamil', var(--sr-font-stack); }
+
 body {
   margin: 0;
   min-height: 100svh;
@@ -27,9 +32,16 @@ body {
 
 h1,
 h2,
+h3,
 p,
 ul {
   margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  font: inherit;
 }
 
 ul {
