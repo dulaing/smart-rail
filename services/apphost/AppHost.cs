@@ -44,6 +44,13 @@ var api = builder.AddProject<Projects.SmartRail_Api>("api")
     .WithReference(smartrailDb)
     .WaitFor(smartrailDb)
     .WithHttpHealthCheck("/health/ready")
+    // Links in the dashboard's Resources page: Swagger UI and the raw OpenAPI document.
+    .WithUrls(context =>
+    {
+        var baseUrl = context.GetEndpoint("https").Url;
+        context.Urls.Add(new ResourceUrlAnnotation { Url = $"{baseUrl}/swagger", DisplayText = "Swagger UI" });
+        context.Urls.Add(new ResourceUrlAnnotation { Url = $"{baseUrl}/openapi/v1.json", DisplayText = "OpenAPI document" });
+    })
     .WithEnvironment("Grilled__ServiceKey", grilledServiceKey)
     .WithEnvironment("Grilled__CallbackSecret", callbackSecret)
     .WithEnvironment("Grilled__InboundServiceKey", smartrailInboundKey);

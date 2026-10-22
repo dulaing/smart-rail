@@ -8,6 +8,7 @@ using SmartRail.Api.Modules.Demo;
 using SmartRail.Api.Modules.Operations;
 using SmartRail.Api.Modules.Rail;
 using SmartRail.Api.Modules.Rail.Running;
+using Microsoft.OpenApi;
 using OpenTelemetry;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
@@ -18,7 +19,26 @@ using OpenTelemetry.Trace;
 // available to the standard configuration parser.
 var builder = WebApplication.CreateBuilder(args.Where(arg => arg != "--seed-operations-demo").ToArray());
 
-builder.Services.AddOpenApi();
+// The document lists every route and offers an Authorize button for a Keycloak access token.
+builder.Services.AddOpenApi(options => options.AddDocumentTransformer((document, _, _) =>
+{
+    document.Info.Title = "SmartRail API";
+    document.Components ??= new OpenApiComponents();
+    document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
+    document.Components.SecuritySchemes["Bearer"] = new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Description = "A Keycloak access token for the smartrail realm.",
+    };
+    document.Security ??= [];
+    document.Security.Add(new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = [],
+    });
+    return Task.CompletedTask;
+}));
 
 // Readiness checks the database. The AppHost sets the connection string; without it
 // (plain `dotnet run`) there is nothing to check yet.
@@ -41,7 +61,7 @@ var telemetry = builder.Services.AddOpenTelemetry()
     .ConfigureResource(resource => resource.AddService("smartrail-api"))
     .WithTracing(tracing => tracing
         .AddAspNetCoreInstrumentation()
-        // Outgoing calls to RailBites carry the caller's trace, so one trace spans both services.
+        // Outgoing calls to Grilled carry the caller's trace, so one trace spans both services.
         .AddHttpClientInstrumentation()
         .AddSource(CateringMetrics.ActivitySourceName))
     .WithMetrics(metrics => metrics
@@ -110,7 +130,7 @@ if (args.Contains("--migrate-and-seed"))
 // `dotnet run --project services/api -- --seed-demo --anchor <ISO>` prepares the Development
 // presentation scenario for the anchor's Colombo service date and writes its manifest. Run it
 // from the repository root so the manifest lands in artifacts/. Identities and provider data are
-// separate commands: --seed-demo-identities (needs Keycloak) and the RailBites seed.
+// separate commands: --seed-demo-identities (needs Keycloak) and the Grilled seed.
 if (args.Contains("--seed-demo"))
 {
     if (!app.Environment.IsDevelopment())
@@ -163,6 +183,18 @@ static string? ArgValue(string[] args, string name)
 
 app.UseHttpsRedirection();
 app.UseCors();
+
+// Swagger UI at /swagger reads the OpenAPI document. It must come before UseAuthorization, whose
+// deny-by-default fallback policy would otherwise answer 401 for its static files.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwaggerUI(ui =>
+    {
+        ui.SwaggerEndpoint("/openapi/v1.json", "SmartRail API v1");
+        ui.RoutePrefix = "swagger";
+    });
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 

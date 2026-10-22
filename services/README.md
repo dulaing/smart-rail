@@ -13,6 +13,9 @@ This starts PostgreSQL, Keycloak, the API and Grilled, and opens the Aspire dash
   "Local HTTPS" below). Token issuer: `https://localhost:8080/realms/smartrail`.
   The admin password is in the dashboard under the keycloak resource.
 - API: `http://localhost:5111/health/live` and `/health/ready` (ready checks the database).
+  In Development, Swagger UI is at `/swagger` and the OpenAPI document at `/openapi/v1.json`; the
+  dashboard's api resource links to both. Use Authorize with a Keycloak access token to call
+  protected routes.
 - Grilled: its port is shown in the dashboard; `/health/live`.
 - Database data lives in the Docker volume `smartrail-postgres-data`. Remove it to start fresh.
 
