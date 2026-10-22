@@ -102,9 +102,8 @@ Still to do:
   restyled yet.
 - **Cloud deployment.** Everything runs locally with Aspire. Nothing is deployed to Azure yet.
 - **Small bugs I found while taking these screenshots**: the route title on the Trains tab does not
-  update when the From station changes, and Home shows tomorrow's train as "In 1205 min" when today's
-  trains are over. The Grilled kiosk login also needs `GRILLED_KIOSK_STAFF` set by hand because
-  Aspire does not set it.
+  update when the From station changes. The Grilled kiosk login also needs `GRILLED_KIOSK_STAFF` set
+  by hand because Aspire does not set it.
 
 Left out on purpose for this pilot: real GPS train positions, online payment, push notifications,
 ticketing, an interactive station terminal, product AI features and an iOS build.

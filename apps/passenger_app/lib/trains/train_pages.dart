@@ -653,7 +653,7 @@ class _HomeLiveTrainCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      'In ${_minutesUntil(dep, controller.now)} min',
+                      'In ${_timeUntil(dep, controller.now)}',
                       style: sr.text('label', color: sr.palette.accentPrimary),
                     ),
                     const Spacer(),
@@ -1673,9 +1673,18 @@ DateTime _colomboTime(DateTime d) =>
     d.toUtc().add(const Duration(hours: 5, minutes: 30));
 
 String _time(DateTime d) => DateFormat.Hm().format(_colomboTime(d));
-int _minutesUntil(DateTime departure, DateTime now) {
-  final minutes = departure.toUtc().difference(now.toUtc()).inMinutes;
-  return minutes < 0 ? 0 : minutes;
+// "In 45 min", "In 2 h 5 min" or "In 1 d 3 h": a train tomorrow should not read as 1300 minutes.
+String _timeUntil(DateTime departure, DateTime now) {
+  final total = departure.toUtc().difference(now.toUtc()).inMinutes;
+  final minutes = total < 0 ? 0 : total;
+  final days = minutes ~/ (24 * 60);
+  final hours = minutes ~/ 60 % 24;
+  final mins = minutes % 60;
+  return [
+    if (days > 0) '$days d',
+    if (hours > 0) '$hours h',
+    if (mins > 0 || (days == 0 && hours == 0)) '$mins min',
+  ].join(' ');
 }
 
 int _delayMinutes(PassengerLiveTrain train) {
