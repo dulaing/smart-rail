@@ -12,7 +12,7 @@ namespace SmartRail.Api.Modules.Catering;
 // with the numbers an operator needs (how many changes and orders are waiting, and for how long).
 // It carries counts and ages only, never an order, a code or a payload.
 public sealed class CateringHealthCheck(
-    SmartRailDbContext db, IRailBitesClient provider, IConfiguration configuration, TimeProvider time) : IHealthCheck
+    SmartRailDbContext db, IGrilledClient provider, IConfiguration configuration, TimeProvider time) : IHealthCheck
 {
     // A change or order waiting longer than this means retries are not catching up.
     private const int DefaultBacklogSeconds = 120;
@@ -41,9 +41,9 @@ public sealed class CateringHealthCheck(
         {
             problems.Add(readiness switch
             {
-                ProviderReadiness.NotConfigured => "RailBites is not configured",
-                ProviderReadiness.NotReady => "RailBites reports it is not ready",
-                _ => "RailBites is unreachable",
+                ProviderReadiness.NotConfigured => "Grilled is not configured",
+                ProviderReadiness.NotReady => "Grilled reports it is not ready",
+                _ => "Grilled is unreachable",
             });
         }
 

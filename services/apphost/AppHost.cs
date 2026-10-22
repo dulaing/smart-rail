@@ -32,10 +32,10 @@ var keycloak = builder.AddKeycloak("keycloak", 8080)
 IResourceBuilder<ParameterResource> Secret(string name) =>
     builder.AddParameter(name, new GenerateParameterDefault { MinLength = 32, Special = false }, secret: true, persist: true);
 
-var railbitesServiceKey = Secret("railbites-service-key");      // SmartRail -> RailBites
-var railbitesAdminKey = Secret("railbites-admin-key");          // RailBites' own policy changes (the cutoff)
-var smartrailInboundKey = Secret("smartrail-inbound-key");      // RailBites -> SmartRail passage read
-var callbackSecret = Secret("railbites-callback-secret");       // HMAC secret for status callbacks
+var grilledServiceKey = Secret("grilled-service-key");      // SmartRail -> Grilled
+var grilledAdminKey = Secret("grilled-admin-key");          // Grilled' own policy changes (the cutoff)
+var smartrailInboundKey = Secret("smartrail-inbound-key");      // Grilled -> SmartRail passage read
+var callbackSecret = Secret("grilled-callback-secret");       // HMAC secret for status callbacks
 var kioskKeyPolgahawela = Secret("kiosk-key-polgahawela");
 var kioskKeyPeradeniya = Secret("kiosk-key-peradeniya");
 
@@ -44,31 +44,31 @@ var api = builder.AddProject<Projects.SmartRail_Api>("api")
     .WithReference(smartrailDb)
     .WaitFor(smartrailDb)
     .WithHttpHealthCheck("/health/ready")
-    .WithEnvironment("RailBites__ServiceKey", railbitesServiceKey)
-    .WithEnvironment("RailBites__CallbackSecret", callbackSecret)
-    .WithEnvironment("RailBites__InboundServiceKey", smartrailInboundKey);
+    .WithEnvironment("Grilled__ServiceKey", grilledServiceKey)
+    .WithEnvironment("Grilled__CallbackSecret", callbackSecret)
+    .WithEnvironment("Grilled__InboundServiceKey", smartrailInboundKey);
 
-// RailBites keeps its own SQLite file outside the build output, so orders and stock survive a
-// restart of the AppHost. Delete services/railbites/data to start fresh.
-var railbitesDatabase = Path.GetFullPath(Path.Combine(builder.AppHostDirectory, "..", "railbites", "data", "railbites.db"));
+// Grilled keeps its own SQLite file outside the build output, so orders and stock survive a
+// restart of the AppHost. Delete services/grilled/data to start fresh.
+var grilledDatabase = Path.GetFullPath(Path.Combine(builder.AppHostDirectory, "..", "grilled", "data", "grilled.db"));
 
-var railbites = builder.AddJavaScriptApp("railbites", "../railbites", "dev")
-    .WithEnvironment("RAILBITES_DB_PATH", railbitesDatabase)
-    .WithEnvironment("RAILBITES_SERVICE_KEY", railbitesServiceKey)
-    .WithEnvironment("RAILBITES_ADMIN_KEY", railbitesAdminKey)
-    .WithEnvironment("RAILBITES_CALLBACK_SECRET", callbackSecret)
+var grilled = builder.AddJavaScriptApp("grilled", "../grilled", "dev")
+    .WithEnvironment("GRILLED_DB_PATH", grilledDatabase)
+    .WithEnvironment("GRILLED_SERVICE_KEY", grilledServiceKey)
+    .WithEnvironment("GRILLED_ADMIN_KEY", grilledAdminKey)
+    .WithEnvironment("GRILLED_CALLBACK_SECRET", callbackSecret)
     .WithEnvironment("SMARTRAIL_SERVICE_KEY", smartrailInboundKey)
-    .WithEnvironment("RAILBITES_KIOSK_KEYS", ReferenceExpression.Create(
+    .WithEnvironment("GRILLED_KIOSK_KEYS", ReferenceExpression.Create(
         $"polgahawela-junction={kioskKeyPolgahawela},peradeniya-junction={kioskKeyPeradeniya}"))
     // Local drills only: the 503 outage switch. Never set outside this local stack.
-    .WithEnvironment("RAILBITES_DEV_CONTROLS", "1")
+    .WithEnvironment("GRILLED_DEV_CONTROLS", "1")
     .WithHttpEndpoint(env: "PORT")
-    // Ready, not just alive: the dashboard shows RailBites unhealthy during a simulated outage.
+    // Ready, not just alive: the dashboard shows Grilled unhealthy during a simulated outage.
     .WithHttpHealthCheck("/health/ready");
 
 // Each service finds the other by the address Aspire gives it. Neither waits for the other: the API
-// serves train information with RailBites down, and RailBites queues what it cannot send yet.
-api.WithEnvironment("RailBites__BaseUrl", railbites.GetEndpoint("http"));
-railbites.WithEnvironment("SMARTRAIL_BASE_URL", api.GetEndpoint("http"));
+// serves train information with Grilled down, and Grilled queues what it cannot send yet.
+api.WithEnvironment("Grilled__BaseUrl", grilled.GetEndpoint("http"));
+grilled.WithEnvironment("SMARTRAIL_BASE_URL", api.GetEndpoint("http"));
 
 builder.Build().Run();

@@ -23,7 +23,7 @@ public static class DemoTimetableSeeder
         ("RGM", "Ragama", "රාගම", "ராகமை"),
         ("GPH", "Gampaha", "ගම්පහ", "கம்பஹா"),
         ("VEY", "Veyangoda", "වේයන්ගොඩ", "வேயங்கொடை"),
-        // The two RailBites collection points. Their IDs are copied into services/railbites/src/seed.ts.
+        // The two Grilled collection points. Their IDs are copied into services/grilled/src/seed.ts.
         ("PLG", "Polgahawela Junction", "පොල්ගහවෙල හන්දිය", "பொல்கஹவெல சந்தி"),
         ("PDN", "Peradeniya Junction", "පේරාදෙණිය හන්දිය", "பேராதனை சந்தி"),
     ];
@@ -58,7 +58,7 @@ public static class DemoTimetableSeeder
             new("GPH", "18:15", "18:16", Platform: "2"),
             new("VEY", "18:30", null, Platform: "1"),
         ]),
-        // The up-country corridor RailBites serves. It ends at Peradeniya, so ending it early at
+        // The up-country corridor Grilled serves. It ends at Peradeniya, so ending it early at
         // Polgahawela leaves a food pickup beyond the new final stop.
         new("SIM-3001", OperatingDays.Every,
         [

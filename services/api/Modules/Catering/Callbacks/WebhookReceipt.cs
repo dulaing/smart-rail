@@ -1,6 +1,6 @@
 namespace SmartRail.Api.Modules.Catering.Callbacks;
 
-// One status callback from RailBites that SmartRail has accepted, in catering.webhook_receipts. It is
+// One status callback from Grilled that SmartRail has accepted, in catering.webhook_receipts. It is
 // written in the same transaction as the update it caused, so a receipt always means the update was
 // decided. The event ID is the primary key: a second delivery of the same event finds it here.
 public sealed class WebhookReceipt

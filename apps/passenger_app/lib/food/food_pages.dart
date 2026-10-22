@@ -378,7 +378,7 @@ class _MenuView extends StatelessWidget {
           runSpacing: 4,
           children: [
             Text(
-              'RailBites',
+              'Grilled',
               style: SrTheme.of(context).text('heading').copyWith(fontSize: 24),
             ),
             const _OpenPill(label: 'SIMULATED DATA'),

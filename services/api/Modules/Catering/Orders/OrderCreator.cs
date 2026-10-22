@@ -23,7 +23,7 @@ public abstract record CreateResult
     public sealed record Unavailable(string Problem) : CreateResult;
 }
 
-// Starts one passenger order. The request is saved as a pending link before RailBites is called,
+// Starts one passenger order. The request is saved as a pending link before Grilled is called,
 // so a crash or timeout leaves something to retry. (account, key) is unique in the database, so
 // concurrent identical submissions end up with the same link.
 public sealed class OrderCreator(

@@ -14,7 +14,7 @@ namespace SmartRail.Api.Tests.Operations;
 
 // Confirming a change: one transaction for the version, the change, the audit row and the
 // Catering message, and a 409 for anyone who confirms from an old preview. PostgreSQL, real
-// tokens, no RailBites.
+// tokens, no Grilled.
 public class PublishApiTests(AccessApi api) : IClassFixture<AccessApi>
 {
     private sealed class FailingOutbox : ICateringOutbox

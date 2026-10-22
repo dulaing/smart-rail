@@ -9,7 +9,7 @@ public class CallbackSignatureTests
     [Fact]
     public void Both_services_use_the_same_raw_body_signature_and_timestamp_examples()
     {
-        using var fixtures = JsonDocument.Parse(File.ReadAllText(System.IO.Path.Combine(RailBitesProcess.ServiceFolder(), "fixtures", "signed-callbacks.json")));
+        using var fixtures = JsonDocument.Parse(File.ReadAllText(System.IO.Path.Combine(GrilledProcess.ServiceFolder(), "fixtures", "signed-callbacks.json")));
         var root = fixtures.RootElement;
         var secret = root.GetProperty("secret").GetString()!;
         var now = root.GetProperty("now").GetDateTimeOffset();

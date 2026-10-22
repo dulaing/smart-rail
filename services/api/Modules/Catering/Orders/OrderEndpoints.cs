@@ -25,7 +25,7 @@ public static class OrderEndpoints
         orders.MapPost("{orderId:guid}/cancellation", Cancel);
     }
 
-    // 201 when RailBites accepted it, 202 while the outcome is unknown (poll the Location), 200
+    // 201 when Grilled accepted it, 202 while the outcome is unknown (poll the Location), 200
     // for a replay, 422 when it was refused. A refusal that happens after the link was stored
     // still carries the link ID so the same request key keeps giving the same answer.
     private static async Task<IResult> Create(

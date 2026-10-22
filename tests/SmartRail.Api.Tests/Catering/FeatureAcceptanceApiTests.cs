@@ -9,8 +9,8 @@ using SmartRail.Api.Tests.Rail;
 
 namespace SmartRail.Api.Tests.Catering;
 
-// The five feature acceptance checks of _specs/railbites.md, each walked end to end against the real
-// SmartRail API (PostgreSQL) and the real RailBites process (SQLite), with a hand-moved clock shared
+// The five feature acceptance checks of _specs/grilled.md, each walked end to end against the real
+// SmartRail API (PostgreSQL) and the real Grilled process (SQLite), with a hand-moved clock shared
 // by both. Each check is one test, named for it.
 public class FeatureAcceptanceApiTests(CallbackApi api) : IClassFixture<CallbackApi>
 {
@@ -28,7 +28,7 @@ public class FeatureAcceptanceApiTests(CallbackApi api) : IClassFixture<Callback
     private static string PointOf(string stop) => stop == "PDN" ? "peradeniya-junction" : "polgahawela-junction";
 
     private static string KioskKeyOf(string point) =>
-        point == "peradeniya-junction" ? RailBitesProcess.PeradeniyaKioskKey : RailBitesProcess.PolgahawelaKioskKey;
+        point == "peradeniya-junction" ? GrilledProcess.PeradeniyaKioskKey : GrilledProcess.PolgahawelaKioskKey;
 
     private async Task<Guid> PlaceAsync(string passenger, Corridor corridor, string stop, string item)
     {
@@ -51,7 +51,7 @@ public class FeatureAcceptanceApiTests(CallbackApi api) : IClassFixture<Callback
     }
 
     private Task<HttpResponseMessage> KioskAsync(string point, string key, string suffix, string? json = null) =>
-        api.RailBites.KioskAsync(point, key, HttpMethod.Post, suffix, json);
+        api.Grilled.KioskAsync(point, key, HttpMethod.Post, suffix, json);
 
     private async Task<Dictionary<string, int>> ReceiptsByLinkAsync(Guid link)
     {
@@ -103,21 +103,21 @@ public class FeatureAcceptanceApiTests(CallbackApi api) : IClassFixture<Callback
         }
 
         // Another collection point's kiosk cannot act on it, with either of its possible keys.
-        var wrongPath = await KioskAsync("polgahawela-junction", RailBitesProcess.PolgahawelaKioskKey, $"/{providerId}/ready");
-        var wrongKey = await KioskAsync("peradeniya-junction", RailBitesProcess.PolgahawelaKioskKey, $"/{providerId}/collected", $$"""{"pickupCode":"{{code}}"}""");
+        var wrongPath = await KioskAsync("polgahawela-junction", GrilledProcess.PolgahawelaKioskKey, $"/{providerId}/ready");
+        var wrongKey = await KioskAsync("peradeniya-junction", GrilledProcess.PolgahawelaKioskKey, $"/{providerId}/collected", $$"""{"pickupCode":"{{code}}"}""");
         Assert.Equal(HttpStatusCode.NotFound, wrongPath.StatusCode);
         Assert.Equal(HttpStatusCode.Forbidden, wrongKey.StatusCode);
         Assert.DoesNotContain(code, await wrongPath.Content.ReadAsStringAsync() + await wrongKey.Content.ReadAsStringAsync());
         Assert.Equal("ACCEPTED", (await ReadAsync(passenger, order)).GetProperty("status").GetString());
 
         // The right kiosk marks it Ready, then collects it with the code; SmartRail shows each step.
-        Assert.Equal(HttpStatusCode.OK, (await KioskAsync("peradeniya-junction", RailBitesProcess.PeradeniyaKioskKey, $"/{providerId}/ready")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await KioskAsync("peradeniya-junction", GrilledProcess.PeradeniyaKioskKey, $"/{providerId}/ready")).StatusCode);
         await api.RunCallbacksAsync();
         Assert.Equal("READY", (await ReadAsync(passenger, order)).GetProperty("status").GetString());
 
-        var wrongCode = await KioskAsync("peradeniya-junction", RailBitesProcess.PeradeniyaKioskKey, $"/{providerId}/collected", """{"pickupCode":"nope"}""");
+        var wrongCode = await KioskAsync("peradeniya-junction", GrilledProcess.PeradeniyaKioskKey, $"/{providerId}/collected", """{"pickupCode":"nope"}""");
         Assert.Equal(HttpStatusCode.UnprocessableEntity, wrongCode.StatusCode);
-        Assert.Equal(HttpStatusCode.OK, (await KioskAsync("peradeniya-junction", RailBitesProcess.PeradeniyaKioskKey, $"/{providerId}/collected", $$"""{"pickupCode":"{{code}}"}""")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await KioskAsync("peradeniya-junction", GrilledProcess.PeradeniyaKioskKey, $"/{providerId}/collected", $$"""{"pickupCode":"{{code}}"}""")).StatusCode);
         await api.RunCallbacksAsync();
 
         var collected = await ReadAsync(passenger, order);
@@ -136,7 +136,7 @@ public class FeatureAcceptanceApiTests(CallbackApi api) : IClassFixture<Callback
 
         // No-show is refused while the train is still before the stop.
         var (plgId, _) = await ProviderIdsAsync(atPolgahawela);
-        var tooSoon = await KioskAsync("polgahawela-junction", RailBitesProcess.PolgahawelaKioskKey, $"/{plgId}/no-show");
+        var tooSoon = await KioskAsync("polgahawela-junction", GrilledProcess.PolgahawelaKioskKey, $"/{plgId}/no-show");
         Assert.Equal(HttpStatusCode.Conflict, tooSoon.StatusCode);
         Assert.Equal("TRAIN_NOT_PASSED", (await tooSoon.JsonAsync()).GetProperty("code").GetString());
 
@@ -162,7 +162,7 @@ public class FeatureAcceptanceApiTests(CallbackApi api) : IClassFixture<Callback
         Assert.Equal("ACCEPTED", (await ReadAsync(passenger, atPeradeniya)).GetProperty("status").GetString());
 
         // The train has now been seen leaving Polgahawela, so No-show is accepted and reaches the passenger.
-        var noShow = await KioskAsync("polgahawela-junction", RailBitesProcess.PolgahawelaKioskKey, $"/{plgId}/no-show");
+        var noShow = await KioskAsync("polgahawela-junction", GrilledProcess.PolgahawelaKioskKey, $"/{plgId}/no-show");
         Assert.Equal(HttpStatusCode.OK, noShow.StatusCode);
         await api.RunCallbacksAsync();
         Assert.Equal("NO_SHOW", (await ReadAsync(passenger, atPolgahawela)).GetProperty("status").GetString());
@@ -175,7 +175,7 @@ public class FeatureAcceptanceApiTests(CallbackApi api) : IClassFixture<Callback
     }
 
     [RequiresDatabaseFact]
-    public async Task Check_3_an_early_ending_with_RailBites_stopped_cancels_once_after_it_returns_and_a_withdrawal_reopens_ordering()
+    public async Task Check_3_an_early_ending_with_Grilled_stopped_cancels_once_after_it_returns_and_a_withdrawal_reopens_ordering()
     {
         var passenger = await NewPassengerAsync();
         var corridor = await api.RunningCorridorAsync();
@@ -183,7 +183,7 @@ public class FeatureAcceptanceApiTests(CallbackApi api) : IClassFixture<Callback
         var beyond = await PlaceAsync(passenger, corridor, "PDN", "pdn-fish-bun");
         var buns = await api.ProviderStockAsync("peradeniya-junction", "pdn-fish-bun");
 
-        await api.RailBites.StopAsync();
+        await api.Grilled.StopAsync();
         Guid ending;
         try
         {
@@ -198,8 +198,8 @@ public class FeatureAcceptanceApiTests(CallbackApi api) : IClassFixture<Callback
         }
         finally
         {
-            await api.RailBites.StartAsync();
-            await api.RailBites.SetNowAsync(api.Clock.Now);
+            await api.Grilled.StartAsync();
+            await api.Grilled.SetNowAsync(api.Clock.Now);
         }
 
         await api.AdvanceAsync(TimeSpan.FromSeconds(5));
@@ -216,7 +216,7 @@ public class FeatureAcceptanceApiTests(CallbackApi api) : IClassFixture<Callback
         var oldEvent = (await api.OutboxOfAsync(corridor)).First().Payload;
         await api.PublishAsync(corridor, ChangeBodies.Withdraw(ending));
         await DeliverEverythingAsync();
-        var replay = await api.RailBites.Http.PostAsync("/v1/journey-events", new StringContent(oldEvent, Encoding.UTF8, "application/json"));
+        var replay = await api.Grilled.Http.PostAsync("/v1/journey-events", new StringContent(oldEvent, Encoding.UTF8, "application/json"));
         Assert.Equal("DUPLICATE", (await replay.JsonAsync()).GetProperty("result").GetString());
 
         Assert.Equal("CANCELLED", (await ReadAsync(passenger, beyond)).GetProperty("status").GetString());
@@ -247,8 +247,8 @@ public class FeatureAcceptanceApiTests(CallbackApi api) : IClassFixture<Callback
             }
         }
 
-        var committedThenLost = await PlaceLostAsync(ProxyMode.DropResponse); // RailBites has this order
-        var lostBeforeCommit = await PlaceLostAsync(ProxyMode.DropRequest);   // RailBites never saw this one
+        var committedThenLost = await PlaceLostAsync(ProxyMode.DropResponse); // Grilled has this order
+        var lostBeforeCommit = await PlaceLostAsync(ProxyMode.DropRequest);   // Grilled never saw this one
         Assert.NotNull(await api.ProviderOrderAsync(committedThenLost));
         Assert.Null(await api.ProviderOrderAsync(lostBeforeCommit));
 
@@ -258,21 +258,21 @@ public class FeatureAcceptanceApiTests(CallbackApi api) : IClassFixture<Callback
         await api.RunPlacementPassAsync();
         await api.RunCallbacksAsync();
 
-        // The order RailBites accepted was cancelled with a reason; the passenger is told, not left waiting.
+        // The order Grilled accepted was cancelled with a reason; the passenger is told, not left waiting.
         var accepted = await ReadAsync(passenger, committedThenLost);
         Assert.Equal(("CANCELLED", "TRAIN_ENDED_EARLY"), (accepted.GetProperty("status").GetString(), accepted.GetProperty("reasonCode").GetString()));
 
         // The other is not called refused while its lost request might still be arriving.
         Assert.Equal("PLACING", (await ReadAsync(passenger, lostBeforeCommit)).GetProperty("status").GetString());
 
-        // If that request does arrive late, describing the journey before the change, RailBites refuses it.
+        // If that request does arrive late, describing the journey before the change, Grilled refuses it.
         var late = $$"""
             {"collectionPointId":"peradeniya-junction",
              "journey":{"journeyId":"{{corridor.JourneyId}}","trainNumber":"SIM-3001","serviceDate":"{{corridor.Date:yyyy-MM-dd}}","version":0,"orderClosed":false,"blockedPickupStopIds":[]},
              "pickup":{"stopId":"{{corridor.Stop("PDN")}}","stationId":"04111fa9-fc9c-3657-e13b-d606dbe37c55","scheduledArrival":"{{corridor.At("11:50"):yyyy-MM-dd'T'HH:mm:ss.fff'Z'}}","estimatedArrival":"{{corridor.At("11:50"):yyyy-MM-dd'T'HH:mm:ss.fff'Z'}}","etaEvidenceAt":"{{api.Clock.Now.AddSeconds(-10):yyyy-MM-dd'T'HH:mm:ss.fff'Z'}}"},
              "items":[{"menuItemId":"pdn-fish-bun","quantity":1}]}
             """;
-        var arrived = await api.RailBites.Http.PutAsync($"/v1/order-links/{lostBeforeCommit}", new StringContent(late, Encoding.UTF8, "application/json"));
+        var arrived = await api.Grilled.Http.PutAsync($"/v1/order-links/{lostBeforeCommit}", new StringContent(late, Encoding.UTF8, "application/json"));
         Assert.Equal(HttpStatusCode.UnprocessableEntity, arrived.StatusCode);
 
         // Once the lost attempt has settled, and only then, the passenger sees a final refusal.
@@ -281,7 +281,7 @@ public class FeatureAcceptanceApiTests(CallbackApi api) : IClassFixture<Callback
         var refused = await ReadAsync(passenger, lostBeforeCommit);
         Assert.Equal(("REJECTED", "STOP_NOT_SERVED"), (refused.GetProperty("status").GetString(), refused.GetProperty("reasonCode").GetString()));
 
-        // Neither order survives at RailBites as live, and stock is whole again.
+        // Neither order survives at Grilled as live, and stock is whole again.
         Assert.Null(await api.ProviderOrderAsync(lostBeforeCommit));
         Assert.Equal("CANCELLED", (await api.ProviderOrderAsync(committedThenLost))!.Value.GetProperty("status").GetString());
         Assert.Equal(buns, await api.ProviderStockAsync("peradeniya-junction", "pdn-fish-bun"));
@@ -301,8 +301,8 @@ public class FeatureAcceptanceApiTests(CallbackApi api) : IClassFixture<Callback
         api.Bridge.Mode = ProxyMode.ServiceUnavailable;
         try
         {
-            Assert.Equal(HttpStatusCode.OK, (await KioskAsync("peradeniya-junction", RailBitesProcess.PeradeniyaKioskKey, $"/{providerId}/ready")).StatusCode);
-            Assert.Equal(HttpStatusCode.OK, (await KioskAsync("peradeniya-junction", RailBitesProcess.PeradeniyaKioskKey, $"/{providerId}/collected", $$"""{"pickupCode":"{{code}}"}""")).StatusCode);
+            Assert.Equal(HttpStatusCode.OK, (await KioskAsync("peradeniya-junction", GrilledProcess.PeradeniyaKioskKey, $"/{providerId}/ready")).StatusCode);
+            Assert.Equal(HttpStatusCode.OK, (await KioskAsync("peradeniya-junction", GrilledProcess.PeradeniyaKioskKey, $"/{providerId}/collected", $$"""{"pickupCode":"{{code}}"}""")).StatusCode);
             for (var i = 0; i < 3; i++)
             {
                 await api.AdvanceAsync(TimeSpan.FromSeconds(20));
@@ -315,14 +315,14 @@ public class FeatureAcceptanceApiTests(CallbackApi api) : IClassFixture<Callback
         }
 
         Assert.Equal("ACCEPTED", (await ReadAsync(passenger, order)).GetProperty("status").GetString());
-        var waiting = (await api.RailBites.Http.GetFromJsonAsync<JsonElement>("/internal/test/callbacks")).GetProperty("callbacks")
+        var waiting = (await api.Grilled.Http.GetFromJsonAsync<JsonElement>("/internal/test/callbacks")).GetProperty("callbacks")
             .EnumerateArray().Where(c => c.GetProperty("deliveredAt").ValueKind == JsonValueKind.Null).ToList();
         Assert.Equal(2, waiting.Count);
 
-        // Restart RailBites: the undelivered callbacks were in its database, and still are.
-        await api.RailBites.RestartAsync();
-        await api.RailBites.SetNowAsync(api.Clock.Now);
-        waiting = (await api.RailBites.Http.GetFromJsonAsync<JsonElement>("/internal/test/callbacks")).GetProperty("callbacks")
+        // Restart Grilled: the undelivered callbacks were in its database, and still are.
+        await api.Grilled.RestartAsync();
+        await api.Grilled.SetNowAsync(api.Clock.Now);
+        waiting = (await api.Grilled.Http.GetFromJsonAsync<JsonElement>("/internal/test/callbacks")).GetProperty("callbacks")
             .EnumerateArray().Where(c => c.GetProperty("deliveredAt").ValueKind == JsonValueKind.Null).ToList();
         Assert.Equal(2, waiting.Count);
 
@@ -342,12 +342,12 @@ public class FeatureAcceptanceApiTests(CallbackApi api) : IClassFixture<Callback
         await api.RunCallbacksAsync();
         Assert.Equal("COLLECTED", (await ReadAsync(passenger, order)).GetProperty("status").GetString());
         Assert.Equal(stockAfterOrder, await api.ProviderStockAsync("peradeniya-junction", "pdn-lamprais"));
-        Assert.All((await api.RailBites.Http.GetFromJsonAsync<JsonElement>("/internal/test/callbacks")).GetProperty("callbacks").EnumerateArray()
+        Assert.All((await api.Grilled.Http.GetFromJsonAsync<JsonElement>("/internal/test/callbacks")).GetProperty("callbacks").EnumerateArray()
             .Where(c => c.GetProperty("eventId").GetString()!.StartsWith(providerId)), c => Assert.NotEqual(JsonValueKind.Null, c.GetProperty("deliveredAt").ValueKind));
 
         // Both services restarted: the order, its receipts and its delivered state are still there.
-        await api.RailBites.RestartAsync();
-        await api.RailBites.SetNowAsync(api.Clock.Now);
+        await api.Grilled.RestartAsync();
+        await api.Grilled.SetNowAsync(api.Clock.Now);
         Assert.Equal("COLLECTED", (await api.ProviderOrderAsync(order))!.Value.GetProperty("status").GetString());
         var afterBoth = await (await restarted.CreateClient().SendAsync(new HttpRequestMessage(HttpMethod.Get, $"/api/food/orders/{order}")
         {

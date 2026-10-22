@@ -11,7 +11,7 @@
 tmp/
 temp/
 
-# Node.js (React apps and RailBites)
+# Node.js (React apps and Grilled)
 node_modules/
 dist/
 coverage/
@@ -68,11 +68,17 @@ artifacts/
 Thumbs.db
 Desktop.ini
 
-# RailBites local SQLite files
-services/railbites/data/
+# Grilled local SQLite files
+services/grilled/data/
 
 # Generated image workspace (curated assets live in shared/design)
 /output/
 
 # Local agent worktrees
 /.claude/worktrees/
+
+# Golden-test diff output (regenerated on every failing run)
+apps/passenger_app/test/visual/failures/
+
+# Scratch render output
+/work/

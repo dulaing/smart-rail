@@ -9,7 +9,7 @@ using SmartRail.Api.Tests.Rail;
 
 namespace SmartRail.Api.Tests.Catering;
 
-// What happens when RailBites does not answer: a timeout is never read as a refusal, the link ID
+// What happens when Grilled does not answer: a timeout is never read as a refusal, the link ID
 // never changes, and at most one provider order survives. The proxy loses a request or its
 // response on demand; the retry pass is run by hand at times the test chooses.
 public class PlacementRecoveryApiTests(CateringApi api) : IClassFixture<CateringApi>
@@ -144,7 +144,7 @@ public class PlacementRecoveryApiTests(CateringApi api) : IClassFixture<Catering
     {
         var passenger = await NewPassengerAsync();
         var corridor = await api.RunningCorridorAsync();
-        await api.RailBites.StopAsync();
+        await api.Grilled.StopAsync();
         Guid linkId;
         try
         {
@@ -154,8 +154,8 @@ public class PlacementRecoveryApiTests(CateringApi api) : IClassFixture<Catering
         }
         finally
         {
-            await api.RailBites.StartAsync();
-            await api.RailBites.SetNowAsync(api.Clock.Now);
+            await api.Grilled.StartAsync();
+            await api.Grilled.SetNowAsync(api.Clock.Now);
         }
 
         Assert.Null(await api.ProviderOrderAsync(linkId));

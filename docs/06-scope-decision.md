@@ -32,7 +32,7 @@ Food ordering proves that an external company can react to a railway change. It 
 
 ## The eight-minute demo story
 
-The people in the demo are Kasun (Gampaha–Fort commuter), Fathima (Tamil-first occasional traveller), Sunil (driver), Dilani (controller), and a RailBites kiosk worker.
+The people in the demo are Kasun (Gampaha–Fort commuter), Fathima (Tamil-first occasional traveller), Sunil (driver), Dilani (controller), and a Grilled kiosk worker.
 
 The trains are fictional **SR-DEMO** journeys using real corridor stations. The seed-demo --anchor command schedules them relative to the presentation start; the app itself still uses the real clock. Fix the precise times at rehearsal, before the day-10 gate.
 
@@ -43,14 +43,14 @@ The trains are fictional **SR-DEMO** journeys using real corridor stations. The 
 | C | Leaves Fort about 15 minutes into the talk. Used to show a platform change and cancellation; an early-ending scenario can be shown separately. |
 | D | Reaches a food collection station during the talk. Its order was placed earlier, so staff can show collection. |
 
-1. Kasun opens Gampaha → Colombo Fort without signing in and sees the next trains, boarding platform and update times. Fathima finds A, signs in only when she orders lunch for collection at Peradeniya. RailBites confirms the order and gives a pickup code.
+1. Kasun opens Gampaha → Colombo Fort without signing in and sees the next trains, boarding platform and update times. Fathima finds A, signs in only when she orders lunch for collection at Peradeniya. Grilled confirms the order and gives a pickup code.
 2. Sunil reports a signal failure from A's driver app using a short reason form.
 3. Dilani opens an incident, enters a 25-minute delay, sees which stops, screens, saved journeys and food orders will be affected, then publishes it.
-4. The passenger app shows the delay and who confirmed it. Peradeniya's entrance board shows it in Sinhala, Tamil and English. The driver briefing updates. RailBites and Fathima see the new arrival and collection time.
+4. The passenger app shows the delay and who confirmed it. Peradeniya's entrance board shows it in Sinhala, Tamil and English. The driver briefing updates. Grilled and Fathima see the new arrival and collection time.
 5. B shows **“Arrival unknown — last seen at Veyangoda at 10:02.”** Its route map shows the stations but no current train marker. Food ordering for B is blocked. Resume its feed to show the marker and arrival estimate return. The simulation console can pause it again if the panel asks.
 6. D arrives; kiosk staff enter the pickup code; Fathima sees **Collected**. Dilani resolves the incident, the auditor sees the history, and the system administrator gets a **403** (permission denied) when trying to change a train's status. That denied attempt is also audited.
 
-**Optional failure demo:** Make RailBites return 503, then cancel C. Train information still works. The health panel shows the pending catering message. Restore RailBites; the message is delivered and the order is cancelled.
+**Optional failure demo:** Make Grilled return 503, then cancel C. Train information still works. The health panel shows the pending catering message. Restore Grilled; the message is delivered and the order is cancelled.
 
 **Early-ending drill:** End a train at Polgahawela after a passenger has ordered food for Peradeniya. The passenger app, station board and driver briefing say where the train now ends. Earlier valid stops stay visible; Peradeniya loses its arrival estimate and new food-order option. The existing Peradeniya order is cancelled with a reason. The pilot has no refund step because payment happens at collection.
 
@@ -90,7 +90,7 @@ The trains are fictional **SR-DEMO** journeys using real corridor stations. The 
 
 **Do not build:** free-text station notices or staff corrections to the board.
 
-### RailBites — a separate Node/TypeScript service with SQLite
+### Grilled — a separate Node/TypeScript service with SQLite
 
 **Build:** provider-owned collection points and cutoff policy, an orders API that is safe to retry, signed order-status webhooks, and a receiver for train-change events.
 
@@ -116,23 +116,23 @@ These are the technical decisions behind the scope. The D-numbers let us refer b
 
 **D4 — Simulator, ETA and map.** The simulator sends a position every 30 seconds through the same input route a future real feed would use. Each position gives the section between two stations and approximate progress along it, not GPS coordinates. The passenger route map draws this progress from the train-detail response. ETA is scheduled arrival plus the current delay. Current delay is the greatest of observed delay, staff-confirmed delay and time already overdue at the next stop. A simulated train never leaves early. Station-only reports would be too far apart for the four-minute freshness rule, so the simulator sends positions between stations. The map says **SmartRail simulation** and shows when the position was last updated.
 
-**D5 — Freshness.** At three minutes since the underlying observation, show that information is ageing. At four minutes, show the observation-dependent position and ETA as **unknown**; hide the moving marker. A separately confirmed platform change stays visible with its own confirmation time. SmartRail blocks new food orders when train status is unknown; it does not send a new “unknown” event to RailBites. The client calculates age from the observation timestamp, correcting for the difference between server and device clocks. The server supplies the thresholds. The same examples are tested in C#, Dart and TypeScript. Older two/ten-minute and three-minute rules in the design visualiser are retired.
+**D5 — Freshness.** At three minutes since the underlying observation, show that information is ageing. At four minutes, show the observation-dependent position and ETA as **unknown**; hide the moving marker. A separately confirmed platform change stays visible with its own confirmation time. SmartRail blocks new food orders when train status is unknown; it does not send a new “unknown” event to Grilled. The client calculates age from the observation timestamp, correcting for the difference between server and device clocks. The server supplies the thresholds. The same examples are tested in C#, Dart and TypeScript. Older two/ten-minute and three-minute rules in the design visualiser are retired.
 
 **D6 — Updates to screens.** Polling is the dependable path: station and operations screens every 15 seconds; mobile every 30 seconds, plus refresh on reopening or pull-to-refresh. Use ETags (version labels) so unchanged answers are cheap. A one-way server hint saying only “something changed” is optional. No SignalR; it would add a Flutter dependency and more server setup.
 
-**D7 — Real external boundary.** RailBites runs separately in Node/TypeScript and owns its SQLite database. Write its OpenAPI contract (the agreed API shape) first. Do not share code classes or data objects across the boundary. The passenger app calls only SmartRail; SmartRail calls RailBites.
+**D7 — Real external boundary.** Grilled runs separately in Node/TypeScript and owns its SQLite database. Write its OpenAPI contract (the agreed API shape) first. Do not share code classes or data objects across the boundary. The passenger app calls only SmartRail; SmartRail calls Grilled.
 
-**D8 — Safe retries and webhooks.** Every order request has an idempotency key, so retries do not make two orders. A PostgreSQL **outbox** stores messages until RailBites receives them, retrying with increasing delays. Status callbacks (**webhooks**) have an HMAC-SHA256 signature, a secret-key check over the timestamp and exact raw message. Reject timestamps outside five minutes, repeated event IDs and old status sequence numbers. Test signed example messages in both services. A separate Pact setup is unnecessary when one person owns both sides.
+**D8 — Safe retries and webhooks.** Every order request has an idempotency key, so retries do not make two orders. A PostgreSQL **outbox** stores messages until Grilled receives them, retrying with increasing delays. Status callbacks (**webhooks**) have an HMAC-SHA256 signature, a secret-key check over the timestamp and exact raw message. Reject timestamps outside five minutes, repeated event IDs and old status sequence numbers. Test signed example messages in both services. A separate Pact setup is unnecessary when one person owns both sides.
 
 **D8a — Staff edit conflict.** A service-change draft carries a version. If another controller has already saved a newer version, the old draft returns **409 Conflict**. Show the user the latest version and require a fresh review before saving. This applies to the change itself; the existing order-cutoff 409 is a different rule. Demonstrate a two-controller conflict before claiming this protection in the viva.
 
-**D9 — Login and permissions (revised 14 October).** Public station, timetable, train-status and disruption reads explicitly allow guests; rate-limit these reads. Saved commutes, following for personal alerts, food orders and all staff actions require a signed-in account with the right permission. **Keycloak is the identity provider** for passenger and staff sign-in. Browser and Flutter clients use OpenID Connect Authorization Code with PKCE; the API validates Keycloak's issuer, signing keys, audience and token lifetime. Keycloak owns credentials and refresh-token lifecycle; SmartRail does not issue tokens or store password hashes or refresh tokens. SmartRail keeps a local account linked by issuer and subject and owns its role-to-permission map, station scopes and driver assignments. Deny by default; check local account status and scope on authenticated requests. Seed demo users and roles reproducibly. Use separate service authentication for RailBites callbacks as described in D8. See [identity and local development](architecture/identity-and-local-development.md).
+**D9 — Login and permissions (revised 14 October).** Public station, timetable, train-status and disruption reads explicitly allow guests; rate-limit these reads. Saved commutes, following for personal alerts, food orders and all staff actions require a signed-in account with the right permission. **Keycloak is the identity provider** for passenger and staff sign-in. Browser and Flutter clients use OpenID Connect Authorization Code with PKCE; the API validates Keycloak's issuer, signing keys, audience and token lifetime. Keycloak owns credentials and refresh-token lifecycle; SmartRail does not issue tokens or store password hashes or refresh tokens. SmartRail keeps a local account linked by issuer and subject and owns its role-to-permission map, station scopes and driver assignments. Deny by default; check local account status and scope on authenticated requests. Seed demo users and roles reproducibly. Use separate service authentication for Grilled callbacks as described in D8. See [identity and local development](architecture/identity-and-local-development.md).
 
 **D10 — Offline behaviour differs by app.** Passenger: cached public timetable works for guests; signed-in saved information stays private. Both show age labels. The route map keeps its stations but hides the train marker when the position becomes unknown; no food order while offline. Driver: cached briefing and, if time allows, an outbox for non-urgent reports. Station: a service worker keeps the last board and falls back to timetable-only display. Operations: no offline writes. Old data never appears current. No mobile database or train-side edge computer.
 
-**D11 — One Azure environment (revised 14 October).** Run the API, RailBites and Keycloak as separate Azure Container Apps for the pilot; Keycloak needs a stable public HTTPS issuer and a persistent database. Keep one API replica, one RailBites replica and at least one Keycloak replica during the live demo. Use separate SmartRail and Keycloak databases on PostgreSQL Flexible Server; never put Keycloak tables in SmartRail's schemas. RailBites' SQLite file also needs a tested persistent storage plan; a Container App's writable filesystem disappears on restart. Keep the free Static Web Apps tier. **.NET Aspire AppHost is the local development and local demo stack** for the API, RailBites, PostgreSQL and Keycloak, with its dashboard for local telemetry; it is not the Azure production orchestrator. Cap Application Insights data and set budget alerts. Re-estimate Container Apps memory and database cost with Keycloak before relying on the USD 200 credit; the earlier B1ms assumption is unverified for this larger stack. The original plan says to delete Azure resources after 20 October. Three environments, Bicep and Key Vault are deferred.
+**D11 — One Azure environment (revised 14 October).** Run the API, Grilled and Keycloak as separate Azure Container Apps for the pilot; Keycloak needs a stable public HTTPS issuer and a persistent database. Keep one API replica, one Grilled replica and at least one Keycloak replica during the live demo. Use separate SmartRail and Keycloak databases on PostgreSQL Flexible Server; never put Keycloak tables in SmartRail's schemas. Grilled' SQLite file also needs a tested persistent storage plan; a Container App's writable filesystem disappears on restart. Keep the free Static Web Apps tier. **.NET Aspire AppHost is the local development and local demo stack** for the API, Grilled, PostgreSQL and Keycloak, with its dashboard for local telemetry; it is not the Azure production orchestrator. Cap Application Insights data and set budget alerts. Re-estimate Container Apps memory and database cost with Keycloak before relying on the USD 200 credit; the earlier B1ms assumption is unverified for this larger stack. The original plan says to delete Azure resources after 20 October. Three environments, Bicep and Key Vault are deferred.
 
-**D12 — Know when it breaks.** Instrument the API and RailBites with OpenTelemetry. Send local telemetry to the Aspire dashboard and Azure telemetry to Application Insights, including a trace across the catering boundary. The dashboard is a local viewer, not durable production storage. Return a correlation ID (a request tracking number) with API errors. Add /health/live and /health/ready; if RailBites is down, report the API as **Degraded**, not Down. Watch feed staleness, rejected webhooks, outbox backlog and when each display was last seen. Check Keycloak availability separately; existing JWTs can still be validated while login is unavailable. Have one alert, a runbook and three measurable reliability targets. No Prometheus/Grafana stack.
+**D12 — Know when it breaks.** Instrument the API and Grilled with OpenTelemetry. Send local telemetry to the Aspire dashboard and Azure telemetry to Application Insights, including a trace across the catering boundary. The dashboard is a local viewer, not durable production storage. Return a correlation ID (a request tracking number) with API errors. Add /health/live and /health/ready; if Grilled is down, report the API as **Degraded**, not Down. Watch feed staleness, rejected webhooks, outbox backlog and when each display was last seen. Check Keycloak availability separately; existing JWTs can still be validated while login is unavailable. Have one alert, a runbook and three measurable reliability targets. No Prometheus/Grafana stack.
 
 **D13 — Languages.** Put translation plumbing in every app. Translate about 40 fixed status and reason phrases into Sinhala, Tamil and English, and have native readers check them. Put all three together on public displays; use them on passenger home and detail. Staff apps stay in English for the pilot, explicitly as an assumption. Do not machine-translate free text. Bundle Noto fonts.
 
@@ -142,17 +142,17 @@ These are the technical decisions behind the scope. The D-numbers let us refer b
 
 ## Food ordering rules
 
-RailBites owns the **menu, collection points, order, stock, cutoff and payment**. In the demo it offers Polgahawela Junction and Peradeniya Junction. SmartRail offers a collection point only if it is still ahead of the train.
+Grilled owns the **menu, collection points, order, stock, cutoff and payment**. In the demo it offers Polgahawela Junction and Peradeniya Junction. SmartRail offers a collection point only if it is still ahead of the train.
 
-- A passenger may order for a journey on the same day until **estimated arrival minus the provider's cutoff**. The default cutoff is 30 minutes; RailBites owns the setting. Do not take orders when train status is unknown. The live-change drill changes the cutoff to 45 minutes in RailBites only.
+- A passenger may order for a journey on the same day until **estimated arrival minus the provider's cutoff**. The default cutoff is 30 minutes; Grilled owns the setting. Do not take orders when train status is unknown. The live-change drill changes the cutoff to 45 minutes in Grilled only.
 - Orders cannot be edited. Before the cutoff, a passenger can cancel freely and place a new order. After it, cancellation is unavailable.
 - If the train is delayed, SmartRail sends the confirmed new ETA from its outbox. The order stays with that train and the ordering window extends. If the train is cancelled or stops before the collection station, the provider cancels the order and the passenger sees why.
-- For an early ending, keep valid stops before the new final station. Do not offer collection beyond it. Send the confirmed change to RailBites so it cancels **existing** orders beyond it and tells the passenger why. The provider does not need an event when a position simply becomes stale.
+- For an early ending, keep valid stops before the new final station. Do not offer collection beyond it. Send the confirmed change to Grilled so it cancels **existing** orders beyond it and tells the passenger why. The provider does not need an event when a position simply becomes stale.
 - If the passenger does not collect it, the provider marks it **No-show** after the train leaves. Show that policy before the order is confirmed.
 - Passengers pay **at the kiosk**. SmartRail handles no card details, and this pilot has no automatic refund. The provider supplies the menu; SmartRail may cache it for 60 seconds, but the provider checks stock again when the order is submitted. If an item is gone or the provider rejects the order, show its reason. Stock changes are fetched when browsing and checked at submit; pushing them is deferred.
-- SmartRail stores the link between the passenger and the provider's order reference. RailBites receives the dated journey ID, train number, collection station, scheduled and estimated arrival, items and pickup code. It receives **no passenger name, phone number or email**.
-- RailBites gives the pickup code. Kiosk staff enter it to mark collection, and a signed status webhook changes the passenger's card to **Collected**.
-- SmartRail never caches the provider's cutoff. Both sides use the same ETA, kept in sync by the outbox. If SmartRail thought an order was allowed but RailBites rejects it, show the provider's reason.
+- SmartRail stores the link between the passenger and the provider's order reference. Grilled receives the dated journey ID, train number, collection station, scheduled and estimated arrival, items and pickup code. It receives **no passenger name, phone number or email**.
+- Grilled gives the pickup code. Kiosk staff enter it to mark collection, and a signed status webhook changes the passenger's card to **Collected**.
+- SmartRail never caches the provider's cutoff. Both sides use the same ETA, kept in sync by the outbox. If SmartRail thought an order was allowed but Grilled rejects it, show the provider's reason.
 
 ## Who can do what
 
@@ -168,7 +168,7 @@ These are **pilot roles**, not a claim about Sri Lanka Railways' official OMS ro
 | Auditor | Read incidents and the audit history | No operational edits |
 | SysAdmin | Manage SmartRail account status and role grants; Keycloak identity provisioning is separate | Cannot change train status |
 | SimOperator | Pause, resume and inject simulated train events | Console exists only when Simulation:Enabled=true |
-| RailBites service | Send order-status webhooks and check eligibility | Its own orders |
+| Grilled service | Send order-status webhooks and check eligibility | Its own orders |
 
 The demonstration shows a controller publishing (E2E-1), a driver reporting (E2E-5), an auditor reading the trail, and a system administrator being denied with **403**. Security tests also try a station user at another station and a passenger trying to read someone else's order.
 
@@ -184,17 +184,17 @@ There are **five automated end-to-end journeys**. Playwright covers the connecte
 
 1. **Delay reaches everyone:** a guest opens the next-trains view without a token; a controller publishes a delay; the passenger API, driver briefing and station board show the same confirmed-by and confirmed-at details, plus the simulation label; the audit record exists.
 2. **Old data is called old:** stop a train's feed; show ageing at three minutes and unknown at four. The passenger map must hide its train marker at four minutes and restore it only after a new position arrives. Then disconnect the display, show **Live updates unavailable**, reconnect and recover. Use test clocks rather than waiting four real minutes.
-3. **Food follows the train:** order food, publish a delay, verify RailBites gets the new ETA, collect with a pickup code and verify the signed webhook updates the passenger card.
-4. **Cancellation and early ending reach orders:** cancel a train, then end a different train early. RailBites cancels existing orders at stations the affected train will not reach; public screens name the change and keep valid earlier stops.
+3. **Food follows the train:** order food, publish a delay, verify Grilled gets the new ETA, collect with a pickup code and verify the signed webhook updates the passenger card.
+4. **Cancellation and early ending reach orders:** cancel a train, then end a different train early. Grilled cancels existing orders at stations the affected train will not reach; public screens name the change and keep valid earlier stops.
 5. **Driver report becomes an incident:** driver files a report; delivery first shows **Sent — awaiting Control acknowledgement**. A controller actively acknowledges it, so the driver sees a name and time. The controller opens an incident, publishes a change and resolves it; the auditor sees the history.
 
-**Tests below that level:** xUnit checks ETA, precedence, freshness, early-ending stop eligibility, order cutoff and incident states. API integration tests use WebApplicationFactory and Testcontainers PostgreSQL. They cover public reads without a token, denial of guest access to saved commutes and orders, an audit row with each change, outbox delivery, RailBites recovery, cancellation of existing orders beyond an early-ending station, an order-cutoff 409, and a separate two-controller edit-conflict 409. A report test distinguishes **Not sent**, server receipt and a real controller acknowledgement with name and time. A security test lists every endpoint and fails if its permissions are missing. It also checks cross-station access, someone else's order, expired temporary access, bad HMACs, replays and duplicate messages. The committed catering OpenAPI file, webhook schemas and signed sample messages are checked by .NET and Node. Flutter widget tests cover every home-screen state and built-in accessibility checks; Vitest covers display freshness and offline components. Change the stale threshold from four to five minutes once as a spot-check and record which tests fail.
+**Tests below that level:** xUnit checks ETA, precedence, freshness, early-ending stop eligibility, order cutoff and incident states. API integration tests use WebApplicationFactory and Testcontainers PostgreSQL. They cover public reads without a token, denial of guest access to saved commutes and orders, an audit row with each change, outbox delivery, Grilled recovery, cancellation of existing orders beyond an early-ending station, an order-cutoff 409, and a separate two-controller edit-conflict 409. A report test distinguishes **Not sent**, server receipt and a real controller acknowledgement with name and time. A security test lists every endpoint and fails if its permissions are missing. It also checks cross-station access, someone else's order, expired temporary access, bad HMACs, replays and duplicate messages. The committed catering OpenAPI file, webhook schemas and signed sample messages are checked by .NET and Node. Flutter widget tests cover every home-screen state and built-in accessibility checks; Vitest covers display freshness and offline components. Change the stale threshold from four to five minutes once as a spot-check and record which tests fail.
 
 **QA evidence:** keep a defect log with the source of each defect (AI code, your code, or a missed requirement). Upload Playwright reports and traces from CI. Save evidence on days 10, 16 and 19. Put requirement IDs in test names so a script can build a traceability matrix. On day 17, write a two-page quality review with an ISO 25010 scorecard, open defects and an honest verdict: **fit for a pilot demo, not production, because…** Load, chaos and device testing are described rather than run; pilot-scale results would not change the build decision.
 
 ### Security and privacy
 
-Draw one data-flow diagram with four trust boundaries: public clients, staff devices, Azure and RailBites. Use STRIDE to list threats, and link each threat to a control and test. Make version 1 on day 3 and version 2 on day 16.
+Draw one data-flow diagram with four trust boundaries: public clients, staff devices, Azure and Grilled. Use STRIDE to list threats, and link each threat to a control and test. Make version 1 on day 3 and version 2 on day 16.
 
 **Build these controls:** Keycloak login; issuer/audience/signature/expiry validation; deny-by-default permissions with station/journey scope; an authorization test for every endpoint; input validation and plain API error responses without stack traces outside Development; rate limits for public reads and Keycloak brute-force protection for login; signed catering webhooks; order idempotency; audit rows committed with the change; HTTPS, CORS allowlist and a Content Security Policy. Keep local secrets in Aspire parameters or user-secrets, CI secrets in GitHub, Azure secrets in Container Apps, and mobile tokens in flutter_secure_storage. Run gitleaks, Dependabot, .NET vulnerable-package checks and npm audit.
 
@@ -205,7 +205,7 @@ Run ZAP API and baseline scans on days 10 and 16, record how each finding was ha
 | Public | Stations, timetable, disruptions, simulated positions | Indefinite | Everyone |
 | Passenger personal | Email and credential data in Keycloak; local account reference, saved journeys and order references in SmartRail | Until deleted; orders 90 days | The passenger; staff see counts only |
 | Operational | Incidents, driver reports, audit rows, staff IDs | Audit one year; positions 30 days | By role; auditor can read audit |
-| Sent to RailBites | Pickup code, journey, station, arrival times, items | RailBites' policy | RailBites |
+| Sent to Grilled | Pickup code, journey, station, arrival times, items | Grilled' policy | Grilled |
 | Secrets | Keycloak admin and database credentials, provider HMAC secret | As required | Deployment pipeline |
 
 Never log request bodies, authentication headers, email or phone. Run an order flow into a test log sink and fail if email or phone patterns appear. Cite Sri Lanka's Personal Data Protection Act No. 9 of 2022 in the privacy note, and **check which provisions are in force** rather than assuming.
@@ -216,7 +216,7 @@ Run axe in the web end-to-end tests and fail CI for serious or critical findings
 
 ## Design work and screen rules
 
-Timebox design to about **1.75 days**. G0 is a time limit, not permission to delay implementation: if the polished screens are not done by Sunday 4 October, build from the wireframes. Make basic wireframes for every surface by day 3, including the terminal and RailBites; draw flows in Mermaid. Polish only four screens: passenger home, train detail in three states, platform board and entrance board. Build operations web with the shared tokens and ordinary controls.
+Timebox design to about **1.75 days**. G0 is a time limit, not permission to delay implementation: if the polished screens are not done by Sunday 4 October, build from the wireframes. Make basic wireframes for every surface by day 3, including the terminal and Grilled; draw flows in Mermaid. Polish only four screens: passenger home, train detail in three states, platform board and entrance board. Build operations web with the shared tokens and ordinary controls.
 
 At G0, have tokens.json and status.json for all eight states and their icons, a passing contrast script, a status sheet using long Tamil placeholder text, and the four polished screens. Get native-reader feedback on translations by day 9 and freeze strings on day 12. After G0, **the code is the source of truth**; do not try to keep Figma and code automatically synced.
 
@@ -236,7 +236,7 @@ The five most important exclusions to explain are:
 | --- | --- | --- |
 | Real SLR train positions | All moving trains are simulated and labelled. Only published schedules come from real sources. | SLR offers an authorised feed |
 | Safety-critical driver instructions | Speed orders and movement authority require official rules, reliable data and safety approval. The app offers an informational briefing only. | Railway approval exists |
-| Online payment | RailBites owns the order and takes payment at the kiosk; SmartRail handles no card data. | SmartRail becomes the seller |
+| Online payment | Grilled owns the order and takes payment at the kiosk; SmartRail handles no card data. | SmartRail becomes the seller |
 | Interactive terminal | The assessment accepts station displays. Terminal wireframes and offline interaction rules still exist; a future terminal can reuse the station-board API. | Displays prove useful |
 | Background push alerts | The decision about who should be notified is built. In-app delivery avoids device tokens and extra operations. | Background alerts are shown to be needed |
 
@@ -277,7 +277,7 @@ G0–G4 are checkpoints: G0 design timebox, G1 first Azure deployment, G2 the di
 | 9 | Fri 9 | Shared Flutter core; passenger next trains, status and detail with the simple route map; translated strings from the start | Widget tests, including map freshness |
 | 10 | Sat 10 | Platform and entrance boards, three-language status, offline banner; passenger cache and in-app alerts | **E2E-2**, first ZAP scan; **G2 on Azure** |
 | 11 | Sun 11 | Rest if G2 passes; otherwise apply the agreed cuts | Record cuts |
-| 12 | Mon 12 | RailBites API, policy, SQLite, signed webhook, staff page; SmartRail catering module; order screens | **E2E-3**, ADR-05, signed samples |
+| 12 | Mon 12 | Grilled API, policy, SQLite, signed webhook, staff page; SmartRail catering module; order screens | **E2E-3**, ADR-05, signed samples |
 | 13 | Tue 13 | Outbox, retry, 503 mode, idempotency, cutoff, No-show and cancellation | **E2E-4**, failure and cutoff tests, data-sharing note |
 | 14 | Wed 14 | Driver cached briefing, report reasons, distinct sent and Control-acknowledged states; optional offline queue | Widget tests |
 | 15 | Thu 15 | Simple incident workflow, report inbox, station permissions, optional validUntil | **E2E-5**, security suite, first viva drill; **G3 freeze** |
@@ -313,7 +313,7 @@ Each build estimate includes its unit tests. These are **AI estimates**, not mea
 | Day 7 | Simulator is not repeatable | Replace it with an **Advance train** button in operations |
 | G2, day 10 | Flutter cannot use the API | Make driver a role-gated React route, which the brief allows as an equivalent; put Sinhala/Tamil on displays only |
 | Day 10 | Passenger offline cache is unfinished | Keep age labels and unknown states; drop downloaded timetable |
-| Day 13 | Catering round trip fails | Drop RailBites staff page first; keep outbox, new ETA delivery and one passenger order screen |
+| Day 13 | Catering round trip fails | Drop Grilled staff page first; keep outbox, new ETA delivery and one passenger order screen |
 | G3, day 15 | Work is slipping | Drop validUntil, driver offline queue, unfinished moving-map marker and SSE hint before core freshness, early ending, report acknowledgement or reviewed language. Add nothing new after G3 |
 
 ## Keep AI-written code understandable
@@ -324,7 +324,7 @@ Each build estimate includes its unit tests. These are **AI estimates**, not mea
 4. Put conventions in CLAUDE.md or AGENTS.md: one endpoint pattern (endpoint, validator, handler, direct DbContext); Riverpod in Flutter; TanStack Query in React. Do not add MediatR, generic repositories, CQRS layers or a new dependency without recording a decision.
 5. Keep an AI log with date, suggestion, your choice, reason and commit. Aim for at least 12 entries, including three rejected code suggestions linked to diffs and one AI-written bug caught by a test.
 6. Spend 15 minutes daily updating the tracker, saving two screenshots, logging AI decisions, recording test count and explaining one random file aloud.
-7. Rehearse without AI on days 15 and 19: change RailBites' cutoff from 30 to 45 minutes; add a Customer Information Officer permission; change staleness from four to five minutes and update the now-failing tests; add a reason code in all three languages.
+7. Rehearse without AI on days 15 and 19: change Grilled' cutoff from 30 to 45 minutes; add a Customer Information Officer permission; change staleness from four to five minutes and update the now-failing tests; add a reason code in all three languages.
 
 ## Questions to be ready for in the presentation
 
@@ -332,13 +332,13 @@ Each build estimate includes its unit tests. These are **AI estimates**, not mea
 2. Make the catering cutoff 45 minutes. Which system owns that rule?
 3. Add a role that can publish notices but cannot change train status.
 4. The simulator stops. What does each app show after three, four and ten minutes? Which clock decides? Show a test.
-5. RailBites accepts an order but its response times out. Why does a retry not create a second order?
+5. Grilled accepts an order but its response times out. Why does a retry not create a second order?
 6. A 40-minute delay happens after ordering. Who decides what happens to the food?
 7. A passenger changes the order ID in a request. Why can they not see another person's order?
 8. Why .NET after training with Node? What would justify splitting the monolith?
 9. Explain the difference between a repeated service pattern, a dated journey and a train observation.
 10. Show an AI suggestion rejected in code, with the diff.
-11. Exactly what passenger/order fields go to RailBites, and what can appear in logs?
+11. Exactly what passenger/order fields go to Grilled, and what can appear in logs?
 12. Two controllers edit the same change. Show the second save returning **409** and requiring review of the newer version. If this is not implemented and demonstrated, say so plainly rather than claiming the protection exists.
 
 ## Document updates still needed

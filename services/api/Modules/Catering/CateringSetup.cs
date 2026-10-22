@@ -17,8 +17,8 @@ public static class CateringSetup
 
             // A short timeout keeps a passenger's request from hanging on a stopped provider; the
             // placement stays pending and is retried.
-            builder.Services.AddHttpClient<IRailBitesClient, RailBitesClient>(client =>
-                client.Timeout = TimeSpan.FromSeconds(builder.Configuration.GetValue("RailBites:TimeoutSeconds", 5)));
+            builder.Services.AddHttpClient<IGrilledClient, GrilledClient>(client =>
+                client.Timeout = TimeSpan.FromSeconds(builder.Configuration.GetValue("Grilled:TimeoutSeconds", 5)));
             builder.Services.AddMemoryCache();
             builder.Services.AddHealthChecks().AddCheck<CateringHealthCheck>("catering", failureStatus: HealthStatus.Degraded, tags: ["ready"]);
 

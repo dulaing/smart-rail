@@ -27,7 +27,7 @@ class FoodReadException implements Exception {
   String toString() => 'FoodReadException($failure, $code, $status)';
 }
 
-/// The public food reads. They need no account and never reach RailBites directly.
+/// The public food reads. They need no account and never reach Grilled directly.
 abstract interface class FoodSource {
   Future<CollectionOptions> collectionOptions(String journeyId);
   Future<FoodMenu> menu(String collectionPointId);

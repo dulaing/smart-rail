@@ -192,8 +192,8 @@ public class DemoControlsApiTests(DemoApi api) : IClassFixture<DemoApi>
             var text = await response.Content.ReadAsStringAsync();
             foreach (var secret in new[]
             {
-                CateringApi.ObservationKey, RailBitesProcess.ServiceKey, RailBitesProcess.CallbackSecret,
-                RailBitesProcess.AdminKey, RailBitesProcess.PolgahawelaKioskKey,
+                CateringApi.ObservationKey, GrilledProcess.ServiceKey, GrilledProcess.CallbackSecret,
+                GrilledProcess.AdminKey, GrilledProcess.PolgahawelaKioskKey,
             })
             {
                 Assert.DoesNotContain(secret, text);
@@ -217,7 +217,7 @@ public class DemoControlsApiTests(DemoApi api) : IClassFixture<DemoApi>
             Assert.True((await on.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("active").GetBoolean());
 
             // The provider really behaves as down, and the switch's own route stays reachable.
-            Assert.Equal(HttpStatusCode.ServiceUnavailable, (await api.RailBites.Http.GetAsync("/v1/collection-points")).StatusCode);
+            Assert.Equal(HttpStatusCode.ServiceUnavailable, (await api.Grilled.Http.GetAsync("/v1/collection-points")).StatusCode);
 
             // Setting the same desired state again is idempotent and still succeeds.
             var repeat = await SendAsync("demo-outage", HttpMethod.Put, "/api/demo/provider/outage", new { active = true });
@@ -226,11 +226,11 @@ public class DemoControlsApiTests(DemoApi api) : IClassFixture<DemoApi>
             var off = await SendAsync("demo-outage", HttpMethod.Put, "/api/demo/provider/outage", new { active = false });
             Assert.Equal(HttpStatusCode.OK, off.StatusCode);
             Assert.False((await off.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("active").GetBoolean());
-            Assert.Equal(HttpStatusCode.OK, (await api.RailBites.Http.GetAsync("/v1/collection-points")).StatusCode);
+            Assert.Equal(HttpStatusCode.OK, (await api.Grilled.Http.GetAsync("/v1/collection-points")).StatusCode);
         }
         finally
         {
-            await api.RailBites.Http.PutAsJsonAsync("/internal/dev/outage", new { active = false });
+            await api.Grilled.Http.PutAsJsonAsync("/internal/dev/outage", new { active = false });
         }
 
         var audit = await api.AuditAsync(operatorId);

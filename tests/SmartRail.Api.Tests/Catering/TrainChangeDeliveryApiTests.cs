@@ -8,7 +8,7 @@ using SmartRail.Api.Tests.Rail;
 
 namespace SmartRail.Api.Tests.Catering;
 
-// A confirmed train change reaches RailBites after an outage and is applied once. Real RailBites
+// A confirmed train change reaches Grilled after an outage and is applied once. Real Grilled
 // (Node + SQLite), disposable PostgreSQL, a hand-moved clock, and a proxy that can lose a response
 // or answer 503. The dispatcher pass is run by hand at times the test chooses.
 public class TrainChangeDeliveryApiTests(CateringApi api) : IClassFixture<CateringApi>
@@ -149,7 +149,7 @@ public class TrainChangeDeliveryApiTests(CateringApi api) : IClassFixture<Cateri
 
         // Delivering the old early ending again changes nothing.
         var oldMessage = (await api.OutboxOfAsync(corridor)).First();
-        var replay = await api.RailBites.Http.PostAsync("/v1/journey-events", new StringContent(oldMessage.Payload, Encoding.UTF8, "application/json"));
+        var replay = await api.Grilled.Http.PostAsync("/v1/journey-events", new StringContent(oldMessage.Payload, Encoding.UTF8, "application/json"));
         Assert.Equal("DUPLICATE", (await JsonAsyncOf(replay)).GetProperty("result").GetString());
         Assert.Equal(HttpStatusCode.Created, (await api.OrderAsync(passenger, Key(), corridor, "PDN", "peradeniya-junction", ("pdn-fish-bun", 1))).StatusCode);
     }
@@ -162,8 +162,8 @@ public class TrainChangeDeliveryApiTests(CateringApi api) : IClassFixture<Cateri
         var collectedLink = await OrderAsync(passenger, corridor, "PDN", "pdn-fish-bun");
         var collected = await ProviderAsync(collectedLink);
         var id = collected.GetProperty("id").GetString();
-        await api.RailBites.KioskAsync("peradeniya-junction", RailBitesProcess.PeradeniyaKioskKey, HttpMethod.Post, $"/{id}/ready");
-        var done = await api.RailBites.KioskAsync("peradeniya-junction", RailBitesProcess.PeradeniyaKioskKey, HttpMethod.Post, $"/{id}/collected",
+        await api.Grilled.KioskAsync("peradeniya-junction", GrilledProcess.PeradeniyaKioskKey, HttpMethod.Post, $"/{id}/ready");
+        var done = await api.Grilled.KioskAsync("peradeniya-junction", GrilledProcess.PeradeniyaKioskKey, HttpMethod.Post, $"/{id}/collected",
             $$"""{"pickupCode":"{{collected.GetProperty("pickupCode").GetString()}}"}""");
         Assert.Equal(HttpStatusCode.OK, done.StatusCode);
 
@@ -174,7 +174,7 @@ public class TrainChangeDeliveryApiTests(CateringApi api) : IClassFixture<Cateri
     }
 
     [RequiresDatabaseFact]
-    public async Task While_RailBites_answers_503_the_change_waits_with_growing_delays_and_train_reads_keep_working()
+    public async Task While_Grilled_answers_503_the_change_waits_with_growing_delays_and_train_reads_keep_working()
     {
         var corridor = await api.RunningCorridorAsync();
         var order = await OrderAsync(await NewPassengerAsync(), corridor, "PDN", "pdn-fish-bun");
@@ -212,16 +212,16 @@ public class TrainChangeDeliveryApiTests(CateringApi api) : IClassFixture<Cateri
     }
 
     [RequiresDatabaseFact]
-    public async Task A_stopped_RailBites_gets_the_change_after_it_restarts_with_its_data_intact()
+    public async Task A_stopped_Grilled_gets_the_change_after_it_restarts_with_its_data_intact()
     {
         var corridor = await api.RunningCorridorAsync();
         var order = await OrderAsync(await NewPassengerAsync(), corridor, "PDN", "pdn-fish-bun");
 
-        await api.RailBites.StopAsync();
+        await api.Grilled.StopAsync();
         try
         {
             await api.PublishAsync(corridor, ChangeBodies.EarlyEnd(corridor.Stop("PLG")));
-            api.Clock.Advance(TimeSpan.FromSeconds(1)); // RailBites is down, so only SmartRail's clock moves
+            api.Clock.Advance(TimeSpan.FromSeconds(1)); // Grilled is down, so only SmartRail's clock moves
             Assert.True(await api.RunOutboxPassAsync() >= 1);
             Assert.Equal(DeliveryStates.Pending, Assert.Single(await api.OutboxOfAsync(corridor)).DeliveryState);
 
@@ -230,8 +230,8 @@ public class TrainChangeDeliveryApiTests(CateringApi api) : IClassFixture<Cateri
         }
         finally
         {
-            await api.RailBites.StartAsync();
-            await api.RailBites.SetNowAsync(api.Clock.Now);
+            await api.Grilled.StartAsync();
+            await api.Grilled.SetNowAsync(api.Clock.Now);
         }
 
         await api.AdvanceAsync(TimeSpan.FromSeconds(5));
@@ -243,14 +243,14 @@ public class TrainChangeDeliveryApiTests(CateringApi api) : IClassFixture<Cateri
     }
 
     [RequiresDatabaseFact]
-    public async Task A_crash_after_RailBites_committed_is_redelivered_and_applied_only_once()
+    public async Task A_crash_after_Grilled_committed_is_redelivered_and_applied_only_once()
     {
         var corridor = await api.RunningCorridorAsync();
         var order = await OrderAsync(await NewPassengerAsync(), corridor, "PDN", "pdn-fish-bun");
         var buns = await api.ProviderStockAsync("peradeniya-junction", "pdn-fish-bun");
         await api.PublishAsync(corridor, ChangeBodies.EarlyEnd(corridor.Stop("PLG")));
 
-        // RailBites commits the event, but the acknowledgement is lost on the way back.
+        // Grilled commits the event, but the acknowledgement is lost on the way back.
         api.Proxy.Mode = ProxyMode.DropResponse;
         try
         {
@@ -284,14 +284,14 @@ public class TrainChangeDeliveryApiTests(CateringApi api) : IClassFixture<Cateri
         Assert.Equal(2, rows.Count);
 
         // The newer message gets there first, then the dispatcher sends both in order.
-        var first = await api.RailBites.Http.PostAsync("/v1/journey-events", new StringContent(rows[1].Payload, Encoding.UTF8, "application/json"));
+        var first = await api.Grilled.Http.PostAsync("/v1/journey-events", new StringContent(rows[1].Payload, Encoding.UTF8, "application/json"));
         Assert.Equal("APPLIED", (await JsonAsyncOf(first)).GetProperty("result").GetString());
         await DeliverAllAsync();
 
         Assert.All(await api.OutboxOfAsync(corridor), r => Assert.Equal(DeliveryStates.Delivered, r.DeliveryState));
         var provider = await ProviderAsync(order);
         Assert.Equal("CANCELLED", provider.GetProperty("status").GetString());
-        var older = await api.RailBites.Http.PostAsync("/v1/journey-events", new StringContent(rows[0].Payload, Encoding.UTF8, "application/json"));
+        var older = await api.Grilled.Http.PostAsync("/v1/journey-events", new StringContent(rows[0].Payload, Encoding.UTF8, "application/json"));
         Assert.Equal("DUPLICATE", (await JsonAsyncOf(older)).GetProperty("result").GetString());
     }
 
@@ -356,7 +356,7 @@ public class TrainChangeDeliveryApiTests(CateringApi api) : IClassFixture<Cateri
              "pickup":{"stopId":"{{corridor.Stop("PDN")}}","stationId":"04111fa9-fc9c-3657-e13b-d606dbe37c55","scheduledArrival":"{{corridor.At("11:50"):yyyy-MM-dd'T'HH:mm:ss.fff'Z'}}","estimatedArrival":"{{corridor.At("11:50"):yyyy-MM-dd'T'HH:mm:ss.fff'Z'}}","etaEvidenceAt":"{{api.Clock.Now.AddSeconds(-10):yyyy-MM-dd'T'HH:mm:ss.fff'Z'}}"},
              "items":[{"menuItemId":"pdn-fish-bun","quantity":1}]}
             """;
-        var arrived = await api.RailBites.Http.PutAsync($"/v1/order-links/{link}", new StringContent(late, Encoding.UTF8, "application/json"));
+        var arrived = await api.Grilled.Http.PutAsync($"/v1/order-links/{link}", new StringContent(late, Encoding.UTF8, "application/json"));
         Assert.Equal(HttpStatusCode.UnprocessableEntity, arrived.StatusCode);
         Assert.Equal("STOP_NOT_SERVED", (await JsonAsyncOf(arrived)).GetProperty("code").GetString());
         Assert.Null(await api.ProviderOrderAsync(link));
@@ -410,7 +410,7 @@ public class TrainChangeDeliveryApiTests(CateringApi api) : IClassFixture<Cateri
         Assert.Equal(1, rebuilt.GetProperty("journey").GetProperty("version").GetInt32());
         Assert.Equal(corridor.Stop("PDN"), rebuilt.GetProperty("journey").GetProperty("blockedPickupStopIds")[0].GetGuid());
         Assert.NotEmpty(rebuilt.GetProperty("stops").EnumerateArray());
-        // Upgrading is not delivering: RailBites still holds the order as accepted.
+        // Upgrading is not delivering: Grilled still holds the order as accepted.
         Assert.Equal("ACCEPTED", (await ProviderAsync(order)).GetProperty("status").GetString());
 
         await DeliverAllAsync();
@@ -447,7 +447,7 @@ public class TrainChangeDeliveryApiTests(CateringApi api) : IClassFixture<Cateri
         await api.WithDbAsync(async db =>
         {
             var row = db.OutboxMessages.Single(m => db.ServiceChanges.Any(c => c.Id == m.ServiceChangeId && c.JourneyId == corridor.JourneyId));
-            // A body RailBites will refuse as malformed, whatever the number of retries.
+            // A body Grilled will refuse as malformed, whatever the number of retries.
             row.Payload = row.Payload.Replace("\"DELAY\"", "\"NOT_A_KIND\"");
             await db.SaveChangesAsync();
         });

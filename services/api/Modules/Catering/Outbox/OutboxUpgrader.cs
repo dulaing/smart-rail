@@ -7,7 +7,7 @@ using SmartRail.Api.Modules.Rail;
 namespace SmartRail.Api.Modules.Catering.Outbox;
 
 // Rebuilds messages that were queued before pickup times existed. Such a message holds only the
-// eligibility, so delivering it as it is would leave RailBites with the old pickup times. It is
+// eligibility, so delivering it as it is would leave Grilled with the old pickup times. It is
 // never marked delivered by this: it is rewritten in the new format under the same event ID and
 // then sent like any other. The eligibility is exactly what it was, folded from the change history
 // up to the message's own journey version; the pickup times are calculated now from that state.

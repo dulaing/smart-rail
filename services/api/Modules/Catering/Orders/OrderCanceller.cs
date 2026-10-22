@@ -18,9 +18,9 @@ public abstract record CancelResult
 }
 
 // Cancels one of the caller's own orders. SmartRail sends a fresh eligibility and ETA snapshot and
-// RailBites decides, because the cutoff is the provider's and is never cached here.
+// Grilled decides, because the cutoff is the provider's and is never cached here.
 public sealed class OrderCanceller(
-    SmartRailDbContext db, PickupAssessor assessor, IRailBitesClient provider, OrderLinkWrites writes, TimeProvider time)
+    SmartRailDbContext db, PickupAssessor assessor, IGrilledClient provider, OrderLinkWrites writes, TimeProvider time)
 {
     public async Task<CancelResult> CancelAsync(Guid accountId, Guid linkId, CancellationToken cancellationToken)
     {

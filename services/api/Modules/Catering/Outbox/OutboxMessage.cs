@@ -20,13 +20,13 @@ public static class PayloadVersions
     // pickup times existed are still this version until they are upgraded.
     public const int EligibilityOnly = 1;
 
-    // The RailBites JourneyEvent contract: eligibility snapshot plus every stop's pickup time.
+    // The Grilled JourneyEvent contract: eligibility snapshot plus every stop's pickup time.
     public const int WithPickupTimes = 2;
 }
 
-// One message waiting to be delivered to RailBites, in catering.outbox_messages. Writing it with
-// the change is what makes the handoff safe when RailBites is down. The dispatcher retries from
-// attempt_count and next_attempt_at until RailBites confirms it has committed the message.
+// One message waiting to be delivered to Grilled, in catering.outbox_messages. Writing it with
+// the change is what makes the handoff safe when Grilled is down. The dispatcher retries from
+// attempt_count and next_attempt_at until Grilled confirms it has committed the message.
 public sealed class OutboxMessage
 {
     public Guid Id { get; init; }
@@ -42,7 +42,7 @@ public sealed class OutboxMessage
     public DateTimeOffset CreatedAt { get; init; }
 }
 
-// Builds the exact body RailBites receives. It is stored once and sent unchanged on every retry.
+// Builds the exact body Grilled receives. It is stored once and sent unchanged on every retry.
 public static class OutboxPayloads
 {
     public static string EventIdFor(Guid serviceChangeId) => $"train-change:{serviceChangeId}";

@@ -31,7 +31,7 @@ public sealed record StoredRequest(string CollectionPointId, Guid JourneyId, Gui
 // until the provider answers or a safe reconciliation says nothing was ever placed.
 public sealed class PlacementProcessor(
     SmartRailDbContext db,
-    IRailBitesClient provider,
+    IGrilledClient provider,
     PickupAssessor assessor,
     OrderLinkWrites writes,
     TimeProvider time,
@@ -102,9 +102,9 @@ public sealed class PlacementProcessor(
                 break;
 
             case ProviderOutcome.Refused:
-                // 400 or 409: SmartRail and RailBites disagree about the contract or the state of
+                // 400 or 409: SmartRail and Grilled disagree about the contract or the state of
                 // the journey. Keep the order, say why, and look again later.
-                logger.LogError("RailBites refused placement for link {LinkId} with {Code}.", link.Id, response.Error!.Code);
+                logger.LogError("Grilled refused placement for link {LinkId} with {Code}.", link.Id, response.Error!.Code);
                 var fault = $"{response.Error.Code}: {response.Error.Message}";
                 await writes.DeferAsync(link.Id, now.AddSeconds(ContractFaultBackoffSeconds), fault[..Math.Min(fault.Length, 200)], now, cancellationToken);
                 break;

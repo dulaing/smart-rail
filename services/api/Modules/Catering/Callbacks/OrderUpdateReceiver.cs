@@ -20,13 +20,13 @@ public abstract record ReceiveResult
     public sealed record UnknownLink : ReceiveResult;
 
     // The link has no order details yet and the provider could not supply them, so the callback is
-    // not acknowledged: RailBites keeps it and sends it again.
+    // not acknowledged: Grilled keeps it and sends it again.
     public sealed record NotReady : ReceiveResult;
 
     public sealed record Invalid(string Detail) : ReceiveResult;
 }
 
-// What RailBites sends when an order's status or pickup time changes.
+// What Grilled sends when an order's status or pickup time changes.
 public sealed record OrderUpdate(
     string EventId,
     Guid OrderLinkId,
@@ -38,8 +38,8 @@ public sealed record OrderUpdate(
 
 // Takes in one authenticated callback. The receipt and the conditional update to the order link
 // commit together or not at all. Only a greater status sequence changes the link, so a repeat or an
-// older callback is accepted (so RailBites can stop sending it) and does nothing.
-public sealed class OrderUpdateReceiver(SmartRailDbContext db, IRailBitesClient provider, OrderLinkWrites writes, TimeProvider time)
+// older callback is accepted (so Grilled can stop sending it) and does nothing.
+public sealed class OrderUpdateReceiver(SmartRailDbContext db, IGrilledClient provider, OrderLinkWrites writes, TimeProvider time)
 {
     private static readonly string[] Statuses = ["ACCEPTED", "READY", "COLLECTED", "NO_SHOW", "CANCELLED"];
 

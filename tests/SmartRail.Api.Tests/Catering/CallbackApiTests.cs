@@ -38,7 +38,7 @@ public class CallbackApiTests(CallbackApi api) : IClassFixture<CallbackApi>
         });
     }
 
-    private Task<HttpResponseMessage> SendAsync(string body, string? secret = RailBitesProcess.CallbackSecret, long? timestamp = null, string? signature = null)
+    private Task<HttpResponseMessage> SendAsync(string body, string? secret = GrilledProcess.CallbackSecret, long? timestamp = null, string? signature = null)
     {
         var seconds = timestamp ?? api.Clock.Now.ToUnixTimeSeconds();
         using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secret ?? ""));
@@ -150,8 +150,8 @@ public class CallbackApiTests(CallbackApi api) : IClassFixture<CallbackApi>
         Assert.Equal(corridor.At("11:20"), (await api.LinkAsync(id)).EstimatedArrival);
         var provider = (await api.ProviderOrderAsync(id))!.Value;
         var providerId = provider.GetProperty("id").GetString();
-        (await api.RailBites.KioskAsync("polgahawela-junction", RailBitesProcess.PolgahawelaKioskKey, HttpMethod.Post, $"/{providerId}/ready")).EnsureSuccessStatusCode();
-        (await api.RailBites.KioskAsync("polgahawela-junction", RailBitesProcess.PolgahawelaKioskKey, HttpMethod.Post,
+        (await api.Grilled.KioskAsync("polgahawela-junction", GrilledProcess.PolgahawelaKioskKey, HttpMethod.Post, $"/{providerId}/ready")).EnsureSuccessStatusCode();
+        (await api.Grilled.KioskAsync("polgahawela-junction", GrilledProcess.PolgahawelaKioskKey, HttpMethod.Post,
             $"/{providerId}/collected", JsonSerializer.Serialize(new { pickupCode = provider.GetProperty("pickupCode").GetString() }))).EnsureSuccessStatusCode();
         await api.RunCallbacksAsync();
         var card = await (await api.SendAsync(passenger, HttpMethod.Get, $"{OrderEndpoints.Path}/{id}")).JsonAsync();
@@ -171,7 +171,7 @@ public class CallbackApiTests(CallbackApi api) : IClassFixture<CallbackApi>
             if (request.Method != HttpMethod.Put) return;
             var id = Guid.Parse(request.RequestUri!.Segments.Last());
             var provider = (await api.ProviderOrderAsync(id))!.Value;
-            (await api.RailBites.KioskAsync("polgahawela-junction", RailBitesProcess.PolgahawelaKioskKey,
+            (await api.Grilled.KioskAsync("polgahawela-junction", GrilledProcess.PolgahawelaKioskKey,
                 HttpMethod.Post, $"/{provider.GetProperty("id").GetString()}/ready")).EnsureSuccessStatusCode();
             await api.RunCallbacksAsync();
         };
@@ -246,7 +246,7 @@ public class CallbackApiTests(CallbackApi api) : IClassFixture<CallbackApi>
             Assert.Equal(1, await ReceiptsAsync(id));
             api.Bridge.Mode = ProxyMode.ServiceUnavailable;
             await api.RestartHostAsync();
-            await api.RailBites.RestartAsync();
+            await api.Grilled.RestartAsync();
             await api.AdvanceAsync(TimeSpan.FromSeconds(3));
             await api.RunCallbacksAsync();
             Assert.Equal(1, await ReceiptsAsync(id));
@@ -270,7 +270,7 @@ public class CallbackApiTests(CallbackApi api) : IClassFixture<CallbackApi>
         var path = $"/internal/catering/journeys/{corridor.JourneyId}/stops/{corridor.Stop("PLG")}/passage";
         Assert.Equal(HttpStatusCode.Unauthorized, (await api.Client.GetAsync(path)).StatusCode);
         using var wrong = new HttpRequestMessage(HttpMethod.Get, path);
-        wrong.Headers.Add(PassageEndpoints.KeyHeader, RailBitesProcess.ServiceKey);
+        wrong.Headers.Add(PassageEndpoints.KeyHeader, GrilledProcess.ServiceKey);
         Assert.Equal(HttpStatusCode.Unauthorized, (await api.Client.SendAsync(wrong)).StatusCode);
         async Task<string> PassageAsync()
         {
@@ -283,10 +283,10 @@ public class CallbackApiTests(CallbackApi api) : IClassFixture<CallbackApi>
         Assert.Equal("UNKNOWN", await PassageAsync());
         var provider = (await api.ProviderOrderAsync(id))!.Value;
         var suffix = $"/{provider.GetProperty("id").GetString()}/no-show";
-        Assert.Equal(HttpStatusCode.Conflict, (await api.RailBites.KioskAsync("polgahawela-junction", RailBitesProcess.PolgahawelaKioskKey, HttpMethod.Post, suffix)).StatusCode);
+        Assert.Equal(HttpStatusCode.Conflict, (await api.Grilled.KioskAsync("polgahawela-junction", GrilledProcess.PolgahawelaKioskKey, HttpMethod.Post, suffix)).StatusCode);
         await api.SetNowAsync(corridor.At("11:05"));
         await api.ObserveAsync(corridor, "PLG", 10, api.Clock.Now);
-        (await api.RailBites.KioskAsync("polgahawela-junction", RailBitesProcess.PolgahawelaKioskKey, HttpMethod.Post, suffix)).EnsureSuccessStatusCode();
+        (await api.Grilled.KioskAsync("polgahawela-junction", GrilledProcess.PolgahawelaKioskKey, HttpMethod.Post, suffix)).EnsureSuccessStatusCode();
         await api.RunCallbacksAsync();
         Assert.Equal("NO_SHOW", (await api.LinkAsync(id)).ProviderStatus);
     }

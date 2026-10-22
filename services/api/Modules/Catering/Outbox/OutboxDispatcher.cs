@@ -22,14 +22,14 @@ public sealed class OutboxOptions
     public bool WorkerEnabled { get; set; } = true;
 }
 
-// Sends queued train-change messages to RailBites, oldest first, and records a message as delivered
-// only when RailBites says it has committed it. Everything else leaves it to be sent again with the
+// Sends queued train-change messages to Grilled, oldest first, and records a message as delivered
+// only when Grilled says it has committed it. Everything else leaves it to be sent again with the
 // same event ID and the same body, so a crash on either side between commit and acknowledgement
-// just causes a repeat that RailBites recognises. The queue lives in PostgreSQL, so a restart of the
-// API or of RailBites loses nothing.
+// just causes a repeat that Grilled recognises. The queue lives in PostgreSQL, so a restart of the
+// API or of Grilled loses nothing.
 public sealed class OutboxDispatcher(
     SmartRailDbContext db,
-    IRailBitesClient provider,
+    IGrilledClient provider,
     OutboxUpgrader upgrader,
     TimeProvider time,
     IOptions<OutboxOptions> options,
@@ -89,7 +89,7 @@ public sealed class OutboxDispatcher(
             case ProviderOutcome.Refused:
                 // The provider understood and said no (a malformed body, an event id reused with
                 // other content). Retrying unchanged cannot help, but dropping it would lose the change.
-                logger.LogError("RailBites refused train-change {EventId} with {Code}.", message.EventId, response.Error!.Code);
+                logger.LogError("Grilled refused train-change {EventId} with {Code}.", message.EventId, response.Error!.Code);
                 await ScheduleAsync(message, options.Value.FailedRetrySeconds, DeliveryStates.Failed, response.Error.Code, cancellationToken);
                 CateringMetrics.OutboxAttempts.Add(1, new KeyValuePair<string, object?>("result", "failed"));
                 break;

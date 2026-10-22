@@ -1,6 +1,6 @@
 namespace SmartRail.Api.Modules.Access;
 
-// Pilot role codes. Guest is not a role: it is a caller with no account at all. The RailBites
+// Pilot role codes. Guest is not a role: it is a caller with no account at all. The Grilled
 // service is not an account either; its webhooks use a signed HMAC contract.
 public static class Roles
 {

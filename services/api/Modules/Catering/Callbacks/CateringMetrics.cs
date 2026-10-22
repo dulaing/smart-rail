@@ -22,7 +22,7 @@ public static class CateringMetrics
     public static readonly Counter<long> CallbacksReceived =
         Meter.CreateCounter<long>("catering.callbacks.received", description: "Authenticated status callbacks, by result.");
 
-    // One try at sending a queued train change to RailBites. result: delivered, retry (will be sent
+    // One try at sending a queued train change to Grilled. result: delivered, retry (will be sent
     // again) or failed (refused for good, kept and retried slowly).
     public static readonly Counter<long> OutboxAttempts =
         Meter.CreateCounter<long>("catering.outbox.attempts", description: "Train-change delivery attempts, by result.");

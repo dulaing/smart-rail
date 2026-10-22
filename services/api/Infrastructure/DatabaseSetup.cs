@@ -41,7 +41,7 @@ public static class DatabaseSetup
         var days = app.Configuration.GetValue("Seed:Days", 7);
         await SeedAsync(db, start, days);
 
-        // Messages queued for RailBites before pickup times existed are rewritten, never dropped or
+        // Messages queued for Grilled before pickup times existed are rewritten, never dropped or
         // sent as they are.
         await scope.ServiceProvider.GetRequiredService<OutboxUpgrader>().UpgradeAllAsync(default);
     }

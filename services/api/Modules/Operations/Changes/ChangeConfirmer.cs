@@ -83,11 +83,11 @@ public sealed class ChangeConfirmer(
             context, actorId, $"change.{preview.Action.ToCode()}.{kind.ToCode()}".ToLowerInvariant(),
             AuditOutcomes.Succeeded, StaffChangeEndpoints.JourneyTarget, journey.Id);
 
-        // A platform change is not food-related, so RailBites needs no message for it.
+        // A platform change is not food-related, so Grilled needs no message for it.
         if (kind != ChangeKind.Platform)
         {
             // Pickup times are calculated now, from the state after this change, and queued with the
-            // change itself, so RailBites never has to guess them and a retry never recalculates.
+            // change itself, so Grilled never has to guess them and a retry never recalculates.
             var after = ConfirmedChangeReader.From(ConfirmedState.Fold([.. loaded.History, change]));
             var times = await pickups.ReadAsync(journey.Id, now, after, cancellationToken)
                 ?? throw new InvalidOperationException("The journey disappeared while its change was being confirmed.");

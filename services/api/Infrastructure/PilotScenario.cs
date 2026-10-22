@@ -23,7 +23,7 @@ public static class PilotScenario
     public const string OutboundFoodRole = "outbound-food";
     public const string SupportingRole = "supporting";
 
-    // Stations the provider (RailBites) serves. SmartRail never owns their menu, stock or cutoff;
+    // Stations the provider (Grilled) serves. SmartRail never owns their menu, stock or cutoff;
     // the manifest only names the station so the provider's own seed can be matched to it.
     private static readonly string[] CollectionPointStations = ["PLG", "PDN"];
 
@@ -147,7 +147,7 @@ public static class PilotScenario
             Console.WriteLine($"  {identity.Username} ({identity.Role}){scope}");
         }
 
-        Console.WriteLine("RailBites collection points (provider-owned; seed with services/railbites):");
+        Console.WriteLine("Grilled collection points (provider-owned; seed with services/grilled):");
         foreach (var point in manifest.CollectionPoints)
         {
             Console.WriteLine($"  {point.StationCode} station {point.StationId}");

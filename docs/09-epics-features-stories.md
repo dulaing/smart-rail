@@ -37,9 +37,9 @@ Each epic is a big goal. Each bullet is a feature with one user story. **Must** 
 
 ## 6. Make the pilot safe to run and honest to demonstrate
 
-- **Train simulation (Must).** As a demo operator, I want to pause and resume simulated updates and make RailBites temporarily unavailable, so I can demonstrate failures and recovery.
+- **Train simulation (Must).** As a demo operator, I want to pause and resume simulated updates and make Grilled temporarily unavailable, so I can demonstrate failures and recovery.
 - **Access and history (Must).** As a railway manager, I want public train information open to guests, sign-in through Keycloak, staff changes restricted by SmartRail's station and journey permissions, and every change recorded, so actions are accountable.
-- **Reliable updates (Must).** As operations staff, I want confirmed changes to reach all apps and RailBites, even after a brief outage, so everyone sees the same decision.
+- **Reliable updates (Must).** As operations staff, I want confirmed changes to reach all apps and Grilled, even after a brief outage, so everyone sees the same decision.
 - **Health and tests (Must).** As the demo operator, I want health checks, local Aspire telemetry and tests of the main journeys, so I can notice failures and show what works.
 - **Azure demo (Should).** As an assessor, I want to try the pilot online, so I can review it without installing anything. A local demo remains available if deployment is not ready.
 

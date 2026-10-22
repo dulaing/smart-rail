@@ -21,14 +21,14 @@ Do not create one giant spec per app. Passenger browsing, personal alerts and fo
 | 5 | [driver-journeys.md](../_specs/driver-journeys.md) | Assigned briefing, offline reading, report and acknowledgement | 1; identity, running, changes and reports APIs |
 | 6 | [operations-reports.md](../_specs/operations-reports.md) | Control inbox, acknowledgement, incidents and auditor history | 3; reports/incidents APIs; pairs with 5 |
 | 7 | [passenger-saved-journeys.md](../_specs/passenger-saved-journeys.md) | Saved commute, follow/unfollow and personal in-app changes | 2; ownership-protected API additions if missing |
-| 8 | [passenger-food.md](../_specs/passenger-food.md) | Food tab, order, pending outcome, pickup code and status | 2; existing RailBites integration and local wiring |
-| 9 | [operations-demo-controls.md](../_specs/operations-demo-controls.md) | Authorised simulation controls and dependency health | 3; RailBites backend T6 where required |
-| 10 | [railbites-kiosk.md](../_specs/railbites-kiosk.md) | Provider staff mark Ready, Collected and No-show | Existing provider APIs; pairs with 8 |
+| 8 | [passenger-food.md](../_specs/passenger-food.md) | Food tab, order, pending outcome, pickup code and status | 2; existing Grilled integration and local wiring |
+| 9 | [operations-demo-controls.md](../_specs/operations-demo-controls.md) | Authorised simulation controls and dependency health | 3; Grilled backend T6 where required |
+| 10 | [grilled-kiosk.md](../_specs/grilled-kiosk.md) | Provider staff mark Ready, Collected and No-show | Existing provider APIs; pairs with 8 |
 | 11 | [pilot-app-acceptance.md](../_specs/pilot-app-acceptance.md) | Five connected journeys and reproducible demonstration evidence | Required feature slices above and backend recovery checks |
 
 The linked specs now record the planning discussion and user-confirmed choices. Their unchecked tasks are not implemented or verified. This is a build order, not a requirement to finish every spec before writing code. After 1, contract discovery for the separate apps can proceed independently. Coordinate changes to shared tokens, backend contracts, identity and demo fixtures through their owning spec.
 
-Steps 9–10 finish supporting parts of the existing pilot, rather than adding another SmartRail client. The RailBites staff page belongs to the provider. Azure deployment needs separate planning and is not silently included in app completion.
+Steps 9–10 finish supporting parts of the existing pilot, rather than adding another SmartRail client. The Grilled staff page belongs to the provider. Azure deployment needs separate planning and is not silently included in app completion.
 
 ## Common context — every spec agent must read this
 
@@ -50,8 +50,8 @@ Steps 9–10 finish supporting parts of the existing pilot, rather than adding a
 | Operations | `apps/ops-web/`: React/TypeScript/Vite, Keycloak login and account/permissions screen |
 | Station | `apps/station-web/`: React/TypeScript/Vite starter |
 | Backend | `services/api/Modules/{Rail,Operations,Access,Catering}/`: one .NET modular monolith with PostgreSQL |
-| Provider | `services/railbites/`: separate Node/TypeScript service and SQLite; contract in `openapi.yaml` |
-| Local stack | `services/apphost/` and `services/README.md`: Aspire, PostgreSQL, Keycloak, API and RailBites |
+| Provider | `services/grilled/`: separate Node/TypeScript service and SQLite; contract in `openapi.yaml` |
+| Local stack | `services/apphost/` and `services/README.md`: Aspire, PostgreSQL, Keycloak, API and Grilled |
 
 Use the codebase-memory skill for structural exploration, including coverage checks and direct source fallback. This handoff is a starting inventory, not a substitute for checking the current branch. Preserve unrelated working changes.
 
@@ -76,7 +76,7 @@ Keycloak already owns sign-in. Reuse Authorization Code + PKCE, existing mobile 
 3. **Driver reads:** `/api/me` includes journey scopes, and report endpoints exist. A dedicated assigned-journey/briefing read was not found in the inspected route mappings. Determine whether existing contracts suffice; otherwise plan a small scoped read with backend enforcement.
 4. **Attribution:** public changes currently include confirmation times but deliberately omit staff identity/audit details. Some scope prose asks who confirmed a change. Resolve the public source label and protected driver issuer needs explicitly; never expose the audit trail or invent a confirmer name to fill a UI label.
 5. **Boards/overview:** do not assume a station-board or corridor aggregate endpoint exists. For this small pilot, evaluate bounded composition of existing reads before adding a specific server projection. Never hardcode sample train rows as the final data source.
-6. **Demo controls:** current pause/resume routes use an internal service key; a `simulation.control` permission also exists. A browser must not receive that internal key. A protected staff route or server-mediated action needs planning. RailBites backend T6 is still unchecked in the inspected spec.
+6. **Demo controls:** current pause/resume routes use an internal service key; a `simulation.control` permission also exists. A browser must not receive that internal key. A protected staff route or server-mediated action needs planning. Grilled backend T6 is still unchecked in the inspected spec.
 7. **Kiosk credentials:** provider kiosk APIs use collection-point-scoped credentials. Choose a small server-side authentication/session arrangement for a staff page; do not put provider or kiosk secrets in a JS bundle, URL or browser storage.
 
 An app feature may need a small backend addition. Name it, assign it to the correct module and include an observable check in that feature's spec. Do not rewrite completed backend features or pretend all app contracts are already available. Coordinate any overlap with an existing backend task instead of duplicating it.
@@ -186,33 +186,33 @@ Cache personal saved information separately per account, protect pickup codes/to
 
 ```text
 Use $spec to plan `_specs/passenger-food.md`.
-Read Common context in `docs/app-spec-plan.md`, passenger-trains if present, `_specs/railbites.md`, `services/railbites/openapi.yaml` and the current SmartRail Catering request/response types. Extend `apps/passenger_app/`; passenger calls go only to SmartRail.
+Read Common context in `docs/app-spec-plan.md`, passenger-trains if present, `_specs/grilled.md`, `services/grilled/openapi.yaml` and the current SmartRail Catering request/response types. Extend `apps/passenger_app/`; passenger calls go only to SmartRail.
 
 Plan a separate Food tab: select the dated journey and an eligible future served stop, browse provider menu/prices in LKR, choose quantities, review, sign in when ordering, place an order, and show pickup code/current status. Pay at collection. Read the real contract for field names and stable refusal reasons; do not copy provider endpoints directly into the mobile app.
 
 Keep one client request key for the same submission through timeouts, app restart and repeated taps. A 202 is pending: retain/poll the stable order link and say the outcome is not yet known. Never mint a second request just because the response was lost. Handle final refusal, stock/cutoff changes, provider outage, stale train eligibility, updated pickup time, cancellation reasons, Ready/Collected/No-show and server-approved cancellation before cutoff.
 
-Do not cache or hardcode provider cutoff as an authority. Unknown train status blocks new orders but does not automatically cancel an existing one; early ending beyond pickup does. A withdrawal does not revive a cancelled order. No edits, online payments, refunds or ratings. Keep personal order details isolated from guest caches. Include screen checks for pending recovery, one order after retry, changed cutoff/ETA and terminal status after provider callbacks. Planning only; record any RailBites T6 blocker without marking it complete.
+Do not cache or hardcode provider cutoff as an authority. Unknown train status blocks new orders but does not automatically cancel an existing one; early ending beyond pickup does. A withdrawal does not revive a cancelled order. No edits, online payments, refunds or ratings. Keep personal order details isolated from guest caches. Include screen checks for pending recovery, one order after retry, changed cutoff/ETA and terminal status after provider callbacks. Planning only; record any Grilled T6 blocker without marking it complete.
 ```
 
 ## 9. Operations demo controls and health — copy this prompt
 
 ```text
 Use $spec to plan `_specs/operations-demo-controls.md`.
-Read Common context in `docs/app-spec-plan.md`, operations-workspace if present, `_specs/simulated-running.md`, `_specs/railbites.md` T6, `services/README.md`, SimulatorSetup and Access's simulation.control permission.
+Read Common context in `docs/app-spec-plan.md`, operations-workspace if present, `_specs/simulated-running.md`, `_specs/grilled.md` T6, `services/README.md`, SimulatorSetup and Access's simulation.control permission.
 
 Plan a small authorised panel in the Operations app to pause/resume a simulated journey and observe its recovery. Show simulation state separately from the train's evidence freshness. Add useful API/provider dependency and pending-delivery/backlog information, with failed/unknown states represented honestly; do not rebuild the Aspire dashboard. Link local traces where useful.
 
 Internal simulator/provider credentials must stay server-side. Plan the smallest authenticated staff route/adapter and enforce the correct role/permission/environment on the server; never make a secret a VITE variable. Resolve any permission gap for health/provider controls explicitly rather than granting every staff member access. Provider outage/restore must remain reachable during the simulated failure and must not stop public train reads.
 
-Coordinate with existing RailBites T6: keep service wiring, diagnostics and recovery proof owned there where applicable; this spec owns their staff-facing controls. Do not create duplicate workers or tests to replace its unfinished drill. Inspect whether repeatable presentation-relative seeding exists; record the minimal needed fixture setup, not a timetable editor or browser clock override. Checks show denied unauthorised actions and real pause → unknown → resume plus provider outage → backlog → recovery. Planning only.
+Coordinate with existing Grilled T6: keep service wiring, diagnostics and recovery proof owned there where applicable; this spec owns their staff-facing controls. Do not create duplicate workers or tests to replace its unfinished drill. Inspect whether repeatable presentation-relative seeding exists; record the minimal needed fixture setup, not a timetable editor or browser clock override. Checks show denied unauthorised actions and real pause → unknown → resume plus provider outage → backlog → recovery. Planning only.
 ```
 
-## 10. RailBites kiosk staff page — copy this prompt
+## 10. Grilled kiosk staff page — copy this prompt
 
 ```text
-Use $spec to plan `_specs/railbites-kiosk.md`.
-Read Common context in `docs/app-spec-plan.md`, `_specs/railbites.md`, provider OpenAPI, `services/railbites/src/kiosk.ts` and its auth/config/server code. This is a small provider-owned staff page, not the interactive station terminal or a fifth SmartRail app.
+Use $spec to plan `_specs/grilled-kiosk.md`.
+Read Common context in `docs/app-spec-plan.md`, `_specs/grilled.md`, provider OpenAPI, `services/grilled/src/kiosk.ts` and its auth/config/server code. This is a small provider-owned staff page, not the interactive station terminal or a fifth SmartRail app.
 
 Plan viewing one authorised collection point's orders/items/pickup times and marking Ready, Collected with the customer's matching code, or No-show when SmartRail proves the train passed. Show train-driven pickup changes and cancellations clearly. Do not pre-display the secret matching code as if it verifies the customer's possession; inspect the existing kiosk response and use the server check.
 

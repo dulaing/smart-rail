@@ -10,7 +10,7 @@ namespace SmartRail.Api.Tests.Catering;
 // A real loopback HTTP listener lets the Node process call the in-process SmartRail test host.
 public sealed class CallbackApi : CateringApi
 {
-    public const string InboundKey = "test-railbites-inbound-key";
+    public const string InboundKey = "test-grilled-inbound-key";
     public CallbackBridge Bridge { get; private set; } = null!;
 
     public override async Task InitializeAsync()
@@ -19,18 +19,18 @@ public sealed class CallbackApi : CateringApi
         await base.InitializeAsync();
     }
 
-    protected override void ConfigureRailBites(RailBitesProcess railBites)
+    protected override void ConfigureGrilled(GrilledProcess Grilled)
     {
-        railBites.Environment["SMARTRAIL_BASE_URL"] = Bridge.BaseUrl;
-        railBites.Environment["SMARTRAIL_SERVICE_KEY"] = InboundKey;
-        railBites.Environment["RAILBITES_CALLBACK_SECRET"] = RailBitesProcess.CallbackSecret;
-        railBites.Environment["RAILBITES_CALLBACK_POLL_MS"] = "0";
+        Grilled.Environment["SMARTRAIL_BASE_URL"] = Bridge.BaseUrl;
+        Grilled.Environment["SMARTRAIL_SERVICE_KEY"] = InboundKey;
+        Grilled.Environment["GRILLED_CALLBACK_SECRET"] = GrilledProcess.CallbackSecret;
+        Grilled.Environment["GRILLED_CALLBACK_POLL_MS"] = "0";
     }
 
     protected override void ConfigureHost(IWebHostBuilder builder)
     {
         base.ConfigureHost(builder);
-        builder.UseSetting(CallbackEndpoints.SecretSetting, RailBitesProcess.CallbackSecret);
+        builder.UseSetting(CallbackEndpoints.SecretSetting, GrilledProcess.CallbackSecret);
         builder.UseSetting(PassageEndpoints.KeySetting, InboundKey);
     }
 
@@ -42,7 +42,7 @@ public sealed class CallbackApi : CateringApi
 
     public async Task RunCallbacksAsync()
     {
-        var response = await RailBites.Http.PostAsync("/internal/test/callbacks/run", null);
+        var response = await Grilled.Http.PostAsync("/internal/test/callbacks/run", null);
         response.EnsureSuccessStatusCode();
     }
 }
@@ -70,7 +70,7 @@ public sealed class CallbackBridge : IAsyncDisposable
                 return;
             }
             using var request = new HttpRequestMessage(new HttpMethod(context.Request.Method), context.Request.Path + context.Request.QueryString);
-            foreach (var header in context.Request.Headers.Where(h => h.Key.StartsWith("X-RailBites", StringComparison.OrdinalIgnoreCase) || h.Key.Equals("traceparent", StringComparison.OrdinalIgnoreCase)))
+            foreach (var header in context.Request.Headers.Where(h => h.Key.StartsWith("X-Grilled", StringComparison.OrdinalIgnoreCase) || h.Key.Equals("traceparent", StringComparison.OrdinalIgnoreCase)))
                 request.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
             if (context.Request.Method == "POST")
             {

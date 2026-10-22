@@ -8,7 +8,7 @@ public static class PlacementStates
 }
 
 // The link between one passenger's request and the provider's order, in catering.order_links.
-// SmartRail's own id for it (Id) is what RailBites sees; the passenger's request key never leaves
+// SmartRail's own id for it (Id) is what Grilled sees; the passenger's request key never leaves
 // SmartRail. Placement uncertainty lives here: a link stays PENDING while the provider's answer is
 // unknown, and only a provider answer (or a safe reconciliation) makes it CONFIRMED or REJECTED.
 public sealed class OrderLink

@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace SmartRail.Api.Modules.Catering.Provider;
 
-// The shapes RailBites sends and receives (services/railbites/openapi.yaml). They are SmartRail's
+// The shapes Grilled sends and receives (services/grilled/openapi.yaml). They are SmartRail's
 // own copies, matched by the contract rather than shared with the Node service.
 public sealed record ProviderCollectionPoint(string Id, Guid SmartRailStationId, string Name, int CutoffMinutes);
 
@@ -14,7 +14,7 @@ public sealed record ProviderMenuItem(string Id, string Name, int PriceMinorLkr,
 
 public sealed record ProviderMenu(string CollectionPointId, string Currency, IReadOnlyList<ProviderMenuItem> Items);
 
-// RailBites' Development-only outage switch, as the provider itself answers it: {"outage": bool}.
+// Grilled' Development-only outage switch, as the provider itself answers it: {"outage": bool}.
 public sealed record ProviderOutage(bool Outage);
 
 public sealed record ProviderPickupTime(
@@ -60,7 +60,7 @@ public sealed record CancelOrderBody(JourneySnapshot Journey, PickupSnapshot Pic
 
 public sealed record ProviderError(string Code, string Message);
 
-// RailBites' answer to a delivered train-change message: APPLIED, DUPLICATE or STALE. All three
+// Grilled' answer to a delivered train-change message: APPLIED, DUPLICATE or STALE. All three
 // mean it was committed.
 public sealed record EventReceipt(string Result);
 

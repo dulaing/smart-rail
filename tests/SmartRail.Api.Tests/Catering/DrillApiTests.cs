@@ -38,7 +38,7 @@ public class DrillApiTests(CallbackApi api) : IClassFixture<CallbackApi>
         ready.GetProperty("checks").EnumerateArray().Single(c => c.GetProperty("name").GetString() == name);
 
     private Task<HttpResponseMessage> SetOutageAsync(bool active) =>
-        api.RailBites.Http.PutAsJsonAsync("/internal/dev/outage", new { active });
+        api.Grilled.Http.PutAsJsonAsync("/internal/dev/outage", new { active });
 
     // Brings both services back to a clean, caught-up state between drills.
     private async Task DrainAsync()
@@ -69,7 +69,7 @@ public class DrillApiTests(CallbackApi api) : IClassFixture<CallbackApi>
     public async Task A_stopped_provider_makes_the_dependency_degraded_not_the_api_down_and_train_reads_keep_working()
     {
         var corridor = await api.RunningCorridorAsync();
-        await api.RailBites.StopAsync();
+        await api.Grilled.StopAsync();
         try
         {
             var ready = await ReadyAsync(); // still 200: the API can serve train information
@@ -87,8 +87,8 @@ public class DrillApiTests(CallbackApi api) : IClassFixture<CallbackApi>
         }
         finally
         {
-            await api.RailBites.StartAsync();
-            await api.RailBites.SetNowAsync(api.Clock.Now);
+            await api.Grilled.StartAsync();
+            await api.Grilled.SetNowAsync(api.Clock.Now);
         }
 
         Assert.Equal("Healthy", (await ReadyAsync()).GetProperty("status").GetString());
@@ -108,8 +108,8 @@ public class DrillApiTests(CallbackApi api) : IClassFixture<CallbackApi>
             Assert.Equal("NotReady", Entry(ready, "catering").GetProperty("data").GetProperty("provider").GetString());
 
             // The provider answers 503 to everything but health and the restore route.
-            Assert.Equal(HttpStatusCode.ServiceUnavailable, (await api.RailBites.Http.GetAsync("/v1/collection-points")).StatusCode);
-            Assert.Equal(HttpStatusCode.OK, (await api.RailBites.Http.GetAsync("/health/live")).StatusCode);
+            Assert.Equal(HttpStatusCode.ServiceUnavailable, (await api.Grilled.Http.GetAsync("/v1/collection-points")).StatusCode);
+            Assert.Equal(HttpStatusCode.OK, (await api.Grilled.Http.GetAsync("/health/live")).StatusCode);
 
             // An order placed now is kept, not lost or refused.
             var response = await api.OrderAsync(passenger, Key(), corridor, "PDN", "peradeniya-junction", ("pdn-fish-bun", 1));
@@ -134,9 +134,9 @@ public class DrillApiTests(CallbackApi api) : IClassFixture<CallbackApi>
     [RequiresDatabaseFact]
     public async Task The_switch_needs_the_service_key()
     {
-        var anonymous = await new HttpClient().PutAsJsonAsync($"{api.RailBites.BaseUrl}/internal/dev/outage", new { active = true });
+        var anonymous = await new HttpClient().PutAsJsonAsync($"{api.Grilled.BaseUrl}/internal/dev/outage", new { active = true });
         Assert.Equal(HttpStatusCode.Unauthorized, anonymous.StatusCode);
-        Assert.Equal(HttpStatusCode.OK, (await api.RailBites.Http.GetAsync("/v1/collection-points")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await api.Grilled.Http.GetAsync("/v1/collection-points")).StatusCode);
     }
 
     [RequiresDatabaseFact]
@@ -235,8 +235,8 @@ public class DrillApiTests(CallbackApi api) : IClassFixture<CallbackApi>
         {
             Content = JsonContent.Create(new { cutoffMinutes = 45 }),
         };
-        request.Headers.Add("X-RailBites-Admin-Key", RailBitesProcess.AdminKey);
-        Assert.Equal(HttpStatusCode.OK, (await api.RailBites.Http.SendAsync(request)).StatusCode);
+        request.Headers.Add("X-Grilled-Admin-Key", GrilledProcess.AdminKey);
+        Assert.Equal(HttpStatusCode.OK, (await api.Grilled.Http.SendAsync(request)).StatusCode);
 
         var option = await OptionAsync();
         Assert.Equal(45, option.GetProperty("collectionPoint").GetProperty("cutoffMinutes").GetInt32());
@@ -254,7 +254,7 @@ public class DrillApiTests(CallbackApi api) : IClassFixture<CallbackApi>
         {
             Content = JsonContent.Create(new { cutoffMinutes = 45 }),
         };
-        Assert.Equal(HttpStatusCode.Unauthorized, (await api.RailBites.Http.SendAsync(request)).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await api.Grilled.Http.SendAsync(request)).StatusCode);
     }
 
     [RequiresDatabaseFact]
@@ -309,7 +309,7 @@ public class DrillApiTests(CallbackApi api) : IClassFixture<CallbackApi>
     }
 
     [RequiresDatabaseFact]
-    public async Task One_trace_runs_from_the_passengers_request_through_RailBites_and_back_in_the_callback()
+    public async Task One_trace_runs_from_the_passengers_request_through_Grilled_and_back_in_the_callback()
     {
         var passenger = await NewPassengerAsync();
         var corridor = await api.RunningCorridorAsync();
@@ -328,7 +328,7 @@ public class DrillApiTests(CallbackApi api) : IClassFixture<CallbackApi>
         var placeTrace = "4bf92f3577b34da6a3ce929d0e0e4736";
         var kioskTrace = "0af7651916cd43dd8448eb211c80319c";
 
-        // The passenger's request arrives with a trace; SmartRail passes it on to RailBites.
+        // The passenger's request arrives with a trace; SmartRail passes it on to Grilled.
         var order = new HttpRequestMessage(HttpMethod.Post, "/api/food/orders")
         {
             Content = JsonContent.Create(new
@@ -346,7 +346,7 @@ public class DrillApiTests(CallbackApi api) : IClassFixture<CallbackApi>
         Assert.Equal(HttpStatusCode.Created, placed.StatusCode);
         Assert.Contains(api.Proxy.Traceparents, t => t is not null && t.Split('-')[1] == placeTrace);
 
-        // RailBites tells SmartRail, and that callback joins the same trace.
+        // Grilled tells SmartRail, and that callback joins the same trace.
         await api.RunCallbacksAsync();
         lock (seen)
         {
@@ -356,13 +356,13 @@ public class DrillApiTests(CallbackApi api) : IClassFixture<CallbackApi>
         // A kiosk action has its own trace, and the callback it causes carries that one.
         var providerId = (await api.ProviderOrderAsync((await placed.JsonAsync()).GetProperty("id").GetGuid()))!.Value.GetProperty("id").GetString();
         var ready = new HttpRequestMessage(HttpMethod.Post, $"/v1/kiosk/collection-points/peradeniya-junction/orders/{providerId}/ready");
-        ready.Headers.Add("X-RailBites-Kiosk-Key", RailBitesProcess.PeradeniyaKioskKey);
+        ready.Headers.Add("X-Grilled-Kiosk-Key", GrilledProcess.PeradeniyaKioskKey);
         ready.Headers.Add("traceparent", Traced(kioskTrace));
         // A client of its own that sends the trace header exactly as written; the shared one would
         // replace it with the test process's own trace, as an instrumented kiosk client would.
-        using var kioskClient = new HttpClient(new SocketsHttpHandler { ActivityHeadersPropagator = null }) { BaseAddress = api.RailBites.Http.BaseAddress };
+        using var kioskClient = new HttpClient(new SocketsHttpHandler { ActivityHeadersPropagator = null }) { BaseAddress = api.Grilled.Http.BaseAddress };
         Assert.Equal(HttpStatusCode.OK, (await kioskClient.SendAsync(ready)).StatusCode);
-        var queued = await api.RailBites.Http.GetStringAsync("/internal/test/callbacks");
+        var queued = await api.Grilled.Http.GetStringAsync("/internal/test/callbacks");
         await api.RunCallbacksAsync();
         lock (seen)
         {

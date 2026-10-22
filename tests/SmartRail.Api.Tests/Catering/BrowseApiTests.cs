@@ -5,7 +5,7 @@ using SmartRail.Api.Tests.Operations;
 
 namespace SmartRail.Api.Tests.Catering;
 
-// Guests browse where food can be collected on a train and what is on the menu. Real RailBites,
+// Guests browse where food can be collected on a train and what is on the menu. Real Grilled,
 // disposable PostgreSQL, a hand-moved clock.
 public class BrowseApiTests(CateringApi api) : IClassFixture<CateringApi>
 {
@@ -102,7 +102,7 @@ public class BrowseApiTests(CateringApi api) : IClassFixture<CateringApi>
         Assert.Equal(85000, lamprais.GetProperty("priceMinorLkr").GetInt32());
 
         // Within the minute SmartRail answers from its cache, so a stopped provider is not noticed.
-        await api.RailBites.StopAsync();
+        await api.Grilled.StopAsync();
         try
         {
             var cached = await api.Client.GetAsync("/api/food/collection-points/peradeniya-junction/menu");
@@ -115,8 +115,8 @@ public class BrowseApiTests(CateringApi api) : IClassFixture<CateringApi>
         }
         finally
         {
-            await api.RailBites.StartAsync();
-            await api.RailBites.SetNowAsync(api.Clock.Now);
+            await api.Grilled.StartAsync();
+            await api.Grilled.SetNowAsync(api.Clock.Now);
         }
     }
 
@@ -131,7 +131,7 @@ public class BrowseApiTests(CateringApi api) : IClassFixture<CateringApi>
     public async Task With_the_provider_down_collection_options_are_unavailable_but_train_information_is_not()
     {
         var corridor = await api.RunningCorridorAsync();
-        await api.RailBites.StopAsync();
+        await api.Grilled.StopAsync();
         try
         {
             var options = await api.Client.GetAsync($"/api/journeys/{corridor.JourneyId}/collection-options");
@@ -142,8 +142,8 @@ public class BrowseApiTests(CateringApi api) : IClassFixture<CateringApi>
         }
         finally
         {
-            await api.RailBites.StartAsync();
-            await api.RailBites.SetNowAsync(api.Clock.Now);
+            await api.Grilled.StartAsync();
+            await api.Grilled.SetNowAsync(api.Clock.Now);
         }
     }
 }

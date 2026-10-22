@@ -4,7 +4,7 @@ Status: **accepted for the pilot**, 13 October 2026; local development and ident
 
 ## The decision in one sentence
 
-Build one ASP.NET Core 10 API as a **modular monolith with feature slices**; use PostgreSQL as the durable source of truth and ordinary HTTP polling with ETags as the guaranteed update path. Add a small, one-way SSE *change hint* only after the five core journeys work. RailBites remains a separate Node service because its integration boundary is part of the assessment.
+Build one ASP.NET Core 10 API as a **modular monolith with feature slices**; use PostgreSQL as the durable source of truth and ordinary HTTP polling with ETags as the guaranteed update path. Add a small, one-way SSE *change hint* only after the five core journeys work. Grilled remains a separate Node service because its integration boundary is part of the assessment.
 
 ## Why this architecture
 
@@ -26,15 +26,15 @@ Keep **one API project** for the pilot. Under `services/api/Modules/`, use four 
 | `Rail` | Published/fictional patterns, stations, dated journeys, simulated observations, freshness and ETA calculation | Staff decisions |
 | `Operations` | Driver reports, incidents, change preview/publish/withdrawal and version conflict | Train timetable source |
 | `Access` | Accounts, roles, assignments, follows, saved routes and audit | Train or provider order state |
-| `Catering` | SmartRail order links, RailBites HTTP contract, outbox and webhook receipts | RailBites menu, stock or orders |
+| `Catering` | SmartRail order links, Grilled HTTP contract, outbox and webhook receipts | Grilled menu, stock or orders |
 
 The PostgreSQL schemas in the [data model](data-model.md) remain `network`, `live`, `changes`, `identity`, `passenger` and `catering`; a module may own more than one schema. A schema is a database namespace, **not** another service.
 
 The Access module owns SmartRail permissions and local account references; **Keycloak** owns authentication, credentials and refresh tokens. The API validates Keycloak tokens before applying local role, station and journey rules. Keycloak has its own database and is not another SmartRail module. The [identity and local development decision](identity-and-local-development.md) gives the login and environment contracts.
 
-Each feature folder contains only the files its use case needs: endpoint/request and response, business rule or handler, persistence mapping, and a focused test. Avoid generic repositories, a MediatR handler for every query, a shared `Utilities` folder, and duplicate DTO/entity layers. Begin with one EF Core context so a change, audit row and RailBites outbox row can commit in **one PostgreSQL transaction**. Place entity mappings beside the owning module and map them to its schema. Cross-module use goes through a small, named interface; feature code must not query another module's EF sets directly. Add an architecture test when the second module exists to enforce that boundary. One context is an explicit pilot trade-off: simpler transactions, weaker compile-time isolation than separate assemblies.
+Each feature folder contains only the files its use case needs: endpoint/request and response, business rule or handler, persistence mapping, and a focused test. Avoid generic repositories, a MediatR handler for every query, a shared `Utilities` folder, and duplicate DTO/entity layers. Begin with one EF Core context so a change, audit row and Grilled outbox row can commit in **one PostgreSQL transaction**. Place entity mappings beside the owning module and map them to its schema. Cross-module use goes through a small, named interface; feature code must not query another module's EF sets directly. Add an architecture test when the second module exists to enforce that boundary. One context is an explicit pilot trade-off: simpler transactions, weaker compile-time isolation than separate assemblies.
 
-The HTTP host (`Program.cs`) only configures services, middleware and module endpoints. It must not contain train logic. A path through the first slice should be easy to explain: `GET /api/stations` → Rail endpoint → Rail query → EF mapping → `network.stations` → response. For a published change: Operations endpoint → version check → one database transaction for change + audit + provider outbox → commit → client change hint. The outbox worker later retries RailBites; the hint is never the durable record.
+The HTTP host (`Program.cs`) only configures services, middleware and module endpoints. It must not contain train logic. A path through the first slice should be easy to explain: `GET /api/stations` → Rail endpoint → Rail query → EF mapping → `network.stations` → response. For a published change: Operations endpoint → version check → one database transaction for change + audit + provider outbox → commit → client change hint. The outbox worker later retries Grilled; the hint is never the durable record.
 
 ## Updates to clients
 
@@ -54,7 +54,7 @@ The train position is **simulated every 30 seconds**, and most interactions are 
 
 - Public schedule provenance and simulated running data remain visibly distinct. No real-time railway API is assumed.
 - `409` on a stale whole-journey preview and order idempotency are database rules, not socket features.
-- A confirmed change, audit row and RailBites outbox record must be atomic. RailBites can be down without losing the change.
+- A confirmed change, audit row and Grilled outbox record must be atomic. Grilled can be down without losing the change.
 - Health checks, structured logs with correlation IDs, outbox backlog and feed age matter more than transport choice. Use OpenTelemetry for both environments: the Aspire dashboard locally and Application Insights in Azure. Aspire AppHost runs local dependencies and the demo fallback. Use one Azure environment and budget alerts as planned in D11; include the separate Keycloak service and database in the new estimate.
 - Product AI remains outside this pilot's operational decisions. If added later, a human must approve any AI-written notice and all train facts must come from structured data (D14).
 

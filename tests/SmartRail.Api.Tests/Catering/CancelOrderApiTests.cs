@@ -5,8 +5,8 @@ using SmartRail.Api.Tests.Rail;
 
 namespace SmartRail.Api.Tests.Catering;
 
-// A passenger cancels their own order. SmartRail sends a fresh snapshot; RailBites applies its own
-// cutoff. Real RailBites, disposable PostgreSQL, hand-moved clock.
+// A passenger cancels their own order. SmartRail sends a fresh snapshot; Grilled applies its own
+// cutoff. Real Grilled, disposable PostgreSQL, hand-moved clock.
 public class CancelOrderApiTests(CateringApi api) : IClassFixture<CateringApi>
 {
     private static int _subjects;
@@ -136,7 +136,7 @@ public class CancelOrderApiTests(CateringApi api) : IClassFixture<CateringApi>
         var corridor = await api.RunningCorridorAsync();
         var orderId = await OrderAsync(passenger, corridor);
 
-        await api.RailBites.StopAsync();
+        await api.Grilled.StopAsync();
         try
         {
             var response = await CancelAsync(passenger, orderId);
@@ -145,8 +145,8 @@ public class CancelOrderApiTests(CateringApi api) : IClassFixture<CateringApi>
         }
         finally
         {
-            await api.RailBites.StartAsync();
-            await api.RailBites.SetNowAsync(api.Clock.Now);
+            await api.Grilled.StartAsync();
+            await api.Grilled.SetNowAsync(api.Clock.Now);
         }
 
         Assert.Equal("ACCEPTED", (await api.LinkAsync(orderId)).ProviderStatus);
@@ -163,8 +163,8 @@ public class CancelOrderApiTests(CateringApi api) : IClassFixture<CateringApi>
         var providerId = provider.GetProperty("id").GetString();
         var code = provider.GetProperty("pickupCode").GetString();
 
-        Assert.Equal(HttpStatusCode.OK, (await api.RailBites.KioskAsync("peradeniya-junction", RailBitesProcess.PeradeniyaKioskKey, HttpMethod.Post, $"/{providerId}/ready")).StatusCode);
-        Assert.Equal(HttpStatusCode.OK, (await api.RailBites.KioskAsync("peradeniya-junction", RailBitesProcess.PeradeniyaKioskKey, HttpMethod.Post, $"/{providerId}/collected", $$"""{"pickupCode":"{{code}}"}""")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await api.Grilled.KioskAsync("peradeniya-junction", GrilledProcess.PeradeniyaKioskKey, HttpMethod.Post, $"/{providerId}/ready")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await api.Grilled.KioskAsync("peradeniya-junction", GrilledProcess.PeradeniyaKioskKey, HttpMethod.Post, $"/{providerId}/collected", $$"""{"pickupCode":"{{code}}"}""")).StatusCode);
 
         var response = await CancelAsync(passenger, orderId);
 

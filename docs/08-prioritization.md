@@ -65,7 +65,7 @@ The last column records what **doc 06 plans**. Its “Built” labels mean **pla
 | 8 | Freshness and "unknown" rule, with shared test vectors | 4 | 5 | 4 | 5 | 3 | **83** | Must | Built ✓ |
 | 9 | Ops corridor table | 5 | 5 | 3 | 4 | 3 | **83** | Must | Built ✓ |
 | 10 | Public guest reads; Keycloak login/token validation, local role table, scoping and auth tests | 5 | 5 | 4 | 3 | 3 | **83** | Must | Built ✓ |
-| 11 | RailBites service, contract, HMAC, outbox and idempotency | 5 | 5 | 5 | 4 | 1 | **81** | Must | Built ✓ |
+| 11 | Grilled service, contract, HMAC, outbox and idempotency | 5 | 5 | 5 | 4 | 1 | **81** | Must | Built ✓ |
 | 12 | Curated network seed and `seed-demo --anchor` | 5 | 5 | 3 | 3 | 3 | **80** | Must | Built ✓ |
 | 13 | Passenger food ordering: menu, order, code, status, cancel | 5 | 5 | 3 | 4 | 2 | **79** | Must | Built ✓ |
 | 14 | Design system tokens, `StatusBadge`/`FreshnessLine`, accessibility checks | 5 | 3 | 4 | 4 | 3 | **78** | Must | Built ✓ |
@@ -124,7 +124,7 @@ The last column records what **doc 06 plans**. Its “Built” labels mean **pla
 | Early ending | 66 | **Now a dependency Must:** the composer says where the train ends. Earlier valid stops remain; later arrival estimates and new food orders disappear; existing food orders beyond the new endpoint are cancelled with a reason. Do not describe the entire train as cancelled when earlier stops still operate. |
 
 **Different risk profiles behind similar scores.**
-- **RailBites (81) vs passenger food ordering (79).** RailBites is the highest-effort Must (E = 1), with two runtimes, HMAC and an outbox. Food ordering is mostly UI. If day 12–13 slips, the doc 06 cut line protects the right thing: keep the outbox and the ETA push, cut the staff page. The integration is what the panel marks (§26 "Integration"). The ordering screens are not.
+- **Grilled (81) vs passenger food ordering (79).** Grilled is the highest-effort Must (E = 1), with two runtimes, HMAC and an outbox. Food ordering is mostly UI. If day 12–13 slips, the doc 06 cut line protects the right thing: keep the outbox and the ETA push, cut the staff page. The integration is what the panel marks (§26 "Integration"). The ordering screens are not.
 - **Push notifications (42).** As a **Kano hypothesis**, background alerts are *Must-Be* for a real commuter, because the app is useless if you have to keep it open. For the assessment they are only a delivery channel. The ranking holds **only because** the in-app feed plus "deciding who gets notified is built and tested" carries §13. If the panel's view of §13 is "notify" in the push sense, push moves to Should (M 2 → 4 gives 54, still Could). Low risk to the ranking, but worth one line in the demo.
 
 **Weight sensitivity.** The 16 top-scoring Musts all have M ≥ 4 and D = 5. Any weighting that gives mandate and demo dependency together at least 40% keeps them in the Must set, so the top of the ranking is stable. Setting ease to 0% (pure value) only reorders the Could and Won't tiers: the planner and push rise, but neither crosses 60.
@@ -141,7 +141,7 @@ The top of the backlog matches doc 06. **The weighted scoring confirms the counc
 4. **Promote "departures from another station" to Could-plus**, and do it on day 10 if G2 is green. It closes the last unanswered §3 question at almost no cost by reusing the board endpoint.
 5. **Add on-board delivery to the cut list** with a viva line, for example: *"Collection at a station only. On-board delivery needs onboard staff, train-coach location and a handover protocol the provider doesn't have."* §12 says "receive **or** collect", so the panel may ask.
 
-The route diagram stays. If time runs short, remove its moving marker and the optional driver offline report queue before cutting freshness, early-ending behaviour, report acknowledgement or reviewed language. A stopped feed makes position and ETA unknown but leaves a separately confirmed platform change visible. SmartRail blocks new food orders when status is unknown; RailBites does not need a new freshness event. Payment happens at collection, so the pilot has no automatic refund.
+The route diagram stays. If time runs short, remove its moving marker and the optional driver offline report queue before cutting freshness, early-ending behaviour, report acknowledgement or reviewed language. A stopped feed makes position and ETA unknown but leaves a separately confirmed platform change visible. SmartRail blocks new food orders when status is unknown; Grilled does not need a new freshness event. Payment happens at collection, so the pilot has no automatic refund.
 
 ---
 

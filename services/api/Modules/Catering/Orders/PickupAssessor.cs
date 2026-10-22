@@ -5,7 +5,7 @@ using SmartRail.Api.Modules.Rail;
 namespace SmartRail.Api.Modules.Catering.Orders;
 
 // The reasons SmartRail itself can see that a pickup is not available. The provider adds its own
-// (cutoff, stock, items); those come back from RailBites unchanged.
+// (cutoff, stock, items); those come back from Grilled unchanged.
 public static class OrderProblems
 {
     public const string JourneyNotFound = "JOURNEY_NOT_FOUND";
@@ -16,7 +16,7 @@ public static class OrderProblems
     public const string TrainUnknown = "TRAIN_UNKNOWN";
 }
 
-// What SmartRail knows about one pickup right now. Journey and Pickup are the snapshot RailBites
+// What SmartRail knows about one pickup right now. Journey and Pickup are the snapshot Grilled
 // receives; they exist whenever the journey and stop do, even if Problem says a new order is not
 // possible, because a cancellation or a reconciliation still sends them.
 public sealed record PickupAssessment(JourneySnapshot? Journey, PickupSnapshot? Pickup, string? Problem);
@@ -47,7 +47,7 @@ public sealed class PickupAssessor(IPickupReader pickups, IJourneyEligibilityRea
             ProblemFor(journey, rules, stop));
     }
 
-    // The full-eligibility snapshot RailBites needs, from the journey's current confirmed state.
+    // The full-eligibility snapshot Grilled needs, from the journey's current confirmed state.
     public static JourneySnapshot SnapshotOf(PickupJourney journey, JourneyEligibility rules) =>
         new(journey.JourneyId, journey.TrainNumber, journey.ServiceDate, rules.Version, rules.OrderClosed, rules.BlockedPickupStopIds);
 

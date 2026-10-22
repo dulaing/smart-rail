@@ -9,7 +9,7 @@ using SmartRail.Api.Tests.Operations;
 namespace SmartRail.Api.Tests.Catering;
 
 // A passenger places, reads, lists and cancels food orders through SmartRail while a real
-// RailBites process holds the menu, stock and orders. Disposable PostgreSQL, a hand-moved clock.
+// Grilled process holds the menu, stock and orders. Disposable PostgreSQL, a hand-moved clock.
 public class OrderApiTests(CateringApi api) : IClassFixture<CateringApi>
 {
     private static int _subjects;
@@ -267,7 +267,7 @@ public class OrderApiTests(CateringApi api) : IClassFixture<CateringApi>
         var passenger = await NewPassengerAsync();
         var corridor = await api.RunningCorridorAsync();
 
-        // Veyangoda is ahead and served, but RailBites has no collection point there.
+        // Veyangoda is ahead and served, but Grilled has no collection point there.
         var response = await api.OrderAsync(passenger, Key(), corridor, "VEY", "peradeniya-junction", ("pdn-fish-bun", 1));
 
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);

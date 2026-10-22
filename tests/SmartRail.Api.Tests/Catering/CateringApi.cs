@@ -29,24 +29,24 @@ public sealed record Corridor(Guid JourneyId, DateOnly Date, IReadOnlyList<(stri
     public DateTimeOffset At(string hhmm) => ColomboTime.ToInstant(Date, TimeOnly.Parse(hhmm), 0);
 }
 
-// The SmartRail API wired to a real RailBites process through a proxy that can lose messages, with
+// The SmartRail API wired to a real Grilled process through a proxy that can lose messages, with
 // one hand-moved clock shared by both services. Needs a disposable PostgreSQL server and a built
-// services/railbites. Each test uses its own corridor journey, because they share one database.
+// services/grilled. Each test uses its own corridor journey, because they share one database.
 public class CateringApi : AccessApi
 {
     public const string ObservationKey = "test-observation-key";
 
     private static int _nextDay;
 
-    private RailBitesProcess? _railBites;
+    private GrilledProcess? _Grilled;
 
-    public RailBitesProcess RailBites => _railBites!;
+    public GrilledProcess Grilled => _Grilled!;
 
     public FlakyProxy Proxy { get; private set; } = null!;
 
     public TestClock Clock { get; } = new(new DateTimeOffset(2026, 10, 14, 0, 0, 0, TimeSpan.Zero));
 
-    protected virtual void ConfigureRailBites(RailBitesProcess railBites)
+    protected virtual void ConfigureGrilled(GrilledProcess Grilled)
     {
     }
 
@@ -57,10 +57,10 @@ public class CateringApi : AccessApi
             return;
         }
 
-        _railBites = new RailBitesProcess();
-        ConfigureRailBites(_railBites);
-        await _railBites.StartAsync();
-        Proxy = await FlakyProxy.StartAsync(_railBites.BaseUrl);
+        _Grilled = new GrilledProcess();
+        ConfigureGrilled(_Grilled);
+        await _Grilled.StartAsync();
+        Proxy = await FlakyProxy.StartAsync(_Grilled.BaseUrl);
         await base.InitializeAsync();
     }
 
@@ -68,9 +68,9 @@ public class CateringApi : AccessApi
     {
         base.ConfigureHost(builder);
         builder.UseSetting(ServiceKeyFilter.ConfigurationKey, ObservationKey);
-        builder.UseSetting("RailBites:BaseUrl", Proxy.BaseUrl);
-        builder.UseSetting("RailBites:ServiceKey", RailBitesProcess.ServiceKey);
-        builder.UseSetting("RailBites:TimeoutSeconds", "5");
+        builder.UseSetting("Grilled:BaseUrl", Proxy.BaseUrl);
+        builder.UseSetting("Grilled:ServiceKey", GrilledProcess.ServiceKey);
+        builder.UseSetting("Grilled:TimeoutSeconds", "5");
 
         // The tests run the retry pass by hand, at times they choose.
         builder.UseSetting("Catering:Placement:WorkerEnabled", "false");
@@ -90,19 +90,19 @@ public class CateringApi : AccessApi
             await Proxy.DisposeAsync();
         }
 
-        if (_railBites is not null)
+        if (_Grilled is not null)
         {
-            await _railBites.DisposeAsync();
+            await _Grilled.DisposeAsync();
         }
     }
 
-    // Moves SmartRail's clock and RailBites' clock to the same instant.
+    // Moves SmartRail's clock and Grilled' clock to the same instant.
     public async Task SetNowAsync(DateTimeOffset now)
     {
         // The API writes the clock's value to PostgreSQL, which accepts only a UTC offset.
         now = now.ToUniversalTime();
         Clock.Set(now);
-        await RailBites.SetNowAsync(now);
+        await Grilled.SetNowAsync(now);
     }
 
     public Task AdvanceAsync(TimeSpan by) => SetNowAsync(Clock.Now + by);
@@ -243,10 +243,10 @@ public class CateringApi : AccessApi
         return count;
     }
 
-    // What RailBites itself holds for a link ID, or null if it has no such order.
+    // What Grilled itself holds for a link ID, or null if it has no such order.
     public async Task<JsonElement?> ProviderOrderAsync(Guid linkId)
     {
-        var response = await RailBites.Http.GetAsync($"/v1/order-links/{linkId}");
+        var response = await Grilled.Http.GetAsync($"/v1/order-links/{linkId}");
         if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
         {
             return null;
@@ -258,7 +258,7 @@ public class CateringApi : AccessApi
 
     public async Task<int> ProviderStockAsync(string collectionPoint, string menuItemId)
     {
-        var menu = JsonDocument.Parse(await RailBites.Http.GetStringAsync($"/v1/collection-points/{collectionPoint}/menu")).RootElement;
+        var menu = JsonDocument.Parse(await Grilled.Http.GetStringAsync($"/v1/collection-points/{collectionPoint}/menu")).RootElement;
         return menu.GetProperty("items").EnumerateArray().Single(i => i.GetProperty("id").GetString() == menuItemId)
             .GetProperty("stockQuantity").GetInt32();
     }

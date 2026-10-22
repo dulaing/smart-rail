@@ -102,7 +102,7 @@ public static class DemoSetup
         return Results.Ok(new SimulationStateDto(journeyId, options.Enabled, paused));
     }
 
-    private static async Task<IResult> ReadOutageAsync(IRailBitesClient provider, CancellationToken cancellationToken)
+    private static async Task<IResult> ReadOutageAsync(IGrilledClient provider, CancellationToken cancellationToken)
     {
         var result = await provider.GetOutageAsync(cancellationToken);
         return result.Outcome == ProviderOutcome.Success
@@ -111,7 +111,7 @@ public static class DemoSetup
     }
 
     private static async Task<IResult> SetOutageAsync(
-        OutageRequest? request, HttpContext context, IRailBitesClient provider, SmartRailDbContext db,
+        OutageRequest? request, HttpContext context, IGrilledClient provider, SmartRailDbContext db,
         CurrentAccount current, AccessGuard guard, CancellationToken cancellationToken)
     {
         if (request?.Active is not { } active)
@@ -151,7 +151,7 @@ public static class DemoSetup
     private static IResult ProviderUnavailable() =>
         Results.Problem(
             title: "Provider unavailable",
-            detail: "RailBites did not answer the outage switch. If its process has stopped, start it from Aspire; a simulated outage keeps this route reachable.",
+            detail: "Grilled did not answer the outage switch. If its process has stopped, start it from Aspire; a simulated outage keeps this route reachable.",
             statusCode: StatusCodes.Status503ServiceUnavailable,
             extensions: new Dictionary<string, object?> { ["code"] = "PROVIDER_UNAVAILABLE" });
 

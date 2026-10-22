@@ -1,0 +1,163 @@
+{
+  "date": "2026-10-19",
+  "status": "User-approved reference rules for existing features",
+  "scope": "Existing implemented feature families only. Future personal Updates/follow and Operations diagnostics/demo UI remain prerequisite exclusions.",
+  "families": [
+    {
+      "frames": "LOGIN, LOGIN_ERROR, LOGIN_RATE, SESSION_EXPIRED, LOGOUT, ACCESS_DENIED",
+      "route": "/staff/login; session redirect/sign-out",
+      "code": [
+        "services/grilled/src/staff-page.ts",
+        "services/grilled/src/staff.ts"
+      ],
+      "status": "existing point-scoped shared session",
+      "referenceNodes": [
+        "252:36",
+        "252:77",
+        "252:170",
+        "252:252"
+      ]
+    },
+    {
+      "frames": "all remaining RB desktop states and TABLET/PHONE examples",
+      "route": "/staff; client-rendered list and inline collect form; /staff/orders API",
+      "code": [
+        "services/grilled/src/staff-page.ts",
+        "services/grilled/src/staff.ts"
+      ],
+      "status": "Existing workflow; detail panels are presentation references, not new routes. Compact exception, keyboard and code-result rules use supplement 314:90; no offline order cache.",
+      "referenceNodes": [
+        "253:155",
+        "254:354",
+        "254:469",
+        "255:954",
+        "256:980",
+        "256:1109"
+      ]
+    }
+  ],
+  "states": {
+    "normal": {
+      "referenceNodes": [
+        "252:36",
+        "253:155",
+        "254:354"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=252-36",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=253-155",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=254-354"
+      ]
+    },
+    "selected": {
+      "referenceNodes": [
+        "253:215"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=253-215"
+      ]
+    },
+    "disabled": {
+      "referenceNodes": [
+        "253:278",
+        "254:526",
+        "314:37"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=253-278",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=254-526",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-37"
+      ]
+    },
+    "focus": {
+      "referenceNodes": [
+        "314:37",
+        "314:90"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-37",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-90"
+      ]
+    },
+    "loading": {
+      "referenceNodes": [
+        "253:414"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=253-414"
+      ]
+    },
+    "empty": {
+      "referenceNodes": [
+        "253:446"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=253-446"
+      ]
+    },
+    "error": {
+      "referenceNodes": [
+        "252:77",
+        "252:124",
+        "254:469",
+        "254:582",
+        "254:692",
+        "254:909"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=252-77",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=252-124",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=254-469",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=254-582",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=254-692",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=254-909"
+      ]
+    },
+    "offline": {
+      "referenceNodes": [
+        "255:954",
+        "255:1005"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=255-954",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=255-1005"
+      ]
+    },
+    "access": {
+      "referenceNodes": [
+        "252:170",
+        "252:252",
+        "314:37"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=252-170",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=252-252",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-37"
+      ]
+    },
+    "compact": {
+      "referenceNodes": [
+        "256:980",
+        "256:1021",
+        "256:1072",
+        "256:1109",
+        "314:90"
+      ],
+      "links": [
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=256-980",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=256-1021",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=256-1072",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=256-1109",
+        "https://www.figma.com/design/38B21GKxgb3wxRar06gHXP/SmartRail-UI?node-id=314-90"
+      ]
+    }
+  },
+  "sharedRules": "Access/action sheet 314:37; content reflow/keyboard sheet 314:90. Specimens use logical content widths; scale target sizes to each profile. No automatic resend, optimistic confirmation, new cache or permission behavior.",
+  "nonApplicable": [],
+  "validationPending": [
+    "App-rendered overlay/diff and raster calibration",
+    "Actual 200% reflow/keyboard/native-reader checks",
+    "Physical device/display measurements"
+  ],
+  "approvedOn": "2026-10-19"
+}

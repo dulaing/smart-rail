@@ -2,7 +2,7 @@ using Microsoft.Extensions.Options;
 
 namespace SmartRail.Api.Modules.Catering.Outbox;
 
-// Sends queued train changes to RailBites in the background.
+// Sends queued train changes to Grilled in the background.
 public sealed class OutboxWorker(
     IServiceScopeFactory scopes, IOptions<OutboxOptions> options, ILogger<OutboxWorker> logger) : BackgroundService
 {

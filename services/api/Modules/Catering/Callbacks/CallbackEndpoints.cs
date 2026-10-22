@@ -1,11 +1,11 @@
 namespace SmartRail.Api.Modules.Catering.Callbacks;
 
-// The route RailBites calls with status changes. It takes no user token: the signature guards it. It
+// The route Grilled calls with status changes. It takes no user token: the signature guards it. It
 // fails closed when the secret is not configured and never logs a body, signature or pickup code.
 public static class CallbackEndpoints
 {
     public const string Path = "/internal/catering/order-updates";
-    public const string SecretSetting = "RailBites:CallbackSecret";
+    public const string SecretSetting = "Grilled:CallbackSecret";
     public const int MaxBodyBytes = 64 * 1024;
 
     public static void MapCallbacks(this IEndpointRouteBuilder app)
@@ -38,7 +38,7 @@ public static class CallbackEndpoints
         if (problem != SignatureProblem.None)
         {
             CateringMetrics.CallbacksRejected.Add(1, new KeyValuePair<string, object?>("reason", problem.ToString()));
-            logger.LogWarning("Rejected a RailBites callback: {Reason}.", problem);
+            logger.LogWarning("Rejected a Grilled callback: {Reason}.", problem);
             return Problem(StatusCodes.Status401Unauthorized, "UNAUTHORIZED", "The callback signature or timestamp is not valid.");
         }
 

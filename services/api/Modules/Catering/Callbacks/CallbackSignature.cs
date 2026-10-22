@@ -14,13 +14,13 @@ public enum SignatureProblem
     BadSignature,
 }
 
-// The signature on a RailBites callback: HMAC-SHA256, keyed with the shared secret, over the UTF-8
+// The signature on a Grilled callback: HMAC-SHA256, keyed with the shared secret, over the UTF-8
 // text "<timestamp>." followed by the exact bytes of the request body, written as "v1=<lower hex>".
 // The check is made on the raw bytes before anything is parsed, so reformatting a body breaks it.
 public static class CallbackSignature
 {
-    public const string SignatureHeader = "X-RailBites-Signature";
-    public const string TimestampHeader = "X-RailBites-Timestamp";
+    public const string SignatureHeader = "X-Grilled-Signature";
+    public const string TimestampHeader = "X-Grilled-Timestamp";
     public static readonly TimeSpan Tolerance = TimeSpan.FromMinutes(5);
     private const string Version = "v1=";
 

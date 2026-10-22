@@ -27,7 +27,7 @@ public static class LinkedChangeBodies
 
 // A service change can name the incident that explains it. The link is checked when previewed and
 // again when confirmed, a withdrawal keeps it, and a resolution cannot slip in between the check
-// and the commit. PostgreSQL, real tokens, no RailBites.
+// and the commit. PostgreSQL, real tokens, no Grilled.
 public class LinkedChangeApiTests(AccessApi api) : IClassFixture<AccessApi>
 {
     private sealed class FailingAudit : IAuditTrail

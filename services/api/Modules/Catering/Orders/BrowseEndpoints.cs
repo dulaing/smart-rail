@@ -6,11 +6,11 @@ using SmartRail.Api.Modules.Rail;
 namespace SmartRail.Api.Modules.Catering.Orders;
 
 // What a passenger can browse before signing in: where on this train they could collect food, and
-// the menu there. SmartRail asks RailBites and adds the train's side (which stops are still ahead
+// the menu there. SmartRail asks Grilled and adds the train's side (which stops are still ahead
 // and served). Ordering itself needs an account; see OrderEndpoints.
 public static class BrowseEndpoints
 {
-    // The menu may be shown from a cache this long. The cutoff never is: it is read from RailBites
+    // The menu may be shown from a cache this long. The cutoff never is: it is read from Grilled
     // on every request.
     private static readonly TimeSpan MenuTtl = TimeSpan.FromSeconds(60);
 
@@ -23,7 +23,7 @@ public static class BrowseEndpoints
 
     private static async Task<IResult> CollectionOptions(
         Guid journeyId, HttpContext context, TimeProvider time, IPickupReader pickups,
-        IJourneyEligibilityReader eligibility, IRailBitesClient provider)
+        IJourneyEligibilityReader eligibility, IGrilledClient provider)
     {
         var now = time.GetUtcNow();
         var journey = await pickups.ReadAsync(journeyId, now, null, context.RequestAborted);
@@ -64,7 +64,7 @@ public static class BrowseEndpoints
     }
 
     private static async Task<IResult> Menu(
-        string collectionPointId, HttpContext context, IMemoryCache cache, IRailBitesClient provider)
+        string collectionPointId, HttpContext context, IMemoryCache cache, IGrilledClient provider)
     {
         if (!cache.TryGetValue(collectionPointId, out ProviderMenu? menu))
         {

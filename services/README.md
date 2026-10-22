@@ -6,48 +6,48 @@ Requires the .NET 10 SDK, Node 24 and Docker.
 
     dotnet run --project services/apphost
 
-This starts PostgreSQL, Keycloak, the API and RailBites, and opens the Aspire dashboard
+This starts PostgreSQL, Keycloak, the API and Grilled, and opens the Aspire dashboard
 (URL and login link are printed in the console). Stop it with Ctrl+C.
 
 - Keycloak: `https://localhost:8080`, with a certificate from the SmartRail development CA (see
   "Local HTTPS" below). Token issuer: `https://localhost:8080/realms/smartrail`.
   The admin password is in the dashboard under the keycloak resource.
 - API: `http://localhost:5111/health/live` and `/health/ready` (ready checks the database).
-- RailBites: its port is shown in the dashboard; `/health/live`.
+- Grilled: its port is shown in the dashboard; `/health/live`.
 - Database data lives in the Docker volume `smartrail-postgres-data`. Remove it to start fresh.
 
 ## One service alone
 
     dotnet run --project services/api                 # http://localhost:5111 with the http profile
-    npm --prefix services/railbites install
-    npm --prefix services/railbites run dev           # http://localhost:5200
+    npm --prefix services/grilled install
+    npm --prefix services/grilled run dev           # http://localhost:5200
 
 Without the AppHost the API has no database, so `/health/ready` reports healthy with no checks.
 
-## RailBites (food ordering provider)
+## Grilled (food ordering provider)
 
-RailBites is a separate Node service with its own SQLite file; its HTTP contract is
-`services/railbites/openapi.yaml`. It uses Node's built-in `node:sqlite`, so there is nothing native to
+Grilled is a separate Node service with its own SQLite file; its HTTP contract is
+`services/grilled/openapi.yaml`. It uses Node's built-in `node:sqlite`, so there is nothing native to
 build (Node may print an experimental-feature warning).
 
 | Setting | Default | Meaning |
 | --- | --- | --- |
-| `RAILBITES_DB_PATH` | `data/railbites.db` | SQLite file. The AppHost sets it to `services/railbites/data/railbites.db`; delete that folder to start fresh. The Docker image uses `/data/railbites.db`, which must be a mounted volume. |
-| `RAILBITES_SERVICE_KEY` | none | Credential SmartRail sends as `X-RailBites-Service-Key`. With none set every service route answers 401. |
-| `RAILBITES_KIOSK_KEYS` | none | `point-id=key,point-id=key`. Each key opens only its own collection point's kiosk routes, sent as `X-RailBites-Kiosk-Key`. |
+| `GRILLED_DB_PATH` | `data/grilled.db` | SQLite file. The AppHost sets it to `services/grilled/data/grilled.db`; delete that folder to start fresh. The Docker image uses `/data/grilled.db`, which must be a mounted volume. |
+| `GRILLED_SERVICE_KEY` | none | Credential SmartRail sends as `X-Grilled-Service-Key`. With none set every service route answers 401. |
+| `GRILLED_KIOSK_KEYS` | none | `point-id=key,point-id=key`. Each key opens only its own collection point's kiosk routes, sent as `X-Grilled-Kiosk-Key`. |
 | `SMARTRAIL_BASE_URL` | none | SmartRail API address for signed callbacks and the no-show passage read. |
-| `SMARTRAIL_SERVICE_KEY` | none | RailBites' own credential for that read; not the same secret as `RAILBITES_SERVICE_KEY`. |
-| `RAILBITES_CALLBACK_SECRET` | none | HMAC secret shared with SmartRail's `RailBites:CallbackSecret`. Missing secret/address leaves callbacks queued. |
-| `RAILBITES_CALLBACK_POLL_MS` | `2000` | Callback queue polling interval; `0` disables automatic delivery for controlled tests. |
-| `RAILBITES_CALLBACK_MAX_BACKOFF_SECONDS` | `60` | Retry cap after connection failures, 408/429 or 5xx (2, 4, 8 ... seconds). |
-| `RAILBITES_CALLBACK_FAILED_RETRY_SECONDS` | `600` | Slow retry after a permanent refusal, such as an incorrect signing secret. |
+| `SMARTRAIL_SERVICE_KEY` | none | Grilled' own credential for that read; not the same secret as `GRILLED_SERVICE_KEY`. |
+| `GRILLED_CALLBACK_SECRET` | none | HMAC secret shared with SmartRail's `Grilled:CallbackSecret`. Missing secret/address leaves callbacks queued. |
+| `GRILLED_CALLBACK_POLL_MS` | `2000` | Callback queue polling interval; `0` disables automatic delivery for controlled tests. |
+| `GRILLED_CALLBACK_MAX_BACKOFF_SECONDS` | `60` | Retry cap after connection failures, 408/429 or 5xx (2, 4, 8 ... seconds). |
+| `GRILLED_CALLBACK_FAILED_RETRY_SECONDS` | `600` | Slow retry after a permanent refusal, such as an incorrect signing secret. |
 | `PORT` | `5200` | HTTP port. |
 
 Start-up creates the tables (`schema_migrations` records what ran) and seeds the two collection
 points and their menus. Re-seeding on every start never resets stock or the cutoff.
 
-    RAILBITES_SERVICE_KEY=demo-key npm --prefix services/railbites run dev
-    curl -H "X-RailBites-Service-Key: demo-key" http://localhost:5200/v1/collection-points
+    GRILLED_SERVICE_KEY=demo-key npm --prefix services/grilled run dev
+    curl -H "X-Grilled-Service-Key: demo-key" http://localhost:5200/v1/collection-points
 
 ## Simulated running (demo trains)
 
@@ -87,41 +87,41 @@ are kept in memory, so restarting the API resumes every train.
 
 ## Food ordering through SmartRail
 
-Passengers order through the API; the API talks to RailBites. Browsing is public: `GET
+Passengers order through the API; the API talks to Grilled. Browsing is public: `GET
 /api/journeys/{journeyId}/collection-options` and `GET /api/food/collection-points/{id}/menu`. Ordering
 needs a signed-in passenger: `POST /api/food/orders`, `GET /api/food/orders`, `GET
-/api/food/orders/{id}` and `POST /api/food/orders/{id}/cancellation`. A `202` means RailBites has not
+/api/food/orders/{id}` and `POST /api/food/orders/{id}/cancellation`. A `202` means Grilled has not
 answered yet; poll the `Location`. The API retries a pending order in the background with the same
 link ID until the provider answers.
 
 | Setting | Default | Meaning |
 | --- | --- | --- |
-| `RailBites:BaseUrl` | none | RailBites address, for example `http://localhost:5200`. |
-| `RailBites:ServiceKey` | none | Must equal RailBites' `RAILBITES_SERVICE_KEY`. With either unset nothing is sent and orders stay pending. |
-| `RailBites:TimeoutSeconds` | `5` | How long one provider call may take before the order is treated as pending. |
-| `RailBites:CallbackSecret` | none | Must equal RailBites' `RAILBITES_CALLBACK_SECRET`; otherwise callbacks get 401. |
-| `RailBites:InboundServiceKey` | none | Must equal RailBites' `SMARTRAIL_SERVICE_KEY`, for its authenticated passage read only. |
+| `Grilled:BaseUrl` | none | Grilled address, for example `http://localhost:5200`. |
+| `Grilled:ServiceKey` | none | Must equal Grilled' `GRILLED_SERVICE_KEY`. With either unset nothing is sent and orders stay pending. |
+| `Grilled:TimeoutSeconds` | `5` | How long one provider call may take before the order is treated as pending. |
+| `Grilled:CallbackSecret` | none | Must equal Grilled' `GRILLED_CALLBACK_SECRET`; otherwise callbacks get 401. |
+| `Grilled:InboundServiceKey` | none | Must equal Grilled' `SMARTRAIL_SERVICE_KEY`, for its authenticated passage read only. |
 | `Catering:Placement:PollSeconds` | `5` | How often the retry loop looks for pending orders. |
 | `Catering:Placement:SettleSeconds` | `30` | After a lost request, how long to wait before a missing provider order is called refused. |
 | `Catering:Placement:WorkerEnabled` | `true` | Turns the retry loop off (tests run it by hand). |
-| `Catering:Outbox:PollSeconds` | `5` | How often confirmed train changes are sent to RailBites. |
+| `Catering:Outbox:PollSeconds` | `5` | How often confirmed train changes are sent to Grilled. |
 | `Catering:Outbox:MaxBackoffSeconds` | `300` | Longest wait between retries after a timeout or 503 (waits grow 2, 4, 8 ... seconds). |
-| `Catering:Outbox:FailedRetrySeconds` | `600` | Wait before retrying a change RailBites refused or a rejected credential; the change is kept, never dropped. |
+| `Catering:Outbox:FailedRetrySeconds` | `600` | Wait before retrying a change Grilled refused or a rejected credential; the change is kept, never dropped. |
 | `Catering:Outbox:WorkerEnabled` | `true` | Turns the delivery loop off (tests run it by hand). |
 
 A confirmed delay, cancellation, early ending or withdrawal is saved with its audit row and a message
-for RailBites in one PostgreSQL transaction, so RailBites can be down without losing it. The message
+for Grilled in one PostgreSQL transaction, so Grilled can be down without losing it. The message
 carries the post-change eligibility and every stop's pickup time. `dotnet run --project services/api -- --migrate-and-seed`
 also rewrites any undelivered message queued before pickup times existed (it is never marked delivered by that step).
 
-RailBites delivers its SQLite `webhook_outbox` to `POST /internal/catering/order-updates`, signing
+Grilled delivers its SQLite `webhook_outbox` to `POST /internal/catering/order-updates`, signing
 the timestamp and exact body with HMAC-SHA256. SmartRail checks the five-minute timestamp window,
 then commits a unique receipt and any greater status sequence together. Replays and older sequences
 are acknowledged without changing the order. A callback that beats the placement response privately
 looks up the provider order first, so its pickup code/items are available and a late response cannot
-regress the status. If that lookup fails, no receipt is committed and RailBites retries.
+regress the status. If that lookup fails, no receipt is committed and Grilled retries.
 
-For No-show, RailBites calls `GET /internal/catering/journeys/{journeyId}/stops/{stopId}/passage`
+For No-show, Grilled calls `GET /internal/catering/journeys/{journeyId}/stops/{stopId}/passage`
 using its inbound service key. Only an observed departure proves `PASSED`; stale evidence that has
 not shown departure returns `UNKNOWN`. A proven departure remains a fact when its observation ages.
 Neither endpoint uses passenger tokens. Apply the new receipt migration with the usual explicit
@@ -129,46 +129,46 @@ Neither endpoint uses passenger tokens. Apply the new receipt migration with the
 secret wiring and the operator failure drill remain T6.
 
 The corridor train `SIM-3001` (Fort 09:00, Polgahawela 11:00, Peradeniya 11:50, daily) is seeded for
-food ordering. The API tests start the real RailBites, so build it first
-(`npm --prefix services/railbites ci && npm --prefix services/railbites run build`); a missing build fails the tests.
+food ordering. The API tests start the real Grilled, so build it first
+(`npm --prefix services/grilled ci && npm --prefix services/grilled run build`); a missing build fails the tests.
 
 ### Status callbacks and the passage read
 
-RailBites tells SmartRail when an order changes (Ready, Collected, No-show, Cancelled, a new pickup time).
+Grilled tells SmartRail when an order changes (Ready, Collected, No-show, Cancelled, a new pickup time).
 Each callback is a JSON body signed with HMAC-SHA256 over `<unix timestamp>.<raw body>`, sent as
-`X-RailBites-Signature: v1=<hex>` with `X-RailBites-Timestamp`; SmartRail checks the raw bytes, a
+`X-Grilled-Signature: v1=<hex>` with `X-Grilled-Timestamp`; SmartRail checks the raw bytes, a
 five-minute timestamp window and a constant-time comparison before it reads the body. The shared
-examples are in `services/railbites/fixtures/signed-callbacks.json` (regenerate with
-`node services/railbites/scripts/make-callback-fixtures.js`); both services' tests run them.
+examples are in `services/grilled/fixtures/signed-callbacks.json` (regenerate with
+`node services/grilled/scripts/make-callback-fixtures.js`); both services' tests run them.
 
 | Where | Setting | Meaning |
 | --- | --- | --- |
-| API | `RailBites:CallbackSecret` | HMAC secret. Unset refuses every callback. |
-| API | `RailBites:InboundServiceKey` | Key RailBites presents to read whether a train has passed a stop (`GET /internal/catering/journeys/{journeyId}/stops/{stopId}/passage`). Unset refuses every read. |
-| RailBites | `RAILBITES_CALLBACK_SECRET` | Same secret as `RailBites:CallbackSecret`. Unset sends nothing. |
-| RailBites | `SMARTRAIL_BASE_URL`, `SMARTRAIL_SERVICE_KEY` | Where to send callbacks and the passage read, and the key for it (= `RailBites:InboundServiceKey`). |
-| RailBites | `RAILBITES_CALLBACK_POLL_MS` | How often queued callbacks are sent (default 2000; 0 turns the loop off). |
-| RailBites | `RAILBITES_CALLBACK_MAX_BACKOFF_SECONDS`, `RAILBITES_CALLBACK_FAILED_RETRY_SECONDS` | Cap on retry delays after a timeout or 5xx (60), and the slow retry after a refusal (600). |
+| API | `Grilled:CallbackSecret` | HMAC secret. Unset refuses every callback. |
+| API | `Grilled:InboundServiceKey` | Key Grilled presents to read whether a train has passed a stop (`GET /internal/catering/journeys/{journeyId}/stops/{stopId}/passage`). Unset refuses every read. |
+| Grilled | `GRILLED_CALLBACK_SECRET` | Same secret as `Grilled:CallbackSecret`. Unset sends nothing. |
+| Grilled | `SMARTRAIL_BASE_URL`, `SMARTRAIL_SERVICE_KEY` | Where to send callbacks and the passage read, and the key for it (= `Grilled:InboundServiceKey`). |
+| Grilled | `GRILLED_CALLBACK_POLL_MS` | How often queued callbacks are sent (default 2000; 0 turns the loop off). |
+| Grilled | `GRILLED_CALLBACK_MAX_BACKOFF_SECONDS`, `GRILLED_CALLBACK_FAILED_RETRY_SECONDS` | Cap on retry delays after a timeout or 5xx (60), and the slow retry after a refusal (600). |
 
 ### Failure and recovery drill (food ordering)
 
-A short walk through "RailBites stops, nothing is lost, it comes back" on the local stack. Start it with
+A short walk through "Grilled stops, nothing is lost, it comes back" on the local stack. Start it with
 `dotnet run --project services/apphost` and prepare the database as in "One-time local setup". Aspire
 generates the service keys on first run and keeps them in the AppHost's user secrets; reveal them in the
-dashboard under the parameters (`railbites-service-key`, `railbites-admin-key`, `kiosk-key-peradeniya`).
-Below, `$RB` is the RailBites address and `$API` the API address from the dashboard, and `$TOKEN` is a
+dashboard under the parameters (`grilled-service-key`, `grilled-admin-key`, `kiosk-key-peradeniya`).
+Below, `$RB` is the Grilled address and `$API` the API address from the dashboard, and `$TOKEN` is a
 signed-in passenger's access token (sign in with `demo-passenger`).
 
 1. **Normal.** `curl $API/health/ready` reports `Healthy`, and its `catering` entry shows
-   `outboxPending: 0` and `ordersPending: 0`. `curl $RB/health/ready` is the same for RailBites.
+   `outboxPending: 0` and `ordersPending: 0`. `curl $RB/health/ready` is the same for Grilled.
 2. **Order.** Find a journey of train `SIM-3001` dated today, make sure it has a recent sighting
    (the simulator reports it between 09:00 and 11:50, or post one as in "Simulated running"), then
    `curl $API/api/journeys/<id>/collection-options` and `POST $API/api/food/orders` with your token.
    You get `201` and a pickup code.
-3. **Stop the provider.** Either stop the `railbites` resource in the dashboard, or, without stopping
+3. **Stop the provider.** Either stop the `grilled` resource in the dashboard, or, without stopping
    anything, switch on the Development-only outage:
-   `curl -X PUT -H "X-RailBites-Service-Key: <service key>" -H "Content-Type: application/json" -d '{"active":true}' $RB/internal/dev/outage`.
-   RailBites now answers `503 SIMULATED_OUTAGE` on every provider route and its `/health/ready`;
+   `curl -X PUT -H "X-Grilled-Service-Key: <service key>" -H "Content-Type: application/json" -d '{"active":true}' $RB/internal/dev/outage`.
+   Grilled now answers `503 SIMULATED_OUTAGE` on every provider route and its `/health/ready`;
    `/health/live` and the switch itself stay reachable.
 4. **Watch it degrade, not fail.** `curl $API/health/ready` is still `200` but `Degraded`, with
    `provider: Unreachable` (or `NotReady` for the switch). `curl $API/api/journeys/<id>/running` and
@@ -177,29 +177,29 @@ signed-in passenger's access token (sign in with `demo-passenger`).
    publish a delay or an early ending for the journey. The readiness `catering` entry now counts the
    waiting orders and train changes and how many seconds the oldest has waited; the Aspire dashboard
    shows the `catering.outbox.attempts{result=retry}` and `catering.placement.attempts{result=retry}`
-   counters rising and RailBites unhealthy.
+   counters rising and Grilled unhealthy.
 6. **Recover.** End the outage with `{"active":false}` (or start the resource). Within seconds the
    dispatcher delivers the change and the retry loop confirms the order under the same link ID: the
    backlog drains to zero, `catering` returns to `Healthy`, and a cancellation caused by an early ending
    reaches the passenger once, with its reason.
 7. **Read the trace.** In the dashboard's Traces view open the order request: one trace runs from the
-   API through RailBites and back through the signed callback (`catering.callbacks.received`). A kiosk
+   API through Grilled and back through the signed callback (`catering.callbacks.received`). A kiosk
    action (`POST $RB/v1/kiosk/collection-points/peradeniya-junction/orders/<orderId>/ready` with
-   `X-RailBites-Kiosk-Key`) starts its own trace that ends at the passenger's updated order.
-8. **Change the cutoff without a SmartRail release.** `curl -X PUT -H "X-RailBites-Admin-Key: <admin key>" -H "Content-Type: application/json" -d '{"cutoffMinutes":45}' $RB/v1/admin/collection-points/peradeniya-junction/cutoff`.
+   `X-Grilled-Kiosk-Key`) starts its own trace that ends at the passenger's updated order.
+8. **Change the cutoff without a SmartRail release.** `curl -X PUT -H "X-Grilled-Admin-Key: <admin key>" -H "Content-Type: application/json" -d '{"cutoffMinutes":45}' $RB/v1/admin/collection-points/peradeniya-junction/cutoff`.
    The next `collection-options` shows 45 and an earlier `orderBy`; an order or cancellation inside the
    last 45 minutes is refused with `CUTOFF_PASSED`. Orders already accepted keep their place. Neither
    service is restarted or reconfigured.
 
 Restart either service at any point (stop it in the dashboard, or `Ctrl+C` the AppHost and start it
-again): RailBites' orders, stock and queued callbacks are in `services/railbites/data/railbites.db`, and the
+again): Grilled' orders, stock and queued callbacks are in `services/grilled/data/grilled.db`, and the
 API's queue and receipts are in PostgreSQL, so everything resumes where it stopped.
 
-| RailBites setting | Meaning |
+| Grilled setting | Meaning |
 | --- | --- |
-| `RAILBITES_ADMIN_KEY` | Credential for RailBites' own policy changes (the cutoff). Unset refuses them. |
-| `RAILBITES_DEV_CONTROLS=1` | Adds the outage switch. Ignored when `NODE_ENV=production`. The AppHost sets it; no deployed environment should. |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | Where RailBites sends spans and metrics (the AppHost sets it). Trace propagation works without it. |
+| `GRILLED_ADMIN_KEY` | Credential for Grilled' own policy changes (the cutoff). Unset refuses them. |
+| `GRILLED_DEV_CONTROLS=1` | Adds the outage switch. Ignored when `NODE_ENV=production`. The AppHost sets it; no deployed environment should. |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | Where Grilled sends spans and metrics (the AppHost sets it). Trace propagation works without it. |
 | API `Catering:Health:BacklogDegradedSeconds` | How long a change or order may wait before readiness says `Degraded` (default 120). |
 
 ## Signing in (Keycloak)
@@ -267,7 +267,7 @@ repeat; it adds only missing journeys and never resets history or changes):
 
 `--anchor` is required and must carry a UTC offset. Run the command from the repository root: it
 writes a manifest of the dated journey, stop and station IDs, routes, times, intended identities
-and the RailBites collection points to `artifacts/pilot-scenario-<run>.json`, and prints the same
+and the Grilled collection points to `artifacts/pilot-scenario-<run>.json`, and prints the same
 IDs. Override the label with `--run <name>` and the path with `--manifest <path>`. The two named
 routes are the guest opening route `SIM-1003` Gampaha → Fort, and the outbound food route
 `SIM-3001` Fort → Peradeniya. `SIM-3001` passes Polgahawela before Peradeniya, so ending it early
@@ -276,7 +276,7 @@ at Polgahawela leaves Peradeniya unserved and cancels the pickup beyond it.
 Identity and provider data stay separate, because each needs its own service running:
 
 1. `--seed-demo-identities` (above) creates the Keycloak users and local accounts the manifest lists.
-2. The RailBites seed (`services/railbites`) owns the Polgahawela and Peradeniya menu, stock and
+2. The Grilled seed (`services/grilled`) owns the Polgahawela and Peradeniya menu, stock and
    cutoff. SmartRail never writes it.
 
 The command touches PostgreSQL only, so it runs while Keycloak is stopped.

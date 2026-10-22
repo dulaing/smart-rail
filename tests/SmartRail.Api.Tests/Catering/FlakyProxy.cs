@@ -11,18 +11,18 @@ public enum ProxyMode
 {
     Forward,
 
-    // The request never reaches RailBites; the caller sees a dropped connection.
+    // The request never reaches Grilled; the caller sees a dropped connection.
     DropRequest,
 
-    // RailBites handles the request and commits, but the caller never gets the answer.
+    // Grilled handles the request and commits, but the caller never gets the answer.
     DropResponse,
 
-    // RailBites is reached but answers 503, as a service does while it is overloaded or restarting.
+    // Grilled is reached but answers 503, as a service does while it is overloaded or restarting.
     ServiceUnavailable,
 }
 
 // A forwarding proxy that can lose a request or its response, to reproduce a timeout on either
-// side of the provider's commit. SmartRail talks to this instead of to RailBites directly.
+// side of the provider's commit. SmartRail talks to this instead of to Grilled directly.
 public sealed class FlakyProxy : IAsyncDisposable
 {
     private readonly WebApplication _app;
@@ -41,7 +41,7 @@ public sealed class FlakyProxy : IAsyncDisposable
 
     public Func<HttpRequestMessage, Task>? BeforeResponse { get; set; }
 
-    // Requests that reached RailBites.
+    // Requests that reached Grilled.
     public int Forwarded { get; private set; }
 
     // The trace identity (W3C traceparent) of every request this proxy forwarded, in order.
@@ -71,7 +71,7 @@ public sealed class FlakyProxy : IAsyncDisposable
             }
 
             using var request = new HttpRequestMessage(new HttpMethod(context.Request.Method), context.Request.Path + context.Request.QueryString);
-            foreach (var header in context.Request.Headers.Where(h => h.Key.StartsWith("X-RailBites", StringComparison.OrdinalIgnoreCase) || h.Key.Equals("traceparent", StringComparison.OrdinalIgnoreCase)))
+            foreach (var header in context.Request.Headers.Where(h => h.Key.StartsWith("X-Grilled", StringComparison.OrdinalIgnoreCase) || h.Key.Equals("traceparent", StringComparison.OrdinalIgnoreCase)))
             {
                 request.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
             }
@@ -93,7 +93,7 @@ public sealed class FlakyProxy : IAsyncDisposable
             }
             catch (HttpRequestException)
             {
-                // RailBites is stopped. A real stopped service refuses or drops the connection,
+                // Grilled is stopped. A real stopped service refuses or drops the connection,
                 // never answers 500, and how fast the refusal arrives differs between operating
                 // systems. Dropping the connection looks the same to the caller everywhere.
                 context.Abort();

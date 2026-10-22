@@ -6,8 +6,8 @@ namespace SmartRail.Api.Modules.Catering;
 
 public static class PassageEndpoints
 {
-    public const string KeySetting = "RailBites:InboundServiceKey";
-    public const string KeyHeader = "X-RailBites-Service-Key";
+    public const string KeySetting = "Grilled:InboundServiceKey";
+    public const string KeyHeader = "X-Grilled-Service-Key";
 
     public static void MapPickupPassage(this IEndpointRouteBuilder app) =>
         app.MapGet("/internal/catering/journeys/{journeyId:guid}/stops/{stopId:guid}/passage", Read).AllowAnonymous();

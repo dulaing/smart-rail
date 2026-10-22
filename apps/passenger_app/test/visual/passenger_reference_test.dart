@@ -232,7 +232,7 @@ class _FoodSource implements FoodSource {
           CollectionOption(
             stopId: 'pjn-stop',
             stationId: 'pjn',
-            pointId: 'railbites-pjn',
+            pointId: 'grilled-pjn',
             pointName: 'Peradeniya Jn',
             cutoffMinutes: 30,
             scheduledArrival: _foodJourney.stops[1].arrival,
@@ -244,7 +244,7 @@ class _FoodSource implements FoodSource {
       );
   @override
   Future<FoodMenu> menu(String collectionPointId) async => const FoodMenu(
-    collectionPointId: 'railbites-pjn',
+    collectionPointId: 'grilled-pjn',
     currency: 'LKR',
     items: [
       FoodMenuItem(
